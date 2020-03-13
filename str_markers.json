@@ -1,0 +1,352 @@
+{
+    "CSF1PO": {
+        "BasesToSubtract": 0,
+        "NumRepeats": 1,
+        "Repeats": [
+            "ATCT"
+        ],
+        "NumBasesToSeparate": 0,
+        "ReverseCompNeeded": "Yes",
+        "LUS": "ATCT",
+        "Sec": "ACCT",
+        "Tert": ""
+    },
+    "D10S1248": {
+        "BasesToSubtract": 0,
+        "NumRepeats": 1,
+        "Repeats": [
+            "GGAA"
+        ],
+        "NumBasesToSeparate": 4,
+        "ReverseCompNeeded": "No",
+        "LUS": "GGAA",
+        "Sec": "",
+        "Tert": ""
+    },
+    "D12S391": {
+        "BasesToSubtract": 0,
+        "NumRepeats": 2,
+        "Repeats": [
+            "AGAT",
+            "AGAC"
+        ],
+        "NumBasesToSeparate": 4,
+        "ReverseCompNeeded": "No",
+        "LUS": "AGAT",
+        "Sec": "AGAC",
+        "Tert": "AGGT"
+    },
+    "D13S317": {
+        "BasesToSubtract": 31,
+        "NumRepeats": 5,
+        "Repeats": [
+            "TATC",
+            "ATTC",
+            "ATCT",
+            "TATA",
+            "AATC"
+        ],
+        "NumBasesToSeparate": 4,
+        "ReverseCompNeeded": "No",
+        "LUS": "TATC",
+        "Sec": "ATCT",
+        "Tert": "GTCT"
+    },
+    "D16S539": {
+        "BasesToSubtract": 0,
+        "NumRepeats": 1,
+        "Repeats": [
+            "GATA"
+        ],
+        "NumBasesToSeparate": 4,
+        "ReverseCompNeeded": "No",
+        "LUS": "GATA",
+        "Sec": "GACA",
+        "Tert": ""
+    },
+    "D17S1301": {
+        "BasesToSubtract": 0,
+        "NumRepeats": 1,
+        "Repeats": [
+            "AGAT"
+        ],
+        "NumBasesToSeparate": 4,
+        "ReverseCompNeeded": "No",
+        "LUS": "AGAT",
+        "Sec": "",
+        "Tert": ""
+    },
+    "D18S51": {
+        "BasesToSubtract": 10,
+        "NumRepeats": 2,
+        "Repeats": [
+            "AGAA",
+            "AAAG",
+            "AGAG"
+        ],
+        "NumBasesToSeparate": 4,
+        "ReverseCompNeeded": "No",
+        "LUS": "AGAA",
+        "Sec": "AAAG",
+        "Tert": ""
+    },
+    "D19S433": {
+        "BasesToSubtract": 26,
+        "NumRepeats": 3,
+        "Repeats": [
+            "CCTT",
+            "CCTA",
+            "TTCT"
+        ],
+        "NumBasesToSeparate": 4,
+        "ReverseCompNeeded": "Yes",
+        "LUS": "CCTT",
+        "Sec": "CTTT",
+        "Tert": "CCTG"
+    },
+    "D1S1656": {
+        "BasesToSubtract": 10,
+        "NumRepeats": 2,
+        "Repeats": [
+            "TCTA",
+            "CATA",
+            "TCTG",
+            "CACA",
+            "CCTA"
+        ],
+        "NumBasesToSeparate": 4,
+        "ReverseCompNeeded": "Yes",
+        "LUS": "TCTA",
+        "Sec": "CCTA",
+        "Tert": "TCTG"
+    },
+    "D20S482": {
+        "BasesToSubtract": 0,
+        "NumRepeats": 1,
+        "Repeats": [
+            "AGAT"
+        ],
+        "NumBasesToSeparate": 4,
+        "ReverseCompNeeded": "No",
+        "LUS": "AGAT",
+        "Sec": "",
+        "Tert": ""
+    },
+    "D21S11": {
+        "BasesToSubtract": 11,
+        "NumRepeats": 2,
+        "Repeats": [
+            "TCTA",
+            "TCTG"
+        ],
+        "NumBasesToSeparate": 6,
+        "ReverseCompNeeded": "No",
+        "LUS": "TCTA",
+        "Sec": "TCTA",
+        "Tert": "TCTG"
+    },
+    "D22S1045": {
+        "BasesToSubtract": 0,
+        "NumRepeats": 1,
+        "Repeats": [
+            "ATT"
+        ],
+        "NumBasesToSeparate": 3,
+        "ReverseCompNeeded": "No",
+        "LUS": "ATT",
+        "Sec": "",
+        "Tert": ""
+    },
+    "D2S1338": {
+        "BasesToSubtract": 0,
+        "NumRepeats": 2,
+        "Repeats": [
+            "GGAA",
+            "GGCA"
+        ],
+        "NumBasesToSeparate": 4,
+        "ReverseCompNeeded": "Yes",
+        "LUS": "GGAA",
+        "Sec": "GGAC",
+        "Tert": "GGCA"
+    },
+    "D2S441": {
+        "BasesToSubtract": 0,
+        "NumRepeats": 2,
+        "Repeats": [
+            "TCTA",
+            "TCTG"
+        ],
+        "NumBasesToSeparate": 4,
+        "ReverseCompNeeded": "No",
+        "LUS": "TCTA",
+        "Sec": "TGTA",
+        "Tert": ""
+    },
+    "D3S1358": {
+        "BasesToSubtract": 0,
+        "NumRepeats": 2,
+        "Repeats": [
+            "TCTA",
+            "TCTG"
+        ],
+        "NumBasesToSeparate": 4,
+        "ReverseCompNeeded": "No",
+        "LUS": "TCTA",
+        "Sec": "TCTG",
+        "Tert": ""
+    },
+    "D4S2408": {
+        "BasesToSubtract": 0,
+        "NumRepeats": 1,
+        "Repeats": [
+            "ATCT"
+        ],
+        "NumBasesToSeparate": 4,
+        "ReverseCompNeeded": "No",
+        "LUS": "ATCT",
+        "Sec": "CTCT",
+        "Tert": ""
+    },
+    "D5S818": {
+        "BasesToSubtract": 4,
+        "NumRepeats": 1,
+        "Repeats": [
+            "ATCT"
+        ],
+        "NumBasesToSeparate": 4,
+        "ReverseCompNeeded": "Yes",
+        "LUS": "ATCT",
+        "Sec": "",
+        "Tert": ""
+    },
+    "D6S1043": {
+        "BasesToSubtract": 0,
+        "NumRepeats": 1,
+        "Repeats": [
+            "ATCT",
+            "ATGT"
+        ],
+        "NumBasesToSeparate": 4,
+        "ReverseCompNeeded": "Yes",
+        "LUS": "ATCT",
+        "Sec": "ATGT",
+        "Tert": ""
+    },
+    "D7S820": {
+        "BasesToSubtract": 16,
+        "NumRepeats": 1,
+        "Repeats": [
+            "TATC",
+            "TGTC"
+        ],
+        "NumBasesToSeparate": 4,
+        "ReverseCompNeeded": "Yes",
+        "LUS": "TATC",
+        "Sec": "TGTC",
+        "Tert": ""
+    },
+    "D8S1179": {
+        "BasesToSubtract": 0,
+        "NumRepeats": 2,
+        "Repeats": [
+            "TCTA",
+            "TCTG"
+        ],
+        "NumBasesToSeparate": 4,
+        "ReverseCompNeeded": "No",
+        "LUS": "TCTA",
+        "Sec": "TCTG",
+        "Tert": "TGTA"
+    },
+    "D9S1122": {
+        "BasesToSubtract": 0,
+        "NumRepeats": 1,
+        "Repeats": [
+            "TAGA"
+        ],
+        "NumBasesToSeparate": 4,
+        "ReverseCompNeeded": "No",
+        "LUS": "TAGA",
+        "Sec": "",
+        "Tert": ""
+    },
+    "FGA": {
+        "BasesToSubtract": 0,
+        "NumRepeats": 3,
+        "Repeats": [
+            "AAAG",
+            "GAAA",
+            "GAAG",
+            "ACAG",
+            "AAAA"
+        ],
+        "NumBasesToSeparate": 4,
+        "ReverseCompNeeded": "Yes",
+        "LUS": "AAAG",
+        "Sec": "GAAA",
+        "Tert": "GAAG"
+    },
+    "PentaD": {
+        "BasesToSubtract": 5,
+        "NumRepeats": 1,
+        "Repeats": [
+            "AAAGA"
+        ],
+        "NumBasesToSeparate": 5,
+        "ReverseCompNeeded": "No",
+        "LUS": "AAAGA",
+        "Sec": "",
+        "Tert": ""
+    },
+    "PentaE": {
+        "BasesToSubtract": 0,
+        "NumRepeats": 1,
+        "Repeats": [
+            "TCTTT"
+        ],
+        "NumBasesToSeparate": 5,
+        "ReverseCompNeeded": "Yes",
+        "LUS": "TCTTT",
+        "Sec": "",
+        "Tert": ""
+    },
+    "TH01": {
+        "BasesToSubtract": 0,
+        "NumRepeats": 1,
+        "Repeats": [
+            "AATG"
+        ],
+        "NumBasesToSeparate": 4,
+        "ReverseCompNeeded": "No",
+        "LUS": "AATG",
+        "Sec": "",
+        "Tert": ""
+    },
+    "TPOX": {
+        "BasesToSubtract": 0,
+        "NumRepeats": 1,
+        "Repeats": [
+            "AATG"
+        ],
+        "NumBasesToSeparate": 4,
+        "ReverseCompNeeded": "No",
+        "LUS": "AATG",
+        "Sec": "",
+        "Tert": ""
+    },
+    "vWA": {
+        "BasesToSubtract": 8,
+        "NumRepeats": 3,
+        "Repeats": [
+            "TAGA",
+            "CAGA",
+            "TGGA"
+        ],
+        "NumBasesToSeparate": 4,
+        "ReverseCompNeeded": "Yes",
+        "LUS": "TAGA",
+        "Sec": "CAGA",
+        "Tert": "TGGA"
+    }
+}
