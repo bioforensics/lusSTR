@@ -1,4 +1,11 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
+#
+# -----------------------------------------------------------------------------
+# Copyright (c) 2020, Battelle National Biodefense Institute.
+#
+# This file is part of lusSTR (http://github.com/bioforensics/lusSTR)
+# and is licensed under the BSD license: see LICENSE.txt.
+# -----------------------------------------------------------------------------
 
 import argparse
 import csv
