@@ -8,13 +8,16 @@
 # -----------------------------------------------------------------------------
 
 import argparse
-import os
 import pandas as pd
-import re
 import sys
 
 
 def main():
+    '''
+    Script to convert UAS Sample Details Report (.xlsx format) to a more user-friendly
+    format. Also removes the Amelogenin locus and extract relevant information (e.g.
+    Sample ID, Project ID and Analysis ID).
+    '''
     parser = argparse.ArgumentParser()
     parser.add_argument(
         '-o', '--out', metavar='FILE',
