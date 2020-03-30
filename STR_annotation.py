@@ -1,4 +1,11 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
+#
+# -----------------------------------------------------------------------------
+# Copyright (c) 2020, Battelle National Biodefense Institute.
+#
+# This file is part of lusSTR (http://github.com/bioforensics/lusSTR)
+# and is licensed under the BSD license: see LICENSE.txt.
+# -----------------------------------------------------------------------------
 
 import argparse
 import csv
@@ -369,7 +376,7 @@ def D21_bracket(sequence, no_of_split_bases, repeats):
         prev == (len(forward_strand_bracketed_form) - 1) or
         prev == (len(forward_strand_bracketed_form) - 2)
        ):
-            return forward_strand_bracketed_form
+        return forward_strand_bracketed_form
     else:
         first_string = forward_strand_bracketed_form[:prev+2]
         second_string = forward_strand_bracketed_form[prev+2:]
@@ -548,11 +555,11 @@ def TH01_annotation(sequence, repeat_list):
     strings = get_annotation(sequence, repeat_list)
     final_string = list()
     for unit in strings.split(' '):
-            if "[" not in unit and len(unit) > 3 and (len(unit) % 4 != 0) and unit[:3] == "ATG":
-                group1 = unit[:3]
-                final_string.append(group1)
-                for x in split_by_n(unit[3:], n=4):
-                    final_string.append(x)
+        if "[" not in unit and len(unit) > 3 and (len(unit) % 4 != 0) and unit[:3] == "ATG":
+            group1 = unit[:3]
+            final_string.append(group1)
+            for x in split_by_n(unit[3:], n=4):
+                final_string.append(x)
             else:
                 final_string.append(unit)
     final_form = ' '.join(final_string)
@@ -623,31 +630,31 @@ def main():
             locus in cannot_split or
             ((len(sequence) % no_of_repeat_bases != 0) and locus not in must_split)
            ):
-                if str_dict[locus]['ReverseCompNeeded'] == "Yes":
-                    reverse_comp_sequence = rev_complement_anno(sequence)
-                    forward_strand_bracketed_form = rev_comp_forward_strand_bracket(
-                        reverse_comp_sequence, no_of_repeat_bases, repeats, locus, cannot_split
-                    )
-                    reverse_strand_bracketed_form = rev_comp_uas_output_bracket(
-                        forward_strand_bracketed_form, no_of_repeat_bases
-                    )
-                elif locus == "D21S11":
-                    forward_strand_bracketed_form = D21_bracket(
-                        sequence, no_of_split_bases, repeats
-                    )
-                elif locus == "TH01" and (len(sequence) % no_of_repeat_bases != 0):
-                    forward_strand_bracketed_form = TH01_annotation(sequence, repeats)
-                elif locus == "PentaD":
-                    forward_strand_bracketed_form = PentaD_annotation(
-                        sequence, no_of_repeat_bases, repeats
-                    )
-                else:
-                    forward_strand_bracketed_form = split_string(
-                        sequence, no_of_repeat_bases, repeats
-                    )
-                lus_final, sec_final, tert_final = lus_anno(
-                    forward_strand_bracketed_form, lus, sec, tert, locus, str_allele
+            if str_dict[locus]['ReverseCompNeeded'] == "Yes":
+                reverse_comp_sequence = rev_complement_anno(sequence)
+                forward_strand_bracketed_form = rev_comp_forward_strand_bracket(
+                    reverse_comp_sequence, no_of_repeat_bases, repeats, locus, cannot_split
                 )
+                reverse_strand_bracketed_form = rev_comp_uas_output_bracket(
+                    forward_strand_bracketed_form, no_of_repeat_bases
+                )
+            elif locus == "D21S11":
+                forward_strand_bracketed_form = D21_bracket(
+                    sequence, no_of_split_bases, repeats
+                )
+            elif locus == "TH01" and (len(sequence) % no_of_repeat_bases != 0):
+                forward_strand_bracketed_form = TH01_annotation(sequence, repeats)
+            elif locus == "PentaD":
+                forward_strand_bracketed_form = PentaD_annotation(
+                    sequence, no_of_repeat_bases, repeats
+                )
+            else:
+                forward_strand_bracketed_form = split_string(
+                    sequence, no_of_repeat_bases, repeats
+                )
+            lus_final, sec_final, tert_final = lus_anno(
+                forward_strand_bracketed_form, lus, sec, tert, locus, str_allele
+            )
         else:
             if locus == "D18S51":
                 if type(str_allele) == str:
