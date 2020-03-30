@@ -14,7 +14,7 @@ testcov:
 
 ## style:     check code style against PEP8
 style:
-	pycodestyle --max-line-length=99 *.py
+	pycodestyle --max-line-length=99 lusSTR/*.py
 
 ## devenv:    configure a development environment
 devenv:
