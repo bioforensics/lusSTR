@@ -565,8 +565,8 @@ def TH01_annotation(sequence, repeat_list):
             final_string.append(group1)
             for x in split_by_n(unit[3:], n=4):
                 final_string.append(x)
-            else:
-                final_string.append(unit)
+        else:
+            final_string.append(unit)
     final_form = ' '.join(final_string)
     return final_form
 
