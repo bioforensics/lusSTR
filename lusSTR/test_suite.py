@@ -57,7 +57,7 @@ def test_split_sequence_into_two_strings():
     reverse_comp_sequence = lusSTR.annot.rev_complement_anno(sequence)
     repeat_for_split = 'CACA'
     seq1, seq2 = lusSTR.annot.split_sequence_into_two_strings(reverse_comp_sequence,
-                                                                repeat_for_split)
+                                                              repeat_for_split)
     assert seq1 == 'CACACACACACA'
     assert seq2 == 'CCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCATCTATCTATCTA'
 

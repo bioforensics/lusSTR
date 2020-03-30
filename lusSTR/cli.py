@@ -21,6 +21,9 @@ from lusSTR.annot import lus_anno, D21_bracket, TH01_annotation, PentaD_annotati
 def get_parser():
     parser = argparse.ArgumentParser()
     parser.add_argument(
+        '-v', '--version', action='version', version='lusSTR v' + lusSTR.__version__
+    )
+    parser.add_argument(
         '-o', '--out', metavar='FILE',
         help='file to which output will be written; default is terminal (stdout)'
     )
