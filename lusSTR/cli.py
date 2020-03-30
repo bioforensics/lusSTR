@@ -12,19 +12,13 @@ import csv
 import os
 import sys
 import lusSTR
-from lusSTR import str_dict
-from lusSTR import split_string, rev_complement_anno, rev_comp_forward_strand_bracket
-from lusSTR import rev_comp_uas_output_bracket, loci_need_split_anno, traditional_str_allele
-from lusSTR import lus_anno, D21_bracket, TH01_annotation, PentaD_annotation
+from lusSTR.annot import str_dict
+from lusSTR.annot import split_string, rev_complement_anno, rev_comp_forward_strand_bracket
+from lusSTR.annot import rev_comp_uas_output_bracket, loci_need_split_anno, traditional_str_allele
+from lusSTR.annot import lus_anno, D21_bracket, TH01_annotation, PentaD_annotation
 
 
-def main():
-    cannot_split = [
-        "D19S433", "D6S1043", "TH01", "D21S11", "D1S1656", "D7S820", "D5S818", "D12S391",
-        "D9S1122", "D1S1656"
-    ]
-    must_split = ["D13S317", "D18S51"]
-
+def get_parser():
     parser = argparse.ArgumentParser()
     parser.add_argument(
         '-o', '--out', metavar='FILE',
@@ -34,7 +28,18 @@ def main():
         'input', help='sample(s) in CSV format; first four columns must be Locus, NumReads, '
         'Sequence, SampleID'
     )
-    args = parser.parse_args()
+    return parser
+
+
+def main(args=None):
+    if args is None:  # pragma: no cover
+        args = get_parser().parse_args()
+
+    cannot_split = [
+        "D19S433", "D6S1043", "TH01", "D21S11", "D1S1656", "D7S820", "D5S818", "D12S391",
+        "D9S1122", "D1S1656"
+    ]
+    must_split = ["D13S317", "D18S51"]
 
     sample_file = open(args.input, "r")
     data = csv.reader(sample_file)

@@ -11,7 +11,7 @@ from setuptools import setup
 
 setup(
     name='lusSTR',
-    description='Convert ForenSeq sequence strings to compact',
+    description='Convert ForenSeq sequence strings to a compact representation',
     packages=['lusSTR'],
     package_data={
         'lusSTR': ['lusSTR/str_markers.json']
