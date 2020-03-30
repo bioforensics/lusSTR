@@ -187,15 +187,14 @@ def test_traditional_str_allele(sequence, n, n_sub_out, allele):
             '1', '15.3'
         )
     ])
-def test_lus_anno(
-    forward_bracket, lus, sec, tert, locus, lus_allele, sec_allele, tert_allele, str_allele
-        ):
-        lus_out, sec_out, tert_out = STR_annotation.lus_anno(
-            forward_bracket, lus, sec, tert, locus, str_allele
-        )
-        assert str(lus_out) == lus_allele
-        assert str(sec_out) == sec_allele
-        assert str(tert_out) == tert_allele
+def test_lus_anno(forward_bracket, lus, sec, tert, locus, lus_allele, sec_allele, tert_allele,
+                  str_allele):
+    lus_out, sec_out, tert_out = STR_annotation.lus_anno(
+        forward_bracket, lus, sec, tert, locus, str_allele
+    )
+    assert str(lus_out) == lus_allele
+    assert str(sec_out) == sec_allele
+    assert str(tert_out) == tert_allele
 
 
 def test_THO1():
