@@ -14,7 +14,7 @@ setup(
     description='Convert ForenSeq sequence strings to a compact representation',
     packages=['lusSTR'],
     package_data={
-        'lusSTR': ['lusSTR/str_markers.json']
+        'lusSTR': ['lusSTR/str_markers.json', 'lusSTR/tests/data/*]
     },
     include_package_data=True,
     install_requires=['pandas>=1.0', 'xlrd>=1.0'],
