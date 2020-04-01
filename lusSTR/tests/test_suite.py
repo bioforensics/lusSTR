@@ -11,12 +11,13 @@ import filecmp
 import pandas as pd
 import pytest
 import lusSTR
+from lusSTR.tests import data_file
 from tempfile import NamedTemporaryFile
 
 
 def test_format():
-    UAStestfile = 'UAS_Sample_Details_Report_test.xlsx'
-    formatoutput = 'testformat.csv'
+    UAStestfile = data_file('UAS_Sample_Details_Report_test.xlsx')
+    formatoutput = data_file('testformat.csv')
     with NamedTemporaryFile(suffix='.csv') as outfile:
         arglist = ['format', UAStestfile, '-o', outfile.name]
         args = lusSTR.cli.get_parser().parse_args(arglist)

@@ -6,11 +6,11 @@ help: Makefile
 
 ## test:      run the automated test suite
 test:
-	pytest lusSTR/test_suite.py
+	pytest lusSTR/tests/test_suite.py
 
 ## testcov:   run the automated test suite and print coverage information
 testcov:
-	pytest --cov=lusSTR lusSTR/test_suite.py
+	pytest --cov=lusSTR lusSTR/tests/test_suite.py
 
 ## style:     check code style against PEP8
 style:
