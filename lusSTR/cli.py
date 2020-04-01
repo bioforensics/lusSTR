@@ -30,7 +30,8 @@ def annot_subparser(subparsers):
         help='file to which output will be written; default is terminal (stdout)'
     )
     cli.add_argument(
-        'input', help='UAS Sample Details Report (in .xlsx format).'
+        'input', help='sample(s) in CSV format; first four columns must be Locus, NumReads, '
+        'Sequence, SampleID; Optional last two columns can be Project and Analysis.'
     )
 
 
