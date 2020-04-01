@@ -14,10 +14,24 @@ from . import format, annot
 
 def format_subparser(subparsers):
     cli = subparsers.add_parser('format')
+    cli.add_argument(
+        '-o', '--out', metavar='FILE',
+        help='file to which output will be written; default is terminal (stdout)'
+    )
+    cli.add_argument(
+        'input', help='UAS Sample Details Report (in .xlsx format).'
+    )
 
 
 def annot_subparser(subparsers):
     cli = subparsers.add_parser('annotate')
+    cli.add_argument(
+        '-o', '--out', metavar='FILE',
+        help='file to which output will be written; default is terminal (stdout)'
+    )
+    cli.add_argument(
+        'input', help='UAS Sample Details Report (in .xlsx format).'
+    )
 
 
 mains = {
@@ -33,14 +47,6 @@ subparser_funcs = {
 
 def get_parser():
     parser = argparse.ArgumentParser()
-    parser.add_argument(
-        '-o', '--out', metavar='FILE',
-        help='file to which output will be written; default is terminal (stdout)'
-    )
-    parser.add_argument(
-        'input', help='sample(s) in CSV format; first four columns must be Locus, NumReads, '
-        'Sequence, SampleID'
-    )
     subcommandstr = ', '.join(sorted(subparser_funcs.keys()))
     subparsers = parser.add_subparsers(dest='subcmd', metavar='subcmd', help=subcommandstr)
     for func in subparser_funcs.values():
