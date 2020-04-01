@@ -8,9 +8,12 @@
 # -----------------------------------------------------------------------------
 
 from setuptools import setup
+import versioneer
 
 setup(
     name='lusSTR',
+    version=versioneer.get_version(),
+    cmdclass=versioneer.get_cmdclass(),
     description='Convert ForenSeq sequence strings to a compact representation',
     packages=['lusSTR'],
     package_data={

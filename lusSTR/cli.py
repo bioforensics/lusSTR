@@ -48,6 +48,9 @@ subparser_funcs = {
 
 def get_parser():
     parser = argparse.ArgumentParser()
+    parser.add_argument(
+        '-v', '--version', action='version', version='lusSTR v' + lusSTR.__version__
+    )
     subcommandstr = ', '.join(sorted(subparser_funcs.keys()))
     subparsers = parser.add_subparsers(dest='subcmd', metavar='subcmd', help=subcommandstr)
     for func in subparser_funcs.values():
