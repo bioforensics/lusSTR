@@ -7,8 +7,21 @@
 # and is licensed under the BSD license: see LICENSE.txt.
 # -----------------------------------------------------------------------------
 
+import filecmp
+import pandas as pd
 import pytest
 import lusSTR
+from tempfile import NamedTemporaryFile
+
+
+def test_format():
+    UAStestfile = 'UAS_Sample_Details_Report_test.xlsx'
+    formatoutput = 'testformat.csv'
+    with NamedTemporaryFile(suffix='.csv') as outfile:
+        arglist = ['format', UAStestfile, '-o', outfile.name]
+        args = lusSTR.cli.get_parser().parse_args(arglist)
+        lusSTR.format.main(args)
+        assert filecmp.cmp(formatoutput, outfile.name) is True
 
 
 @pytest.mark.parametrize('sequence, repeat_list, output', [
