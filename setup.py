@@ -19,7 +19,7 @@ setup(
     include_package_data=True,
     install_requires=['pandas>=1.0'],
     entry_points={
-        'console_scripts': ['lusstr = lusSTR.cli:main']
+        'console_scripts': ['lusstr = lusSTR.__main__:main']
     },
     classifiers=[
         'Environment :: Console',
