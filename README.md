@@ -1,8 +1,34 @@
-lusSTR is a tool written to convert NGS sequence data to different annotation types for forensic STR loci.
+# lusSTR
 
-These python scripts have been written for use with the 27 autosomal STR loci from the ForenSeq panel and the sequence range output by the ForenSeq Universal Analysis Software (UAS).
+lusSTR is a tool written in Python to convert NGS sequence data of forensic STR loci to different annotation types for ease in downstream analyses.
 
-The format_UAS_output.R script requires the Sample Details Report output directly from the UAS software. The R script removes unnecessary rows/columns and outputs a table in CSV format containing the following columns:
+This Python package has been written for use with the 27 autosomal STR loci from the ForenSeq panel and the sequence range output by the ForenSeq Universal Analysis Software (UAS).
+
+## Installation
+
+For best results, install from bioconda.
+```
+conda install -c bioconda lusstr
+```
+Contributors/developers who want to create a dedicated environment on their machine can do so:
+```
+conda create --name lusSTR -y python=3.7 pandas
+git clone https://www.github.com/bioforensics/lusSTR.git
+cd lusSTR
+make devenv
+```
+
+## Usage
+
+lusSTR accomodates two different input formats:
+(1) UAS Sample Details Report in .xlsx format
+(2) Sample(s) sequences in CSV format; first four columns must be Locus, NumReads, Sequence, SampleID; Optional last two columns can be Project and Analysis IDs.
+
+If inputting the UAS Sample Details Report, the user must first invoke the ```format``` command to extract necessary information from the UAS Sample Details Report and format for the ```annotate``` command. The user must specify the input file as well an output file:
+```
+lusstr format <input> -o <output>
+```
+The ```format``` command removes unnecessary rows/columns and outputs a table in CSV format containing the following columns:
 *  Locus
 *  Number of Reads observed with the specified sequence
 *  Sequence
@@ -10,7 +36,11 @@ The format_UAS_output.R script requires the Sample Details Report output directl
 *  Project ID (if provided)
 *  Analysis ID (if provided)
 
-The STR_annotation.py script is run on the output from the above R script (or any provided .csv files in the correct format) and currently outputs a table with the following columns:
+This CSV file format is required for the ```annotate``` command:
+```
+lusstr annotate <input> -o <output>
+```
+The ```annotate``` command produces a table with the following columns:
 *  Sample ID
 *  Project ID (if provided)
 *  Analysis ID (if provided)
@@ -23,10 +53,6 @@ The STR_annotation.py script is run on the output from the above R script (or an
 *  LUS: Longest uninterrupted stretch
 *  LUS+: annotation combining multiple annotations including traditional STR allele designation, LUS, secondary motif (if applicable) and tertiary motif (if applicable)
 *  Reads: number of reads observed with the specified sequence
- 
 
-The provided shell script (submit_for_annotation.sh) is to be run in the directory containing either .xlsx files (direct from the UAS software) or the provided .csv files.
-
-User should copy the scripts to a directory in their `$PATH`.
 
 lusSTR is still under development and any suggestions/issues found are welcome!
