@@ -1,3 +1,4 @@
 include versioneer.py
 include lusSTR/_version.py
-lusSTR/str_markers.json
+include lusSTR/str_markers.json
+include lusSTR/tests/data/*

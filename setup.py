@@ -10,12 +10,13 @@
 from setuptools import setup
 import versioneer
 
+desc = 'Tool for converting NGS sequence data of forensic STR loci to various annotation styles'
 setup(
     name='lusSTR',
     version=versioneer.get_version(),
     cmdclass=versioneer.get_cmdclass(),
-    description='Convert ForenSeq sequence strings to a compact representation',
-    packages=['lusSTR'],
+    description=desc,
+    packages=['lusSTR', 'lusSTR.tests'],
     package_data={
         'lusSTR': ['lusSTR/str_markers.json', 'lusSTR/tests/data/*']
     },
