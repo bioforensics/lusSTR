@@ -116,9 +116,9 @@ def rev_complement_anno(sequence):
     '''
     Function creates reverse complement of sequence
 
-    Sequences in which the UAS software output contains the sequence on the reverse strand require
-    translation of the sequence to the forward strand. This allows for consistency between both
-    loci and any outside analyses in which comparisons may be made.
+    Sequences in which the UAS software output contains the sequence on the reverse strand
+    require translation of the sequence to the forward strand. This allows for consistency
+    between both loci and any outside analyses in which comparisons may be made.
     '''
     complement = {'A': 'T', 'C': 'G', 'G': 'C', 'T': 'A'}
     bases = list(sequence)
@@ -132,9 +132,9 @@ def rev_comp_forward_strand_bracket(rev_sequence, n, repeat_list, locusid, canno
     '''
     Function creates bracketed annotation for reverse complement sequences
 
-    Function is used to create the bracketed annotation for reverse complement sequences (i.e. the
-    forward strand). It calls additional functions depending on the locus and/or if the sequence
-    is a microvariant or not.
+    Function is used to create the bracketed annotation for reverse complement sequences (i.e
+    the forward strand). It calls additional functions depending on the locus and/or if the
+    sequence is a microvariant or not.
     '''
     if locusid in cannot_split_list:
         if locusid == "D19S433":
@@ -592,6 +592,13 @@ def PentaD_annotation(sequence, no_of_repeat_bases, repeat_list):
 
 
 def full_foren(full_seq, front, back):
+    '''
+    Function to trim full sequences to the UAS region.
+
+    It identifies the number of bases to remove from the 5' and 3' ends of the sequence to
+    trim to the UAS region. The downstream annotation, including length-based allele
+    designations, LUS, LUS+ and bracketed annotation is based on this region in the sequence.
+    '''
     if front == 0:
         seq_uas = full_seq[:-back]
     elif back == 0:
@@ -635,17 +642,23 @@ def main(args):
             uas_sequence = sequence
         else:
             if args.kit == "forenseq":
-                uas_sequence = full_foren(sequence, foren_5, foren_3)
-        str_allele = traditional_str_allele(sequence, no_of_repeat_bases, no_of_sub_bases)
+                if str_dict[locus]['ReverseCompNeeded'] == "No":
+                    uas_sequence = full_foren(sequence, foren_5, foren_3)
+                else:
+                    uas_from_full = full_foren(sequence, foren_5, foren_3)
+                    uas_sequence = rev_complement_anno(uas_from_full)
+        str_allele = traditional_str_allele(uas_sequence, no_of_repeat_bases, no_of_sub_bases)
         if (
             locus in cannot_split or
             ((len(uas_sequence) % no_of_repeat_bases != 0) and locus not in must_split)
            ):
             if str_dict[locus]['ReverseCompNeeded'] == "Yes":
                 reverse_comp_sequence = rev_complement_anno(uas_sequence)
+                print(reverse_comp_sequence)
                 forward_strand_bracketed_form = rev_comp_forward_strand_bracket(
                     reverse_comp_sequence, no_of_repeat_bases, repeats, locus, cannot_split
                 )
+                print(forward_strand_bracketed_form)
                 reverse_strand_bracketed_form = rev_comp_uas_output_bracket(
                     forward_strand_bracketed_form, no_of_repeat_bases
                 )
@@ -689,8 +702,9 @@ def main(args):
                     uas_sequence, no_of_repeat_bases, repeats
                 )
             else:
-                forward_strand_bracketed_form =
-                loci_need_split_anno(uas_sequence, no_of_repeat_bases)
+                forward_strand_bracketed_form = loci_need_split_anno(
+                    uas_sequence, no_of_repeat_bases
+                )
             lus_final, sec_final, tert_final = lus_anno(
                 forward_strand_bracketed_form, lus, sec, tert, locus, str_allele
             )
@@ -717,7 +731,7 @@ def main(args):
             summary = '\t'.join(str(i) for i in summary)
         else:
             summary = [
-                sampleid, project, analysis, locus, sequence, sequence, str_allele,
+                sampleid, project, analysis, locus, uas_sequence, uas_sequence, str_allele,
                 forward_strand_bracketed_form, forward_strand_bracketed_form, lus_final_output,
                 lus_plus, reads
             ]
