@@ -11,7 +11,9 @@
         "Sec": "ACCT",
         "Tert": "",
         "Foren_5": 6,
-        "Foren_3": 14
+        "Foren_3": 14,
+        "Power_5": 13,
+        "Power_3": 107
     },
     "D10S1248": {
         "BasesToSubtract": 0,
@@ -25,7 +27,9 @@
         "Sec": "",
         "Tert": "",
         "Foren_5": 18,
-        "Foren_3": 23
+        "Foren_3": 23,
+        "Power_5": 57,
+        "Power_3": 1
     },
     "D12S391": {
         "BasesToSubtract": 0,
@@ -40,7 +44,10 @@
         "Sec": "AGAC",
         "Tert": "AGGT",
         "Foren_5": 39,
-        "Foren_3": 73
+        "Foren_3": 73,
+        "Power_5": 21,
+        "Power_3": 11
+
     },
     "D13S317": {
         "BasesToSubtract": 31,
@@ -58,7 +65,9 @@
         "Sec": "ATCT",
         "Tert": "GTCT",
         "Foren_5": 39,
-        "Foren_3": 8
+        "Foren_3": 8,
+        "Power_5": 70,
+        "Power_3": 43
     },
     "D16S539": {
         "BasesToSubtract": 0,
@@ -72,7 +81,9 @@
         "Sec": "GACA",
         "Tert": "",
         "Foren_5": 38,
-        "Foren_3": 36
+        "Foren_3": 36,
+        "Power_5": 133,
+        "Power_3": 4
     },
     "D17S1301": {
         "BasesToSubtract": 0,
@@ -86,7 +97,9 @@
         "Sec": "",
         "Tert": "",
         "Foren_5": 9,
-        "Foren_3": 16
+        "Foren_3": 16,
+        "Power_5": "",
+        "Power_3": ""
     },
     "D18S51": {
         "BasesToSubtract": 10,
@@ -102,7 +115,9 @@
         "Sec": "AAAG",
         "Tert": "",
         "Foren_5": 5,
-        "Foren_3": 48
+        "Foren_3": 48,
+        "Power_5": 64,
+        "Power_3": 43
     },
     "D19S433": {
         "BasesToSubtract": 26,
@@ -118,7 +133,9 @@
         "Sec": "CTTT",
         "Tert": "CCTG",
         "Foren_5": 12,
-        "Foren_3": 54
+        "Foren_3": 54,
+        "Power_5": 61,
+        "Power_3": 39
     },
     "D1S1656": {
         "BasesToSubtract": 10,
@@ -136,7 +153,9 @@
         "Sec": "CCTA",
         "Tert": "TCTG",
         "Foren_5": 51,
-        "Foren_3": 0
+        "Foren_3": 0,
+        "Power_5": 46,
+        "Power_3": 21
     },
     "D20S482": {
         "BasesToSubtract": 0,
@@ -150,7 +169,9 @@
         "Sec": "",
         "Tert": "",
         "Foren_5": 18,
-        "Foren_3": 24
+        "Foren_3": 24,
+        "Power_5": "",
+        "Power_3": ""
     },
     "D21S11": {
         "BasesToSubtract": 11,
@@ -165,7 +186,9 @@
         "Sec": "TCTA",
         "Tert": "TCTG",
         "Foren_5": 34,
-        "Foren_3": 12
+        "Foren_3": 12,
+        "Power_5": 10,
+        "Power_3": 41
     },
     "D22S1045": {
         "BasesToSubtract": 0,
@@ -179,7 +202,9 @@
         "Sec": "",
         "Tert": "",
         "Foren_5": 106,
-        "Foren_3": 20
+        "Foren_3": 20,
+        "Power_5": 52,
+        "Power_3": 11
     },
     "D2S1338": {
         "BasesToSubtract": 0,
@@ -194,7 +219,9 @@
         "Sec": "GGAC",
         "Tert": "GGCA",
         "Foren_5": 3,
-        "Foren_3": 14
+        "Foren_3": 14,
+        "Power_5": 66,
+        "Power_3": 46
     },
     "D2S441": {
         "BasesToSubtract": 0,
@@ -209,7 +236,9 @@
         "Sec": "TGTA",
         "Tert": "",
         "Foren_5": 29,
-        "Foren_3": 23
+        "Foren_3": 23,
+        "Power_5": 83,
+        "Power_3": 4
     },
     "D3S1358": {
         "BasesToSubtract": 0,
@@ -224,7 +253,9 @@
         "Sec": "TCTG",
         "Tert": "",
         "Foren_5": 48,
-        "Foren_3": 18
+        "Foren_3": 18,
+        "Power_5": 97,
+        "Power_3": 18
     },
     "D4S2408": {
         "BasesToSubtract": 0,
@@ -238,7 +269,9 @@
         "Sec": "CTCT",
         "Tert": "",
         "Foren_5": 6,
-        "Foren_3": 8
+        "Foren_3": 8,
+        "Power_5": "",
+        "Power_3": ""
     },
     "D5S818": {
         "BasesToSubtract": 4,
@@ -252,7 +285,9 @@
         "Sec": "",
         "Tert": "",
         "Foren_5": 9,
-        "Foren_3": 7
+        "Foren_3": 7,
+        "Power_5": 36,
+        "Power_3": 82
     },
     "D6S1043": {
         "BasesToSubtract": 0,
@@ -267,7 +302,9 @@
         "Sec": "ATGT",
         "Tert": "",
         "Foren_5": 65,
-        "Foren_3": 20
+        "Foren_3": 20,
+        "Power_5": "",
+        "Power_3": ""
     },
     "D7S820": {
         "BasesToSubtract": 16,
@@ -282,7 +319,9 @@
         "Sec": "TGTC",
         "Tert": "",
         "Foren_5": 19,
-        "Foren_3": 20
+        "Foren_3": 20,
+        "Power_5": 63,
+        "Power_3": 67
     },
     "D8S1179": {
         "BasesToSubtract": 0,
@@ -297,7 +336,9 @@
         "Sec": "TCTG",
         "Tert": "TGTA",
         "Foren_5": 0,
-        "Foren_3": 5
+        "Foren_3": 5,
+        "Power_5": 19,
+        "Power_3": 108
     },
     "D9S1122": {
         "BasesToSubtract": 0,
@@ -311,7 +352,9 @@
         "Sec": "",
         "Tert": "",
         "Foren_5": 17,
-        "Foren_3": 7
+        "Foren_3": 7,
+        "Power_5": "",
+        "Power_3": ""
     },
     "FGA": {
         "BasesToSubtract": 0,
@@ -329,7 +372,9 @@
         "Sec": "GAAA",
         "Tert": "GAAG",
         "Foren_5": 23,
-        "Foren_3": 0
+        "Foren_3": 0,
+        "Power_5": 81,
+        "Power_3": 0
     },
     "PentaD": {
         "BasesToSubtract": 5,
@@ -343,7 +388,9 @@
         "Sec": "",
         "Tert": "",
         "Foren_5": 100,
-        "Foren_3": 9
+        "Foren_3": 9,
+        "Power_5": 62,
+        "Power_3": 63
     },
     "PentaE": {
         "BasesToSubtract": 0,
@@ -357,7 +404,9 @@
         "Sec": "",
         "Tert": "",
         "Foren_5": 19,
-        "Foren_3": 75
+        "Foren_3": 75,
+        "Power_5": 108,
+        "Power_3": 0
     },
     "TH01": {
         "BasesToSubtract": 0,
@@ -371,7 +420,9 @@
         "Sec": "",
         "Tert": "",
         "Foren_5": 32,
-        "Foren_3": 12
+        "Foren_3": 12,
+        "Power_5": 7,
+        "Power_3": 156
     },
     "TPOX": {
         "BasesToSubtract": 0,
@@ -385,7 +436,9 @@
         "Sec": "",
         "Tert": "",
         "Foren_5": 2,
-        "Foren_3": 5
+        "Foren_3": 5,
+        "Power_5": 121,
+        "Power_3": 14
     },
     "vWA": {
         "BasesToSubtract": 8,
@@ -401,6 +454,8 @@
         "Sec": "CAGA",
         "Tert": "TGGA",
         "Foren_5": 19,
-        "Foren_3": 5
+        "Foren_3": 5,
+        "Power_5": 4,
+        "Power_3": 100
     }
 }
