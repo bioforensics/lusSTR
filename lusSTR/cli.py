@@ -33,6 +33,15 @@ def annot_subparser(subparsers):
         'input', help='sample(s) in CSV format; first four columns must be Locus, NumReads, '
         'Sequence, SampleID; Optional last two columns can be Project and Analysis.'
     )
+    cli.add_argument(
+        '--kit', choices=['forenseq', 'powerseq'], default='forenseq',
+        help='Kit used to develop sequences; only forenseq or powerseq accepted;'
+        'default = forenseq'
+    )
+    cli.add_argument(
+        '--uas', action='store_true',
+        help='Use if sequences have been run through the ForenSeq UAS.'
+    )
 
 
 mains = {
