@@ -656,10 +656,10 @@ def main(args):
                     uas_from_full = full_seq_to_uas(sequence, power_5, power_3)
                     uas_sequence = rev_complement_anno(uas_from_full)
         str_allele = traditional_str_allele(uas_sequence, no_of_repeat_bases, no_of_sub_bases)
-        if (
-            locus in cannot_split or
-            ((len(uas_sequence) % no_of_repeat_bases != 0) and locus not in must_split)
-           ):
+        cantsplit = locus in cannot_split
+        havetosplit = locus in must_split
+        split_incompatible = len(uas_sequence) % no_of_repeat_bases != 0 and not havetosplit
+        if cantsplit or split_incompatible:
             if str_dict[locus]['ReverseCompNeeded'] == "Yes":
                 reverse_comp_sequence = rev_complement_anno(uas_sequence)
                 print(reverse_comp_sequence)
