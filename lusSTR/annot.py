@@ -591,7 +591,7 @@ def PentaD_annotation(sequence, no_of_repeat_bases, repeat_list):
         return re.sub("  ", " ", final_string)
 
 
-def full_foren(full_seq, front, back):
+def full_seq_to_uas(full_seq, front, back):
     '''
     Function to trim full sequences to the UAS region.
 
@@ -638,14 +638,22 @@ def main(args):
         tert = str_dict[locus]['Tert']
         foren_5 = str_dict[locus]['Foren_5']
         foren_3 = str_dict[locus]['Foren_3']
+        power_5 = str_dict[locus]['Power_5']
+        power_3 = str_dict[locus]['Power_3']
         if args.uas:
             uas_sequence = sequence
         else:
             if args.kit == "forenseq":
                 if str_dict[locus]['ReverseCompNeeded'] == "No":
-                    uas_sequence = full_foren(sequence, foren_5, foren_3)
+                    uas_sequence = full_seq_to_uas(sequence, foren_5, foren_3)
                 else:
-                    uas_from_full = full_foren(sequence, foren_5, foren_3)
+                    uas_from_full = full_seq_to_uas(sequence, foren_5, foren_3)
+                    uas_sequence = rev_complement_anno(uas_from_full)
+            elif args.kit == "powerseq":
+                if str_dict[locus]['ReverseCompNeeded'] == "No":
+                    uas_sequence = full_seq_to_uas(sequence, power_5, power_3)
+                else:
+                    uas_from_full = full_seq_to_uas(sequence, power_5, power_3)
                     uas_sequence = rev_complement_anno(uas_from_full)
         str_allele = traditional_str_allele(uas_sequence, no_of_repeat_bases, no_of_sub_bases)
         if (
