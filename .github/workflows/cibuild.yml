@@ -24,4 +24,4 @@ jobs:
     - name: Style check
       run: make style
     - name: Test with pytest
-      run: make testcov
+      run: make test
