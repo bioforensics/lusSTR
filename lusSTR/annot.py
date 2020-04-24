@@ -591,6 +591,33 @@ def PentaD_annotation(sequence, no_of_repeat_bases, repeat_list):
         return re.sub("  ", " ", final_string)
 
 
+def resolve_uas_sequence(sequence, str_data, uas, kit):
+    assert kit in ('forenseq', 'powerseq')
+
+    foren_5, foren_3, power_5, power_3 = 0, 0, 0, 0
+    if 'Foren_5' in str_data:
+        foren_5 = str_data['Foren_5']
+        foren_3 = str_data['Foren_3']
+    if 'Power_5' in str_data:
+        power_5 = str_data['Power_5']
+        power_3 = str_data['Power_3']
+
+    if uas:
+        uas_sequence = sequence
+    else:
+        if kit == "forenseq":
+            trim5, trim3 = foren_5, foren_3
+        else:
+            trim5, trim3 = power_5, power_3
+        if str_data['ReverseCompNeeded'] == "No":
+            uas_sequence = full_seq_to_uas(sequence, trim5, trim3)
+        else:
+            uas_from_full = full_seq_to_uas(sequence, trim5, trim3)
+            uas_sequence = rev_complement_anno(uas_from_full)
+
+    return uas_sequence
+
+
 def full_seq_to_uas(full_seq, front, back):
     '''
     Function to trim full sequences to the UAS region.
@@ -636,25 +663,8 @@ def main(args):
         lus = str_dict[locus]['LUS']
         sec = str_dict[locus]['Sec']
         tert = str_dict[locus]['Tert']
-        foren_5 = str_dict[locus]['Foren_5']
-        foren_3 = str_dict[locus]['Foren_3']
-        power_5 = str_dict[locus]['Power_5']
-        power_3 = str_dict[locus]['Power_3']
-        if args.uas:
-            uas_sequence = sequence
-        else:
-            if args.kit == "forenseq":
-                if str_dict[locus]['ReverseCompNeeded'] == "No":
-                    uas_sequence = full_seq_to_uas(sequence, foren_5, foren_3)
-                else:
-                    uas_from_full = full_seq_to_uas(sequence, foren_5, foren_3)
-                    uas_sequence = rev_complement_anno(uas_from_full)
-            elif args.kit == "powerseq":
-                if str_dict[locus]['ReverseCompNeeded'] == "No":
-                    uas_sequence = full_seq_to_uas(sequence, power_5, power_3)
-                else:
-                    uas_from_full = full_seq_to_uas(sequence, power_5, power_3)
-                    uas_sequence = rev_complement_anno(uas_from_full)
+
+        uas_sequence = resolve_uas_sequence(sequence, str_dict[locus], args.uas, args.kit)
         str_allele = traditional_str_allele(uas_sequence, no_of_repeat_bases, no_of_sub_bases)
         cantsplit = locus in cannot_split
         havetosplit = locus in must_split
