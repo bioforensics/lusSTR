@@ -662,11 +662,9 @@ def main(args):
         if cantsplit or split_incompatible:
             if str_dict[locus]['ReverseCompNeeded'] == "Yes":
                 reverse_comp_sequence = rev_complement_anno(uas_sequence)
-                print(reverse_comp_sequence)
                 forward_strand_bracketed_form = rev_comp_forward_strand_bracket(
                     reverse_comp_sequence, no_of_repeat_bases, repeats, locus, cannot_split
                 )
-                print(forward_strand_bracketed_form)
                 reverse_strand_bracketed_form = rev_comp_uas_output_bracket(
                     forward_strand_bracketed_form, no_of_repeat_bases
                 )

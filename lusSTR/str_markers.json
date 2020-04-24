@@ -97,9 +97,7 @@
         "Sec": "",
         "Tert": "",
         "Foren_5": 9,
-        "Foren_3": 16,
-        "Power_5": "",
-        "Power_3": ""
+        "Foren_3": 16
     },
     "D18S51": {
         "BasesToSubtract": 10,
@@ -169,9 +167,7 @@
         "Sec": "",
         "Tert": "",
         "Foren_5": 18,
-        "Foren_3": 24,
-        "Power_5": "",
-        "Power_3": ""
+        "Foren_3": 24
     },
     "D21S11": {
         "BasesToSubtract": 11,
@@ -269,9 +265,7 @@
         "Sec": "CTCT",
         "Tert": "",
         "Foren_5": 6,
-        "Foren_3": 8,
-        "Power_5": "",
-        "Power_3": ""
+        "Foren_3": 8
     },
     "D5S818": {
         "BasesToSubtract": 4,
@@ -302,9 +296,7 @@
         "Sec": "ATGT",
         "Tert": "",
         "Foren_5": 65,
-        "Foren_3": 20,
-        "Power_5": "",
-        "Power_3": ""
+        "Foren_3": 20
     },
     "D7S820": {
         "BasesToSubtract": 16,
@@ -352,9 +344,7 @@
         "Sec": "",
         "Tert": "",
         "Foren_5": 17,
-        "Foren_3": 7,
-        "Power_5": "",
-        "Power_3": ""
+        "Foren_3": 7
     },
     "FGA": {
         "BasesToSubtract": 0,
