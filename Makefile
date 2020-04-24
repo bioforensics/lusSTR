@@ -4,12 +4,8 @@ help: Makefile
 	@sed -n 's/^## //p' Makefile
 	@echo ''
 
-## test:      run the automated test suite
+## test:      run the automated test suite and print coverage information
 test:
-	pytest lusSTR/tests/test_suite.py
-
-## testcov:   run the automated test suite and print coverage information
-testcov:
 	pytest --cov=lusSTR lusSTR/tests/test_suite.py
 
 ## style:     check code style against PEP8
