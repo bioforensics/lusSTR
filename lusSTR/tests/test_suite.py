@@ -249,3 +249,12 @@ def test_D21_lus_sec():
     lus_out, sec_out = lusSTR.annot.D21_lus_sec(sequence, repeat, tert)
     assert str(lus_out) == '10'
     assert str(sec_out) == '4'
+
+
+@pytest.mark.parametrize('sequence, uas_seq, front, back', [
+    ('CTATGCATCTATCTATCTATCTATCTATCTATCTATCTATCTAATGGTTA', 'ATCTATCTATCTATCTATCTATCTATCTATCTATCT', 6, 8),
+    ('TCTATCTGTCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATTCCC', 'TCTATCTGTCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTA', 0, 5)
+])
+def test_full_seq_to_uas(sequence, uas_seq, front, back):
+    uas_sequence = lusSTR.annot.full_seq_to_uas(sequence, front, back)
+    assert uas_sequence == uas_seq
