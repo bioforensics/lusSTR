@@ -591,29 +591,20 @@ def PentaD_annotation(sequence, no_of_repeat_bases, repeat_list):
         return re.sub("  ", " ", final_string)
 
 
-def resolve_uas_sequence(sequence, str_data, uas, kit):
+def resolve_uas_sequence(sequence, str_data, kit):
     assert kit in ('forenseq', 'powerseq')
-
-    foren_5, foren_3, power_5, power_3 = 0, 0, 0, 0
-    if 'Foren_5' in str_data:
-        foren_5 = str_data['Foren_5']
-        foren_3 = str_data['Foren_3']
-    if 'Power_5' in str_data:
-        power_5 = str_data['Power_5']
-        power_3 = str_data['Power_3']
-
-    if uas:
-        uas_sequence = sequence
+    if kit == 'forenseq':
+        trim5 = str_data['Foren_5']
+        trim3 = str_data['Foren_3']
     else:
-        if kit == "forenseq":
-            trim5, trim3 = foren_5, foren_3
-        else:
-            trim5, trim3 = power_5, power_3
-        if str_data['ReverseCompNeeded'] == "No":
-            uas_sequence = full_seq_to_uas(sequence, trim5, trim3)
-        else:
-            uas_from_full = full_seq_to_uas(sequence, trim5, trim3)
-            uas_sequence = rev_complement_anno(uas_from_full)
+        trim5 = str_data['Power_5']
+        trim3 = str_data['Power_3']
+
+    if str_data['ReverseCompNeeded'] == "No":
+        uas_sequence = full_seq_to_uas(sequence, trim5, trim3)
+    else:
+        uas_from_full = full_seq_to_uas(sequence, trim5, trim3)
+        uas_sequence = rev_complement_anno(uas_from_full)
 
     return uas_sequence
 
@@ -664,7 +655,10 @@ def main(args):
         sec = str_dict[locus]['Sec']
         tert = str_dict[locus]['Tert']
 
-        uas_sequence = resolve_uas_sequence(sequence, str_dict[locus], args.uas, args.kit)
+        if args.uas:
+            uas_sequence = sequence
+        else:
+            uas_sequence = resolve_uas_sequence(sequence, str_dict[locus], args.kit)
         str_allele = traditional_str_allele(uas_sequence, no_of_repeat_bases, no_of_sub_bases)
         cantsplit = locus in cannot_split
         havetosplit = locus in must_split
