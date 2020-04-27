@@ -12,7 +12,7 @@ import pandas as pd
 import pytest
 import lusSTR
 from lusSTR.tests import data_file
-from tempfile import NamedTemporaryFile
+from tempfile import NamedTemporaryFile, TemporaryDirectory
 
 
 def test_format():
@@ -258,3 +258,17 @@ def test_D21_lus_sec():
 def test_full_seq_to_uas(sequence, uas_seq, front, back):
     uas_sequence = lusSTR.annot.full_seq_to_uas(sequence, front, back)
     assert uas_sequence == uas_seq
+
+
+def test_annotate_uas():
+    with NamedTemporaryFile() as outfile:
+        input = data_file('2800M_formatted_uas.csv')
+        arglist = ['annotate', input, '-o', outfile.name, '--kit', 'forenseq', '--uas']
+        args = lusSTR.cli.get_parser().parse_args(arglist)
+        lusSTR.annot.main(args)
+        with open(outfile.name, 'r') as fh:
+            results = fh.read().strip('\n')
+        with open(data_file('2800M_uas_anno.txt'), 'r') as fh:
+            testresults = fh.read().strip('\n')
+        assert results == testresults
+
