@@ -270,3 +270,15 @@ def test_annotate_uas():
         args = lusSTR.cli.get_parser().parse_args(arglist)
         lusSTR.annot.main(args)
         assert filecmp.cmp(testanno, outfile.name) is True
+
+
+def test_annotate_full():
+    with NamedTemporaryFile() as outfile:
+        os.unlink(outfile.name)
+        inputfile = data_file('2800M_formatted_full.csv')
+        testanno = data_file('2800M_full_anno.txt')
+        arglist = ['annotate', inputfile, '-o', outfile.name, '--kit', 'forenseq']
+        args = lusSTR.cli.get_parser().parse_args(arglist)
+        lusSTR.annot.main(args)
+        assert filecmp.cmp(testanno, outfile.name) is True
+
