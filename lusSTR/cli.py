@@ -22,7 +22,9 @@ def format_subparser(subparsers):
         'input',
         help='Input is either a single file (UAS Sample Details Report, in .xlsx format) or a '
         'directory of STRait Razor output files. If input is the UAS Sample Details Report '
-        '(in .xlsx format), use of the --uas flag is required.'
+        '(in .xlsx format), use of the --uas flag is required. If STRait Razor output is '
+        'used, the name of the provided directory will be used as the Analysis ID in the '
+        'final annotation table.'
     )
     cli.add_argument(
         '--uas', action='store_true',
