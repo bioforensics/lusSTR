@@ -264,9 +264,9 @@ def test_full_seq_to_uas(sequence, uas_seq, front, back):
 def test_annotate_uas():
     with NamedTemporaryFile() as outfile:
         os.unlink(outfile.name)
-        input = data_file('2800M_formatted_uas.csv')
+        inputfile = data_file('2800M_formatted_uas.csv')
         testanno = data_file('2800M_uas_anno.txt')
-        arglist = ['annotate', input, '-o', outfile.name, '--kit', 'forenseq', '--uas']
+        arglist = ['annotate', inputfile, '-o', outfile.name, '--kit', 'forenseq', '--uas']
         args = lusSTR.cli.get_parser().parse_args(arglist)
         lusSTR.annot.main(args)
         assert filecmp.cmp(testanno, outfile.name) is True
