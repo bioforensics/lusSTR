@@ -67,6 +67,10 @@ def main(args):
         results_final['Analysis'] = file.iloc[3, 1]
     else:
         results_final = strait_razor_concat(args.input)
+        print(args.input)
+        analysisID = re.sub("_FASTQ/", "", args.input)
+        results_final['Project'] = "NA"
+        results_final['Analysis'] = re.sub("_FASTQ/", "", args.input)
 
     output_file = sys.stdout
     if args.out is not None:
