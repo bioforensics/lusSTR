@@ -19,7 +19,14 @@ def format_subparser(subparsers):
         help='file to which output will be written; default is terminal (stdout)'
     )
     cli.add_argument(
-        'input', help='UAS Sample Details Report (in .xlsx format).'
+        'input',
+        help='Input is either a single file (UAS Sample Details Report, in .xlsx format) or a '
+        'directory of STRait Razor output files. If input is the UAS Sample Details Report '
+        '(in .xlsx format), use of the --uas flag is required.'
+    )
+    cli.add_argument(
+        '--uas', action='store_true',
+        help='Use if sequences have been previously run through the ForenSeq UAS.'
     )
 
 
