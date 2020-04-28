@@ -9,7 +9,11 @@
         "ReverseCompNeeded": "Yes",
         "LUS": "ATCT",
         "Sec": "ACCT",
-        "Tert": ""
+        "Tert": "",
+        "Foren_5": 6,
+        "Foren_3": 14,
+        "Power_5": 13,
+        "Power_3": 107
     },
     "D10S1248": {
         "BasesToSubtract": 0,
@@ -21,7 +25,11 @@
         "ReverseCompNeeded": "No",
         "LUS": "GGAA",
         "Sec": "",
-        "Tert": ""
+        "Tert": "",
+        "Foren_5": 18,
+        "Foren_3": 23,
+        "Power_5": 57,
+        "Power_3": 1
     },
     "D12S391": {
         "BasesToSubtract": 0,
@@ -34,7 +42,12 @@
         "ReverseCompNeeded": "No",
         "LUS": "AGAT",
         "Sec": "AGAC",
-        "Tert": "AGGT"
+        "Tert": "AGGT",
+        "Foren_5": 39,
+        "Foren_3": 73,
+        "Power_5": 21,
+        "Power_3": 11
+
     },
     "D13S317": {
         "BasesToSubtract": 31,
@@ -50,7 +63,11 @@
         "ReverseCompNeeded": "No",
         "LUS": "TATC",
         "Sec": "ATCT",
-        "Tert": "GTCT"
+        "Tert": "GTCT",
+        "Foren_5": 39,
+        "Foren_3": 8,
+        "Power_5": 70,
+        "Power_3": 43
     },
     "D16S539": {
         "BasesToSubtract": 0,
@@ -62,7 +79,11 @@
         "ReverseCompNeeded": "No",
         "LUS": "GATA",
         "Sec": "GACA",
-        "Tert": ""
+        "Tert": "",
+        "Foren_5": 38,
+        "Foren_3": 36,
+        "Power_5": 133,
+        "Power_3": 4
     },
     "D17S1301": {
         "BasesToSubtract": 0,
@@ -74,7 +95,9 @@
         "ReverseCompNeeded": "No",
         "LUS": "AGAT",
         "Sec": "",
-        "Tert": ""
+        "Tert": "",
+        "Foren_5": 9,
+        "Foren_3": 16
     },
     "D18S51": {
         "BasesToSubtract": 10,
@@ -88,7 +111,11 @@
         "ReverseCompNeeded": "No",
         "LUS": "AGAA",
         "Sec": "AAAG",
-        "Tert": ""
+        "Tert": "",
+        "Foren_5": 5,
+        "Foren_3": 48,
+        "Power_5": 64,
+        "Power_3": 43
     },
     "D19S433": {
         "BasesToSubtract": 26,
@@ -102,7 +129,11 @@
         "ReverseCompNeeded": "Yes",
         "LUS": "CCTT",
         "Sec": "CTTT",
-        "Tert": "CCTG"
+        "Tert": "CCTG",
+        "Foren_5": 12,
+        "Foren_3": 54,
+        "Power_5": 61,
+        "Power_3": 39
     },
     "D1S1656": {
         "BasesToSubtract": 10,
@@ -118,7 +149,11 @@
         "ReverseCompNeeded": "Yes",
         "LUS": "TCTA",
         "Sec": "CCTA",
-        "Tert": "TCTG"
+        "Tert": "TCTG",
+        "Foren_5": 51,
+        "Foren_3": 0,
+        "Power_5": 46,
+        "Power_3": 21
     },
     "D20S482": {
         "BasesToSubtract": 0,
@@ -130,7 +165,9 @@
         "ReverseCompNeeded": "No",
         "LUS": "AGAT",
         "Sec": "",
-        "Tert": ""
+        "Tert": "",
+        "Foren_5": 18,
+        "Foren_3": 24
     },
     "D21S11": {
         "BasesToSubtract": 11,
@@ -143,7 +180,11 @@
         "ReverseCompNeeded": "No",
         "LUS": "TCTA",
         "Sec": "TCTA",
-        "Tert": "TCTG"
+        "Tert": "TCTG",
+        "Foren_5": 34,
+        "Foren_3": 12,
+        "Power_5": 10,
+        "Power_3": 41
     },
     "D22S1045": {
         "BasesToSubtract": 0,
@@ -155,7 +196,11 @@
         "ReverseCompNeeded": "No",
         "LUS": "ATT",
         "Sec": "",
-        "Tert": ""
+        "Tert": "",
+        "Foren_5": 106,
+        "Foren_3": 20,
+        "Power_5": 52,
+        "Power_3": 11
     },
     "D2S1338": {
         "BasesToSubtract": 0,
@@ -168,7 +213,11 @@
         "ReverseCompNeeded": "Yes",
         "LUS": "GGAA",
         "Sec": "GGAC",
-        "Tert": "GGCA"
+        "Tert": "GGCA",
+        "Foren_5": 3,
+        "Foren_3": 14,
+        "Power_5": 66,
+        "Power_3": 46
     },
     "D2S441": {
         "BasesToSubtract": 0,
@@ -181,7 +230,11 @@
         "ReverseCompNeeded": "No",
         "LUS": "TCTA",
         "Sec": "TGTA",
-        "Tert": ""
+        "Tert": "",
+        "Foren_5": 29,
+        "Foren_3": 23,
+        "Power_5": 83,
+        "Power_3": 4
     },
     "D3S1358": {
         "BasesToSubtract": 0,
@@ -194,7 +247,11 @@
         "ReverseCompNeeded": "No",
         "LUS": "TCTA",
         "Sec": "TCTG",
-        "Tert": ""
+        "Tert": "",
+        "Foren_5": 48,
+        "Foren_3": 18,
+        "Power_5": 97,
+        "Power_3": 18
     },
     "D4S2408": {
         "BasesToSubtract": 0,
@@ -206,7 +263,9 @@
         "ReverseCompNeeded": "No",
         "LUS": "ATCT",
         "Sec": "CTCT",
-        "Tert": ""
+        "Tert": "",
+        "Foren_5": 6,
+        "Foren_3": 8
     },
     "D5S818": {
         "BasesToSubtract": 4,
@@ -218,7 +277,11 @@
         "ReverseCompNeeded": "Yes",
         "LUS": "ATCT",
         "Sec": "",
-        "Tert": ""
+        "Tert": "",
+        "Foren_5": 9,
+        "Foren_3": 7,
+        "Power_5": 36,
+        "Power_3": 82
     },
     "D6S1043": {
         "BasesToSubtract": 0,
@@ -231,7 +294,9 @@
         "ReverseCompNeeded": "Yes",
         "LUS": "ATCT",
         "Sec": "ATGT",
-        "Tert": ""
+        "Tert": "",
+        "Foren_5": 65,
+        "Foren_3": 20
     },
     "D7S820": {
         "BasesToSubtract": 16,
@@ -244,7 +309,11 @@
         "ReverseCompNeeded": "Yes",
         "LUS": "TATC",
         "Sec": "TGTC",
-        "Tert": ""
+        "Tert": "",
+        "Foren_5": 19,
+        "Foren_3": 20,
+        "Power_5": 63,
+        "Power_3": 67
     },
     "D8S1179": {
         "BasesToSubtract": 0,
@@ -257,7 +326,11 @@
         "ReverseCompNeeded": "No",
         "LUS": "TCTA",
         "Sec": "TCTG",
-        "Tert": "TGTA"
+        "Tert": "TGTA",
+        "Foren_5": 0,
+        "Foren_3": 5,
+        "Power_5": 19,
+        "Power_3": 108
     },
     "D9S1122": {
         "BasesToSubtract": 0,
@@ -269,7 +342,9 @@
         "ReverseCompNeeded": "No",
         "LUS": "TAGA",
         "Sec": "",
-        "Tert": ""
+        "Tert": "",
+        "Foren_5": 17,
+        "Foren_3": 7
     },
     "FGA": {
         "BasesToSubtract": 0,
@@ -285,7 +360,11 @@
         "ReverseCompNeeded": "Yes",
         "LUS": "AAAG",
         "Sec": "GAAA",
-        "Tert": "GAAG"
+        "Tert": "GAAG",
+        "Foren_5": 23,
+        "Foren_3": 0,
+        "Power_5": 81,
+        "Power_3": 0
     },
     "PentaD": {
         "BasesToSubtract": 5,
@@ -297,7 +376,11 @@
         "ReverseCompNeeded": "No",
         "LUS": "AAAGA",
         "Sec": "",
-        "Tert": ""
+        "Tert": "",
+        "Foren_5": 100,
+        "Foren_3": 9,
+        "Power_5": 62,
+        "Power_3": 63
     },
     "PentaE": {
         "BasesToSubtract": 0,
@@ -309,7 +392,11 @@
         "ReverseCompNeeded": "Yes",
         "LUS": "TCTTT",
         "Sec": "",
-        "Tert": ""
+        "Tert": "",
+        "Foren_5": 19,
+        "Foren_3": 75,
+        "Power_5": 108,
+        "Power_3": 0
     },
     "TH01": {
         "BasesToSubtract": 0,
@@ -321,7 +408,11 @@
         "ReverseCompNeeded": "No",
         "LUS": "AATG",
         "Sec": "",
-        "Tert": ""
+        "Tert": "",
+        "Foren_5": 32,
+        "Foren_3": 12,
+        "Power_5": 7,
+        "Power_3": 156
     },
     "TPOX": {
         "BasesToSubtract": 0,
@@ -333,7 +424,11 @@
         "ReverseCompNeeded": "No",
         "LUS": "AATG",
         "Sec": "",
-        "Tert": ""
+        "Tert": "",
+        "Foren_5": 2,
+        "Foren_3": 5,
+        "Power_5": 121,
+        "Power_3": 14
     },
     "vWA": {
         "BasesToSubtract": 8,
@@ -347,6 +442,10 @@
         "ReverseCompNeeded": "Yes",
         "LUS": "TAGA",
         "Sec": "CAGA",
-        "Tert": "TGGA"
+        "Tert": "TGGA",
+        "Foren_5": 19,
+        "Foren_3": 5,
+        "Power_5": 4,
+        "Power_3": 100
     }
 }

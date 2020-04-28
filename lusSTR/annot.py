@@ -116,9 +116,9 @@ def rev_complement_anno(sequence):
     '''
     Function creates reverse complement of sequence
 
-    Sequences in which the UAS software output contains the sequence on the reverse strand require
-    translation of the sequence to the forward strand. This allows for consistency between both
-    loci and any outside analyses in which comparisons may be made.
+    Sequences in which the UAS software output contains the sequence on the reverse strand
+    require translation of the sequence to the forward strand. This allows for consistency
+    between both loci and any outside analyses in which comparisons may be made.
     '''
     complement = {'A': 'T', 'C': 'G', 'G': 'C', 'T': 'A'}
     bases = list(sequence)
@@ -132,9 +132,9 @@ def rev_comp_forward_strand_bracket(rev_sequence, n, repeat_list, locusid, canno
     '''
     Function creates bracketed annotation for reverse complement sequences
 
-    Function is used to create the bracketed annotation for reverse complement sequences (i.e. the
-    forward strand). It calls additional functions depending on the locus and/or if the sequence
-    is a microvariant or not.
+    Function is used to create the bracketed annotation for reverse complement sequences (i.e
+    the forward strand). It calls additional functions depending on the locus and/or if the
+    sequence is a microvariant or not.
     '''
     if locusid in cannot_split_list:
         if locusid == "D19S433":
@@ -591,6 +591,41 @@ def PentaD_annotation(sequence, no_of_repeat_bases, repeat_list):
         return re.sub("  ", " ", final_string)
 
 
+def resolve_uas_sequence(sequence, str_data, kit):
+    assert kit in ('forenseq', 'powerseq')
+    if kit == 'forenseq':
+        trim5 = str_data['Foren_5']
+        trim3 = str_data['Foren_3']
+    else:
+        trim5 = str_data['Power_5']
+        trim3 = str_data['Power_3']
+
+    if str_data['ReverseCompNeeded'] == "No":
+        uas_sequence = full_seq_to_uas(sequence, trim5, trim3)
+    else:
+        uas_from_full = full_seq_to_uas(sequence, trim5, trim3)
+        uas_sequence = rev_complement_anno(uas_from_full)
+
+    return uas_sequence
+
+
+def full_seq_to_uas(full_seq, front, back):
+    '''
+    Function to trim full sequences to the UAS region.
+
+    It identifies the number of bases to remove from the 5' and 3' ends of the sequence to
+    trim to the UAS region. The downstream annotation, including length-based allele
+    designations, LUS, LUS+ and bracketed annotation is based on this region in the sequence.
+    '''
+    if front == 0:
+        seq_uas = full_seq[:-back]
+    elif back == 0:
+        seq_uas = full_seq[front:]
+    else:
+        seq_uas = full_seq[front:-back]
+    return seq_uas
+
+
 def main(args):
     cannot_split = [
         "D19S433", "D6S1043", "TH01", "D21S11", "D1S1656", "D7S820", "D5S818", "D12S391",
@@ -619,13 +654,18 @@ def main(args):
         lus = str_dict[locus]['LUS']
         sec = str_dict[locus]['Sec']
         tert = str_dict[locus]['Tert']
-        str_allele = traditional_str_allele(sequence, no_of_repeat_bases, no_of_sub_bases)
-        if (
-            locus in cannot_split or
-            ((len(sequence) % no_of_repeat_bases != 0) and locus not in must_split)
-           ):
+
+        if args.uas:
+            uas_sequence = sequence
+        else:
+            uas_sequence = resolve_uas_sequence(sequence, str_dict[locus], args.kit)
+        str_allele = traditional_str_allele(uas_sequence, no_of_repeat_bases, no_of_sub_bases)
+        cantsplit = locus in cannot_split
+        havetosplit = locus in must_split
+        split_incompatible = len(uas_sequence) % no_of_repeat_bases != 0 and not havetosplit
+        if cantsplit or split_incompatible:
             if str_dict[locus]['ReverseCompNeeded'] == "Yes":
-                reverse_comp_sequence = rev_complement_anno(sequence)
+                reverse_comp_sequence = rev_complement_anno(uas_sequence)
                 forward_strand_bracketed_form = rev_comp_forward_strand_bracket(
                     reverse_comp_sequence, no_of_repeat_bases, repeats, locus, cannot_split
                 )
@@ -634,17 +674,17 @@ def main(args):
                 )
             elif locus == "D21S11":
                 forward_strand_bracketed_form = D21_bracket(
-                    sequence, no_of_split_bases, repeats
+                    uas_sequence, no_of_split_bases, repeats
                 )
-            elif locus == "TH01" and (len(sequence) % no_of_repeat_bases != 0):
-                forward_strand_bracketed_form = TH01_annotation(sequence, repeats)
+            elif locus == "TH01" and (len(uas_sequence) % no_of_repeat_bases != 0):
+                forward_strand_bracketed_form = TH01_annotation(uas_sequence, repeats)
             elif locus == "PentaD":
                 forward_strand_bracketed_form = PentaD_annotation(
-                    sequence, no_of_repeat_bases, repeats
+                    uas_sequence, no_of_repeat_bases, repeats
                 )
             else:
                 forward_strand_bracketed_form = split_string(
-                    sequence, no_of_repeat_bases, repeats
+                    uas_sequence, no_of_repeat_bases, repeats
                 )
             lus_final, sec_final, tert_final = lus_anno(
                 forward_strand_bracketed_form, lus, sec, tert, locus, str_allele
@@ -653,14 +693,14 @@ def main(args):
             if locus == "D18S51":
                 if type(str_allele) == str:
                     forward_strand_bracketed_form = split_string(
-                        sequence, no_of_repeat_bases, repeats
+                        uas_sequence, no_of_repeat_bases, repeats
                     )
                 else:
                     forward_strand_bracketed_form = loci_need_split_anno(
-                        sequence, no_of_repeat_bases
+                        uas_sequence, no_of_repeat_bases
                     )
             elif str_dict[locus]['ReverseCompNeeded'] == "Yes":
-                reverse_comp_sequence = rev_complement_anno(sequence)
+                reverse_comp_sequence = rev_complement_anno(uas_sequence)
                 forward_strand_bracketed_form = rev_comp_forward_strand_bracket(
                     reverse_comp_sequence, no_of_repeat_bases, repeats, locus, cannot_split
                 )
@@ -669,10 +709,12 @@ def main(args):
                 )
             elif locus == "PentaD":
                 forward_strand_bracketed_form = PentaD_annotation(
-                    sequence, no_of_repeat_bases, repeats
+                    uas_sequence, no_of_repeat_bases, repeats
                 )
             else:
-                forward_strand_bracketed_form = loci_need_split_anno(sequence, no_of_repeat_bases)
+                forward_strand_bracketed_form = loci_need_split_anno(
+                    uas_sequence, no_of_repeat_bases
+                )
             lus_final, sec_final, tert_final = lus_anno(
                 forward_strand_bracketed_form, lus, sec, tert, locus, str_allele
             )
@@ -692,14 +734,14 @@ def main(args):
                 lus_plus = f"{str_allele}_{lus_final}_{sec_final}_{tert_final}"
         if str_dict[locus]['ReverseCompNeeded'] == "Yes":
             summary = [
-                sampleid, project, analysis, locus, sequence, reverse_comp_sequence, str_allele,
-                forward_strand_bracketed_form, reverse_strand_bracketed_form, lus_final_output,
-                lus_plus, reads
+                sampleid, project, analysis, locus, uas_sequence, reverse_comp_sequence,
+                str_allele, forward_strand_bracketed_form, reverse_strand_bracketed_form,
+                lus_final_output, lus_plus, reads
             ]
             summary = '\t'.join(str(i) for i in summary)
         else:
             summary = [
-                sampleid, project, analysis, locus, sequence, sequence, str_allele,
+                sampleid, project, analysis, locus, uas_sequence, uas_sequence, str_allele,
                 forward_strand_bracketed_form, forward_strand_bracketed_form, lus_final_output,
                 lus_plus, reads
             ]

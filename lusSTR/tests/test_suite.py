@@ -8,6 +8,7 @@
 # -----------------------------------------------------------------------------
 
 import filecmp
+import os
 import pandas as pd
 import pytest
 import lusSTR
@@ -249,3 +250,35 @@ def test_D21_lus_sec():
     lus_out, sec_out = lusSTR.annot.D21_lus_sec(sequence, repeat, tert)
     assert str(lus_out) == '10'
     assert str(sec_out) == '4'
+
+
+@pytest.mark.parametrize('sequence, uas_seq, front, back', [
+    ('CTATGCATCTATCTATCTATCTATCTATCTATCTATCTATCTAATGGTTA', 'ATCTATCTATCTATCTATCTATCTATCTATCTATCT', 6, 8),
+    ('TCTATCTGTCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATTCCC', 'TCTATCTGTCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTA', 0, 5)
+])
+def test_full_seq_to_uas(sequence, uas_seq, front, back):
+    uas_sequence = lusSTR.annot.full_seq_to_uas(sequence, front, back)
+    assert uas_sequence == uas_seq
+
+
+def test_annotate_uas():
+    with NamedTemporaryFile() as outfile:
+        os.unlink(outfile.name)
+        inputfile = data_file('2800M_formatted_uas.csv')
+        testanno = data_file('2800M_uas_anno.txt')
+        arglist = ['annotate', inputfile, '-o', outfile.name, '--kit', 'forenseq', '--uas']
+        args = lusSTR.cli.get_parser().parse_args(arglist)
+        lusSTR.annot.main(args)
+        assert filecmp.cmp(testanno, outfile.name) is True
+
+
+def test_annotate_full():
+    with NamedTemporaryFile() as outfile:
+        os.unlink(outfile.name)
+        inputfile = data_file('2800M_formatted_full.csv')
+        testanno = data_file('2800M_full_anno.txt')
+        arglist = ['annotate', inputfile, '-o', outfile.name, '--kit', 'forenseq']
+        args = lusSTR.cli.get_parser().parse_args(arglist)
+        lusSTR.annot.main(args)
+        assert filecmp.cmp(testanno, outfile.name) is True
+

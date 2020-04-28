@@ -1,0 +1,6 @@
+[report]
+show_missing = True
+
+[run]
+branch = True
+omit = lusSTR/_version.py, lusSTR/tests/test_*.py
