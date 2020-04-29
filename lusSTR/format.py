@@ -33,7 +33,6 @@ def strait_razor_concat(input_dir):
     straitrazorcomp = pd.DataFrame()
     for filename in myfiles:
         name = re.sub("_STRaitRazor.txt", "", filename)
-        print(filename)
         file = pd.read_table(input_dir + filename, sep="\t", header=None)
         file.columns = ['Locus_allele', 'Length', 'Sequence', 'Forward_Reads', 'Reverse_Reads']
         file[['Locus', 'Allele']] = file.Locus_allele.str.split(":", expand=True)
@@ -67,10 +66,10 @@ def main(args):
         results_final['Analysis'] = file.iloc[3, 1]
     else:
         results_final = strait_razor_concat(args.input)
-        print(args.input)
         analysisID = re.sub("_FASTQ/", "", args.input)
+        analysisID_final = os.path.basename(analysisID)
         results_final['Project'] = "NA"
-        results_final['Analysis'] = re.sub("_FASTQ/", "", args.input)
+        results_final['Analysis'] = analysisID_final
 
     output_file = sys.stdout
     if args.out is not None:
