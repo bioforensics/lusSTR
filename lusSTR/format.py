@@ -66,7 +66,8 @@ def main(args):
         results_final['Analysis'] = file.iloc[3, 1]
     else:
         results_final = strait_razor_concat(args.input)
-        analysisID = re.sub("_FASTQ/", "", args.input)
+        path = args.input
+        analysisID = path.rstrip(os.sep)
         analysisID_final = os.path.basename(analysisID)
         results_final['Project'] = "NA"
         results_final['Analysis'] = analysisID_final

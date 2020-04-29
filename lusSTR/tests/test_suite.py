@@ -286,7 +286,7 @@ def test_annotate_full():
 def test_format_straitrazor():
     with NamedTemporaryFile() as outfile:
         os.unlink(outfile.name)
-        inputdb = data_file('STRait_Razor_test_output_FASTQ/')
+        inputdb = data_file('STRait_Razor_test_output/')
         testformat = data_file('STRait_Razor_test_output.csv')
         arglist = ['format', inputdb, '-o', outfile.name]
         args = lusSTR.cli.get_parser().parse_args(arglist)
