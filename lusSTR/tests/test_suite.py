@@ -20,7 +20,7 @@ def test_format():
     UAStestfile = data_file('UAS_Sample_Details_Report_test.xlsx')
     formatoutput = data_file('testformat.csv')
     with NamedTemporaryFile(suffix='.csv') as outfile:
-        arglist = ['format', UAStestfile, '-o', outfile.name]
+        arglist = ['format', UAStestfile, '-o', outfile.name, '--uas']
         args = lusSTR.cli.get_parser().parse_args(arglist)
         lusSTR.format.main(args)
         assert filecmp.cmp(formatoutput, outfile.name) is True
@@ -282,3 +282,13 @@ def test_annotate_full():
         lusSTR.annot.main(args)
         assert filecmp.cmp(testanno, outfile.name) is True
 
+
+def test_format_straitrazor():
+    with NamedTemporaryFile() as outfile:
+        os.unlink(outfile.name)
+        inputdb = data_file('STRait_Razor_test_output/')
+        testformat = data_file('STRait_Razor_test_output.csv')
+        arglist = ['format', inputdb, '-o', outfile.name]
+        args = lusSTR.cli.get_parser().parse_args(arglist)
+        lusSTR.format.main(args)
+        assert filecmp.cmp(testformat, outfile.name) is True
