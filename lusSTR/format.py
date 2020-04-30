@@ -31,7 +31,7 @@ def strait_razor_concat(input_dir):
         ]
     myfiles = os.listdir(input_dir)
     straitrazorcomp = pd.DataFrame()
-    for filename in myfiles:
+    for filename in sorted(myfiles):
         name = re.sub("_STRaitRazor.txt", "", filename)
         file = pd.read_table(input_dir + filename, sep="\t", header=None)
         file.columns = ['Locus_allele', 'Length', 'Sequence', 'Forward_Reads', 'Reverse_Reads']
