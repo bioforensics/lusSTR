@@ -591,7 +591,7 @@ def PentaD_annotation(sequence, no_of_repeat_bases, repeat_list):
         return re.sub("  ", " ", final_string)
 
 
-def resolve_uas_sequence(sequence, str_data, kit):
+def resolve_uas_sequence(sequence, str_data, kit, locus, n):
     assert kit in ('forenseq', 'powerseq')
     if kit == 'forenseq':
         trim5 = str_data['Foren_5']
@@ -605,8 +605,9 @@ def resolve_uas_sequence(sequence, str_data, kit):
     else:
         uas_from_full = full_seq_to_uas(sequence, trim5, trim3)
         uas_sequence = rev_complement_anno(uas_from_full)
-
-    return uas_sequence
+    flank_5_anno = flank_5(sequence, trim5, locus, n)
+    flank_3_anno = flank_3(sequence, trim3, locus, n)
+    return uas_sequence, flank_5_anno, flank_3_anno
 
 
 def full_seq_to_uas(full_seq, front, back):
@@ -624,6 +625,84 @@ def full_seq_to_uas(full_seq, front, back):
     else:
         seq_uas = full_seq[front:-back]
     return seq_uas
+
+
+def flank_5(full_seq, front, locus, n):
+    invariant_loci = [
+        'D10S1248', 'D17S1301', 'D18S51', 'D21S11', 'D2S1338', 'D4S2408', 'D5S818', 'PentaE',
+        'D12S391', 'D19S433', 'FGA', 'TPOX', 'CSF1PO', 'D22S1045', 'D3S1358', 'D6S1043',
+        'TH01', 'D9S1122'
+    ]
+    flank_seq = full_seq[:front]
+    if locus == "D8S1179":
+        flank = ""
+    elif locus == "D13S317":
+        flank = (
+            f"{flank_seq[:2]} {loci_need_split_anno(flank_seq[2:14], 4)} {flank_seq[14]} "
+            f"{flank_seq[15]} {flank_seq[16:19]} {loci_need_split_anno(flank_seq[19:], 4)}"
+        )
+    elif locus == "D20S482":
+        flank = (
+            f"{flank_seq[:2]} {flank_seq[2:6]} {flank_seq[6]} {flank_seq[7:10]} "
+            f"{flank_seq[10:14]} {flank_seq[14:18]}"
+        )
+    elif locus == "D2S441":
+        flank = f"{flank_seq[:4]} {flank_seq[4]} {loci_need_split_anno(flank_seq[5:], 4)}"
+    elif locus == "D7S820":
+        flank = f"{flank_seq[0]} {loci_need_split_anno(flank_seq[1:13], 4)} {flank_seq[13:]}"
+    elif locus == "D16S539":
+        flank = (
+            f"{flank_seq[:2]} {flank_seq[2:6]} {flank_seq[6]} "
+            f"{loci_need_split_anno(flank_seq[7:], 4)}"
+        )
+    elif locus == "D1S1656":
+        flank = f"{flank_seq[:3]} {loci_need_split_anno(flank_seq[3:], 4)}"
+    elif locus == "PentaD":
+        flank = (
+            f"{loci_need_split_anno(flank_seq[:20], 5)} {flank_seq[20]} {flank_seq[21:25]} "
+            f"{loci_need_split_anno(flank_seq[25:], 5)}"
+        )
+    elif locus == "vWA":
+        flank = f"{flank_seq[:3]} {loci_need_split_anno(flank_seq[3:], 4)}"
+    elif locus in invariant_loci:
+        flank_rev = loci_need_split_anno(flank_seq[::-1], n)
+        flank = flank_rev[::-1]
+    return flank
+
+
+def flank_3(full_seq, back, locus, n):
+    invariant_loci = [
+        'D1S1656', 'FGA', 'D10S1248', 'D12S391', 'D13S317', 'D17S1301', 'D20S482', 'D22S1045',
+        'D2S1338', 'D2S441', 'D3S1358', 'D4S2408', 'D5S818', 'D8S1179', 'D9S1122', 'TPOX',
+        'vWA', 'D19S433', 'D6S1043', 'PentaE', 'TH01', 'PentaD'
+    ]
+    flank_seq = full_seq[-back:]
+    if locus == "D1S1656" or locus == "FGA":
+        flank = ""
+    elif locus == "CSF1PO":
+        flank = f"{flank_seq[0]} {loci_need_split_anno(flank_seq[1:-1], 4)} {flank_seq[-1]}"
+    elif locus == "D18S51":
+        flank = (
+            f"{flank_seq[:2]} {loci_need_split_anno(flank_seq[2:30], 4)} {flank_seq[30:33]} "
+            f"{flank_seq[33]} {loci_need_split_anno(flank_seq[34:42], 4)} {flank_seq[42:44]} "
+            f"{flank_seq[44:]}"
+        )
+    elif locus == "D16S539":
+        flank = (
+            f"{loci_need_split_anno(flank_seq[:12], 4)} {flank_seq[12:15]} {flank_seq[15]} "
+            f"{loci_need_split_anno(flank_seq[16:28], 4)} {flank_seq[28:31]} "
+            f"{flank_seq[31:33]} {flank_seq[33]} {flank_seq[-2:]}"
+        )
+    elif locus == "D7S820":
+        flank = loci_need_split_anno(flank_seq, 4)
+    elif locus == "D21S11":
+        flank = (
+            f"{flank_seq[:2]} {flank_seq[2]} {loci_need_split_anno(flank_seq[3:11], 4)} "
+            f"{flank_seq[-1]}"
+        )
+    elif locus in invariant_loci:
+        flank = loci_need_split_anno(flank_seq, n)
+    return flank
 
 
 def main(args):
@@ -658,7 +737,9 @@ def main(args):
         if args.uas:
             uas_sequence = sequence
         else:
-            uas_sequence = resolve_uas_sequence(sequence, str_dict[locus], args.kit)
+            uas_sequence, flank_5_anno, flank_3_anno = resolve_uas_sequence(
+                sequence, str_dict[locus], args.kit, locus, no_of_repeat_bases
+            )
         str_allele = traditional_str_allele(uas_sequence, no_of_repeat_bases, no_of_sub_bases)
         cantsplit = locus in cannot_split
         havetosplit = locus in must_split
@@ -764,3 +845,30 @@ def main(args):
         print(summary, file=output_file)
         if args.out is not None:
             output_file.close()
+
+        if not args.uas and args.kit == "forenseq":
+            if flank_5_anno == "":
+                full_bracketed_anno = f"{forward_strand_bracketed_form} {flank_3_anno}"
+            elif flank_3_anno == "":
+                full_bracketed_anno = f"{flank_5_anno} {forward_strand_bracketed_form}"
+            else:
+                full_bracketed_anno = (
+                    f"{flank_5_anno} {forward_strand_bracketed_form} {flank_3_anno}"
+                )
+            flank_summary = [
+                sampleid, project, analysis, locus, reads, sequence, full_bracketed_anno
+            ]
+            flank_summary = '\t'.join(str(i) for i in flank_summary)
+            name = re.sub(".txt", "", args.out)
+            if os.path.exists(f"{name}_flanks_anno.txt"):
+                flank_file = open(f"{name}_flanks_anno.txt", "a")
+            else:
+                flank_file = open(f"{name}_flanks_anno.txt", "w")
+                header = [
+                    'SampleID', 'Project', 'Analysis', 'Locus', 'Reads', 'Full_Sequence',
+                    'Bracket_Annotation'
+                    ]
+                header = '\t'.join(header)
+                print(header, file=flank_file)
+            print(flank_summary, file=flank_file)
+            flank_file.close()
