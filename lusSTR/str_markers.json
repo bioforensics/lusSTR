@@ -336,7 +336,8 @@
         "BasesToSubtract": 0,
         "NumRepeats": 1,
         "Repeats": [
-            "TAGA"
+            "TAGA",
+            "TCGA"
         ],
         "NumBasesToSeparate": 4,
         "ReverseCompNeeded": "No",

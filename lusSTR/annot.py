@@ -596,6 +596,8 @@ def resolve_uas_sequence(sequence, str_data, kit, locus, n):
     if kit == 'forenseq':
         trim5 = str_data['Foren_5']
         trim3 = str_data['Foren_3']
+        flank_5_anno = flank_5(sequence, trim5, locus, n)
+        flank_3_anno = flank_3(sequence, trim3, locus, n)
     else:
         trim5 = str_data['Power_5']
         trim3 = str_data['Power_3']
@@ -605,8 +607,6 @@ def resolve_uas_sequence(sequence, str_data, kit, locus, n):
     else:
         uas_from_full = full_seq_to_uas(sequence, trim5, trim3)
         uas_sequence = rev_complement_anno(uas_from_full)
-    flank_5_anno = flank_5(sequence, trim5, locus, n)
-    flank_3_anno = flank_3(sequence, trim3, locus, n)
     return uas_sequence, flank_5_anno, flank_3_anno
 
 
@@ -629,9 +629,8 @@ def full_seq_to_uas(full_seq, front, back):
 
 def flank_5(full_seq, front, locus, n):
     invariant_loci = [
-        'D10S1248', 'D17S1301', 'D18S51', 'D21S11', 'D2S1338', 'D4S2408', 'D5S818', 'PentaE',
-        'D12S391', 'D19S433', 'FGA', 'TPOX', 'CSF1PO', 'D22S1045', 'D3S1358', 'D6S1043',
-        'TH01', 'D9S1122'
+        'D17S1301', 'D18S51', 'D21S11', 'D2S1338', 'D4S2408', 'D5S818', 'PentaE', 'D12S391',
+        'D19S433', 'FGA', 'TPOX', 'CSF1PO', 'D22S1045', 'D3S1358', 'D6S1043', 'TH01', 'D9S1122'
     ]
     flank_seq = full_seq[:front]
     if locus == "D8S1179":
@@ -664,6 +663,8 @@ def flank_5(full_seq, front, locus, n):
         )
     elif locus == "vWA":
         flank = f"{flank_seq[:3]} {loci_need_split_anno(flank_seq[3:], 4)}"
+    elif locus == "D10S1248":
+        flank = f"{flank_seq[:2]} {loci_need_split_anno(flank_seq[2:], 4)}"
     elif locus in invariant_loci:
         flank_rev = loci_need_split_anno(flank_seq[::-1], n)
         flank = flank_rev[::-1]
@@ -708,7 +709,7 @@ def flank_3(full_seq, back, locus, n):
 def main(args):
     cannot_split = [
         "D19S433", "D6S1043", "TH01", "D21S11", "D1S1656", "D7S820", "D5S818", "D12S391",
-        "D9S1122", "D1S1656"
+        "D9S1122", "D1S1656", "PentaE"
     ]
     must_split = ["D13S317", "D18S51"]
 
