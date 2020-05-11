@@ -629,6 +629,19 @@ def D7_anno(sequence, allele, n, repeat_list):
     return forward_strand_bracketed_form
 
 
+def D13_anno(sequence, repeats):
+    if len(sequence) < 110:
+        bracketed_form = loci_need_split_anno(sequence, 4)
+    else:
+        for m in re.finditer("GGGC", sequence):
+            break_point = m.end()
+        bracketed_form = (
+            f"{loci_need_split_anno(sequence[:break_point], 4)} "
+            f"{split_string(sequence[break_point:], 4, repeats)}"
+        )
+    return bracketed_form
+
+
 def resolve_uas_sequence(sequence, str_data, kit, locus, n):
     assert kit in ('forenseq', 'powerseq')
     if kit == 'forenseq':
@@ -822,6 +835,8 @@ def main(args):
                     forward_strand_bracketed_form = loci_need_split_anno(
                         uas_sequence, no_of_repeat_bases
                     )
+            elif locus == "D13S317":
+                forward_strand_bracketed_form = D13_anno(uas_sequence, repeats)
             elif str_dict[locus]['ReverseCompNeeded'] == "Yes":
                 reverse_comp_sequence = rev_complement_anno(uas_sequence)
                 forward_strand_bracketed_form = rev_comp_forward_strand_bracket(
@@ -835,15 +850,6 @@ def main(args):
                 forward_strand_bracketed_form = PentaD_annotation(
                     uas_sequence, no_of_repeat_bases, repeats
                 )
-            elif locus == "D13S317":
-                if type(str_allele) == int:
-                    forward_strand_bracketed_form = loci_need_split_anno(
-                        uas_sequence, no_of_repeat_bases
-                    )
-                else:
-                    forward_strand_bracketed_form = split_string(
-                        uas_sequence, no_of_repeat_bases, repeats
-                    )
             else:
                 forward_strand_bracketed_form = loci_need_split_anno(
                     uas_sequence, no_of_repeat_bases
