@@ -128,7 +128,9 @@ def rev_complement_anno(sequence):
     return reverse_comp_sequence
 
 
-def rev_comp_forward_strand_bracket(rev_sequence, n, repeat_list, locusid, cannot_split_list):
+def rev_comp_forward_strand_bracket(
+    rev_sequence, n, repeat_list, locusid, cannot_split_list, allele
+):
     '''
     Function creates bracketed annotation for reverse complement sequences
 
@@ -141,6 +143,8 @@ def rev_comp_forward_strand_bracket(rev_sequence, n, repeat_list, locusid, canno
             forward_strand_bracketed_form = D19_annotation(rev_sequence, repeat_list, "CCTT")
         elif locusid == "D1S1656":
             forward_strand_bracketed_form = D1_annotation(rev_sequence, repeat_list, "CACA")
+        elif locusid == "D7S820":
+            forward_strand_bracketed_form = D7_anno(rev_sequence, allele, n, repeat_list)
         else:
             forward_strand_bracketed_form = split_string(rev_sequence, n, repeat_list)
     elif locusid == "FGA":
@@ -591,6 +595,40 @@ def PentaD_annotation(sequence, no_of_repeat_bases, repeat_list):
         return re.sub("  ", " ", final_string)
 
 
+def D7_anno(sequence, allele, n, repeat_list):
+    '''
+    Function to correctly bracket microvariants in the D7S820 locus.
+
+    Microvariants N.1 and N.3 separate the first base (or first three bases) of the sequence
+    in order to correctly bracket the sequence. Microvariants N.2 has a third repeat motif
+    added in order to bracket the sequence correctly.
+    '''
+    if type(allele) == int:
+        forward_strand_bracketed_form = split_string(sequence, n, repeat_list)
+    else:
+        if re.search(r'\d{1,2}.1', allele):
+            if sequence[-1] == "T":
+                forward_strand_bracketed_form = split_string(sequence, n, repeat_list)
+            else:
+                forward_strand_bracketed_form = (
+                    f"{sequence[0]} "
+                    f"{split_string(sequence[1:], n, repeat_list)}"
+                )
+        elif re.search(r'\d{1,2}.2', allele):
+            new_repeat_list = [
+                "TATC",
+                "TGTC",
+                "AATC"
+            ]
+            forward_strand_bracketed_form = split_string(sequence, n, new_repeat_list)
+        else:
+            forward_strand_bracketed_form = (
+                f"{sequence[:3]} "
+                f"{split_string(sequence[3:], n, repeat_list)}"
+            )
+    return forward_strand_bracketed_form
+
+
 def resolve_uas_sequence(sequence, str_data, kit, locus, n):
     assert kit in ('forenseq', 'powerseq')
     if kit == 'forenseq':
@@ -643,7 +681,7 @@ def flank_5(full_seq, front, locus, n):
     elif locus == "D20S482":
         flank = (
             f"{flank_seq[:2]} {flank_seq[2:6]} {flank_seq[6]} {flank_seq[7:10]} "
-            f"{flank_seq[10:14]} {flank_seq[14:18]}"
+            f"{flank_seq[10:]} {flank_seq[14:18]}"
         )
     elif locus == "D2S441":
         flank = f"{flank_seq[:4]} {flank_seq[4]} {loci_need_split_anno(flank_seq[5:], 4)}"
@@ -665,6 +703,8 @@ def flank_5(full_seq, front, locus, n):
         flank = f"{flank_seq[:3]} {loci_need_split_anno(flank_seq[3:], 4)}"
     elif locus == "D10S1248":
         flank = f"{flank_seq[:2]} {loci_need_split_anno(flank_seq[2:], 4)}"
+    elif locus == "D22S1045":
+        flank = f"{flank_seq[0]} {loci_need_split_anno(flank_seq[1:], 3)}"
     elif locus in invariant_loci:
         flank_rev = loci_need_split_anno(flank_seq[::-1], n)
         flank = flank_rev[::-1]
@@ -749,7 +789,8 @@ def main(args):
             if str_dict[locus]['ReverseCompNeeded'] == "Yes":
                 reverse_comp_sequence = rev_complement_anno(uas_sequence)
                 forward_strand_bracketed_form = rev_comp_forward_strand_bracket(
-                    reverse_comp_sequence, no_of_repeat_bases, repeats, locus, cannot_split
+                    reverse_comp_sequence, no_of_repeat_bases, repeats, locus, cannot_split,
+                    str_allele
                 )
                 reverse_strand_bracketed_form = rev_comp_uas_output_bracket(
                     forward_strand_bracketed_form, no_of_repeat_bases
@@ -784,7 +825,8 @@ def main(args):
             elif str_dict[locus]['ReverseCompNeeded'] == "Yes":
                 reverse_comp_sequence = rev_complement_anno(uas_sequence)
                 forward_strand_bracketed_form = rev_comp_forward_strand_bracket(
-                    reverse_comp_sequence, no_of_repeat_bases, repeats, locus, cannot_split
+                    reverse_comp_sequence, no_of_repeat_bases, repeats, locus, cannot_split,
+                    str_allele
                 )
                 reverse_strand_bracketed_form = rev_comp_uas_output_bracket(
                     forward_strand_bracketed_form, no_of_repeat_bases
@@ -793,6 +835,15 @@ def main(args):
                 forward_strand_bracketed_form = PentaD_annotation(
                     uas_sequence, no_of_repeat_bases, repeats
                 )
+            elif locus == "D13S317":
+                if type(str_allele) == int:
+                    forward_strand_bracketed_form = loci_need_split_anno(
+                        uas_sequence, no_of_repeat_bases
+                    )
+                else:
+                    forward_strand_bracketed_form = split_string(
+                        uas_sequence, no_of_repeat_bases, repeats
+                    )
             else:
                 forward_strand_bracketed_form = loci_need_split_anno(
                     uas_sequence, no_of_repeat_bases
@@ -857,7 +908,8 @@ def main(args):
                     f"{flank_5_anno} {forward_strand_bracketed_form} {flank_3_anno}"
                 )
             flank_summary = [
-                sampleid, project, analysis, locus, reads, sequence, full_bracketed_anno
+                sampleid, project, analysis, locus, reads, str_allele, sequence, flank_5_anno,
+                forward_strand_bracketed_form, flank_3_anno
             ]
             flank_summary = '\t'.join(str(i) for i in flank_summary)
             name = re.sub(".txt", "", args.out)
@@ -866,8 +918,8 @@ def main(args):
             else:
                 flank_file = open(f"{name}_flanks_anno.txt", "w")
                 header = [
-                    'SampleID', 'Project', 'Analysis', 'Locus', 'Reads', 'Full_Sequence',
-                    'Bracket_Annotation'
+                    'SampleID', 'Project', 'Analysis', 'Locus', 'Reads', 'Length_Allele',
+                    'Full_Sequence', '5_Flank_Anno', 'UAS_Region_Anno', '3_Flank_Anno'
                     ]
                 header = '\t'.join(header)
                 print(header, file=flank_file)
