@@ -13,6 +13,7 @@ import pandas as pd
 import pytest
 import lusSTR
 from lusSTR.tests import data_file
+import re
 from tempfile import NamedTemporaryFile
 
 
@@ -292,3 +293,15 @@ def test_format_straitrazor():
         args = lusSTR.cli.get_parser().parse_args(arglist)
         lusSTR.format.main(args)
         assert filecmp.cmp(testformat, outfile.name) is True
+
+def test_flank_anno():
+    with NamedTemporaryFile(suffix=".txt") as outfile:
+        os.unlink(outfile.name)
+        inputfile = data_file('Flanks_testing_file.csv')
+        testflanks = data_file('testflanks_flanks_anno.txt')
+        arglist = ['annotate', inputfile, '-o', outfile.name, '--kit', 'forenseq']
+        args = lusSTR.cli.get_parser().parse_args(arglist)
+        lusSTR.annot.main(args)
+        outfile_name = re.sub(".txt", "", outfile.name)
+        outfile_name_output = f"{outfile_name}_flanks_anno.txt"
+        assert filecmp.cmp(testflanks, outfile_name_output) is True
