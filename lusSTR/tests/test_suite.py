@@ -303,6 +303,6 @@ def test_flank_anno():
         arglist = ['annotate', inputfile, '-o', outfile.name, '--kit', 'forenseq']
         args = lusSTR.cli.get_parser().parse_args(arglist)
         lusSTR.annot.main(args)
-        outfile_name = re.sub('.txt', '', outfile.name)
+        outfile_name = os.path.splitext(outfile.name)[0]
         outfile_name_output = f'{outfile_name}_flanks_anno.txt'
         assert filecmp.cmp(testflanks, outfile_name_output) is True

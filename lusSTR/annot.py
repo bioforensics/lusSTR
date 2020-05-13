@@ -918,7 +918,8 @@ def main(args):
                 forward_strand_bracketed_form, flank_3_anno
             ]
             flank_summary = '\t'.join(str(i) for i in flank_summary)
-            name = re.sub(".txt", "", args.out)
+            outfile = args.out
+            name = os.path.splitext(args.out)[0]
             if os.path.exists(f"{name}_flanks_anno.txt"):
                 flank_file = open(f"{name}_flanks_anno.txt", "a")
             else:
