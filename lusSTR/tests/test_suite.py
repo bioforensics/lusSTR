@@ -30,11 +30,11 @@ def test_format():
 @pytest.mark.parametrize('sequence, repeat_list, output', [
     (
         'AGACAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGACAGACAGACAGACAGACAGACAGAT',
-        ["AGAT", "AGAC"], 'AGAC [AGAT]11 [AGAC]6 AGAT'
+        ['AGAT', 'AGAC'], 'AGAC [AGAT]11 [AGAC]6 AGAT'
     ),
     (
         'TAGATAGATAGATAGATGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGG',
-        ["TCTA", "CATA", "TCTG", "CACA", "CCTA"],
+        ['TCTA', 'CATA', 'TCTG', 'CACA', 'CCTA'],
         'TAGATAGATAGATAGATGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGG'
     )
 ])
@@ -65,7 +65,7 @@ def test_extract():
     s = '[ATCT]3 ATGT [ATCT]12'
     repeat = 'ATCT'
     final_output = lusSTR.annot.extract(s, repeat)
-    assert str(final_output) == "12"
+    assert str(final_output) == '12'
 
 
 def test_split_sequence_into_two_strings():
@@ -125,7 +125,7 @@ def test_loci_need_split_anno():
     )
 ])
 def test_D21_bracket(sequence, bracket_form):
-    repeats = ["TCTA", "TCTG"]
+    repeats = ['TCTA', 'TCTG']
     final_output = lusSTR.annot.D21_bracket(sequence, 6, repeats)
     assert final_output == bracket_form
 
@@ -134,7 +134,7 @@ def test_D19_annotation():
     sequence = (
         'AAGGAAAAGGTAGGAAGGAAGGAAGGAAGGAAGGAAGGAAGGAAGGAAGGAAGGAAGGAAGGAAGGAAGGAGAGAAGAAGAAAGAGAG'
     )
-    repeats = ["TCTA", "TCTG"]
+    repeats = ['TCTA', 'TCTG']
     repeat_for_split = 'CCTT'
     reverse_comp_sequence = lusSTR.annot.rev_complement_anno(sequence)
     final_output = lusSTR.annot.D19_annotation(reverse_comp_sequence, repeats, repeat_for_split)
@@ -144,7 +144,7 @@ def test_D19_annotation():
 def test_D1_annotation():
     sequence = 'TAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATGTGTATGTG'
     reverse_comp_sequence = lusSTR.annot.rev_complement_anno(sequence)
-    repeats = ["TCTA", "CATA", "TCTG", "CACA", "CCTA"]
+    repeats = ['TCTA', 'CATA', 'TCTG', 'CACA', 'CCTA']
     repeat_for_split = 'CACA'
     final_output = lusSTR.annot.D1_annotation(reverse_comp_sequence, repeats, repeat_for_split)
     print(final_output)
@@ -161,7 +161,7 @@ def test_D1_annotation():
     ('AAAAGAAAAAAAAGAAAAGAAAAGAAAAGAAAAGAAAAGAAAAGAAAAGA', 'AAAAG AAAAA [AAAGA]8')
 ])
 def test_PentaD_annotation(sequence, bracket_form):
-    repeats = ["AAAGA"]
+    repeats = ['AAAGA']
     no_of_repeat_bases = 5
     final_output = lusSTR.annot.PentaD_annotation(sequence, no_of_repeat_bases, repeats)
     assert final_output == bracket_form
@@ -172,7 +172,7 @@ def test_FGA_anno():
         'TTTCTTTCTTTCTTTCTTTTTTCTTTCTTTCTTTCTTTCTTTCTTTCTTTCTTTCTTTCTGTCTGTCTGTCTTTCTTTCTTTCTTTCTT'
         'TCTTTCTTTCTTTCTTTCTTTCTTTCTTTCTTTCTTTCTTTCTTCCTTCCTTCCTTTCTTTCTTTCTCCTTCCTTCCTTCCTTCC'
     )
-    repeats = ["AAAG", "GAAA", "GAAG", "ACAG", "AAAA"]
+    repeats = ['AAAG', 'GAAA', 'GAAG', 'ACAG', 'AAAA']
     reverse_comp_sequence = lusSTR.annot.rev_complement_anno(sequence)
     final_output = lusSTR.annot.FGA_anno(reverse_comp_sequence, repeats)
     assert final_output == '[GGAA]4 GGAG [AAAG]3 [GAAG]3 [AAAG]15 [ACAG]3 [AAAG]9 AA AAAA [GAAA]4'
@@ -224,7 +224,7 @@ def test_lus_anno(forward_bracket, lus, sec, tert, locus, lus_allele, sec_allele
 
 def test_THO1():
     sequence = 'AATGAATGAATGAATGAATGATGATGAATGAATGAATG'
-    repeats = ["AATG"]
+    repeats = ['AATG']
     final_output = lusSTR.annot.TH01_annotation(sequence, repeats)
     assert final_output == '[AATG]5 ATG ATG [AATG]3'
 
@@ -235,9 +235,9 @@ def test_THO1():
     ('[TCTA]4 [TCTG]5 [TCTA]3 TA [TCTA]3 TCA [TCTA]2 TCCATA [TCTA]12', '12', '4', '5')
 ])
 def test_D21_anno(forward_bracket, lus_allele, sec_allele, tert_allele):
-    lus = "TCTA"
-    sec = "TCTA"
-    tert = "TCTG"
+    lus = 'TCTA'
+    sec = 'TCTA'
+    tert = 'TCTG'
     final_lus, final_sec, final_tert = lusSTR.annot.lus_D21_anno(forward_bracket, lus, sec, tert)
     assert str(final_lus) == lus_allele
     assert str(final_sec) == sec_allele
@@ -294,14 +294,15 @@ def test_format_straitrazor():
         lusSTR.format.main(args)
         assert filecmp.cmp(testformat, outfile.name) is True
 
+
 def test_flank_anno():
-    with NamedTemporaryFile(suffix=".txt") as outfile:
+    with NamedTemporaryFile(suffix='.txt') as outfile:
         os.unlink(outfile.name)
         inputfile = data_file('Flanks_testing_file.csv')
         testflanks = data_file('testflanks_flanks_anno.txt')
         arglist = ['annotate', inputfile, '-o', outfile.name, '--kit', 'forenseq']
         args = lusSTR.cli.get_parser().parse_args(arglist)
         lusSTR.annot.main(args)
-        outfile_name = re.sub(".txt", "", outfile.name)
-        outfile_name_output = f"{outfile_name}_flanks_anno.txt"
+        outfile_name = re.sub('.txt', '', outfile.name)
+        outfile_name_output = f'{outfile_name}_flanks_anno.txt'
         assert filecmp.cmp(testflanks, outfile_name_output) is True

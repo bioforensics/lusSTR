@@ -600,7 +600,7 @@ def D7_anno(sequence, allele, n, repeat_list):
     Function to correctly bracket microvariants in the D7S820 locus.
 
     Microvariants N.1 and N.3 separate the first base (or first three bases) of the sequence
-    in order to correctly bracket the sequence. Microvariants N.2 has a third repeat motif
+    in order to correctly bracket the sequence. Microvariant N.2 has a third repeat motif
     added in order to bracket the sequence correctly.
     '''
     if type(allele) == int:
