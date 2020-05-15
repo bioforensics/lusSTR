@@ -277,11 +277,13 @@ def test_annotate_full():
     with NamedTemporaryFile() as outfile:
         os.unlink(outfile.name)
         inputfile = data_file('2800M_formatted_full.csv')
-        testanno = data_file('2800M_full_anno.txt')
+        testfullanno = data_file('2800M_full_anno.txt')
+        testuasanno = data_file('2800M_uas_anno.txt')
         arglist = ['annotate', inputfile, '-o', outfile.name, '--kit', 'forenseq']
         args = lusSTR.cli.get_parser().parse_args(arglist)
         lusSTR.annot.main(args)
-        assert filecmp.cmp(testanno, outfile.name) is True
+        assert filecmp.cmp(testfullanno, outfile.name) is True
+        assert filecmp.cmp(testuasanno, outfile.name) is True
 
 
 def test_format_straitrazor():
