@@ -52,6 +52,12 @@ def annot_subparser(subparsers):
         '--uas', action='store_true',
         help='Use if sequences have been run through the ForenSeq UAS.'
     )
+    cli.add_argument(
+        '--nocombine', action='store_true',
+        help='If the sequences were not run through the UAS, the reads are automatically '
+        'combined for duplicate sequences within the UAS region. If the user wishes to not '
+        'combine the read counts, use this flag.'
+    )
 
 
 mains = {
