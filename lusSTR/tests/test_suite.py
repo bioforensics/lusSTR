@@ -275,20 +275,21 @@ def test_annotate_uas():
 
 def test_annotate_full():
     with NamedTemporaryFile() as outfile:
-        os.unlink(outfile.name)
         inputfile = data_file('2800M_formatted_full.csv')
         testfullanno = data_file('2800M_full_anno.txt')
         testuasanno = data_file('2800M_uas_anno.txt')
-        arglist = ['annotate', inputfile, '-o', outfile.name, '--kit', 'forenseq']
+        arglist = [
+            'annotate', inputfile, '-o', outfile.name, '--kit', 'forenseq', '--nocombine'
+        ]
         args = lusSTR.cli.get_parser().parse_args(arglist)
         lusSTR.annot.main(args)
-        assert filecmp.cmp(testfullanno, outfile.name) is True
-        assert filecmp.cmp(testuasanno, outfile.name) is True
+        outfile_name = os.path.splitext(outfile.name)[0]
+        outfile_name_output = f"{outfile_name}_no_combined_reads.txt"
+        assert filecmp.cmp(testfullanno, outfile_name_output) is True
 
 
 def test_format_straitrazor():
     with NamedTemporaryFile() as outfile:
-        os.unlink(outfile.name)
         inputdb = data_file('STRait_Razor_test_output/')
         testformat = data_file('STRait_Razor_test_output.csv')
         arglist = ['format', inputdb, '-o', outfile.name]
@@ -299,7 +300,6 @@ def test_format_straitrazor():
 
 def test_flank_anno():
     with NamedTemporaryFile(suffix='.txt') as outfile:
-        os.unlink(outfile.name)
         inputfile = data_file('Flanks_testing_file.csv')
         testflanks = data_file('testflanks_flanks_anno.txt')
         arglist = ['annotate', inputfile, '-o', outfile.name, '--kit', 'forenseq']
