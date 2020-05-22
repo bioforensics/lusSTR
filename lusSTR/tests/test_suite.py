@@ -316,7 +316,5 @@ def test_annotate_combine():
         args = lusSTR.cli.get_parser().parse_args(arglist)
         lusSTR.annot.main(args)
         count=0
-        with open (outfile.name,'rb') as f:
-            for line in f:
-                count+=1
-        assert count == 952
+        with open(outfile.name, 'r') as fh:
+            assert len(fh.readlines()) == 952
