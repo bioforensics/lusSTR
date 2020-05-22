@@ -768,11 +768,9 @@ def main(args):
     must_split = ["D13S317", "D18S51"]
 
     data = pd.read_csv(args.input)
-    final_output = pd.DataFrame()
-    final_flank_output = pd.DataFrame()
     list_of_lists = []
     flanks_list = []
-    for i in range(len(data)):
+    for i, row in data.iterrows():
         locus = data.iloc[i, 0]
         reads = data.iloc[i, 1]
         sequence = data.iloc[i, 2]
@@ -909,20 +907,16 @@ def main(args):
                     'Forward_Strand_Bracketed_form', 'UAS_Output_Bracketed_Form', 'LUS',
                     'LUS_Plus', 'Reads'
                 ]
-    final_output = final_output.append(
-        pd.DataFrame(list_of_lists, columns=final_output_columns)
-    )
+    final_output = pd.DataFrame(list_of_lists, columns=final_output_columns)
     name = os.path.splitext(args.out)[0]
     if not args.uas:
         flanks_columns = [
                     'SampleID', 'Project', 'Analysis', 'Locus', 'Reads', 'Length_Allele',
                     'Full_Sequence', '5_Flank_Anno', 'UAS_Region_Anno', '3_Flank_Anno'
                     ]
-        final_flank_output = final_flank_output.append(
-            pd.DataFrame(flanks_list, columns=flanks_columns)
-        )
+        final_flank_output = pd.DataFrame(flanks_list, columns=flanks_columns)
         final_flank_output.to_csv(f"{name}_flanks_anno.txt", sep="\t", index=False)
-        if not args.nocombine:
+        if args.combine:
             final_output = final_output.groupby([
                 'SampleID', 'Project', 'Analysis', 'Locus', 'UAS_Output_Sequence',
                 'Forward_Strand_Sequence', 'Traditional_STR_Allele',
