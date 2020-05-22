@@ -273,11 +273,10 @@ def test_annotate_uas():
         assert filecmp.cmp(testanno, outfile.name) is True
 
 
-def test_annotate_full():
+def test_annotate_full_nocombine():
     with NamedTemporaryFile() as outfile:
         inputfile = data_file('2800M_formatted_full.csv')
         testfullanno = data_file('2800M_full_anno.txt')
-        testuasanno = data_file('2800M_uas_anno.txt')
         arglist = [
             'annotate', inputfile, '-o', outfile.name, '--kit', 'forenseq', '--nocombine'
         ]
@@ -308,3 +307,16 @@ def test_flank_anno():
         outfile_name = os.path.splitext(outfile.name)[0]
         outfile_name_output = f'{outfile_name}_flanks_anno.txt'
         assert filecmp.cmp(testflanks, outfile_name_output) is True
+
+
+def test_annotate_combine():
+    with NamedTemporaryFile() as outfile:
+        inputfile = data_file('Flanks_testing_file.csv')
+        arglist = ['annotate', inputfile, '-o', outfile.name, '--kit', 'forenseq']
+        args = lusSTR.cli.get_parser().parse_args(arglist)
+        lusSTR.annot.main(args)
+        count=0
+        with open (outfile.name,'rb') as f:
+            for line in f:
+                count+=1
+        assert count == 952

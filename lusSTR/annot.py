@@ -767,7 +767,7 @@ def main(args):
     ]
     must_split = ["D13S317", "D18S51"]
 
-    data = pd.read_csv(args.input, )
+    data = pd.read_csv(args.input)
     final_output = pd.DataFrame()
     final_flank_output = pd.DataFrame()
     list_of_lists = []
