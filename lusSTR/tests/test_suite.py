@@ -254,8 +254,18 @@ def test_D21_lus_sec():
 
 
 @pytest.mark.parametrize('sequence, uas_seq, front, back', [
-    ('CTATGCATCTATCTATCTATCTATCTATCTATCTATCTATCTAATGGTTA', 'ATCTATCTATCTATCTATCTATCTATCTATCTATCT', 6, 8),
-    ('TCTATCTGTCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATTCCC', 'TCTATCTGTCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTA', 0, 5)
+    (
+        'CTATGCATCTATCTATCTATCTATCTATCTATCTATCTATCTAATGGTTA',
+        'ATCTATCTATCTATCTATCTATCTATCTATCTATCT',
+        6,
+        8,
+    ),
+    (
+        'TCTATCTGTCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATTCCC',
+        'TCTATCTGTCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTA',
+        0,
+        5,
+    ),
 ])
 def test_full_seq_to_uas(sequence, uas_seq, front, back):
     uas_sequence = lusSTR.annot.full_seq_to_uas(sequence, front, back)
@@ -283,7 +293,7 @@ def test_annotate_full_nocombine():
         args = lusSTR.cli.get_parser().parse_args(arglist)
         lusSTR.annot.main(args)
         outfile_name = os.path.splitext(outfile.name)[0]
-        outfile_name_output = f"{outfile_name}_no_combined_reads.txt"
+        outfile_name_output = f'{outfile_name}_no_combined_reads.txt'
         assert filecmp.cmp(testfullanno, outfile_name_output) is True
 
 
@@ -315,6 +325,5 @@ def test_annotate_combine():
         arglist = ['annotate', inputfile, '-o', outfile.name, '--kit', 'forenseq']
         args = lusSTR.cli.get_parser().parse_args(arglist)
         lusSTR.annot.main(args)
-        count=0
         with open(outfile.name, 'r') as fh:
             assert len(fh.readlines()) == 952

@@ -10,7 +10,7 @@ test:
 
 ## style:     check code style against PEP8
 style:
-	pycodestyle --max-line-length=99 lusSTR/*.py
+	pycodestyle --max-line-length=99 lusSTR/*.py lusSTR/tests/test_suite.py
 
 ## devenv:    configure a development environment
 devenv:
