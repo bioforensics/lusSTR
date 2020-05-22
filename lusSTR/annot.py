@@ -901,28 +901,22 @@ def main(args):
             ]
             flanks_list.append(flank_summary)
 
-    final_output_columns = [
-                    'SampleID', 'Project', 'Analysis', 'Locus', 'UAS_Output_Sequence',
-                    'Forward_Strand_Sequence', 'Traditional_STR_Allele',
-                    'Forward_Strand_Bracketed_form', 'UAS_Output_Bracketed_Form', 'LUS',
-                    'LUS_Plus', 'Reads'
-                ]
-    final_output = pd.DataFrame(list_of_lists, columns=final_output_columns)
+    columns = [
+        'SampleID', 'Project', 'Analysis', 'Locus', 'UAS_Output_Sequence',
+        'Forward_Strand_Sequence', 'Traditional_STR_Allele', 'Forward_Strand_Bracketed_form',
+        'UAS_Output_Bracketed_Form', 'LUS', 'LUS_Plus', 'Reads'
+    ]
+    final_output = pd.DataFrame(list_of_lists, columns=columns)
     name = os.path.splitext(args.out)[0]
     if not args.uas:
         flanks_columns = [
-                    'SampleID', 'Project', 'Analysis', 'Locus', 'Reads', 'Length_Allele',
-                    'Full_Sequence', '5_Flank_Anno', 'UAS_Region_Anno', '3_Flank_Anno'
-                    ]
+            'SampleID', 'Project', 'Analysis', 'Locus', 'Reads', 'Length_Allele', 'Full_Sequence',
+            '5_Flank_Anno', 'UAS_Region_Anno', '3_Flank_Anno'
+        ]
         final_flank_output = pd.DataFrame(flanks_list, columns=flanks_columns)
         final_flank_output.to_csv(f'{name}_flanks_anno.txt', sep='\t', index=False)
         if args.combine:
-            final_output = final_output.groupby([
-                'SampleID', 'Project', 'Analysis', 'Locus', 'UAS_Output_Sequence',
-                'Forward_Strand_Sequence', 'Traditional_STR_Allele',
-                'Forward_Strand_Bracketed_form', 'UAS_Output_Bracketed_Form', 'LUS',
-                'LUS_Plus'
-            ], as_index=False)['Reads'].sum()
+            final_output = final_output.groupby(columns[:-1], as_index=False)['Reads'].sum()
             final_output.to_csv(args.out, sep='\t', index=False)
         else:
             final_output.to_csv(f'{name}_no_combined_reads.txt', sep='\t', index=False)
