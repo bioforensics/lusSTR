@@ -25,6 +25,13 @@ with open(get_str_metadata_file(), 'r') as fh:
     str_dict = json.load(fh)
 
 
+cannot_split = [
+    'D19S433', 'D6S1043', 'TH01', 'D21S11', 'D1S1656', 'D7S820', 'D5S818',
+    'D12S391', 'D9S1122', 'PentaE'
+]
+must_split = ['D13S317', 'D18S51']
+
+
 def get_annotation(sequence, repeat_list):
     '''
     Function used to (in part) create bracketed annotation.
@@ -760,146 +767,148 @@ def flank_3(full_seq, back, locus, n):
     return flank
 
 
-def main(args):
-    cannot_split = [
-        'D19S433', 'D6S1043', 'TH01', 'D21S11', 'D1S1656', 'D7S820', 'D5S818', 'D12S391',
-        'D9S1122', 'PentaE'
-    ]
-    must_split = ['D13S317', 'D18S51']
+def handle_sequence_record(locus, reads, sequence, sampleid, project='NA', analysis='NA',
+                           uas=False, kit='forenseq'):
+    repeats = str_dict[locus]['Repeats']
+    no_of_repeat_bases = len(str_dict[locus]['LUS'])
+    no_of_sub_bases = str_dict[locus]['BasesToSubtract']
+    no_of_split_bases = str_dict[locus]['NumBasesToSeparate']
+    lus = str_dict[locus]['LUS']
+    sec = str_dict[locus]['Sec']
+    tert = str_dict[locus]['Tert']
 
-    data = pd.read_csv(args.input)
-    list_of_lists = []
-    flanks_list = []
-    for i, row in data.iterrows():
-        locus = data.iloc[i, 0]
-        reads = data.iloc[i, 1]
-        sequence = data.iloc[i, 2]
-        sampleid = data.iloc[i, 3]
-        try:
-            project = data.iloc[i, 4]
-            analysis = data.iloc[i, 5]
-        except IndexError:
-            project = 'NA'
-            analysis = 'NA'
-        repeats = str_dict[locus]['Repeats']
-        no_of_repeat_bases = len(str_dict[locus]['LUS'])
-        no_of_sub_bases = str_dict[locus]['BasesToSubtract']
-        no_of_split_bases = str_dict[locus]['NumBasesToSeparate']
-        lus = str_dict[locus]['LUS']
-        sec = str_dict[locus]['Sec']
-        tert = str_dict[locus]['Tert']
-
-        if args.uas:
-            uas_sequence = sequence
-        else:
-            uas_sequence, flank_5_anno, flank_3_anno = resolve_uas_sequence(
-                sequence, str_dict[locus], args.kit, locus, no_of_repeat_bases
+    if uas:
+        uas_sequence = sequence
+    else:
+        uas_sequence, flank_5_anno, flank_3_anno = resolve_uas_sequence(
+            sequence, str_dict[locus], kit, locus, no_of_repeat_bases
+        )
+    str_allele = traditional_str_allele(uas_sequence, no_of_repeat_bases, no_of_sub_bases)
+    cantsplit = locus in cannot_split
+    havetosplit = locus in must_split
+    split_incompatible = len(uas_sequence) % no_of_repeat_bases != 0 and not havetosplit
+    if cantsplit or split_incompatible:
+        if str_dict[locus]['ReverseCompNeeded'] == 'Yes':
+            reverse_comp_sequence = rev_complement_anno(uas_sequence)
+            forward_strand_bracketed_form = rev_comp_forward_strand_bracket(
+                reverse_comp_sequence, no_of_repeat_bases, repeats, locus, cannot_split,
+                str_allele
             )
-        str_allele = traditional_str_allele(uas_sequence, no_of_repeat_bases, no_of_sub_bases)
-        cantsplit = locus in cannot_split
-        havetosplit = locus in must_split
-        split_incompatible = len(uas_sequence) % no_of_repeat_bases != 0 and not havetosplit
-        if cantsplit or split_incompatible:
-            if str_dict[locus]['ReverseCompNeeded'] == 'Yes':
-                reverse_comp_sequence = rev_complement_anno(uas_sequence)
-                forward_strand_bracketed_form = rev_comp_forward_strand_bracket(
-                    reverse_comp_sequence, no_of_repeat_bases, repeats, locus, cannot_split,
-                    str_allele
-                )
-                reverse_strand_bracketed_form = rev_comp_uas_output_bracket(
-                    forward_strand_bracketed_form, no_of_repeat_bases
-                )
-            elif locus == 'D21S11':
-                forward_strand_bracketed_form = D21_bracket(
-                    uas_sequence, no_of_split_bases, repeats
-                )
-            elif locus == 'TH01' and (len(uas_sequence) % no_of_repeat_bases != 0):
-                forward_strand_bracketed_form = TH01_annotation(uas_sequence, repeats)
-            elif locus == 'PentaD':
-                forward_strand_bracketed_form = PentaD_annotation(
-                    uas_sequence, no_of_repeat_bases, repeats
-                )
-            else:
+            reverse_strand_bracketed_form = rev_comp_uas_output_bracket(
+                forward_strand_bracketed_form, no_of_repeat_bases
+            )
+        elif locus == 'D21S11':
+            forward_strand_bracketed_form = D21_bracket(
+                uas_sequence, no_of_split_bases, repeats
+            )
+        elif locus == 'TH01' and (len(uas_sequence) % no_of_repeat_bases != 0):
+            forward_strand_bracketed_form = TH01_annotation(uas_sequence, repeats)
+        elif locus == 'PentaD':
+            forward_strand_bracketed_form = PentaD_annotation(
+                uas_sequence, no_of_repeat_bases, repeats
+            )
+        else:
+            forward_strand_bracketed_form = split_string(
+                uas_sequence, no_of_repeat_bases, repeats
+            )
+        lus_final, sec_final, tert_final = lus_anno(
+            forward_strand_bracketed_form, lus, sec, tert, locus, str_allele
+        )
+    else:
+        if locus == 'D18S51':
+            if type(str_allele) == str:
                 forward_strand_bracketed_form = split_string(
-                    uas_sequence, no_of_repeat_bases, repeats
-                )
-            lus_final, sec_final, tert_final = lus_anno(
-                forward_strand_bracketed_form, lus, sec, tert, locus, str_allele
-            )
-        else:
-            if locus == 'D18S51':
-                if type(str_allele) == str:
-                    forward_strand_bracketed_form = split_string(
-                        uas_sequence, no_of_repeat_bases, repeats
-                    )
-                else:
-                    forward_strand_bracketed_form = loci_need_split_anno(
-                        uas_sequence, no_of_repeat_bases
-                    )
-            elif locus == 'D13S317':
-                forward_strand_bracketed_form = D13_anno(uas_sequence, repeats)
-            elif str_dict[locus]['ReverseCompNeeded'] == 'Yes':
-                reverse_comp_sequence = rev_complement_anno(uas_sequence)
-                forward_strand_bracketed_form = rev_comp_forward_strand_bracket(
-                    reverse_comp_sequence, no_of_repeat_bases, repeats, locus, cannot_split,
-                    str_allele
-                )
-                reverse_strand_bracketed_form = rev_comp_uas_output_bracket(
-                    forward_strand_bracketed_form, no_of_repeat_bases
-                )
-            elif locus == 'PentaD':
-                forward_strand_bracketed_form = PentaD_annotation(
                     uas_sequence, no_of_repeat_bases, repeats
                 )
             else:
                 forward_strand_bracketed_form = loci_need_split_anno(
                     uas_sequence, no_of_repeat_bases
                 )
-            lus_final, sec_final, tert_final = lus_anno(
-                forward_strand_bracketed_form, lus, sec, tert, locus, str_allele
+        elif locus == 'D13S317':
+            forward_strand_bracketed_form = D13_anno(uas_sequence, repeats)
+        elif str_dict[locus]['ReverseCompNeeded'] == 'Yes':
+            reverse_comp_sequence = rev_complement_anno(uas_sequence)
+            forward_strand_bracketed_form = rev_comp_forward_strand_bracket(
+                reverse_comp_sequence, no_of_repeat_bases, repeats, locus, cannot_split,
+                str_allele
             )
+            reverse_strand_bracketed_form = rev_comp_uas_output_bracket(
+                forward_strand_bracketed_form, no_of_repeat_bases
+            )
+        elif locus == 'PentaD':
+            forward_strand_bracketed_form = PentaD_annotation(
+                uas_sequence, no_of_repeat_bases, repeats
+            )
+        else:
+            forward_strand_bracketed_form = loci_need_split_anno(
+                uas_sequence, no_of_repeat_bases
+            )
+        lus_final, sec_final, tert_final = lus_anno(
+            forward_strand_bracketed_form, lus, sec, tert, locus, str_allele
+        )
 
-        if locus == 'PentaD':
-            if str_allele == '2.2':
-                lus_final = 5
-            elif str_allele == '3.2':
-                lus_final = 6
-        lus_final_output = f'{str_allele}_{lus_final}'
-        if sec_final == '':
-            lus_plus = lus_final_output
+    if locus == 'PentaD':
+        if str_allele == '2.2':
+            lus_final = 5
+        elif str_allele == '3.2':
+            lus_final = 6
+    lus_final_output = f'{str_allele}_{lus_final}'
+    if sec_final == '':
+        lus_plus = lus_final_output
+    else:
+        if tert_final == '':
+            lus_plus = f'{str_allele}_{lus_final}_{sec_final}'
         else:
-            if tert_final == '':
-                lus_plus = f'{str_allele}_{lus_final}_{sec_final}'
-            else:
-                lus_plus = f'{str_allele}_{lus_final}_{sec_final}_{tert_final}'
-        if str_dict[locus]['ReverseCompNeeded'] == 'Yes':
-            summary = [
-                sampleid, project, analysis, locus, uas_sequence, reverse_comp_sequence,
-                str_allele, forward_strand_bracketed_form, reverse_strand_bracketed_form,
-                lus_final_output, lus_plus, reads
-            ]
+            lus_plus = f'{str_allele}_{lus_final}_{sec_final}_{tert_final}'
+    if str_dict[locus]['ReverseCompNeeded'] == 'Yes':
+        summary = [
+            sampleid, project, analysis, locus, uas_sequence, reverse_comp_sequence,
+            str_allele, forward_strand_bracketed_form, reverse_strand_bracketed_form,
+            lus_final_output, lus_plus, reads
+        ]
+    else:
+        summary = [
+            sampleid, project, analysis, locus, uas_sequence, uas_sequence, str_allele,
+            forward_strand_bracketed_form, forward_strand_bracketed_form, lus_final_output,
+            lus_plus, reads
+        ]
+
+    flank_summary = None
+    if not uas and kit == 'forenseq':
+        if flank_5_anno == '':
+            full_bracketed_anno = f'{forward_strand_bracketed_form} {flank_3_anno}'
+        elif flank_3_anno == '':
+            full_bracketed_anno = f'{flank_5_anno} {forward_strand_bracketed_form}'
         else:
-            summary = [
-                sampleid, project, analysis, locus, uas_sequence, uas_sequence, str_allele,
-                forward_strand_bracketed_form, forward_strand_bracketed_form, lus_final_output,
-                lus_plus, reads
-            ]
+            full_bracketed_anno = (
+                f'{flank_5_anno} {forward_strand_bracketed_form} {flank_3_anno}'
+            )
+        flank_summary = [
+            sampleid, project, analysis, locus, reads, str_allele, sequence, flank_5_anno,
+            forward_strand_bracketed_form, flank_3_anno
+        ]
+
+    return summary, flank_summary
+
+
+def main(args):
+    data = pd.read_csv(args.input)
+    list_of_lists = list()
+    flanks_list = list()
+    for i, row in data.iterrows():
+        locus, reads, sequence, sampleid = row.iloc[:4]
+        try:
+            project, analysis = row.iloc[4:6]
+        except ValueError:
+            project, analysis = 'NA', 'NA'
+        summary, flank_summary = handle_sequence_record(
+            locus, reads, sequence, sampleid, project=project, analysis=analysis, uas=args.uas,
+            kit=args.kit,
+        )
         list_of_lists.append(summary)
-
-        if not args.uas and args.kit == 'forenseq':
-            if flank_5_anno == '':
-                full_bracketed_anno = f'{forward_strand_bracketed_form} {flank_3_anno}'
-            elif flank_3_anno == '':
-                full_bracketed_anno = f'{flank_5_anno} {forward_strand_bracketed_form}'
-            else:
-                full_bracketed_anno = (
-                    f'{flank_5_anno} {forward_strand_bracketed_form} {flank_3_anno}'
-                )
-            flank_summary = [
-                sampleid, project, analysis, locus, reads, str_allele, sequence, flank_5_anno,
-                forward_strand_bracketed_form, flank_3_anno
-            ]
+        if flank_summary is not None:
             flanks_list.append(flank_summary)
+
 
     columns = [
         'SampleID', 'Project', 'Analysis', 'Locus', 'UAS_Output_Sequence',
