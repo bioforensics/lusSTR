@@ -10,6 +10,7 @@
 import csv
 import json
 import os
+import pandas as pd
 from pkg_resources import resource_filename
 import re
 import sys
@@ -453,11 +454,11 @@ def D19_annotation(sequence, repeat_list, repeat_for_split):
     Function to create bracketed annotation for the D19S433 locus
 
     A specialized function is required for this locus. The sequence is first broken into two
-    different strings. The two sets of sequences are processed separately in order to identify the
-    potential presence of a deletion in either sequence.
+    different strings. The two sets of sequences are processed separately in order to identify
+    the potential presence of a deletion in either sequence.
 
-    Simply identifying repeat units in a specified order does not result in the final annotation
-    which is consistent with previously published annotation for this locus.
+    Simply identifying repeat units in a specified order does not result in the final
+    annotation which is consistent with previously published annotation for this locus.
     '''
     final = list()
     last = 0
@@ -681,7 +682,7 @@ def full_seq_to_uas(full_seq, front, back):
 def flank_5(full_seq, front, locus, n):
     invariant_loci = [
         'D17S1301', 'D18S51', 'D21S11', 'D2S1338', 'D4S2408', 'D5S818', 'PentaE', 'D12S391',
-        'D19S433', 'FGA', 'TPOX', 'CSF1PO', 'D22S1045', 'D3S1358', 'D6S1043', 'TH01', 'D9S1122'
+        'D19S433', 'FGA', 'TPOX', 'CSF1PO', 'D3S1358', 'D6S1043', 'TH01', 'D9S1122'
     ]
     flank_seq = full_seq[:front]
     if locus == "D8S1179":
@@ -762,21 +763,21 @@ def flank_3(full_seq, back, locus, n):
 def main(args):
     cannot_split = [
         "D19S433", "D6S1043", "TH01", "D21S11", "D1S1656", "D7S820", "D5S818", "D12S391",
-        "D9S1122", "D1S1656", "PentaE"
+        "D9S1122", "PentaE"
     ]
     must_split = ["D13S317", "D18S51"]
 
-    sample_file = open(args.input, "r")
-    data = csv.reader(sample_file)
-    next(data)
-    for row in data:
-        locus = row[0]
-        reads = row[1]
-        sequence = row[2]
-        sampleid = row[3]
+    data = pd.read_csv(args.input)
+    list_of_lists = []
+    flanks_list = []
+    for i, row in data.iterrows():
+        locus = data.iloc[i, 0]
+        reads = data.iloc[i, 1]
+        sequence = data.iloc[i, 2]
+        sampleid = data.iloc[i, 3]
         try:
-            project = row[4]
-            analysis = row[5]
+            project = data.iloc[i, 4]
+            analysis = data.iloc[i, 5]
         except IndexError:
             project = "NA"
             analysis = "NA"
@@ -877,32 +878,13 @@ def main(args):
                 str_allele, forward_strand_bracketed_form, reverse_strand_bracketed_form,
                 lus_final_output, lus_plus, reads
             ]
-            summary = '\t'.join(str(i) for i in summary)
         else:
             summary = [
                 sampleid, project, analysis, locus, uas_sequence, uas_sequence, str_allele,
                 forward_strand_bracketed_form, forward_strand_bracketed_form, lus_final_output,
                 lus_plus, reads
             ]
-            summary = '\t'.join(str(i) for i in summary)
-
-        output_file = sys.stdout
-        if args.out is not None:
-            if os.path.exists(args.out):
-                output_file = open(args.out, "a")
-            else:
-                output_file = open(args.out, "w")
-                header = [
-                    'SampleID', 'Project', 'Analysis', 'Locus', 'UAS_Output_Sequence',
-                    'Forward_Strand_Sequence', 'Traditional_STR_Allele',
-                    'Forward_Strand_Bracketed_form', 'UAS_Output_Bracketed_Form', 'LUS',
-                    'LUS_Plus', 'Reads'
-                ]
-                header = '\t'.join(header)
-                print(header, file=output_file)
-        print(summary, file=output_file)
-        if args.out is not None:
-            output_file.close()
+        list_of_lists.append(summary)
 
         if not args.uas and args.kit == "forenseq":
             if flank_5_anno == "":
@@ -917,18 +899,32 @@ def main(args):
                 sampleid, project, analysis, locus, reads, str_allele, sequence, flank_5_anno,
                 forward_strand_bracketed_form, flank_3_anno
             ]
-            flank_summary = '\t'.join(str(i) for i in flank_summary)
-            outfile = args.out
-            name = os.path.splitext(args.out)[0]
-            if os.path.exists(f"{name}_flanks_anno.txt"):
-                flank_file = open(f"{name}_flanks_anno.txt", "a")
-            else:
-                flank_file = open(f"{name}_flanks_anno.txt", "w")
-                header = [
+            flanks_list.append(flank_summary)
+
+    final_output_columns = [
+                    'SampleID', 'Project', 'Analysis', 'Locus', 'UAS_Output_Sequence',
+                    'Forward_Strand_Sequence', 'Traditional_STR_Allele',
+                    'Forward_Strand_Bracketed_form', 'UAS_Output_Bracketed_Form', 'LUS',
+                    'LUS_Plus', 'Reads'
+                ]
+    final_output = pd.DataFrame(list_of_lists, columns=final_output_columns)
+    name = os.path.splitext(args.out)[0]
+    if not args.uas:
+        flanks_columns = [
                     'SampleID', 'Project', 'Analysis', 'Locus', 'Reads', 'Length_Allele',
                     'Full_Sequence', '5_Flank_Anno', 'UAS_Region_Anno', '3_Flank_Anno'
                     ]
-                header = '\t'.join(header)
-                print(header, file=flank_file)
-            print(flank_summary, file=flank_file)
-            flank_file.close()
+        final_flank_output = pd.DataFrame(flanks_list, columns=flanks_columns)
+        final_flank_output.to_csv(f"{name}_flanks_anno.txt", sep="\t", index=False)
+        if args.combine:
+            final_output = final_output.groupby([
+                'SampleID', 'Project', 'Analysis', 'Locus', 'UAS_Output_Sequence',
+                'Forward_Strand_Sequence', 'Traditional_STR_Allele',
+                'Forward_Strand_Bracketed_form', 'UAS_Output_Bracketed_Form', 'LUS',
+                'LUS_Plus'
+            ], as_index=False)['Reads'].sum()
+            final_output.to_csv(args.out, sep="\t", index=False)
+        else:
+            final_output.to_csv(f"{name}_no_combined_reads.txt", sep="\t", index=False)
+    else:
+        final_output.to_csv(args.out, sep="\t", index=False)
