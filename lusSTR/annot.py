@@ -122,7 +122,7 @@ def traditional_str_allele(sequence, n, n_sub_out):
 
 
 def repeat_copy_number(bf, repeat):
-    '''Determine the longest uninterrupted stretch of the specified allele.
+    '''Determine the longest uninterrupted stretch of the specified repeat.
 
     The input is a sequence string collapsed to bracketed annotation form.
     '''
