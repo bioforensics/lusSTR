@@ -6,11 +6,11 @@ help: Makefile
 
 ## test:      run the automated test suite and print coverage information
 test:
-	pytest --cov=lusSTR --doctest-modules lusSTR/annot.py lusSTR/tests/test_suite.py
+	pytest --cov=lusSTR --doctest-modules lusSTR/annot.py lusSTR/tests/test_*.py
 
 ## style:     check code style against PEP8
 style:
-	pycodestyle --max-line-length=99 lusSTR/*.py lusSTR/tests/test_suite.py
+	pycodestyle --max-line-length=99 lusSTR/*.py lusSTR/tests/test_*.py
 
 ## devenv:    configure a development environment
 devenv:
