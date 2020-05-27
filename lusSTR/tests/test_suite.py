@@ -38,8 +38,8 @@ def test_format():
         'TAGATAGATAGATAGATGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGG'
     )
 ])
-def test_get_annotation(sequence, repeat_list, output):
-    final_output = lusSTR.annot.get_annotation(sequence, repeat_list)
+def test_collapse_all_repeats(sequence, repeat_list, output):
+    final_output = lusSTR.annot.collapse_all_repeats(sequence, repeat_list)
     assert final_output == output
 
 

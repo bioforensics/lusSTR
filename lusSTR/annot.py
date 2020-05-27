@@ -25,64 +25,43 @@ with open(get_str_metadata_file(), 'r') as fh:
     str_dict = json.load(fh)
 
 
-def get_annotation(sequence, repeat_list):
-    '''
-    Function used to (in part) create bracketed annotation.
+def collapse_tandem_repeat(fullseq, repeat):
+    '''Collapse tandem stretches of the specified repeat sequence in a larger sequence.
 
-    This function, called as a part of the split_string() function, identifies and extracts
-    specified repeats in order defined in the dict. The function returns the repeats in the
-    bracketed form with any remaining sequence returned intact. This function is used to
-    identify the specified repeats in the prioritized order within the sequence.
+    >>> collapse_tandem_repeat('TAGATTATTATTTAGTAGATTTAGTAG', 'ATT')
+    'TAG [ATT]3 TAGTAG ATT TAGTAG'
+    >>> collapse_tandem_repeat('TAGATTATTATTTAGTAGATTTAGTAG', 'TAG')
+    'TAG ATTATTATT [TAG]2 ATT [TAG]2'
     '''
-    for k in range(len(repeat_list)):
-        repeat = repeat_list[k]
-        if k == 0:
-            count = 0
-            final = list()
-            for element in re.split(repeat, sequence):
-                parts = element.split(',')
-                for i in parts:
-                    if i == '':
-                        count += 1
-                    else:
-                        if count == 1:
-                            final.append(repeat)
-                        elif count >= 2:
-                            final.append(f'[{repeat}]{count}')
-                        count = 1
-                        final.append(i)
-            if parts[-1] == '' and count > 2:
-                final.append(f'[{repeat}]{count-1}')
-            elif parts[-1] == '' and count <= 2:
-                final.append(repeat)
-            tmp = ' '.join(final)
-        elif k > 0:
-            final = list()
-            if re.match(repeat, sequence):
-                if sequence[:4] == repeat:
-                    count = 0
-                else:
-                    count = 1
-            else:
-                count = 0
-            for element in re.split(repeat, tmp):
-                parts = element.split(',')
-                for i in parts:
-                    if i == '':
-                        count += 1
-                    else:
-                        if count == 1:
-                            final.append(repeat)
-                        elif count >= 2:
-                            final.append(f'[{repeat}]{count}')
-                        count = 1
-                        final.append(i)
-            if parts[-1] == '' and count > 2:
-                final.append(f'[{repeat}]{count-1}')
-            elif parts[-1] == '' and count <= 2:
-                final.append(repeat)
-            tmp = ' '.join(final)
-    return re.sub('  ', ' ', tmp)
+    if repeat not in fullseq:
+        return fullseq
+    i = fullseq.find(repeat)
+    prefix = fullseq[:i]
+    suffix = fullseq[i:]
+    count = 0
+    while suffix.startswith(repeat):
+        count += 1
+        suffix = suffix[len(repeat):]
+    if count == 1:
+        formatted = f' {repeat} '
+    else:
+        formatted = f' [{repeat}]{count} '
+    final = prefix + formatted + collapse_tandem_repeat(suffix, repeat)
+    final = final.strip()
+    final = re.sub(r' +', ' ', final)
+    return final
+
+
+def collapse_all_repeats(sequence, repeats):
+    '''Convert a sequence to bracketed form by collapsing stretches of tandem repeats.
+
+    >>> collapse_all_repeats('TAGATTATTATTTAGTAGATTTAGTAG', ['ATT', 'TAG'])
+    'TAG [ATT]3 [TAG]2 ATT [TAG]2'
+    '''
+    collapsed_seq = sequence
+    for repeat in repeats:
+        collapsed_seq = collapse_tandem_repeat(collapsed_seq, repeat)
+    return collapsed_seq
 
 
 def split_by_n(sequence, n):
@@ -101,7 +80,7 @@ def split_string(sequence, n, repeat_list):
     Function creates bracketed annotation using a prioritized ordered list of repeats (repeat
     units are marker specific and are specified in str_markers.json file).
     '''
-    strings = get_annotation(sequence, repeat_list)
+    strings = collapse_all_repeats(sequence, repeat_list)
     final_string = list()
     for unit in strings.split(' '):
         if len(unit) > n and '[' not in unit:
@@ -562,7 +541,7 @@ def TH01_annotation(sequence, repeat_list):
     A separate function is required for the microvariants of the TH01 locus because of the
     insertion of the 'ATG' between the repeat units 'AATG'.
     '''
-    strings = get_annotation(sequence, repeat_list)
+    strings = collapse_all_repeats(sequence, repeat_list)
     final_string = list()
     for unit in strings.split(' '):
         if '[' not in unit and len(unit) > 3 and (len(unit) % 4 != 0) and unit[:3] == 'ATG':
