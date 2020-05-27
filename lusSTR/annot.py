@@ -177,8 +177,8 @@ def get_blocks(sequence, n):
     '''
     Function to split a sequence into blocks of size n
 
-    This function is used as a part of the collapse_repeats_by_length() function. It splits the sequence
-    into blocks of size n bases (as specified in the str_markers.json file).
+    This function is used as a part of the collapse_repeats_by_length() function. It splits the
+    sequence into blocks of size n bases (as specified in the str_markers.json file).
     '''
     count = 0
     prev = None
@@ -714,8 +714,8 @@ def flank_3(full_seq, back, locus, n):
     elif locus == 'D18S51':
         flank = (
             f'{flank_seq[:2]} {collapse_repeats_by_length(flank_seq[2:30], 4)} {flank_seq[30:33]} '
-            f'{flank_seq[33]} {collapse_repeats_by_length(flank_seq[34:42], 4)} {flank_seq[42:44]} '
-            f'{flank_seq[44:]}'
+            f'{flank_seq[33]} {collapse_repeats_by_length(flank_seq[34:42], 4)} '
+            f'{flank_seq[42:44]} {flank_seq[44:]}'
         )
     elif locus == 'D16S539':
         flank = (
