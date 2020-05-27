@@ -122,16 +122,16 @@ def traditional_str_allele(sequence, n, n_sub_out):
 
 
 def repeat_copy_number(bf, repeat):
-    '''
-    Function to identify the # of alleles for a specified repeat unit from the bracketed
-    annotation form.
+    '''Determine the longest uninterrupted stretch of the specified allele.
+
+    The input is a sequence string collapsed to bracketed annotation form.
     '''
     longest = 0
     for block in bf.split(' '):
         if block == repeat:
             if 1 > longest:
                 longest = 1
-        match = re.match(r'\['+ repeat +r'\](\d+)', block)
+        match = re.match(r'\[' + repeat + r'\](\d+)', block)
         if match:
             length = int(match.group(1))
             if length > longest:
