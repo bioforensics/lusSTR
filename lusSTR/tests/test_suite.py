@@ -51,13 +51,13 @@ def test_split_by_n():
     ]
 
 
-def test_split_string():
+def test_sequence_to_bracketed_form():
     sequence = (
         'TCTATCTATCTATCTGTCTGTCTGTCTGTCTGTCTGTCTATCTATCTATATCTATCTATCTATCATCTATCTATCCATATCTATCTATC'
         'TATCTATCTATCTATCTATCTATCTATCTATCTA'
     )
     repeats = ['TCTA', 'TCTG']
-    final_output = lusSTR.annot.split_string(sequence, 6, repeats)
+    final_output = lusSTR.annot.sequence_to_bracketed_form(sequence, 6, repeats)
     assert final_output == '[TCTA]3 [TCTG]6 [TCTA]3 TA [TCTA]3 TCA [TCTA]2 TCCATA [TCTA]11'
 
 

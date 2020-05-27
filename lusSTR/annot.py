@@ -73,23 +73,23 @@ def split_by_n(sequence, n):
         sequence = sequence[n:]
 
 
-def split_string(sequence, n, repeat_list):
-    '''
-    Function to create bracketed annotation.
+def sequence_to_bracketed_form(sequence, n, repeats):
+    '''Convert sequence to bracketed annotation.
 
-    Function creates bracketed annotation using a prioritized ordered list of repeats (repeat
-    units are marker specific and are specified in str_markers.json file).
+    Uses a combination of repeat-based and length-based methods to convert a sequence containing
+    tandem repeats into a concise bracketed representation.
     '''
-    strings = collapse_all_repeats(sequence, repeat_list)
-    final_string = list()
-    for unit in strings.split(' '):
+    collapsed = collapse_all_repeats(sequence, repeats)
+    blocks = list()
+    for unit in collapsed.split(' '):
         if len(unit) > n and '[' not in unit:
             for x in split_by_n(unit, n):
-                final_string.append(x)
+                blocks.append(x)
         else:
-            final_string.append(unit)
-    final_string_formatted = ' '.join(final_string)
-    return re.sub('  ', ' ', final_string_formatted)
+            blocks.append(unit)
+    result = ' '.join(blocks)
+    result = re.sub(r' +', ' ', result)
+    return result
 
 
 def rev_complement_anno(sequence):
@@ -120,21 +120,21 @@ def rev_comp_forward_strand_bracket(
     '''
     if locusid in cannot_split_list:
         if locusid == 'D19S433':
-            forward_strand_bracketed_form = D19_annotation(rev_sequence, repeat_list, 'CCTT')
+            forward_strand_brack_form = D19_annotation(rev_sequence, repeat_list, 'CCTT')
         elif locusid == 'D1S1656':
-            forward_strand_bracketed_form = D1_annotation(rev_sequence, repeat_list, 'CACA')
+            forward_strand_brack_form = D1_annotation(rev_sequence, repeat_list, 'CACA')
         elif locusid == 'D7S820':
-            forward_strand_bracketed_form = D7_anno(rev_sequence, allele, n, repeat_list)
+            forward_strand_brack_form = D7_anno(rev_sequence, allele, n, repeat_list)
         else:
-            forward_strand_bracketed_form = split_string(rev_sequence, n, repeat_list)
+            forward_strand_brack_form = sequence_to_bracketed_form(rev_sequence, n, repeat_list)
     elif locusid == 'FGA':
         if len(rev_sequence) % n != 0:
-            forward_strand_bracketed_form = FGA_anno(rev_sequence, repeat_list)
+            forward_strand_brack_form = FGA_anno(rev_sequence, repeat_list)
         else:
-            forward_strand_bracketed_form = collapse_repeats_by_length(rev_sequence, n)
+            forward_strand_brack_form = collapse_repeats_by_length(rev_sequence, n)
     else:
-        forward_strand_bracketed_form = collapse_repeats_by_length(rev_sequence, n)
-    return re.sub('  ', ' ', forward_strand_bracketed_form)
+        forward_strand_brack_form = collapse_repeats_by_length(rev_sequence, n)
+    return re.sub('  ', ' ', forward_strand_brack_form)
 
 
 def rev_comp_uas_output_bracket(forward_bracket, n):
@@ -353,18 +353,18 @@ def D21_bracket(sequence, no_of_split_bases, repeats):
     the conventional annotation for this particular locus. However, if the 'TATCTA' is included in
     a repeat unit, the repeat unit needs to be reported (i.e. [TCTA]2).
     '''
-    forward_strand_bracketed_form = split_string(sequence, no_of_split_bases, repeats)
+    forward_strand_brack_form = sequence_to_bracketed_form(sequence, no_of_split_bases, repeats)
     prev = 0
-    for m in re.finditer(']', forward_strand_bracketed_form):
+    for m in re.finditer(']', forward_strand_brack_form):
         prev = m.end()
     if (
-        prev == (len(forward_strand_bracketed_form) - 1) or
-        prev == (len(forward_strand_bracketed_form) - 2)
+        prev == (len(forward_strand_brack_form) - 1) or
+        prev == (len(forward_strand_brack_form) - 2)
        ):
-        return forward_strand_bracketed_form
+        return forward_strand_brack_form
     else:
-        first_string = forward_strand_bracketed_form[:prev+2]
-        second_string = forward_strand_bracketed_form[prev+2:]
+        first_string = forward_strand_brack_form[:prev+2]
+        second_string = forward_strand_brack_form[prev+2:]
         second_string_final = re.sub(' ', '', second_string)
         if len(second_string_final) % 4 == 0:
             split_second_string = collapse_repeats_by_length(second_string_final, 4)
@@ -417,7 +417,7 @@ def D1_annotation(sequence, repeat_list, repeat_for_split):
     else:
         final.append(collapse_repeats_by_length(first_string, 4))
     if (len(second_string) % 4 != 0):
-        final.append(split_string(second_string, 4, repeat_list))
+        final.append(sequence_to_bracketed_form(second_string, 4, repeat_list))
     else:
         final.append(collapse_repeats_by_length(second_string, 4))
     final_string = ' '.join(final)
@@ -447,7 +447,7 @@ def D19_annotation(sequence, repeat_list, repeat_for_split):
     first_string = sequence[2:prev]
     second_string = sequence[prev:]
     if (len(first_string) % 4 != 0):
-        final.append(split_string(first_string, 4, repeat_list))
+        final.append(sequence_to_bracketed_form(first_string, 4, repeat_list))
     else:
         final.append(collapse_repeats_by_length(first_string, 4))
     if (len(second_string) % 4 != 0):
@@ -499,7 +499,7 @@ def FGA_anno(sequence, repeat_list):
             third_string = second_string[:prev]
             fourth_string = second_string[prev:]
         final.append(collapse_repeats_by_length(first_string, 4))
-        final.append(split_string(third_string, 4, repeat_list))
+        final.append(sequence_to_bracketed_form(third_string, 4, repeat_list))
         count = 0
         tmp = list()
         for element in re.split('GAAA', fourth_string):
@@ -561,14 +561,14 @@ def PentaD_annotation(sequence, no_of_repeat_bases, repeat_list):
     sequence to preserve that sequence. Then the repeat units are identified and bracketed.
     '''
     if len(sequence) < 18:
-        final_string = split_string(sequence, no_of_repeat_bases, repeat_list)
+        final_string = sequence_to_bracketed_form(sequence, no_of_repeat_bases, repeat_list)
         return final_string
     else:
-        first_string = sequence[:5]
-        second_string = sequence[5:]
-        second_string_anno = split_string(second_string, no_of_repeat_bases, repeat_list)
-        final_string = f'{first_string} {second_string_anno}'
-        return re.sub('  ', ' ', final_string)
+        prefix = sequence[:5]
+        suffix = sequence[5:]
+        brack_form = sequence_to_bracketed_form(suffix, no_of_repeat_bases, repeat_list)
+        final_string = f'{prefix} {brack_form}'
+        return re.sub(r' +', ' ', final_string)
 
 
 def D7_anno(sequence, allele, n, repeat_list):
@@ -580,15 +580,15 @@ def D7_anno(sequence, allele, n, repeat_list):
     added in order to bracket the sequence correctly.
     '''
     if type(allele) == int:
-        forward_strand_bracketed_form = split_string(sequence, n, repeat_list)
+        forward_strand_brack_form = sequence_to_bracketed_form(sequence, n, repeat_list)
     else:
         if re.search(r'\d{1,2}.1', allele):
             if sequence[-1] == 'T':
-                forward_strand_bracketed_form = split_string(sequence, n, repeat_list)
+                forward_strand_brack_form = sequence_to_bracketed_form(sequence, n, repeat_list)
             else:
-                forward_strand_bracketed_form = (
+                forward_strand_brack_form = (
                     f'{sequence[0]} '
-                    f'{split_string(sequence[1:], n, repeat_list)}'
+                    f'{sequence_to_bracketed_form(sequence[1:], n, repeat_list)}'
                 )
         elif re.search(r'\d{1,2}.2', allele):
             new_repeat_list = [
@@ -596,13 +596,13 @@ def D7_anno(sequence, allele, n, repeat_list):
                 'TGTC',
                 'AATC'
             ]
-            forward_strand_bracketed_form = split_string(sequence, n, new_repeat_list)
+            forward_strand_brack_form = sequence_to_bracketed_form(sequence, n, new_repeat_list)
         else:
-            forward_strand_bracketed_form = (
+            forward_strand_brack_form = (
                 f'{sequence[:3]} '
-                f'{split_string(sequence[3:], n, repeat_list)}'
+                f'{sequence_to_bracketed_form(sequence[3:], n, repeat_list)}'
             )
-    return forward_strand_bracketed_form
+    return forward_strand_brack_form
 
 
 def D13_anno(sequence, repeats):
@@ -613,7 +613,7 @@ def D13_anno(sequence, repeats):
             break_point = m.end()
         bracketed_form = (
             f'{collapse_repeats_by_length(sequence[:break_point], 4)} '
-            f'{split_string(sequence[break_point:], 4, repeats)}'
+            f'{sequence_to_bracketed_form(sequence[break_point:], 4, repeats)}'
         )
     return bracketed_form
 
@@ -795,7 +795,7 @@ def main(args):
                     uas_sequence, no_of_repeat_bases, repeats
                 )
             else:
-                forward_strand_bracketed_form = split_string(
+                forward_strand_bracketed_form = sequence_to_bracketed_form(
                     uas_sequence, no_of_repeat_bases, repeats
                 )
             lus_final, sec_final, tert_final = lus_anno(
@@ -804,7 +804,7 @@ def main(args):
         else:
             if locus == 'D18S51':
                 if type(str_allele) == str:
-                    forward_strand_bracketed_form = split_string(
+                    forward_strand_bracketed_form = sequence_to_bracketed_form(
                         uas_sequence, no_of_repeat_bases, repeats
                     )
                 else:
