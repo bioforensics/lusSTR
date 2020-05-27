@@ -28,7 +28,7 @@ with open(get_str_metadata_file(), 'r') as fh:
     str_dict = json.load(fh)
 
 
-def rev_complement_anno(sequence):
+def reverse_complement(sequence):
     '''
     Function creates reverse complement of sequence
 
@@ -37,11 +37,9 @@ def rev_complement_anno(sequence):
     between both loci and any outside analyses in which comparisons may be made.
     '''
     complement = {'A': 'T', 'C': 'G', 'G': 'C', 'T': 'A'}
-    bases = list(sequence)
-    bases = [complement[base] for base in bases]
-    comp = ''.join(bases)
-    reverse_comp_sequence = comp[::-1]
-    return reverse_comp_sequence
+    rclist = [complement[base] for base in sequence[::-1]]
+    rc = ''.join(rclist)
+    return rc
 
 
 def rev_comp_forward_strand_bracket(
@@ -123,27 +121,22 @@ def traditional_str_allele(sequence, n, n_sub_out):
     return trad_allele
 
 
-def extract(s, single_repeat):
+def repeat_copy_number(bf, repeat):
     '''
     Function to identify the # of alleles for a specified repeat unit from the bracketed
     annotation form.
     '''
-    finalcount = 0
-    for m in re.finditer(single_repeat, s):
-        count = s[m.end()+1:m.end()+3]
-        if count == '' or count[0] == '[' or count[0] == ' ' or count.isalpha():
-            count = 1
-        try:
-            if float(count) > float(finalcount):
-                finalcount = count
-                try:
-                    if str(finalcount)[1] == ' ':
-                        finalcount = finalcount[0]
-                except IndexError:
-                    count = count
-        except ValueError:
-            count = count
-    return finalcount
+    longest = 0
+    for block in bf.split(' '):
+        if block == repeat:
+            if 1 > longest:
+                longest = 1
+        match = re.match(r'\['+ repeat +r'\](\d+)', block)
+        if match:
+            length = int(match.group(1))
+            if length > longest:
+                longest = length
+    return longest
 
 
 def lus_anno(sequence, lus, sec, tert, locusid, str_allele):
@@ -163,11 +156,11 @@ def lus_anno(sequence, lus, sec, tert, locusid, str_allele):
     if locusid == 'D21S11':
         lus_allele, sec_allele, tert_allele = lus_D21_anno(sequence, lus, sec, tert)
     else:
-        lus_allele = extract(sequence, lus)
+        lus_allele = repeat_copy_number(sequence, lus)
         if sec != '':
-            sec_allele = extract(sequence, sec)
+            sec_allele = repeat_copy_number(sequence, sec)
             if tert != '':
-                tert_allele = extract(sequence, tert)
+                tert_allele = repeat_copy_number(sequence, tert)
             elif locusid == 'D7S820':
                 if str(sequence)[-1] == 'T' and isinstance(str_allele, str):
                     tert_allele = 1
@@ -193,7 +186,7 @@ def D21_lus_sec(sequence, repeat, tert):
     lus_allele = None
     for element in re.split(tert, sequence):
         if element == sequence:
-            lus_sec = extract(element, repeat)
+            lus_sec = repeat_copy_number(element, repeat)
             sec_allele = lus_sec[0]
             if len(lus_sec) == 1 and element[-4:] == repeat:
                 lus_allele = 1
@@ -205,7 +198,7 @@ def D21_lus_sec(sequence, repeat, tert):
             parts = element.split('[,]')
             for i in parts:
                 if i != '':
-                    repeats = extract(i, repeat)
+                    repeats = repeat_copy_number(i, repeat)
                     lus_sec.append(repeats)
     if lus_allele is None:
         lus_allele = lus_sec[1]
@@ -571,7 +564,7 @@ def main(args):
             elif locus == 'D13S317':
                 forward_strand_bracketed_form = D13_anno(uas_sequence, repeats)
             elif str_dict[locus]['ReverseCompNeeded'] == 'Yes':
-                reverse_comp_sequence = rev_complement_anno(uas_sequence)
+                reverse_comp_sequence = reverse_complement(uas_sequence)
                 forward_strand_bracketed_form = rev_comp_forward_strand_bracket(
                     reverse_comp_sequence, no_of_repeat_bases, repeats, locus, cannot_split,
                     str_allele
@@ -592,7 +585,7 @@ def main(args):
             )
         else:
             if str_dict[locus]['ReverseCompNeeded'] == 'Yes':
-                reverse_comp_sequence = rev_complement_anno(uas_sequence)
+                reverse_comp_sequence = reverse_complement(uas_sequence)
                 forward_strand_bracketed_form = rev_comp_forward_strand_bracket(
                     reverse_comp_sequence, no_of_repeat_bases, repeats, locus, cannot_split,
                     str_allele
