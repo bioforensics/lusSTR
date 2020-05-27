@@ -6,7 +6,7 @@ help: Makefile
 
 ## test:      run the automated test suite and print coverage information
 test:
-	pytest --cov=lusSTR lusSTR/tests/test_suite.py
+	pytest --cov=lusSTR --doctest-modules lusSTR/annot.py lusSTR/tests/test_suite.py
 
 ## style:     check code style against PEP8
 style:

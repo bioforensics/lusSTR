@@ -38,8 +38,8 @@ def test_format():
         'TAGATAGATAGATAGATGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGG'
     )
 ])
-def test_get_annotation(sequence, repeat_list, output):
-    final_output = lusSTR.annot.get_annotation(sequence, repeat_list)
+def test_collapse_all_repeats(sequence, repeat_list, output):
+    final_output = lusSTR.annot.collapse_all_repeats(sequence, repeat_list)
     assert final_output == output
 
 
@@ -51,13 +51,13 @@ def test_split_by_n():
     ]
 
 
-def test_split_string():
+def test_sequence_to_bracketed_form():
     sequence = (
         'TCTATCTATCTATCTGTCTGTCTGTCTGTCTGTCTGTCTATCTATCTATATCTATCTATCTATCATCTATCTATCCATATCTATCTATC'
         'TATCTATCTATCTATCTATCTATCTATCTATCTA'
     )
     repeats = ['TCTA', 'TCTG']
-    final_output = lusSTR.annot.split_string(sequence, 6, repeats)
+    final_output = lusSTR.annot.sequence_to_bracketed_form(sequence, 6, repeats)
     assert final_output == '[TCTA]3 [TCTG]6 [TCTA]3 TA [TCTA]3 TCA [TCTA]2 TCCATA [TCTA]11'
 
 
@@ -92,9 +92,9 @@ def test_rev_comp_uas_output_bracket():
     assert rev_comp_bracket == 'CCAA [TTCG]2 [ACCT]3'
 
 
-def test_loci_need_split_anno():
+def test_collapse_repeats_by_length():
     sequence = 'TCTATCTATCTATCTATCTATCTATCTATATATCTATCTATCTATCTA'
-    assert lusSTR.annot.loci_need_split_anno(sequence, 4) == '[TCTA]7 TATA [TCTA]4'
+    assert lusSTR.annot.collapse_repeats_by_length(sequence, 4) == '[TCTA]7 TATA [TCTA]4'
 
 
 @pytest.mark.parametrize('sequence, bracket_form', [

@@ -25,64 +25,43 @@ with open(get_str_metadata_file(), 'r') as fh:
     str_dict = json.load(fh)
 
 
-def get_annotation(sequence, repeat_list):
-    '''
-    Function used to (in part) create bracketed annotation.
+def collapse_tandem_repeat(fullseq, repeat):
+    '''Collapse tandem stretches of the specified repeat sequence in a larger sequence.
 
-    This function, called as a part of the split_string() function, identifies and extracts
-    specified repeats in order defined in the dict. The function returns the repeats in the
-    bracketed form with any remaining sequence returned intact. This function is used to
-    identify the specified repeats in the prioritized order within the sequence.
+    >>> collapse_tandem_repeat('TAGATTATTATTTAGTAGATTTAGTAG', 'ATT')
+    'TAG [ATT]3 TAGTAG ATT TAGTAG'
+    >>> collapse_tandem_repeat('TAGATTATTATTTAGTAGATTTAGTAG', 'TAG')
+    'TAG ATTATTATT [TAG]2 ATT [TAG]2'
     '''
-    for k in range(len(repeat_list)):
-        repeat = repeat_list[k]
-        if k == 0:
-            count = 0
-            final = list()
-            for element in re.split(repeat, sequence):
-                parts = element.split(',')
-                for i in parts:
-                    if i == '':
-                        count += 1
-                    else:
-                        if count == 1:
-                            final.append(repeat)
-                        elif count >= 2:
-                            final.append(f'[{repeat}]{count}')
-                        count = 1
-                        final.append(i)
-            if parts[-1] == '' and count > 2:
-                final.append(f'[{repeat}]{count-1}')
-            elif parts[-1] == '' and count <= 2:
-                final.append(repeat)
-            tmp = ' '.join(final)
-        elif k > 0:
-            final = list()
-            if re.match(repeat, sequence):
-                if sequence[:4] == repeat:
-                    count = 0
-                else:
-                    count = 1
-            else:
-                count = 0
-            for element in re.split(repeat, tmp):
-                parts = element.split(',')
-                for i in parts:
-                    if i == '':
-                        count += 1
-                    else:
-                        if count == 1:
-                            final.append(repeat)
-                        elif count >= 2:
-                            final.append(f'[{repeat}]{count}')
-                        count = 1
-                        final.append(i)
-            if parts[-1] == '' and count > 2:
-                final.append(f'[{repeat}]{count-1}')
-            elif parts[-1] == '' and count <= 2:
-                final.append(repeat)
-            tmp = ' '.join(final)
-    return re.sub('  ', ' ', tmp)
+    if repeat not in fullseq:
+        return fullseq
+    i = fullseq.find(repeat)
+    prefix = fullseq[:i]
+    suffix = fullseq[i:]
+    count = 0
+    while suffix.startswith(repeat):
+        count += 1
+        suffix = suffix[len(repeat):]
+    if count == 1:
+        formatted = f' {repeat} '
+    else:
+        formatted = f' [{repeat}]{count} '
+    final = prefix + formatted + collapse_tandem_repeat(suffix, repeat)
+    final = final.strip()
+    final = re.sub(r' +', ' ', final)
+    return final
+
+
+def collapse_all_repeats(sequence, repeats):
+    '''Convert a sequence to bracketed form by collapsing stretches of tandem repeats.
+
+    >>> collapse_all_repeats('TAGATTATTATTTAGTAGATTTAGTAG', ['ATT', 'TAG'])
+    'TAG [ATT]3 [TAG]2 ATT [TAG]2'
+    '''
+    collapsed_seq = sequence
+    for repeat in repeats:
+        collapsed_seq = collapse_tandem_repeat(collapsed_seq, repeat)
+    return collapsed_seq
 
 
 def split_by_n(sequence, n):
@@ -94,23 +73,23 @@ def split_by_n(sequence, n):
         sequence = sequence[n:]
 
 
-def split_string(sequence, n, repeat_list):
-    '''
-    Function to create bracketed annotation.
+def sequence_to_bracketed_form(sequence, n, repeats):
+    '''Convert sequence to bracketed annotation.
 
-    Function creates bracketed annotation using a prioritized ordered list of repeats (repeat
-    units are marker specific and are specified in str_markers.json file).
+    Uses a combination of repeat-based and length-based methods to convert a sequence containing
+    tandem repeats into a concise bracketed representation.
     '''
-    strings = get_annotation(sequence, repeat_list)
-    final_string = list()
-    for unit in strings.split(' '):
+    collapsed = collapse_all_repeats(sequence, repeats)
+    blocks = list()
+    for unit in collapsed.split(' '):
         if len(unit) > n and '[' not in unit:
             for x in split_by_n(unit, n):
-                final_string.append(x)
+                blocks.append(x)
         else:
-            final_string.append(unit)
-    final_string_formatted = ' '.join(final_string)
-    return re.sub('  ', ' ', final_string_formatted)
+            blocks.append(unit)
+    result = ' '.join(blocks)
+    result = re.sub(r' +', ' ', result)
+    return result
 
 
 def rev_complement_anno(sequence):
@@ -141,21 +120,21 @@ def rev_comp_forward_strand_bracket(
     '''
     if locusid in cannot_split_list:
         if locusid == 'D19S433':
-            forward_strand_bracketed_form = D19_annotation(rev_sequence, repeat_list, 'CCTT')
+            forward_strand_brack_form = D19_annotation(rev_sequence, repeat_list, 'CCTT')
         elif locusid == 'D1S1656':
-            forward_strand_bracketed_form = D1_annotation(rev_sequence, repeat_list, 'CACA')
+            forward_strand_brack_form = D1_annotation(rev_sequence, repeat_list, 'CACA')
         elif locusid == 'D7S820':
-            forward_strand_bracketed_form = D7_anno(rev_sequence, allele, n, repeat_list)
+            forward_strand_brack_form = D7_anno(rev_sequence, allele, n, repeat_list)
         else:
-            forward_strand_bracketed_form = split_string(rev_sequence, n, repeat_list)
+            forward_strand_brack_form = sequence_to_bracketed_form(rev_sequence, n, repeat_list)
     elif locusid == 'FGA':
         if len(rev_sequence) % n != 0:
-            forward_strand_bracketed_form = FGA_anno(rev_sequence, repeat_list)
+            forward_strand_brack_form = FGA_anno(rev_sequence, repeat_list)
         else:
-            forward_strand_bracketed_form = loci_need_split_anno(rev_sequence, n)
+            forward_strand_brack_form = collapse_repeats_by_length(rev_sequence, n)
     else:
-        forward_strand_bracketed_form = loci_need_split_anno(rev_sequence, n)
-    return re.sub('  ', ' ', forward_strand_bracketed_form)
+        forward_strand_brack_form = collapse_repeats_by_length(rev_sequence, n)
+    return re.sub('  ', ' ', forward_strand_brack_form)
 
 
 def rev_comp_uas_output_bracket(forward_bracket, n):
@@ -198,8 +177,8 @@ def get_blocks(sequence, n):
     '''
     Function to split a sequence into blocks of size n
 
-    This function is used as a part of the loci_need_split_anno() function. It splits the sequence
-    into blocks of size n bases (as specified in the str_markers.json file).
+    This function is used as a part of the collapse_repeats_by_length() function. It splits the
+    sequence into blocks of size n bases (as specified in the str_markers.json file).
     '''
     count = 0
     prev = None
@@ -213,21 +192,17 @@ def get_blocks(sequence, n):
     yield prev, count
 
 
-def loci_need_split_anno(sequence, n):
-    '''
-    Function creates bracketed annotation form using the sequence split into blocks of size n.
-
-    This is the simplest way to create bracketed annotation form. It splits sequence by specified
-    # of bases then checks for repeats of units in sequential order.
-    '''
-    alleles = list()
+def collapse_repeats_by_length(sequence, n):
+    '''Convert to bracketed annotation form by splitting the sequence into blocks of size n.'''
+    units = list()
     for unit, count in get_blocks(sequence, n):
         if count == 1:
-            alleles.append(unit)
+            units.append(unit)
         else:
-            alleles.append(f'[{unit}]{count}')
-    alleles_final = '  '.join(alleles)
-    return re.sub('  ', ' ', alleles_final)
+            units.append(f'[{unit}]{count}')
+    result = '  '.join(units)
+    result = re.sub(r' +', ' ', result)
+    return result
 
 
 def traditional_str_allele(sequence, n, n_sub_out):
@@ -378,21 +353,21 @@ def D21_bracket(sequence, no_of_split_bases, repeats):
     the conventional annotation for this particular locus. However, if the 'TATCTA' is included in
     a repeat unit, the repeat unit needs to be reported (i.e. [TCTA]2).
     '''
-    forward_strand_bracketed_form = split_string(sequence, no_of_split_bases, repeats)
+    forward_strand_brack_form = sequence_to_bracketed_form(sequence, no_of_split_bases, repeats)
     prev = 0
-    for m in re.finditer(']', forward_strand_bracketed_form):
+    for m in re.finditer(']', forward_strand_brack_form):
         prev = m.end()
     if (
-        prev == (len(forward_strand_bracketed_form) - 1) or
-        prev == (len(forward_strand_bracketed_form) - 2)
+        prev == (len(forward_strand_brack_form) - 1) or
+        prev == (len(forward_strand_brack_form) - 2)
        ):
-        return forward_strand_bracketed_form
+        return forward_strand_brack_form
     else:
-        first_string = forward_strand_bracketed_form[:prev+2]
-        second_string = forward_strand_bracketed_form[prev+2:]
+        first_string = forward_strand_brack_form[:prev+2]
+        second_string = forward_strand_brack_form[prev+2:]
         second_string_final = re.sub(' ', '', second_string)
         if len(second_string_final) % 4 == 0:
-            split_second_string = loci_need_split_anno(second_string_final, 4)
+            split_second_string = collapse_repeats_by_length(second_string_final, 4)
             final_string = f'{first_string} {second_string}'
         elif len(second_string_final) == 6:
             third_string = second_string_final[-6:-4]
@@ -402,10 +377,10 @@ def D21_bracket(sequence, no_of_split_bases, repeats):
             third_string = second_string_final[:-6]
             fourth_string = second_string_final[-6:-4]
             last_string = second_string_final[-4:]
-            third_string_final = loci_need_split_anno(third_string, 4)
+            third_string_final = collapse_repeats_by_length(third_string, 4)
             final_string = f'{first_string} {third_string_final} {fourth_string} {last_string}'
         else:
-            third_string = loci_need_split_anno(second_string_final, 4)
+            third_string = collapse_repeats_by_length(second_string_final, 4)
             final_string = f'{first_string} {third_string}'
         return re.sub('  ', ' ', final_string)
 
@@ -440,11 +415,11 @@ def D1_annotation(sequence, repeat_list, repeat_for_split):
     if first_string == '':
         final.append(repeat_for_split)
     else:
-        final.append(loci_need_split_anno(first_string, 4))
+        final.append(collapse_repeats_by_length(first_string, 4))
     if (len(second_string) % 4 != 0):
-        final.append(split_string(second_string, 4, repeat_list))
+        final.append(sequence_to_bracketed_form(second_string, 4, repeat_list))
     else:
-        final.append(loci_need_split_anno(second_string, 4))
+        final.append(collapse_repeats_by_length(second_string, 4))
     final_string = ' '.join(final)
     return re.sub('  ', ' ', final_string)
 
@@ -472,16 +447,16 @@ def D19_annotation(sequence, repeat_list, repeat_for_split):
     first_string = sequence[2:prev]
     second_string = sequence[prev:]
     if (len(first_string) % 4 != 0):
-        final.append(split_string(first_string, 4, repeat_list))
+        final.append(sequence_to_bracketed_form(first_string, 4, repeat_list))
     else:
-        final.append(loci_need_split_anno(first_string, 4))
+        final.append(collapse_repeats_by_length(first_string, 4))
     if (len(second_string) % 4 != 0):
         third_string = second_string[:-6]
-        final.append(loci_need_split_anno(third_string, 4))
+        final.append(collapse_repeats_by_length(third_string, 4))
         final.append(second_string[-6:-4])
         final.append(second_string[-4:])
     else:
-        final.append(loci_need_split_anno(second_string, 4))
+        final.append(collapse_repeats_by_length(second_string, 4))
     final_string = ' '.join(final)
     return re.sub('  ', ' ', final_string)
 
@@ -501,7 +476,7 @@ def FGA_anno(sequence, repeat_list):
     final = list()
     prev = 0
     if (len(sequence) % 4 == 0):
-        final_string = loci_need_split_anno(sequence, 4)
+        final_string = collapse_repeats_by_length(sequence, 4)
     else:
         for m in re.finditer('GGAA', sequence):
             if prev == 0 or m.start() == prev:
@@ -523,8 +498,8 @@ def FGA_anno(sequence, repeat_list):
         else:
             third_string = second_string[:prev]
             fourth_string = second_string[prev:]
-        final.append(loci_need_split_anno(first_string, 4))
-        final.append(split_string(third_string, 4, repeat_list))
+        final.append(collapse_repeats_by_length(first_string, 4))
+        final.append(sequence_to_bracketed_form(third_string, 4, repeat_list))
         count = 0
         tmp = list()
         for element in re.split('GAAA', fourth_string):
@@ -562,7 +537,7 @@ def TH01_annotation(sequence, repeat_list):
     A separate function is required for the microvariants of the TH01 locus because of the
     insertion of the 'ATG' between the repeat units 'AATG'.
     '''
-    strings = get_annotation(sequence, repeat_list)
+    strings = collapse_all_repeats(sequence, repeat_list)
     final_string = list()
     for unit in strings.split(' '):
         if '[' not in unit and len(unit) > 3 and (len(unit) % 4 != 0) and unit[:3] == 'ATG':
@@ -586,14 +561,14 @@ def PentaD_annotation(sequence, no_of_repeat_bases, repeat_list):
     sequence to preserve that sequence. Then the repeat units are identified and bracketed.
     '''
     if len(sequence) < 18:
-        final_string = split_string(sequence, no_of_repeat_bases, repeat_list)
+        final_string = sequence_to_bracketed_form(sequence, no_of_repeat_bases, repeat_list)
         return final_string
     else:
-        first_string = sequence[:5]
-        second_string = sequence[5:]
-        second_string_anno = split_string(second_string, no_of_repeat_bases, repeat_list)
-        final_string = f'{first_string} {second_string_anno}'
-        return re.sub('  ', ' ', final_string)
+        prefix = sequence[:5]
+        suffix = sequence[5:]
+        brack_form = sequence_to_bracketed_form(suffix, no_of_repeat_bases, repeat_list)
+        final_string = f'{prefix} {brack_form}'
+        return re.sub(r' +', ' ', final_string)
 
 
 def D7_anno(sequence, allele, n, repeat_list):
@@ -605,15 +580,15 @@ def D7_anno(sequence, allele, n, repeat_list):
     added in order to bracket the sequence correctly.
     '''
     if type(allele) == int:
-        forward_strand_bracketed_form = split_string(sequence, n, repeat_list)
+        forward_strand_brack_form = sequence_to_bracketed_form(sequence, n, repeat_list)
     else:
         if re.search(r'\d{1,2}.1', allele):
             if sequence[-1] == 'T':
-                forward_strand_bracketed_form = split_string(sequence, n, repeat_list)
+                forward_strand_brack_form = sequence_to_bracketed_form(sequence, n, repeat_list)
             else:
-                forward_strand_bracketed_form = (
+                forward_strand_brack_form = (
                     f'{sequence[0]} '
-                    f'{split_string(sequence[1:], n, repeat_list)}'
+                    f'{sequence_to_bracketed_form(sequence[1:], n, repeat_list)}'
                 )
         elif re.search(r'\d{1,2}.2', allele):
             new_repeat_list = [
@@ -621,24 +596,24 @@ def D7_anno(sequence, allele, n, repeat_list):
                 'TGTC',
                 'AATC'
             ]
-            forward_strand_bracketed_form = split_string(sequence, n, new_repeat_list)
+            forward_strand_brack_form = sequence_to_bracketed_form(sequence, n, new_repeat_list)
         else:
-            forward_strand_bracketed_form = (
+            forward_strand_brack_form = (
                 f'{sequence[:3]} '
-                f'{split_string(sequence[3:], n, repeat_list)}'
+                f'{sequence_to_bracketed_form(sequence[3:], n, repeat_list)}'
             )
-    return forward_strand_bracketed_form
+    return forward_strand_brack_form
 
 
 def D13_anno(sequence, repeats):
     if len(sequence) < 110:
-        bracketed_form = loci_need_split_anno(sequence, 4)
+        bracketed_form = collapse_repeats_by_length(sequence, 4)
     else:
         for m in re.finditer('GGGC', sequence):
             break_point = m.end()
         bracketed_form = (
-            f'{loci_need_split_anno(sequence[:break_point], 4)} '
-            f'{split_string(sequence[break_point:], 4, repeats)}'
+            f'{collapse_repeats_by_length(sequence[:break_point], 4)} '
+            f'{sequence_to_bracketed_form(sequence[break_point:], 4, repeats)}'
         )
     return bracketed_form
 
@@ -689,8 +664,8 @@ def flank_5(full_seq, front, locus, n):
         flank = ''
     elif locus == 'D13S317':
         flank = (
-            f'{flank_seq[:2]} {loci_need_split_anno(flank_seq[2:14], 4)} {flank_seq[14]} '
-            f'{flank_seq[15]} {flank_seq[16:19]} {loci_need_split_anno(flank_seq[19:], 4)}'
+            f'{flank_seq[:2]} {collapse_repeats_by_length(flank_seq[2:14], 4)} {flank_seq[14]} '
+            f'{flank_seq[15]} {flank_seq[16:19]} {collapse_repeats_by_length(flank_seq[19:], 4)}'
         )
     elif locus == 'D20S482':
         flank = (
@@ -698,29 +673,29 @@ def flank_5(full_seq, front, locus, n):
             f'{flank_seq[10:]} {flank_seq[14:18]}'
         )
     elif locus == 'D2S441':
-        flank = f'{flank_seq[:4]} {flank_seq[4]} {loci_need_split_anno(flank_seq[5:], 4)}'
+        flank = f'{flank_seq[:4]} {flank_seq[4]} {collapse_repeats_by_length(flank_seq[5:], 4)}'
     elif locus == 'D7S820':
-        flank = f'{flank_seq[0]} {loci_need_split_anno(flank_seq[1:13], 4)} {flank_seq[13:]}'
+        flank = f'{flank_seq[0]} {collapse_repeats_by_length(flank_seq[1:13], 4)} {flank_seq[13:]}'
     elif locus == 'D16S539':
         flank = (
             f'{flank_seq[:2]} {flank_seq[2:6]} {flank_seq[6]} '
-            f'{loci_need_split_anno(flank_seq[7:], 4)}'
+            f'{collapse_repeats_by_length(flank_seq[7:], 4)}'
         )
     elif locus == 'D1S1656':
-        flank = f'{flank_seq[:3]} {loci_need_split_anno(flank_seq[3:], 4)}'
+        flank = f'{flank_seq[:3]} {collapse_repeats_by_length(flank_seq[3:], 4)}'
     elif locus == 'PentaD':
         flank = (
-            f'{loci_need_split_anno(flank_seq[:20], 5)} {flank_seq[20]} {flank_seq[21:25]} '
-            f'{loci_need_split_anno(flank_seq[25:], 5)}'
+            f'{collapse_repeats_by_length(flank_seq[:20], 5)} {flank_seq[20]} {flank_seq[21:25]} '
+            f'{collapse_repeats_by_length(flank_seq[25:], 5)}'
         )
     elif locus == 'vWA':
-        flank = f'{flank_seq[:3]} {loci_need_split_anno(flank_seq[3:], 4)}'
+        flank = f'{flank_seq[:3]} {collapse_repeats_by_length(flank_seq[3:], 4)}'
     elif locus == 'D10S1248':
-        flank = f'{flank_seq[:2]} {loci_need_split_anno(flank_seq[2:], 4)}'
+        flank = f'{flank_seq[:2]} {collapse_repeats_by_length(flank_seq[2:], 4)}'
     elif locus == 'D22S1045':
-        flank = f'{flank_seq[0]} {loci_need_split_anno(flank_seq[1:], 3)}'
+        flank = f'{flank_seq[0]} {collapse_repeats_by_length(flank_seq[1:], 3)}'
     elif locus in invariant_loci:
-        flank_rev = loci_need_split_anno(flank_seq[::-1], n)
+        flank_rev = collapse_repeats_by_length(flank_seq[::-1], n)
         flank = flank_rev[::-1]
     return flank
 
@@ -735,28 +710,28 @@ def flank_3(full_seq, back, locus, n):
     if locus == 'D1S1656' or locus == 'FGA':
         flank = ''
     elif locus == 'CSF1PO':
-        flank = f'{flank_seq[0]} {loci_need_split_anno(flank_seq[1:-1], 4)} {flank_seq[-1]}'
+        flank = f'{flank_seq[0]} {collapse_repeats_by_length(flank_seq[1:-1], 4)} {flank_seq[-1]}'
     elif locus == 'D18S51':
         flank = (
-            f'{flank_seq[:2]} {loci_need_split_anno(flank_seq[2:30], 4)} {flank_seq[30:33]} '
-            f'{flank_seq[33]} {loci_need_split_anno(flank_seq[34:42], 4)} {flank_seq[42:44]} '
-            f'{flank_seq[44:]}'
+            f'{flank_seq[:2]} {collapse_repeats_by_length(flank_seq[2:30], 4)} {flank_seq[30:33]} '
+            f'{flank_seq[33]} {collapse_repeats_by_length(flank_seq[34:42], 4)} '
+            f'{flank_seq[42:44]} {flank_seq[44:]}'
         )
     elif locus == 'D16S539':
         flank = (
-            f'{loci_need_split_anno(flank_seq[:12], 4)} {flank_seq[12:15]} {flank_seq[15]} '
-            f'{loci_need_split_anno(flank_seq[16:28], 4)} {flank_seq[28:31]} '
+            f'{collapse_repeats_by_length(flank_seq[:12], 4)} {flank_seq[12:15]} {flank_seq[15]} '
+            f'{collapse_repeats_by_length(flank_seq[16:28], 4)} {flank_seq[28:31]} '
             f'{flank_seq[31:33]} {flank_seq[33]} {flank_seq[-2:]}'
         )
     elif locus == 'D7S820':
-        flank = loci_need_split_anno(flank_seq, 4)
+        flank = collapse_repeats_by_length(flank_seq, 4)
     elif locus == 'D21S11':
         flank = (
-            f'{flank_seq[:2]} {flank_seq[2]} {loci_need_split_anno(flank_seq[3:11], 4)} '
+            f'{flank_seq[:2]} {flank_seq[2]} {collapse_repeats_by_length(flank_seq[3:11], 4)} '
             f'{flank_seq[-1]}'
         )
     elif locus in invariant_loci:
-        flank = loci_need_split_anno(flank_seq, n)
+        flank = collapse_repeats_by_length(flank_seq, n)
     return flank
 
 
@@ -820,7 +795,7 @@ def main(args):
                     uas_sequence, no_of_repeat_bases, repeats
                 )
             else:
-                forward_strand_bracketed_form = split_string(
+                forward_strand_bracketed_form = sequence_to_bracketed_form(
                     uas_sequence, no_of_repeat_bases, repeats
                 )
             lus_final, sec_final, tert_final = lus_anno(
@@ -829,11 +804,11 @@ def main(args):
         else:
             if locus == 'D18S51':
                 if type(str_allele) == str:
-                    forward_strand_bracketed_form = split_string(
+                    forward_strand_bracketed_form = sequence_to_bracketed_form(
                         uas_sequence, no_of_repeat_bases, repeats
                     )
                 else:
-                    forward_strand_bracketed_form = loci_need_split_anno(
+                    forward_strand_bracketed_form = collapse_repeats_by_length(
                         uas_sequence, no_of_repeat_bases
                     )
             elif locus == 'D13S317':
@@ -852,7 +827,7 @@ def main(args):
                     uas_sequence, no_of_repeat_bases, repeats
                 )
             else:
-                forward_strand_bracketed_form = loci_need_split_anno(
+                forward_strand_bracketed_form = collapse_repeats_by_length(
                     uas_sequence, no_of_repeat_bases
                 )
             lus_final, sec_final, tert_final = lus_anno(
