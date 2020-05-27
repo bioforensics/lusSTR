@@ -92,9 +92,9 @@ def test_rev_comp_uas_output_bracket():
     assert rev_comp_bracket == 'CCAA [TTCG]2 [ACCT]3'
 
 
-def test_loci_need_split_anno():
+def test_collapse_repeats_by_length():
     sequence = 'TCTATCTATCTATCTATCTATCTATCTATATATCTATCTATCTATCTA'
-    assert lusSTR.annot.loci_need_split_anno(sequence, 4) == '[TCTA]7 TATA [TCTA]4'
+    assert lusSTR.annot.collapse_repeats_by_length(sequence, 4) == '[TCTA]7 TATA [TCTA]4'
 
 
 @pytest.mark.parametrize('sequence, bracket_form', [

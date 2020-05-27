@@ -131,9 +131,9 @@ def rev_comp_forward_strand_bracket(
         if len(rev_sequence) % n != 0:
             forward_strand_bracketed_form = FGA_anno(rev_sequence, repeat_list)
         else:
-            forward_strand_bracketed_form = loci_need_split_anno(rev_sequence, n)
+            forward_strand_bracketed_form = collapse_repeats_by_length(rev_sequence, n)
     else:
-        forward_strand_bracketed_form = loci_need_split_anno(rev_sequence, n)
+        forward_strand_bracketed_form = collapse_repeats_by_length(rev_sequence, n)
     return re.sub('  ', ' ', forward_strand_bracketed_form)
 
 
@@ -177,7 +177,7 @@ def get_blocks(sequence, n):
     '''
     Function to split a sequence into blocks of size n
 
-    This function is used as a part of the loci_need_split_anno() function. It splits the sequence
+    This function is used as a part of the collapse_repeats_by_length() function. It splits the sequence
     into blocks of size n bases (as specified in the str_markers.json file).
     '''
     count = 0
@@ -192,21 +192,17 @@ def get_blocks(sequence, n):
     yield prev, count
 
 
-def loci_need_split_anno(sequence, n):
-    '''
-    Function creates bracketed annotation form using the sequence split into blocks of size n.
-
-    This is the simplest way to create bracketed annotation form. It splits sequence by specified
-    # of bases then checks for repeats of units in sequential order.
-    '''
-    alleles = list()
+def collapse_repeats_by_length(sequence, n):
+    '''Convert to bracketed annotation form by splitting the sequence into blocks of size n.'''
+    units = list()
     for unit, count in get_blocks(sequence, n):
         if count == 1:
-            alleles.append(unit)
+            units.append(unit)
         else:
-            alleles.append(f'[{unit}]{count}')
-    alleles_final = '  '.join(alleles)
-    return re.sub('  ', ' ', alleles_final)
+            units.append(f'[{unit}]{count}')
+    result = '  '.join(units)
+    result = re.sub(r' +', ' ', result)
+    return result
 
 
 def traditional_str_allele(sequence, n, n_sub_out):
@@ -371,7 +367,7 @@ def D21_bracket(sequence, no_of_split_bases, repeats):
         second_string = forward_strand_bracketed_form[prev+2:]
         second_string_final = re.sub(' ', '', second_string)
         if len(second_string_final) % 4 == 0:
-            split_second_string = loci_need_split_anno(second_string_final, 4)
+            split_second_string = collapse_repeats_by_length(second_string_final, 4)
             final_string = f'{first_string} {second_string}'
         elif len(second_string_final) == 6:
             third_string = second_string_final[-6:-4]
@@ -381,10 +377,10 @@ def D21_bracket(sequence, no_of_split_bases, repeats):
             third_string = second_string_final[:-6]
             fourth_string = second_string_final[-6:-4]
             last_string = second_string_final[-4:]
-            third_string_final = loci_need_split_anno(third_string, 4)
+            third_string_final = collapse_repeats_by_length(third_string, 4)
             final_string = f'{first_string} {third_string_final} {fourth_string} {last_string}'
         else:
-            third_string = loci_need_split_anno(second_string_final, 4)
+            third_string = collapse_repeats_by_length(second_string_final, 4)
             final_string = f'{first_string} {third_string}'
         return re.sub('  ', ' ', final_string)
 
@@ -419,11 +415,11 @@ def D1_annotation(sequence, repeat_list, repeat_for_split):
     if first_string == '':
         final.append(repeat_for_split)
     else:
-        final.append(loci_need_split_anno(first_string, 4))
+        final.append(collapse_repeats_by_length(first_string, 4))
     if (len(second_string) % 4 != 0):
         final.append(split_string(second_string, 4, repeat_list))
     else:
-        final.append(loci_need_split_anno(second_string, 4))
+        final.append(collapse_repeats_by_length(second_string, 4))
     final_string = ' '.join(final)
     return re.sub('  ', ' ', final_string)
 
@@ -453,14 +449,14 @@ def D19_annotation(sequence, repeat_list, repeat_for_split):
     if (len(first_string) % 4 != 0):
         final.append(split_string(first_string, 4, repeat_list))
     else:
-        final.append(loci_need_split_anno(first_string, 4))
+        final.append(collapse_repeats_by_length(first_string, 4))
     if (len(second_string) % 4 != 0):
         third_string = second_string[:-6]
-        final.append(loci_need_split_anno(third_string, 4))
+        final.append(collapse_repeats_by_length(third_string, 4))
         final.append(second_string[-6:-4])
         final.append(second_string[-4:])
     else:
-        final.append(loci_need_split_anno(second_string, 4))
+        final.append(collapse_repeats_by_length(second_string, 4))
     final_string = ' '.join(final)
     return re.sub('  ', ' ', final_string)
 
@@ -480,7 +476,7 @@ def FGA_anno(sequence, repeat_list):
     final = list()
     prev = 0
     if (len(sequence) % 4 == 0):
-        final_string = loci_need_split_anno(sequence, 4)
+        final_string = collapse_repeats_by_length(sequence, 4)
     else:
         for m in re.finditer('GGAA', sequence):
             if prev == 0 or m.start() == prev:
@@ -502,7 +498,7 @@ def FGA_anno(sequence, repeat_list):
         else:
             third_string = second_string[:prev]
             fourth_string = second_string[prev:]
-        final.append(loci_need_split_anno(first_string, 4))
+        final.append(collapse_repeats_by_length(first_string, 4))
         final.append(split_string(third_string, 4, repeat_list))
         count = 0
         tmp = list()
@@ -611,12 +607,12 @@ def D7_anno(sequence, allele, n, repeat_list):
 
 def D13_anno(sequence, repeats):
     if len(sequence) < 110:
-        bracketed_form = loci_need_split_anno(sequence, 4)
+        bracketed_form = collapse_repeats_by_length(sequence, 4)
     else:
         for m in re.finditer('GGGC', sequence):
             break_point = m.end()
         bracketed_form = (
-            f'{loci_need_split_anno(sequence[:break_point], 4)} '
+            f'{collapse_repeats_by_length(sequence[:break_point], 4)} '
             f'{split_string(sequence[break_point:], 4, repeats)}'
         )
     return bracketed_form
@@ -668,8 +664,8 @@ def flank_5(full_seq, front, locus, n):
         flank = ''
     elif locus == 'D13S317':
         flank = (
-            f'{flank_seq[:2]} {loci_need_split_anno(flank_seq[2:14], 4)} {flank_seq[14]} '
-            f'{flank_seq[15]} {flank_seq[16:19]} {loci_need_split_anno(flank_seq[19:], 4)}'
+            f'{flank_seq[:2]} {collapse_repeats_by_length(flank_seq[2:14], 4)} {flank_seq[14]} '
+            f'{flank_seq[15]} {flank_seq[16:19]} {collapse_repeats_by_length(flank_seq[19:], 4)}'
         )
     elif locus == 'D20S482':
         flank = (
@@ -677,29 +673,29 @@ def flank_5(full_seq, front, locus, n):
             f'{flank_seq[10:]} {flank_seq[14:18]}'
         )
     elif locus == 'D2S441':
-        flank = f'{flank_seq[:4]} {flank_seq[4]} {loci_need_split_anno(flank_seq[5:], 4)}'
+        flank = f'{flank_seq[:4]} {flank_seq[4]} {collapse_repeats_by_length(flank_seq[5:], 4)}'
     elif locus == 'D7S820':
-        flank = f'{flank_seq[0]} {loci_need_split_anno(flank_seq[1:13], 4)} {flank_seq[13:]}'
+        flank = f'{flank_seq[0]} {collapse_repeats_by_length(flank_seq[1:13], 4)} {flank_seq[13:]}'
     elif locus == 'D16S539':
         flank = (
             f'{flank_seq[:2]} {flank_seq[2:6]} {flank_seq[6]} '
-            f'{loci_need_split_anno(flank_seq[7:], 4)}'
+            f'{collapse_repeats_by_length(flank_seq[7:], 4)}'
         )
     elif locus == 'D1S1656':
-        flank = f'{flank_seq[:3]} {loci_need_split_anno(flank_seq[3:], 4)}'
+        flank = f'{flank_seq[:3]} {collapse_repeats_by_length(flank_seq[3:], 4)}'
     elif locus == 'PentaD':
         flank = (
-            f'{loci_need_split_anno(flank_seq[:20], 5)} {flank_seq[20]} {flank_seq[21:25]} '
-            f'{loci_need_split_anno(flank_seq[25:], 5)}'
+            f'{collapse_repeats_by_length(flank_seq[:20], 5)} {flank_seq[20]} {flank_seq[21:25]} '
+            f'{collapse_repeats_by_length(flank_seq[25:], 5)}'
         )
     elif locus == 'vWA':
-        flank = f'{flank_seq[:3]} {loci_need_split_anno(flank_seq[3:], 4)}'
+        flank = f'{flank_seq[:3]} {collapse_repeats_by_length(flank_seq[3:], 4)}'
     elif locus == 'D10S1248':
-        flank = f'{flank_seq[:2]} {loci_need_split_anno(flank_seq[2:], 4)}'
+        flank = f'{flank_seq[:2]} {collapse_repeats_by_length(flank_seq[2:], 4)}'
     elif locus == 'D22S1045':
-        flank = f'{flank_seq[0]} {loci_need_split_anno(flank_seq[1:], 3)}'
+        flank = f'{flank_seq[0]} {collapse_repeats_by_length(flank_seq[1:], 3)}'
     elif locus in invariant_loci:
-        flank_rev = loci_need_split_anno(flank_seq[::-1], n)
+        flank_rev = collapse_repeats_by_length(flank_seq[::-1], n)
         flank = flank_rev[::-1]
     return flank
 
@@ -714,28 +710,28 @@ def flank_3(full_seq, back, locus, n):
     if locus == 'D1S1656' or locus == 'FGA':
         flank = ''
     elif locus == 'CSF1PO':
-        flank = f'{flank_seq[0]} {loci_need_split_anno(flank_seq[1:-1], 4)} {flank_seq[-1]}'
+        flank = f'{flank_seq[0]} {collapse_repeats_by_length(flank_seq[1:-1], 4)} {flank_seq[-1]}'
     elif locus == 'D18S51':
         flank = (
-            f'{flank_seq[:2]} {loci_need_split_anno(flank_seq[2:30], 4)} {flank_seq[30:33]} '
-            f'{flank_seq[33]} {loci_need_split_anno(flank_seq[34:42], 4)} {flank_seq[42:44]} '
+            f'{flank_seq[:2]} {collapse_repeats_by_length(flank_seq[2:30], 4)} {flank_seq[30:33]} '
+            f'{flank_seq[33]} {collapse_repeats_by_length(flank_seq[34:42], 4)} {flank_seq[42:44]} '
             f'{flank_seq[44:]}'
         )
     elif locus == 'D16S539':
         flank = (
-            f'{loci_need_split_anno(flank_seq[:12], 4)} {flank_seq[12:15]} {flank_seq[15]} '
-            f'{loci_need_split_anno(flank_seq[16:28], 4)} {flank_seq[28:31]} '
+            f'{collapse_repeats_by_length(flank_seq[:12], 4)} {flank_seq[12:15]} {flank_seq[15]} '
+            f'{collapse_repeats_by_length(flank_seq[16:28], 4)} {flank_seq[28:31]} '
             f'{flank_seq[31:33]} {flank_seq[33]} {flank_seq[-2:]}'
         )
     elif locus == 'D7S820':
-        flank = loci_need_split_anno(flank_seq, 4)
+        flank = collapse_repeats_by_length(flank_seq, 4)
     elif locus == 'D21S11':
         flank = (
-            f'{flank_seq[:2]} {flank_seq[2]} {loci_need_split_anno(flank_seq[3:11], 4)} '
+            f'{flank_seq[:2]} {flank_seq[2]} {collapse_repeats_by_length(flank_seq[3:11], 4)} '
             f'{flank_seq[-1]}'
         )
     elif locus in invariant_loci:
-        flank = loci_need_split_anno(flank_seq, n)
+        flank = collapse_repeats_by_length(flank_seq, n)
     return flank
 
 
@@ -812,7 +808,7 @@ def main(args):
                         uas_sequence, no_of_repeat_bases, repeats
                     )
                 else:
-                    forward_strand_bracketed_form = loci_need_split_anno(
+                    forward_strand_bracketed_form = collapse_repeats_by_length(
                         uas_sequence, no_of_repeat_bases
                     )
             elif locus == 'D13S317':
@@ -831,7 +827,7 @@ def main(args):
                     uas_sequence, no_of_repeat_bases, repeats
                 )
             else:
-                forward_strand_bracketed_form = loci_need_split_anno(
+                forward_strand_bracketed_form = collapse_repeats_by_length(
                     uas_sequence, no_of_repeat_bases
                 )
             lus_final, sec_final, tert_final = lus_anno(
