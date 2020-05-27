@@ -558,37 +558,7 @@ def main(args):
             flank_3_anno = marker.flank_3p
 
         str_allele = traditional_str_allele(uas_sequence, no_of_repeat_bases, no_of_sub_bases)
-        cantsplit = locus in cannot_split
-        havetosplit = locus in must_split
-        split_incompatible = len(uas_sequence) % no_of_repeat_bases != 0 and not havetosplit
-        if cantsplit or split_incompatible:
-            if str_dict[locus]['ReverseCompNeeded'] == 'Yes':
-                reverse_comp_sequence = rev_complement_anno(uas_sequence)
-                forward_strand_bracketed_form = rev_comp_forward_strand_bracket(
-                    reverse_comp_sequence, no_of_repeat_bases, repeats, locus, cannot_split,
-                    str_allele
-                )
-                reverse_strand_bracketed_form = rev_comp_uas_output_bracket(
-                    forward_strand_bracketed_form, no_of_repeat_bases
-                )
-            elif locus == 'D21S11':
-                forward_strand_bracketed_form = D21_bracket(
-                    uas_sequence, no_of_split_bases, repeats
-                )
-            elif locus == 'TH01' and (len(uas_sequence) % no_of_repeat_bases != 0):
-                forward_strand_bracketed_form = TH01_annotation(uas_sequence, repeats)
-            elif locus == 'PentaD':
-                forward_strand_bracketed_form = PentaD_annotation(
-                    uas_sequence, no_of_repeat_bases, repeats
-                )
-            else:
-                forward_strand_bracketed_form = sequence_to_bracketed_form(
-                    uas_sequence, no_of_repeat_bases, repeats
-                )
-            lus_final, sec_final, tert_final = lus_anno(
-                forward_strand_bracketed_form, lus, sec, tert, locus, str_allele
-            )
-        else:
+        if marker.do_split:
             if locus == 'D18S51':
                 if type(str_allele) == str:
                     forward_strand_bracketed_form = sequence_to_bracketed_form(
@@ -616,6 +586,33 @@ def main(args):
             else:
                 forward_strand_bracketed_form = collapse_repeats_by_length(
                     uas_sequence, no_of_repeat_bases
+                )
+            lus_final, sec_final, tert_final = lus_anno(
+                forward_strand_bracketed_form, lus, sec, tert, locus, str_allele
+            )
+        else:
+            if str_dict[locus]['ReverseCompNeeded'] == 'Yes':
+                reverse_comp_sequence = rev_complement_anno(uas_sequence)
+                forward_strand_bracketed_form = rev_comp_forward_strand_bracket(
+                    reverse_comp_sequence, no_of_repeat_bases, repeats, locus, cannot_split,
+                    str_allele
+                )
+                reverse_strand_bracketed_form = rev_comp_uas_output_bracket(
+                    forward_strand_bracketed_form, no_of_repeat_bases
+                )
+            elif locus == 'D21S11':
+                forward_strand_bracketed_form = D21_bracket(
+                    uas_sequence, no_of_split_bases, repeats
+                )
+            elif locus == 'TH01' and (len(uas_sequence) % no_of_repeat_bases != 0):
+                forward_strand_bracketed_form = TH01_annotation(uas_sequence, repeats)
+            elif locus == 'PentaD':
+                forward_strand_bracketed_form = PentaD_annotation(
+                    uas_sequence, no_of_repeat_bases, repeats
+                )
+            else:
+                forward_strand_bracketed_form = sequence_to_bracketed_form(
+                    uas_sequence, no_of_repeat_bases, repeats
                 )
             lus_final, sec_final, tert_final = lus_anno(
                 forward_strand_bracketed_form, lus, sec, tert, locus, str_allele

@@ -113,6 +113,25 @@ class STRMarker():
             canon_allele = f'{allele_int}.{allele_dec}'
         return canon_allele
 
+    @property
+    def cannot_split(self):
+        return self.locus in [
+            'D19S433', 'D6S1043', 'TH01', 'D21S11', 'D1S1656', 'D7S820', 'D5S818', 'D12S391',
+            'D9S1122', 'PentaE'
+        ]
+
+    @property
+    def must_split(self):
+        return self.locus in ['D13S317', 'D18S51']
+
+    @property
+    def split_compatible(self):
+        return self.must_split or len(self.uas_sequence) % self.repeat_size == 0
+
+    @property
+    def do_split(self):
+        return not self.cannot_split or self.split_compatible
+
 
 class STRMarker_D8S1179(STRMarker):
     @property
