@@ -139,26 +139,6 @@ def test_FGA_anno():
     assert final_output == '[GGAA]4 GGAG [AAAG]3 [GAAG]3 [AAAG]15 [ACAG]3 [AAAG]9 AA AAAA [GAAA]4'
 
 
-@pytest.mark.parametrize('sequence, n, n_sub_out, allele', [
-    (
-        'TCTATCTATCTGTCTGTCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTA', 4, 0, 17
-    ),
-    (
-        'AGATTAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGACAGACAGACAGACAGACAGACAGAT', 4,
-        0, '21.1'
-    ),
-    (
-        'TAGATAGATAGATAGATGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGGTGTGTGTGTG', 4, 10, '14.3'
-    ),
-    (
-        'AAAAGAAAGAAAAGAAAAGAAAAGAAAAGAAAAGAAAAGAAAAGAAAAGAAAAGAAAAGAAAAGAAAAGAAAAGAAAAGAAA'
-        'AGAAAAGA', 5, 5, 17
-    )
-])
-def test_traditional_str_allele(sequence, n, n_sub_out, allele):
-    assert lusSTR.annot.traditional_str_allele(sequence, n, n_sub_out) == allele
-
-
 @pytest.mark.parametrize(
     'forward_bracket, lus, sec, tert, locus, lus_allele, sec_allele, tert_allele, str_allele', [
         (
@@ -212,25 +192,6 @@ def test_D21_lus_sec():
     lus_out, sec_out = lusSTR.annot.D21_lus_sec(sequence, repeat, tert)
     assert str(lus_out) == '10'
     assert str(sec_out) == '4'
-
-
-@pytest.mark.parametrize('sequence, uas_seq, front, back', [
-    (
-        'CTATGCATCTATCTATCTATCTATCTATCTATCTATCTATCTAATGGTTA',
-        'ATCTATCTATCTATCTATCTATCTATCTATCTATCT',
-        6,
-        8,
-    ),
-    (
-        'TCTATCTGTCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATTCCC',
-        'TCTATCTGTCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTA',
-        0,
-        5,
-    ),
-])
-def test_full_seq_to_uas(sequence, uas_seq, front, back):
-    uas_sequence = lusSTR.annot.full_seq_to_uas(sequence, front, back)
-    assert uas_sequence == uas_seq
 
 
 def test_annotate_uas():

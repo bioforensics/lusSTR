@@ -522,123 +522,6 @@ def D13_anno(sequence, repeats):
     return bracketed_form
 
 
-def resolve_uas_sequence(sequence, str_data, kit, locus, n):
-    assert kit in ('forenseq', 'powerseq')
-    if kit == 'forenseq':
-        trim5 = str_data['Foren_5']
-        trim3 = str_data['Foren_3']
-        flank_5_anno = flank_5(sequence, trim5, locus, n)
-        flank_3_anno = flank_3(sequence, trim3, locus, n)
-    else:
-        trim5 = str_data['Power_5']
-        trim3 = str_data['Power_3']
-
-    if str_data['ReverseCompNeeded'] == 'No':
-        uas_sequence = full_seq_to_uas(sequence, trim5, trim3)
-    else:
-        uas_from_full = full_seq_to_uas(sequence, trim5, trim3)
-        uas_sequence = rev_complement_anno(uas_from_full)
-    return uas_sequence, flank_5_anno, flank_3_anno
-
-
-def full_seq_to_uas(full_seq, front, back):
-    '''
-    Function to trim full sequences to the UAS region.
-
-    It identifies the number of bases to remove from the 5' and 3' ends of the sequence to
-    trim to the UAS region. The downstream annotation, including length-based allele
-    designations, LUS, LUS+ and bracketed annotation is based on this region in the sequence.
-    '''
-    if front == 0:
-        seq_uas = full_seq[:-back]
-    elif back == 0:
-        seq_uas = full_seq[front:]
-    else:
-        seq_uas = full_seq[front:-back]
-    return seq_uas
-
-
-def flank_5(full_seq, front, locus, n):
-    invariant_loci = [
-        'D17S1301', 'D18S51', 'D21S11', 'D2S1338', 'D4S2408', 'D5S818', 'PentaE', 'D12S391',
-        'D19S433', 'FGA', 'TPOX', 'CSF1PO', 'D3S1358', 'D6S1043', 'TH01', 'D9S1122'
-    ]
-    flank_seq = full_seq[:front]
-    if locus == 'D8S1179':
-        flank = ''
-    elif locus == 'D13S317':
-        flank = (
-            f'{flank_seq[:2]} {collapse_repeats_by_length(flank_seq[2:14], 4)} {flank_seq[14]} '
-            f'{flank_seq[15]} {flank_seq[16:19]} {collapse_repeats_by_length(flank_seq[19:], 4)}'
-        )
-    elif locus == 'D20S482':
-        flank = (
-            f'{flank_seq[:2]} {flank_seq[2:6]} {flank_seq[6]} {flank_seq[7:10]} '
-            f'{flank_seq[10:]} {flank_seq[14:18]}'
-        )
-    elif locus == 'D2S441':
-        flank = f'{flank_seq[:4]} {flank_seq[4]} {collapse_repeats_by_length(flank_seq[5:], 4)}'
-    elif locus == 'D7S820':
-        flank = f'{flank_seq[0]} {collapse_repeats_by_length(flank_seq[1:13], 4)} {flank_seq[13:]}'
-    elif locus == 'D16S539':
-        flank = (
-            f'{flank_seq[:2]} {flank_seq[2:6]} {flank_seq[6]} '
-            f'{collapse_repeats_by_length(flank_seq[7:], 4)}'
-        )
-    elif locus == 'D1S1656':
-        flank = f'{flank_seq[:3]} {collapse_repeats_by_length(flank_seq[3:], 4)}'
-    elif locus == 'PentaD':
-        flank = (
-            f'{collapse_repeats_by_length(flank_seq[:20], 5)} {flank_seq[20]} {flank_seq[21:25]} '
-            f'{collapse_repeats_by_length(flank_seq[25:], 5)}'
-        )
-    elif locus == 'vWA':
-        flank = f'{flank_seq[:3]} {collapse_repeats_by_length(flank_seq[3:], 4)}'
-    elif locus == 'D10S1248':
-        flank = f'{flank_seq[:2]} {collapse_repeats_by_length(flank_seq[2:], 4)}'
-    elif locus == 'D22S1045':
-        flank = f'{flank_seq[0]} {collapse_repeats_by_length(flank_seq[1:], 3)}'
-    elif locus in invariant_loci:
-        flank_rev = collapse_repeats_by_length(flank_seq[::-1], n)
-        flank = flank_rev[::-1]
-    return flank
-
-
-def flank_3(full_seq, back, locus, n):
-    invariant_loci = [
-        'D1S1656', 'FGA', 'D10S1248', 'D12S391', 'D13S317', 'D17S1301', 'D20S482', 'D22S1045',
-        'D2S1338', 'D2S441', 'D3S1358', 'D4S2408', 'D5S818', 'D8S1179', 'D9S1122', 'TPOX',
-        'vWA', 'D19S433', 'D6S1043', 'PentaE', 'TH01', 'PentaD'
-    ]
-    flank_seq = full_seq[-back:]
-    if locus == 'D1S1656' or locus == 'FGA':
-        flank = ''
-    elif locus == 'CSF1PO':
-        flank = f'{flank_seq[0]} {collapse_repeats_by_length(flank_seq[1:-1], 4)} {flank_seq[-1]}'
-    elif locus == 'D18S51':
-        flank = (
-            f'{flank_seq[:2]} {collapse_repeats_by_length(flank_seq[2:30], 4)} {flank_seq[30:33]} '
-            f'{flank_seq[33]} {collapse_repeats_by_length(flank_seq[34:42], 4)} '
-            f'{flank_seq[42:44]} {flank_seq[44:]}'
-        )
-    elif locus == 'D16S539':
-        flank = (
-            f'{collapse_repeats_by_length(flank_seq[:12], 4)} {flank_seq[12:15]} {flank_seq[15]} '
-            f'{collapse_repeats_by_length(flank_seq[16:28], 4)} {flank_seq[28:31]} '
-            f'{flank_seq[31:33]} {flank_seq[33]} {flank_seq[-2:]}'
-        )
-    elif locus == 'D7S820':
-        flank = collapse_repeats_by_length(flank_seq, 4)
-    elif locus == 'D21S11':
-        flank = (
-            f'{flank_seq[:2]} {flank_seq[2]} {collapse_repeats_by_length(flank_seq[3:11], 4)} '
-            f'{flank_seq[-1]}'
-        )
-    elif locus in invariant_loci:
-        flank = collapse_repeats_by_length(flank_seq, n)
-    return flank
-
-
 def main(args):
     cannot_split = [
         'D19S433', 'D6S1043', 'TH01', 'D21S11', 'D1S1656', 'D7S820', 'D5S818', 'D12S391',
@@ -668,12 +551,12 @@ def main(args):
         sec = str_dict[locus]['Sec']
         tert = str_dict[locus]['Tert']
 
-        if args.uas:
-            uas_sequence = sequence
-        else:
-            uas_sequence, flank_5_anno, flank_3_anno = resolve_uas_sequence(
-                sequence, str_dict[locus], args.kit, locus, no_of_repeat_bases
-            )
+        marker = lusSTR.marker.init_str_marker(locus, sequence, uas=args.uas, kit=args.kit)
+        uas_sequence = marker.uas_sequence
+        if not args.uas:
+            flank_5_anno = marker.flank_5p
+            flank_3_anno = marker.flank_3p
+
         str_allele = traditional_str_allele(uas_sequence, no_of_repeat_bases, no_of_sub_bases)
         cantsplit = locus in cannot_split
         havetosplit = locus in must_split
