@@ -100,3 +100,33 @@ def sequence_to_bracketed_form(sequence, n, repeats):
     result = ' '.join(blocks)
     result = re.sub(r' +', ' ', result)
     return result
+
+
+def reverse_complement(sequence):
+    '''
+    Function creates reverse complement of sequence
+
+    Sequences in which the UAS software output contains the sequence on the reverse strand
+    require translation of the sequence to the forward strand. This allows for consistency
+    between both loci and any outside analyses in which comparisons may be made.
+    '''
+    complement = {'A': 'T', 'C': 'G', 'G': 'C', 'T': 'A'}
+    rclist = [complement[base] for base in sequence[::-1]]
+    rc = ''.join(rclist)
+    return rc
+
+
+def reverse_complement_bracketed(forward_bracket, n):
+    '''Compute reverse complement of a bracketed form annotation.'''
+    inblocks = forward_bracket.split(' ')
+    outblocks = list()
+    for block in reversed(inblocks):
+        match = re.match(r'\[([ACGT]+)\](\d+)', block)
+        if match:
+            rcrep = reverse_complement(match.group(1))
+            count = match.group(2)
+            rcblock = f'[{rcrep}]{count}'
+        else:
+            rcblock = reverse_complement(block)
+        outblocks.append(rcblock)
+    return ' '.join(outblocks)
