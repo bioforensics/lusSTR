@@ -12,6 +12,7 @@ import os
 import pandas as pd
 import pytest
 import lusSTR
+from lusSTR.repeat import reverse_complement
 from lusSTR.tests import data_file
 import re
 from tempfile import NamedTemporaryFile
@@ -36,26 +37,12 @@ def test_extract():
 
 def test_split_sequence_into_two_strings():
     sequence = 'TAGATAGATAGATGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGGTGTGTGTGTGTG'
-    reverse_comp_sequence = lusSTR.annot.rev_complement_anno(sequence)
+    reverse_comp_sequence = reverse_complement(sequence)
     repeat_for_split = 'CACA'
     seq1, seq2 = lusSTR.annot.split_sequence_into_two_strings(reverse_comp_sequence,
                                                               repeat_for_split)
     assert seq1 == 'CACACACACACA'
     assert seq2 == 'CCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCATCTATCTATCTA'
-
-
-def test_rev_complement_anno():
-    sequence = 'TAGATAGATAGATGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGGTGTGTGTGTGTG'
-    final_output = lusSTR.annot.rev_complement_anno(sequence)
-    assert final_output == (
-        'CACACACACACACCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCATCTATCTATCTA'
-    )
-
-
-def test_rev_comp_uas_output_bracket():
-    foward_strand = '[AGGT]3 [CGAA]2 TTGG'
-    rev_comp_bracket = lusSTR.annot.rev_comp_uas_output_bracket(foward_strand, 4)
-    assert rev_comp_bracket == 'CCAA [TTCG]2 [ACCT]3'
 
 
 @pytest.mark.parametrize('sequence, bracket_form', [
@@ -97,14 +84,14 @@ def test_D19_annotation():
     )
     repeats = ['TCTA', 'TCTG']
     repeat_for_split = 'CCTT'
-    reverse_comp_sequence = lusSTR.annot.rev_complement_anno(sequence)
+    reverse_comp_sequence = reverse_complement(sequence)
     final_output = lusSTR.annot.D19_annotation(reverse_comp_sequence, repeats, repeat_for_split)
     assert final_output == 'CT CTCT TTCT TCTT CTCT [CCTT]14 CCTA CCTT TT CCTT'
 
 
 def test_D1_annotation():
     sequence = 'TAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATGTGTATGTG'
-    reverse_comp_sequence = lusSTR.annot.rev_complement_anno(sequence)
+    reverse_comp_sequence = reverse_complement(sequence)
     repeats = ['TCTA', 'CATA', 'TCTG', 'CACA', 'CCTA']
     repeat_for_split = 'CACA'
     final_output = lusSTR.annot.D1_annotation(reverse_comp_sequence, repeats, repeat_for_split)
@@ -134,7 +121,7 @@ def test_FGA_anno():
         'TCTTTCTTTCTTTCTTTCTTTCTTTCTTTCTTTCTTTCTTTCTTCCTTCCTTCCTTTCTTTCTTTCTCCTTCCTTCCTTCCTTCC'
     )
     repeats = ['AAAG', 'GAAA', 'GAAG', 'ACAG', 'AAAA']
-    reverse_comp_sequence = lusSTR.annot.rev_complement_anno(sequence)
+    reverse_comp_sequence = reverse_complement(sequence)
     final_output = lusSTR.annot.FGA_anno(reverse_comp_sequence, repeats)
     assert final_output == '[GGAA]4 GGAG [AAAG]3 [GAAG]3 [AAAG]15 [ACAG]3 [AAAG]9 AA AAAA [GAAA]4'
 

@@ -18,6 +18,7 @@ import sys
 import lusSTR
 from lusSTR.repeat import collapse_all_repeats, collapse_repeats_by_length
 from lusSTR.repeat import sequence_to_bracketed_form, split_by_n
+from lusSTR.repeat import reverse_complement, reverse_complement_bracketed
 
 
 def get_str_metadata_file():
@@ -26,22 +27,6 @@ def get_str_metadata_file():
 
 with open(get_str_metadata_file(), 'r') as fh:
     str_dict = json.load(fh)
-
-
-def rev_complement_anno(sequence):
-    '''
-    Function creates reverse complement of sequence
-
-    Sequences in which the UAS software output contains the sequence on the reverse strand
-    require translation of the sequence to the forward strand. This allows for consistency
-    between both loci and any outside analyses in which comparisons may be made.
-    '''
-    complement = {'A': 'T', 'C': 'G', 'G': 'C', 'T': 'A'}
-    bases = list(sequence)
-    bases = [complement[base] for base in bases]
-    comp = ''.join(bases)
-    reverse_comp_sequence = comp[::-1]
-    return reverse_comp_sequence
 
 
 def rev_comp_forward_strand_bracket(
@@ -71,42 +56,6 @@ def rev_comp_forward_strand_bracket(
     else:
         forward_strand_brack_form = collapse_repeats_by_length(rev_sequence, n)
     return re.sub('  ', ' ', forward_strand_brack_form)
-
-
-def rev_comp_uas_output_bracket(forward_bracket, n):
-    '''
-    Function creates bracketed annotation for the UAS output sequence.
-
-    There may be instances where the bracketed annotation is required for the UAS output sequence.
-    This function performs the reverse complement of the forward strand bracketed annotation to
-    create the bracketed annotation for the UAS output (for those loci in which the UAS output
-    reports the reverse strand).
-    '''
-    ind = list(forward_bracket)
-    complement = {'A': 'T', 'C': 'G', 'G': 'C', 'T': 'A'}
-    reverse_strand_form = list()
-    for j in ind:
-        if j.isalpha():
-            reverse_strand_form.append(complement[j])
-        elif j == '[':
-            reverse_strand_form.append(']')
-        elif j == ']':
-            reverse_strand_form.append('[')
-        else:
-            reverse_strand_form.append(j)
-    reverse_form_anno_tmp = ''.join(reversed(reverse_strand_form))
-    reverse_form_anno_final = list()
-    for unit in reverse_form_anno_tmp.split(' '):
-        if '[' in unit:
-            if len(unit) == (n+3):
-                final_string = f'{unit[1:(len(unit))]}{unit[0]}'
-            else:
-                final_string = f'{unit[2:(len(unit))]}{unit[1]}{unit[0]}'
-            reverse_form_anno_final.append(final_string)
-        else:
-            reverse_form_anno_final.append(unit)
-    reverse_strand_bracketed_form = ' '.join(reverse_form_anno_final)
-    return re.sub('  ', ' ', reverse_strand_bracketed_form)
 
 
 def traditional_str_allele(sequence, n, n_sub_out):
@@ -537,7 +486,7 @@ def resolve_uas_sequence(sequence, str_data, kit, locus, n):
         uas_sequence = full_seq_to_uas(sequence, trim5, trim3)
     else:
         uas_from_full = full_seq_to_uas(sequence, trim5, trim3)
-        uas_sequence = rev_complement_anno(uas_from_full)
+        uas_sequence = reverse_complement(uas_from_full)
     return uas_sequence, flank_5_anno, flank_3_anno
 
 
@@ -680,13 +629,13 @@ def main(args):
         split_incompatible = len(uas_sequence) % no_of_repeat_bases != 0 and not havetosplit
         if cantsplit or split_incompatible:
             if str_dict[locus]['ReverseCompNeeded'] == 'Yes':
-                reverse_comp_sequence = rev_complement_anno(uas_sequence)
+                reverse_comp_sequence = reverse_complement(uas_sequence)
                 forward_strand_bracketed_form = rev_comp_forward_strand_bracket(
                     reverse_comp_sequence, no_of_repeat_bases, repeats, locus, cannot_split,
                     str_allele
                 )
-                reverse_strand_bracketed_form = rev_comp_uas_output_bracket(
-                    forward_strand_bracketed_form, no_of_repeat_bases
+                reverse_strand_bracketed_form = reverse_complement_bracketed(
+                    forward_strand_bracketed_form
                 )
             elif locus == 'D21S11':
                 forward_strand_bracketed_form = D21_bracket(
@@ -718,13 +667,13 @@ def main(args):
             elif locus == 'D13S317':
                 forward_strand_bracketed_form = D13_anno(uas_sequence, repeats)
             elif str_dict[locus]['ReverseCompNeeded'] == 'Yes':
-                reverse_comp_sequence = rev_complement_anno(uas_sequence)
+                reverse_comp_sequence = reverse_complement(uas_sequence)
                 forward_strand_bracketed_form = rev_comp_forward_strand_bracket(
                     reverse_comp_sequence, no_of_repeat_bases, repeats, locus, cannot_split,
                     str_allele
                 )
-                reverse_strand_bracketed_form = rev_comp_uas_output_bracket(
-                    forward_strand_bracketed_form, no_of_repeat_bases
+                reverse_strand_bracketed_form = reverse_complement_bracketed(
+                    forward_strand_bracketed_form
                 )
             elif locus == 'PentaD':
                 forward_strand_bracketed_form = PentaD_annotation(
