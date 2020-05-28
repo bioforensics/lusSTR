@@ -74,6 +74,7 @@ def collapse_repeats_by_length(sequence, n):
     '''Convert to bracketed annotation form by splitting the sequence into blocks of size n.'''
     units = list()
     for unit, count in get_blocks(sequence, n):
+        assert unit is not None, (sequence, n)
         if count == 1:
             units.append(unit)
         else:
@@ -149,4 +150,4 @@ def repeat_copy_number(bf, repeat):
             length = int(match.group(1))
             if length > longest:
                 longest = length
-    return longest
+    return str(longest)

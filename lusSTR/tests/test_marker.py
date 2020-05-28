@@ -154,3 +154,29 @@ def test_annotation_and_lus(locus, sequence, forward_bracket, lus, sec, tert):
     assert str(lus_out) == lus
     assert str(sec_out) == sec
     assert str(tert_out) == tert
+
+
+def test_strobj_CSF1PO():
+    marker = STRMarkerObject(
+        'CSF1PO', 'CTTCCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTAATCTATCTATCTT',
+        uas=False, kit='forenseq'
+    )
+    assert marker.uas_sequence == 'AGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGAT'
+    assert marker.forward_sequence == 'ATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCT'
+    assert marker.annotation == '[ATCT]12'
+    assert marker.annotation_reverse == '[AGAT]12'
+    assert marker.canonical == 12
+    assert marker.designation == ('12', '0', None)
+
+
+def test_strobj_D10S1248():
+    marker = STRMarkerObject(
+        'D10S1248', 'TTGAACAAATGAGTGAGTGGAAGGAAGGAAGGAAGGAAGGAAGGAAGGAAGGAAGGAAGGAAGGAAGGAAATGAAGA'
+        'CAATACAACCAGAGTT', uas=False, kit='forenseq'
+    )
+    assert marker.uas_sequence == 'GGAAGGAAGGAAGGAAGGAAGGAAGGAAGGAAGGAAGGAAGGAAGGAAGGAA'
+    assert marker.forward_sequence == 'GGAAGGAAGGAAGGAAGGAAGGAAGGAAGGAAGGAAGGAAGGAAGGAAGGAA'
+    assert marker.annotation == '[GGAA]13'
+    assert marker.annotation_reverse == '[GGAA]13'
+    assert marker.canonical == 13
+    assert marker.designation == ('13', None, None)

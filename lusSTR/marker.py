@@ -34,7 +34,7 @@ class UnsupportedKitError(ValueError):
 
 
 class STRMarker():
-    def __init__(self, locus, sequence, uas=True, kit='forenseq'):
+    def __init__(self, locus, sequence, uas=False, kit='forenseq'):
         self.locus = locus
         self.sequence = sequence
         if locus not in str_marker_data:
@@ -70,8 +70,7 @@ class STRMarker():
             raise UnsupportedKitError(self.kit)
 
     @property
-    def uas_sequence(self):
-        '''Determine the UAS core sequence.'''
+    def forward_sequence(self):
         if self.uas:
             return self.sequence
         front, back = self._uas_bases_to_trim()
@@ -82,10 +81,11 @@ class STRMarker():
         return self.sequence[front:back]
 
     @property
-    def forward_sequence(self):
-        if self.data['ReverseCompNeeded']:
-            return reverse_complement(self.uas_sequence)
-        return self.uas_sequence
+    def uas_sequence(self):
+        '''Determine the UAS core sequence.'''
+        if self.data['ReverseCompNeeded'] == "Yes":
+            return reverse_complement(self.forward_sequence)
+        return self.forward_sequence
 
     @property
     def flankseq_5p(self):
@@ -149,10 +149,11 @@ class STRMarker():
     @property
     def annotation(self):
         if self.data['ReverseCompNeeded'] == 'Yes' and not self.cannot_split:
-            collapseseq = collapse_repeats_by_length(self.forward_sequence, self.repeat_size)
+            collapseseq = collapse_repeats_by_length(self.uas_sequence, self.repeat_size)
+            collapseseq = reverse_complement_bracketed(collapseseq)
         else:
             collapseseq = sequence_to_bracketed_form(
-                self.forward_sequence, self.repeat_size, self.repeats
+                self.uas_sequence, self.repeat_size, self.repeats
             )
         return collapseseq
 
@@ -180,22 +181,23 @@ class STRMarker():
     @property
     def summary(self):
         lus, sec, ter = self.designation
-        lus_final_output = f'{self.canonical}_{lus}'
+        canon  = self.canonical
+        lus_final_output = f'{canon}_{lus}'
         if sec is None:
             lus_plus = lus_final_output
         else:
             if ter is None:
-                lus_plus = f'{self.canonical}_{lus}_{sec}'
+                lus_plus = f'{canon}_{lus}_{sec}'
             else:
-                lus_plus = f'{self.canonical}_{lus}_{sec}'
+                lus_plus = f'{canon}_{lus}_{sec}_{ter}'
         if self.data['ReverseCompNeeded'] == 'Yes':
             return [
-                self.uas_sequence, self.forward_sequence, self.canonical, self.annotation,
+                self.uas_sequence, self.forward_sequence, canon, self.annotation,
                 self.annotation_reverse, lus_final_output, lus_plus
             ]
         else:
             return [
-                self.uas_sequence, self.uas_sequence, self.canonical, self.annotation,
+                self.uas_sequence, self.forward_sequence, canon, self.annotation,
                 self.annotation, lus_final_output, lus_plus
             ]
 
@@ -268,29 +270,29 @@ class STRMarker_D7S820(STRMarker):
         '''
         if type(self.canonical) == int:
             forward_strand_brack_form = sequence_to_bracketed_form(
-                self.forward_sequence, self.repeat_size, self.repeats
+                self.uas_sequence, self.repeat_size, self.repeats
             )
         else:
             if re.search(r'\d{1,2}.1', self.canonical):
-                if self.forward_sequence[-1] == 'T':
+                if self.uas_sequence[-1] == 'T':
                     forward_strand_brack_form = sequence_to_bracketed_form(
-                        self.forward_sequence, self.repeat_size, self.repeats
+                        self.uas_sequence, self.repeat_size, self.repeats
                     )
                 else:
                     bf = sequence_to_bracketed_form(
-                        self.forward_sequence[1:], self.repeat_size, self.repeats
+                        self.uas_sequence[1:], self.repeat_size, self.repeats
                     )
-                    forward_strand_brack_form = f'{self.forward_sequence[0]} {bf}'
+                    forward_strand_brack_form = f'{self.uas_sequence[0]} {bf}'
             elif re.search(r'\d{1,2}.2', self.canonical):
                 new_repeat_list = ['TATC', 'TGTC', 'AATC']
                 forward_strand_brack_form = sequence_to_bracketed_form(
-                    self.forward_sequence, self.repeat_size, new_repeat_list
+                    self.uas_sequence, self.repeat_size, new_repeat_list
                 )
             else:
                 bf = sequence_to_bracketed_form(
-                    self.forward_sequence[3:], self.repeat_size, self.repeats
+                    self.uas_sequence[3:], self.repeat_size, self.repeats
                 )
-                forward_strand_brack_form = f'{self.forward_sequence[:3]} {bf}'
+                forward_strand_brack_form = f'{self.uas_sequence[:3]} {bf}'
         return forward_strand_brack_form
 
     @property
@@ -341,10 +343,10 @@ class STRMarker_D1S1656(STRMarker):
         This function identifies if the sequence is a microvariant in order to call different
         functions to create the bracketed annotation.
         '''
-        sequence_filt = self.forward_sequence[2:]
+        sequence_filt = self.uas_sequence[2:]
         final = list()
         first_string, second_string = split_sequence_into_two_strings(sequence_filt, 'CACA')
-        final.append(self.forward_sequence[:2])
+        final.append(self.uas_sequence[:2])
         if first_string == '':
             final.append('CACA')
         else:
@@ -431,13 +433,13 @@ class STRMarker_FGA(STRMarker):
         Simply identifying repeat units in a specified order does not result in the final
         annotation which is consistent with previously published annotation for this locus.
         '''
-        if len(self.forward_sequence) % self.repeat_size != 0:
-            return collapse_repeats_by_length(self.forward_sequence, self.repeat_size)
+        if len(self.uas_sequence) % self.repeat_size != 0:
+            return collapse_repeats_by_length(self.uas_sequence, self.repeat_size)
         else:
-            sequence = self.forward_sequence
+            sequence = self.uas_sequence
             final = list()
             prev = 0
-            if (len(sequence) % 4 == 0):
+            if len(sequence) % 4 == 0:
                 final_string = collapse_repeats_by_length(sequence, 4)
             else:
                 for m in re.finditer('GGAA', sequence):
@@ -489,7 +491,7 @@ class STRMarker_FGA(STRMarker):
                 last_string_final = ' '.join(tmp)
                 final.append(last_string_final)
                 final_string = ' '.join(final)
-                return re.sub(r' +', ' ', final_string)
+            return re.sub(r' +', ' ', final_string)
 
 
 class STRMarker_CSF1PO(STRMarker):
@@ -679,7 +681,7 @@ class STRMarker_D19S433(STRMarker):
         return re.sub(r' +', ' ', final_string)
 
 
-def STRMarkerObject(locus, sequence, uas=True, kit='forenseq'):
+def STRMarkerObject(locus, sequence, uas=False, kit='forenseq'):
     constructors = {
         'D8S1179': STRMarker_D8S1179,
         'D13S317': STRMarker_D13S317,

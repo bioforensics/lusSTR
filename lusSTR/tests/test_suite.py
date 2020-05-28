@@ -60,6 +60,8 @@ def test_annotate_full_nocombine():
         lusSTR.annot.main(args)
         outfile_name = os.path.splitext(outfile.name)[0]
         outfile_name_output = f'{outfile_name}_no_combined_reads.txt'
+        import subprocess
+        subprocess.check_call(['cp', outfile_name_output, 'FLARFY'])
         assert filecmp.cmp(testfullanno, outfile_name_output) is True
 
 
