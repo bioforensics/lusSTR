@@ -9,7 +9,7 @@
 
 import json
 import lusSTR
-from lusSTR.repeat import collapse_repeats_by_length
+from lusSTR.repeat import collapse_repeats_by_length, sequence_to_bracketed_form
 from pkg_resources import resource_filename
 import re
 
@@ -75,6 +75,12 @@ class STRMarker():
         return self.sequence[front:back]
 
     @property
+    def forward_sequence(self):
+        if self.data['ReverseCompNeeded']:
+            return lusSTR.annot.reverse_complement(self.uas_sequence)
+        return self.uas_sequence
+
+    @property
     def flankseq_5p(self):
         front, back = self._uas_bases_to_trim()
         return self.sequence[:front]
@@ -99,16 +105,17 @@ class STRMarker():
     @property
     def canonical(self):
         '''Canonical STR allele designation'''
+        n = self.repeat_size
         nsubout = self.data['BasesToSubtract']
         if nsubout == 0:
             nsubout = None
         else:
             nsubout *= -1
-        new_seq = sequence[:nsubout]
+        new_seq = self.uas_sequence[:nsubout]
         if len(new_seq) % n == 0:
-            canon_allele = int(len(new_seq)/n)
+            canon_allele = int(len(new_seq) / n)
         else:
-            allele_int = int(len(new_seq)/n)
+            allele_int = int(len(new_seq) / n)
             allele_dec = int(len(new_seq) % n)
             canon_allele = f'{allele_int}.{allele_dec}'
         return canon_allele
@@ -131,6 +138,22 @@ class STRMarker():
     @property
     def do_split(self):
         return not self.cannot_split or self.split_compatible
+
+    @property
+    def annotation(self):
+        lus, sec, ter = None, None, None
+        if self.data['ReverseCompNeeded']:
+            collapsed = collapse_repeats_by_length(self.forward_sequence, self.repeat_size)
+        else:
+            collapsed = sequence_to_bracketed_form(
+                self.forward_sequence, self.repeat_size, self.data['Repeats']
+            )
+        lus = repeat_copy_number(collapsed, self.data['LUS'])
+        if self.data['Sec'] != '':
+            sec = repeat_copy_number(collapsed, self.data['Sec'])
+        if self.data['Tert'] != '':
+            ter = repeat_copy_number(collapsed, self.data['Tert'])
+        return lus, sec, ter
 
 
 class STRMarker_D8S1179(STRMarker):

@@ -107,20 +107,6 @@ def rev_comp_uas_output_bracket(forward_bracket, n):
     return re.sub('  ', ' ', reverse_strand_bracketed_form)
 
 
-def traditional_str_allele(sequence, n, n_sub_out):
-    '''
-    Function used to calculate the traditional STR allele designation
-    '''
-    new_seq = sequence[:(len(sequence)-n_sub_out)]
-    if (len(new_seq) % n) == 0:
-        trad_allele = int(len(new_seq)/n)
-    else:
-        allele_tmp = int(len(new_seq)/n)
-        allele_dec = int(len(new_seq) % n)
-        trad_allele = f'{allele_tmp}.{allele_dec}'
-    return trad_allele
-
-
 def repeat_copy_number(bf, repeat):
     '''Determine the longest uninterrupted stretch of the specified repeat.
 
@@ -549,8 +535,8 @@ def main(args):
         if not args.uas:
             flank_5_anno = marker.flank_5p
             flank_3_anno = marker.flank_3p
+        str_allele = marker.canonical
 
-        str_allele = traditional_str_allele(uas_sequence, no_of_repeat_bases, no_of_sub_bases)
         if marker.do_split:
             if locus == 'D18S51':
                 if type(str_allele) == str:

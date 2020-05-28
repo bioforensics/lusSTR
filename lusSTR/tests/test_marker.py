@@ -14,24 +14,24 @@ import re
 from tempfile import NamedTemporaryFile
 
 
-@pytest.mark.parametrize('sequence, n, n_sub_out, allele', [
-    (
-        'TCTATCTATCTGTCTGTCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTA', 4, 0, 17
-    ),
-    (
-        'AGATTAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGACAGACAGACAGACAGACAGACAGAT', 4,
-        0, '21.1'
-    ),
-    (
-        'TAGATAGATAGATAGATGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGGTGTGTGTGTG', 4, 10, '14.3'
-    ),
-    (
-        'AAAAGAAAGAAAAGAAAAGAAAAGAAAAGAAAAGAAAAGAAAAGAAAAGAAAAGAAAAGAAAAGAAAAGAAAAGAAAAGAAA'
-        'AGAAAAGA', 5, 5, 17
-    )
-])
-def test_traditional_str_allele(sequence, n, n_sub_out, allele):
-    assert lusSTR.annot.traditional_str_allele(sequence, n, n_sub_out) == allele
+# @pytest.mark.parametrize('sequence, n, n_sub_out, allele', [
+#     (
+#         'TCTATCTATCTGTCTGTCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTA', 4, 0, 17
+#     ),
+#     (
+#         'AGATTAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGACAGACAGACAGACAGACAGACAGAT',
+#         4, 0, '21.1'
+#     ),
+#     (
+#         'TAGATAGATAGATAGATGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGGTGTGTGTGTG', 4, 10, '14.3'
+#     ),
+#     (
+#         'AAAAGAAAGAAAAGAAAAGAAAAGAAAAGAAAAGAAAAGAAAAGAAAAGAAAAGAAAAGAAAAGAAAAGAAAAGAAAAGAAA'
+#         'AGAAAAGA', 5, 5, 17
+#     )
+# ])
+# def test_traditional_str_allele(sequence, n, n_sub_out, allele):
+#     assert lusSTR.annot.traditional_str_allele(sequence, n, n_sub_out) == allele
 
 
 # @pytest.mark.parametrize('sequence, uas_seq, front, back', [
