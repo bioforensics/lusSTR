@@ -29,24 +29,6 @@ with open(get_str_metadata_file(), 'r') as fh:
     str_dict = json.load(fh)
 
 
-def repeat_copy_number(bf, repeat):
-    '''Determine the longest uninterrupted stretch of the specified repeat.
-
-    The input is a sequence string collapsed to bracketed annotation form.
-    '''
-    longest = 0
-    for block in bf.split(' '):
-        if block == repeat:
-            if 1 > longest:
-                longest = 1
-        match = re.match(r'\[' + repeat + r'\](\d+)', block)
-        if match:
-            length = int(match.group(1))
-            if length > longest:
-                longest = length
-    return longest
-
-
 def split_sequence_into_two_strings(sequence, repeat_for_split):
     '''
     Function to split a sequence into two separate strings at a specified repeat unit.

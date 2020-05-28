@@ -12,6 +12,7 @@ import lusSTR
 from lusSTR.annot import split_sequence_into_two_strings
 from lusSTR.repeat import collapse_repeats_by_length, sequence_to_bracketed_form
 from lusSTR.repeat import reverse_complement, reverse_complement_bracketed
+from lusSTR.repeat import repeat_copy_number, collapse_all_repeats, split_by_n
 from pkg_resources import resource_filename
 import re
 
@@ -158,8 +159,8 @@ class STRMarker():
     @property
     def annotation_reverse(self):
         if self.data['ReverseCompNeeded'] == 'Yes':
-            return reverse_complement_bracketed(self.collapsed)
-        return self.collapsed
+            return reverse_complement_bracketed(self.annotation)
+        return self.annotation
 
     @property
     def annotation_with_flanks(self):
@@ -169,11 +170,11 @@ class STRMarker():
     @property
     def designation(self):
         lus, sec, ter = None, None, None
-        lus = repeat_copy_number(self.collapsed, self.data['LUS'])
+        lus = repeat_copy_number(self.annotation, self.data['LUS'])
         if self.data['Sec'] != '':
-            sec = repeat_copy_number(self.collapsed, self.data['Sec'])
+            sec = repeat_copy_number(self.annotation, self.data['Sec'])
         if self.data['Tert'] != '':
-            ter = repeat_copy_number(self.collapsed, self.data['Tert'])
+            ter = repeat_copy_number(self.annotation, self.data['Tert'])
         return lus, sec, ter
 
     @property
@@ -216,7 +217,7 @@ class STRMarker_D13S317(STRMarker):
 
     @property
     def annotation(self):
-        if len(sequence) < 110:
+        if len(self.uas_sequence) < 110:
             bracketed_form = collapse_repeats_by_length(self.uas_sequence, 4)
         else:
             for m in re.finditer('GGGC', self.uas_sequence):
@@ -295,8 +296,8 @@ class STRMarker_D7S820(STRMarker):
     @property
     def designation(self):
         lus, sec, ter = None, None, None
-        lus = repeat_copy_number(self.collapsed, self.data['LUS'])
-        sec = repeat_copy_number(self.collapsed, self.data['Sec'])
+        lus = repeat_copy_number(self.annotation, self.data['LUS'])
+        sec = repeat_copy_number(self.annotation, self.data['Sec'])
         if str(self.annotation)[-1] == 'T' and isinstance(self.canonical, str):
             ter = 1
         else:
@@ -381,7 +382,7 @@ class STRMarker_PentaD(STRMarker):
         If the sequence is >= 18bp, the flanking region (first 5 bases) is first split off in the
         sequence to preserve that sequence. Then the repeat units are identified and bracketed.
         '''
-        if len(sequence) < 18:
+        if len(self.uas_sequence) < 18:
             return sequence_to_bracketed_form(self.uas_sequence, self.repeat_size, self.repeats)
         else:
             prefix = self.uas_sequence[:5]
@@ -601,7 +602,7 @@ class STRMarker_D21S11(STRMarker):
 
         finalcount = 0
         for m in re.finditer(self.data['Tert'], self.annotation):
-            count = s[m.end()+1:m.end()+3]
+            count = self.annotation[m.end()+1:m.end()+3]
             if count == '' or count[0] == '[' or count[0] == ' ' or count.isalpha():
                 count = 1
             try:
@@ -651,10 +652,11 @@ class STRMarker_D19S433(STRMarker):
         Simply identifying repeat units in a specified order does not result in the final
         annotation which is consistent with previously published annotation for this locus.
         '''
+        sequence = self.forward_sequence
         final = list()
         last = 0
         prev = 0
-        for m in re.finditer('CCTT', self.forward_sequence):
+        for m in re.finditer('CCTT', sequence):
             if m.start() == prev or m.start() == last:
                 prev = m.end()
             else:
