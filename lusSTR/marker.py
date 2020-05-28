@@ -162,6 +162,11 @@ class STRMarker():
         return self.collapsed
 
     @property
+    def annotation_with_flanks(self):
+        full_annot = f'{self.flank_5p} {self.annotation} {self.flank_3p}'
+        return full_annot.strip()
+
+    @property
     def designation(self):
         lus, sec, ter = None, None, None
         lus = repeat_copy_number(self.collapsed, self.data['LUS'])
@@ -170,6 +175,28 @@ class STRMarker():
         if self.data['Tert'] != '':
             ter = repeat_copy_number(self.collapsed, self.data['Tert'])
         return lus, sec, ter
+
+    @property
+    def summary(self):
+        lus, sec, ter = self.designation
+        lus_final_output = f'{self.canonical}_{lus}'
+        if sec is None:
+            lus_plus = lus_final_output
+        else:
+            if ter is None:
+                lus_plus = f'{self.canonical}_{lus}_{sec}'
+            else:
+                lus_plus = f'{self.canonical}_{lus}_{sec}'
+        if self.data['ReverseCompNeeded'] == 'Yes':
+            return [
+                self.uas_sequence, self.forward_sequence, self.canonical, self.annotation,
+                self.annotation_reverse, lus_final_output, lus_plus
+            ]
+        else:
+            return [
+                self.uas_sequence, self.uas_sequence, self.canonical, self.annotation,
+                self.annotation, lus_final_output, lus_plus
+            ]
 
 
 class STRMarker_D8S1179(STRMarker):
@@ -337,6 +364,15 @@ class STRMarker_PentaD(STRMarker):
             f'{collapse_repeats_by_length(flank_seq[:20], 5)} {flank_seq[20]} {flank_seq[21:25]} '
             f'{collapse_repeats_by_length(flank_seq[25:], 5)}'
         )
+
+    @property
+    def designation(self):
+        lus, sec, ter = super(STRMarker_PentaD, self).designation
+        if self.canonical == '2.2':
+            lus = 5
+        elif self.canonical == '3.2':
+            lus = 6
+        return lus, sec, ter
 
     @property
     def annotation(self):
@@ -641,7 +677,7 @@ class STRMarker_D19S433(STRMarker):
         return re.sub(r' +', ' ', final_string)
 
 
-def init_str_marker(locus, sequence, uas=True, kit='forenseq'):
+def STRMarkerObject(locus, sequence, uas=True, kit='forenseq'):
     constructors = {
         'D8S1179': STRMarker_D8S1179,
         'D13S317': STRMarker_D13S317,
