@@ -63,5 +63,5 @@ def test_reverse_complement():
 
 def test_reverse_complement_bracketed():
     foward_strand = '[AGGT]3 [CGAA]2 TTGG'
-    rev_comp_bracket = reverse_complement_bracketed(foward_strand, 4)
+    rev_comp_bracket = reverse_complement_bracketed(foward_strand)
     assert rev_comp_bracket == 'CCAA [TTCG]2 [ACCT]3'

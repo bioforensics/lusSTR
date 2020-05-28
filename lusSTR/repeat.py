@@ -116,7 +116,7 @@ def reverse_complement(sequence):
     return rc
 
 
-def reverse_complement_bracketed(forward_bracket, n):
+def reverse_complement_bracketed(forward_bracket):
     '''Compute reverse complement of a bracketed form annotation.'''
     inblocks = forward_bracket.split(' ')
     outblocks = list()

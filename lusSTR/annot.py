@@ -635,7 +635,7 @@ def main(args):
                     str_allele
                 )
                 reverse_strand_bracketed_form = reverse_complement_bracketed(
-                    forward_strand_bracketed_form, no_of_repeat_bases
+                    forward_strand_bracketed_form
                 )
             elif locus == 'D21S11':
                 forward_strand_bracketed_form = D21_bracket(
@@ -673,7 +673,7 @@ def main(args):
                     str_allele
                 )
                 reverse_strand_bracketed_form = reverse_complement_bracketed(
-                    forward_strand_bracketed_form, no_of_repeat_bases
+                    forward_strand_bracketed_form
                 )
             elif locus == 'PentaD':
                 forward_strand_bracketed_form = PentaD_annotation(
