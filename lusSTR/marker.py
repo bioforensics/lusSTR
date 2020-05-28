@@ -265,6 +265,17 @@ class STRMarker_D7S820(STRMarker):
                 forward_strand_brack_form = f'{self.forward_sequence[:3]} {bf}'
         return forward_strand_brack_form
 
+    @property
+    def designation(self):
+        lus, sec, ter = None, None, None
+        lus = repeat_copy_number(self.collapsed, self.data['LUS'])
+        sec = repeat_copy_number(self.collapsed, self.data['Sec'])
+        if str(self.annotation)[-1] == 'T' and isinstance(self.canonical, str):
+            ter = 1
+        else:
+            ter = 0
+        return lus, sec, ter
+
 
 class STRMarker_D16S539(STRMarker):
     @property
@@ -519,6 +530,55 @@ class STRMarker_D21S11(STRMarker):
                 third_string = collapse_repeats_by_length(second_string_final, 4)
                 final_string = f'{first_string} {third_string}'
             return re.sub('  ', ' ', final_string)
+
+    @property
+    def designation(self):
+        '''Primary, secondary, and tertiary motif alleles for the D21S11 locus
+
+        Special handling is required because the LUS repeat motif is the last 'TCTA' repeat set and
+        the secondary repeat motif is the first set of 'TCTA' repeats in the sequence.
+        '''
+        sequence = self.annotation
+        repeat = self.data['LUS']
+        remaining = list()
+        lus_sec = list()
+        lus_allele = None
+        for element in re.split(self.data['Tert'], sequence):
+            if element == sequence:
+                lus_sec = repeat_copy_number(element, repeat)
+                sec_allele = lus_sec[0]
+                if len(lus_sec) == 1 and element[-4:] == repeat:
+                    lus_allele = 1
+                elif len(lus_sec) == 1 and element[-4:] != repeat:
+                    lus_allele = 0
+                else:
+                    lus_allele = lus_sec[1]
+            else:
+                parts = element.split('[,]')
+                for i in parts:
+                    if i != '':
+                        repeats = repeat_copy_number(i, repeat)
+                        lus_sec.append(repeats)
+        if lus_allele is None:
+            lus_allele = lus_sec[1]
+            sec_allele = lus_sec[0]
+
+        finalcount = 0
+        for m in re.finditer(self.data['Tert'], self.annotation):
+            count = s[m.end()+1:m.end()+3]
+            if count == '' or count[0] == '[' or count[0] == ' ' or count.isalpha():
+                count = 1
+            try:
+                if float(count) > float(finalcount):
+                    finalcount = count
+                    try:
+                        if str(finalcount)[1] == ' ':
+                            finalcount = finalcount[0]
+                    except IndexError:
+                        count = count
+            except ValueError:
+                count = count
+        return lus_allele, sec_allele, finalcount
 
 
 class STRMarker_TH01(STRMarker):
