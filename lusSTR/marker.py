@@ -46,6 +46,10 @@ class STRMarker():
     def repeat_size(self):
         return len(self.data['LUS'])
 
+    @property
+    def repeats(self):
+        return self.data['Repeats']
+
     def _uas_bases_to_trim(self):
         '''Number of bases to trim off each side to get the UAS sequence.
 
@@ -140,19 +144,23 @@ class STRMarker():
         return not self.cannot_split or self.split_compatible
 
     @property
+    def collapsed(self):
+        if self.data['ReverseCompNeeded']:
+            collapseseq = collapse_repeats_by_length(self.forward_sequence, self.repeat_size)
+        else:
+            collapseseq = sequence_to_bracketed_form(
+                self.forward_sequence, self.repeat_size, self.repeats
+            )
+        return collapsed
+
+    @property
     def annotation(self):
         lus, sec, ter = None, None, None
-        if self.data['ReverseCompNeeded']:
-            collapsed = collapse_repeats_by_length(self.forward_sequence, self.repeat_size)
-        else:
-            collapsed = sequence_to_bracketed_form(
-                self.forward_sequence, self.repeat_size, self.data['Repeats']
-            )
-        lus = repeat_copy_number(collapsed, self.data['LUS'])
+        lus = repeat_copy_number(self.collapsed, self.data['LUS'])
         if self.data['Sec'] != '':
-            sec = repeat_copy_number(collapsed, self.data['Sec'])
+            sec = repeat_copy_number(self.collapsed, self.data['Sec'])
         if self.data['Tert'] != '':
-            ter = repeat_copy_number(collapsed, self.data['Tert'])
+            ter = repeat_copy_number(self.collapsed, self.data['Tert'])
         return lus, sec, ter
 
 
@@ -170,6 +178,19 @@ class STRMarker_D13S317(STRMarker):
             f'{flank_seq[:2]} {collapse_repeats_by_length(flank_seq[2:14], 4)} {flank_seq[14]} '
             f'{flank_seq[15]} {flank_seq[16:19]} {collapse_repeats_by_length(flank_seq[19:], 4)}'
         )
+
+    @property
+    def annotation(self):
+        if len(sequence) < 110:
+            bracketed_form = collapse_repeats_by_length(self.uas_sequence, 4)
+        else:
+            for m in re.finditer('GGGC', self.uas_sequence):
+                break_point = m.end()
+            bracketed_form = (
+                f'{collapse_repeats_by_length(self.uas_sequence[:break_point], 4)} '
+                f'{sequence_to_bracketed_form(self.uas_sequence[break_point:], 4, self.repeats)}'
+            )
+        return bracketed_form
 
 
 class STRMarker_D20S482(STRMarker):
@@ -284,6 +305,14 @@ class STRMarker_D18S51(STRMarker):
             f'{flank_seq[33]} {collapse_repeats_by_length(flank_seq[34:42], 4)} '
             f'{flank_seq[42:44]} {flank_seq[44:]}'
         )
+
+    @property
+    def collapsed(self):
+        if isinstance(self.canonical, str):
+            return sequence_to_bracketed_form(self.uas_sequence, self.repeat_size, self.repeats)
+        elif isinstance(self.canonical, int):
+            return collapse_repeats_by_length(self.uas_sequence, self.repeat_size)
+
 
 
 class STRMarker_D21S11(STRMarker):
