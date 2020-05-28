@@ -707,14 +707,9 @@ def main(args):
             )
         else:
             if locus == 'D18S51':
-                if type(str_allele) == str:
-                    forward_strand_bracketed_form = sequence_to_bracketed_form(
-                        uas_sequence, no_of_repeat_bases, repeats
-                    )
-                else:
-                    forward_strand_bracketed_form = collapse_repeats_by_length(
-                        uas_sequence, no_of_repeat_bases
-                    )
+                forward_strand_bracketed_form = sequence_to_bracketed_form(
+                    uas_sequence, no_of_repeat_bases, repeats
+                )
             elif locus == 'D13S317':
                 forward_strand_bracketed_form = D13_anno(uas_sequence, repeats)
             elif str_dict[locus]['ReverseCompNeeded'] == 'Yes':
