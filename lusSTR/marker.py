@@ -44,6 +44,8 @@ class STRMarker():
         if kit.lower() not in ('forenseq', 'powerseq'):
             raise UnsupportedKitError(kit)
         self.kit = kit.lower()
+        if uas and self.data['ReverseCompNeeded'] == "Yes":
+            self.sequence = reverse_complement(sequence)
 
     @property
     def repeat_size(self):
@@ -71,6 +73,12 @@ class STRMarker():
 
     @property
     def forward_sequence(self):
+        '''Sequence from the UAS region, in the forward orientation
+
+        If it is the full ForenSeq or PowerSeq amplicon sequence, trim the full forward sequence
+        back to the UAS region. If the sequence has already been run through UAS, no trimming is
+        required.
+        '''
         if self.uas:
             return self.sequence
         front, back = self._uas_bases_to_trim()
@@ -82,7 +90,10 @@ class STRMarker():
 
     @property
     def uas_sequence(self):
-        '''Determine the UAS core sequence.'''
+        '''Sequence from the UAS region, matching the orientation of the UAS output
+
+        The UAS software outputs the reverse complement of the forward sequence for some loci.
+        '''
         if self.data['ReverseCompNeeded'] == "Yes":
             return reverse_complement(self.forward_sequence)
         return self.forward_sequence
@@ -433,10 +444,10 @@ class STRMarker_FGA(STRMarker):
         Simply identifying repeat units in a specified order does not result in the final
         annotation which is consistent with previously published annotation for this locus.
         '''
-        if len(self.uas_sequence) % self.repeat_size == 0:
-            return collapse_repeats_by_length(self.uas_sequence, self.repeat_size)
+        sequence = self.uas_sequence
+        if len(sequence) % self.repeat_size == 0:
+            return collapse_repeats_by_length(sequence, self.repeat_size)
         else:
-            sequence = self.uas_sequence
             final = list()
             prev = 0
             if len(sequence) % 4 == 0:
@@ -654,7 +665,7 @@ class STRMarker_D19S433(STRMarker):
         Simply identifying repeat units in a specified order does not result in the final
         annotation which is consistent with previously published annotation for this locus.
         '''
-        sequence = self.forward_sequence
+        sequence = self.uas_sequence
         final = list()
         last = 0
         prev = 0

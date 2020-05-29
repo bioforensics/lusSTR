@@ -10,7 +10,7 @@
 import pytest
 import lusSTR
 from lusSTR.marker import STRMarkerObject
-from lusSTR.repeat import reverse_complement as rc
+from lusSTR.repeat import reverse_complement as revcom
 
 
 @pytest.mark.parametrize('sequence, bracket_form', [
@@ -46,15 +46,16 @@ def test_D21_bracket(sequence, bracket_form):
 
 
 def test_D19_annotation():
-    sequence = (
+    uas_sequence = revcom(
         'AAGGAAAAGGTAGGAAGGAAGGAAGGAAGGAAGGAAGGAAGGAAGGAAGGAAGGAAGGAAGGAAGGAAGGAGAGAAGAAGAAAGAGAG'
     )
-    marker = STRMarkerObject('D19S433', sequence, uas=True)
+    marker = STRMarkerObject('D19S433', uas_sequence, uas=True)
     assert marker.annotation == 'CT CTCT TTCT TCTT CTCT [CCTT]14 CCTA CCTT TT CCTT'
 
 
 def test_D1_annotation():
-    marker = STRMarkerObject('D1S1656', 'TAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATGTGTATGTG', uas=True)
+    uas_sequence = revcom('TAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATGTGTATGTG')
+    marker = STRMarkerObject('D1S1656', uas_sequence, uas=True)
     assert marker.annotation == 'CA CATA CACA [TCTA]11'
 
 
@@ -73,12 +74,12 @@ def test_PentaD_annotation(sequence, bracket_form):
 
 
 def test_FGA_anno():
-    sequence = (
+    uas_sequence = revcom(
         'TTTCTTTCTTTCTTTCTTTTTTCTTTCTTTCTTTCTTTCTTTCTTTCTTTCTTTCTTTCTGTCTGTCTGTCTTTCTTTCTTTCTTTCTT'
         'TCTTTCTTTCTTTCTTTCTTTCTTTCTTTCTTTCTTTCTTTCTTCCTTCCTTCCTTTCTTTCTTTCTCCTTCCTTCCTTCCTTCC'
     )
     annotation = '[GGAA]4 GGAG [AAAG]3 [GAAG]3 [AAAG]15 [ACAG]3 [AAAG]9 AA AAAA [GAAA]4'
-    marker = STRMarkerObject('FGA', sequence, uas=True)
+    marker = STRMarkerObject('FGA', uas_sequence, uas=True)
     print(annotation)
     print(marker.annotation)
     assert marker.annotation == annotation
@@ -131,15 +132,15 @@ def test_D21_lus_sec():
             '13', '5', '5'
         ),
         (
-            'D7S820', rc('TATCTATCTATCTATCTATCTATCTGTCTATCTATCTATCTATC'), '[TATC]6 TGTC [TATC]4',
-            '6', '1', '0'
+            'D7S820', 'TATCTATCTATCTATCTATCTATCTGTCTATCTATCTATCTATC',
+            '[TATC]6 TGTC [TATC]4', '6', '1', '0'
         ),
         (
-            'D9S1122', rc('TAGATCGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGA'),
+            'D9S1122', 'TAGATCGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGA',
             'TAGA TCGA [TAGA]10', '10', 'None', 'None'
         ),
         (
-            'D16S539', rc('GATAGATAGATAGATAGATAGACAGATAGATAGATAGATA'), '[GATA]5 GACA [GATA]4',
+            'D16S539', 'GATAGATAGATAGATAGATAGACAGATAGATAGATAGATA', '[GATA]5 GACA [GATA]4',
             '5', '1', 'None'
         ),
         (
