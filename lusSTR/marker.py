@@ -433,7 +433,7 @@ class STRMarker_FGA(STRMarker):
         Simply identifying repeat units in a specified order does not result in the final
         annotation which is consistent with previously published annotation for this locus.
         '''
-        if len(self.uas_sequence) % self.repeat_size != 0:
+        if len(self.uas_sequence) % self.repeat_size == 0:
             return collapse_repeats_by_length(self.uas_sequence, self.repeat_size)
         else:
             sequence = self.uas_sequence
