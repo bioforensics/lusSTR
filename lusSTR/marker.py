@@ -100,17 +100,23 @@ class STRMarker():
 
     @property
     def flankseq_5p(self):
+        if self.uas:
+            return None
         front, back = self._uas_bases_to_trim()
         return self.sequence[:front]
 
     @property
     def flank_5p(self):
-        flank_rev = collapse_repeats_by_length(self.flankseq_5p, self.repeat_size)
+        if self.uas:
+            return None
+        flank_rev = collapse_repeats_by_length(self.flankseq_5p[::-1], self.repeat_size)
         flank = flank_rev[::-1]
         return flank
 
     @property
     def flankseq_3p(self):
+        if self.uas:
+            return None
         front, back = self._uas_bases_to_trim()
         if back == 0:
             return ''
@@ -118,6 +124,8 @@ class STRMarker():
 
     @property
     def flank_3p(self):
+        if self.uas:
+            return None
         return collapse_repeats_by_length(self.flankseq_3p, self.repeat_size)
 
     @property
@@ -159,7 +167,7 @@ class STRMarker():
 
     @property
     def annotation(self):
-        if self.data['ReverseCompNeeded'] == 'Yes' and not self.cannot_split:
+        if (self.data['ReverseCompNeeded'] == 'Yes' and not self.cannot_split) or self.locus == 'D16S539':
             collapseseq = collapse_repeats_by_length(self.forward_sequence, self.repeat_size)
         else:
             collapseseq = sequence_to_bracketed_form(
@@ -279,7 +287,7 @@ class STRMarker_D7S820(STRMarker):
             )
         else:
             if re.search(r'\d{1,2}.1', self.canonical):
-                if self.uas_sequence[-1] == 'T':
+                if sequence[-1] == 'T':
                     forward_strand_brack_form = sequence_to_bracketed_form(
                         sequence, self.repeat_size, self.repeats
                     )
