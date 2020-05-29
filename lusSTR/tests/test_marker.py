@@ -10,7 +10,6 @@
 import pytest
 import lusSTR
 from lusSTR.marker import STRMarkerObject
-from lusSTR.repeat import reverse_complement as revcom
 
 
 @pytest.mark.parametrize('sequence, bracket_form', [
@@ -54,7 +53,7 @@ def test_D19_annotation():
 
 
 def test_D1_annotation():
-    uas_sequence = revcom('TAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATGTGTATGTG')
+    uas_sequence = 'TAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATGTGTATGTG'
     marker = STRMarkerObject('D1S1656', uas_sequence, uas=True)
     assert marker.annotation == 'CA CATA CACA [TCTA]11'
 
@@ -74,7 +73,7 @@ def test_PentaD_annotation(sequence, bracket_form):
 
 
 def test_FGA_anno():
-    uas_sequence = revcom(
+    uas_sequence = (
         'TTTCTTTCTTTCTTTCTTTTTTCTTTCTTTCTTTCTTTCTTTCTTTCTTTCTTTCTTTCTGTCTGTCTGTCTTTCTTTCTTTCTTTCTT'
         'TCTTTCTTTCTTTCTTTCTTTCTTTCTTTCTTTCTTTCTTTCTTCCTTCCTTCCTTTCTTTCTTTCTCCTTCCTTCCTTCCTTCC'
     )
@@ -132,7 +131,7 @@ def test_D21_lus_sec():
             '13', '5', '5'
         ),
         (
-            'D7S820', revcom('TATCTATCTATCTATCTATCTATCTGTCTATCTATCTATCTATC'),
+            'D7S820', 'GATAGATAGATAGATAGACAGATAGATAGATAGATAGATAGATA',
             '[TATC]6 TGTC [TATC]4', '6', '1', '0'
         ),
         (

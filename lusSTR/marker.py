@@ -348,7 +348,7 @@ class STRMarker_D1S1656(STRMarker):
         This function identifies if the sequence is a microvariant in order to call different
         functions to create the bracketed annotation.
         '''
-        sequence = self.uas_sequence
+        sequence = self.forward_sequence
         sequence_filt = sequence[2:]
         final = list()
         first_string, second_string = split_sequence_into_two_strings(sequence_filt, 'CACA')
@@ -440,7 +440,7 @@ class STRMarker_FGA(STRMarker):
         Simply identifying repeat units in a specified order does not result in the final
         annotation which is consistent with previously published annotation for this locus.
         '''
-        sequence = self.uas_sequence
+        sequence = self.forward_sequence
         if len(sequence) % self.repeat_size == 0:
             return collapse_repeats_by_length(sequence, self.repeat_size)
         else:
