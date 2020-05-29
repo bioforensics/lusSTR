@@ -181,3 +181,16 @@ def test_strobj_D10S1248():
     assert marker.annotation_reverse == '[GGAA]13'
     assert marker.canonical == 13
     assert marker.designation == ('13', None, None)
+
+
+def test_strobj_D1S1656():
+    marker = STRMarkerObject(
+        'D1S1656', 'TTCAGAGAAATAGAATCACTAGGGAACCAAATATATATACATACAATTAAACACACACACACCTATCTATCTATCTAT'
+        'CTATCTATCTATCTATCTATCTATCTATCTA', uas=False, kit='forenseq'
+    )
+    assert marker.uas_sequence == 'TAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGGTGTGTGTGTG'
+    assert marker.forward_sequence == 'CACACACACACCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTA'
+    assert marker.annotation == 'CA [CACA]2 CCTA [TCTA]11'
+    assert marker.annotation_reverse == '[TAGA]11 TAGG [TGTG]2 TG'
+    assert marker.canonical == 12
+    assert marker.designation == ('11', '1', '0')

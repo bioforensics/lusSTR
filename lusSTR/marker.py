@@ -354,10 +354,11 @@ class STRMarker_D1S1656(STRMarker):
         This function identifies if the sequence is a microvariant in order to call different
         functions to create the bracketed annotation.
         '''
-        sequence_filt = self.uas_sequence[2:]
+        sequence = self.uas_sequence
+        sequence_filt = sequence[2:]
         final = list()
         first_string, second_string = split_sequence_into_two_strings(sequence_filt, 'CACA')
-        final.append(self.uas_sequence[:2])
+        final.append(sequence[:2])
         if first_string == '':
             final.append('CACA')
         else:
@@ -367,7 +368,8 @@ class STRMarker_D1S1656(STRMarker):
         else:
             final.append(collapse_repeats_by_length(second_string, 4))
         final_string = ' '.join(final)
-        return re.sub('  ', ' ', final_string)
+        final_string = re.sub(r' +', ' ', final_string)
+        return final_string
 
 
 class STRMarker_PentaD(STRMarker):
