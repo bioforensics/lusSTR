@@ -165,7 +165,7 @@ def test_strobj_CSF1PO():
     assert marker.uas_sequence == 'AGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGAT'
     assert marker.forward_sequence == 'ATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCT'
     assert marker.annotation == '[ATCT]12'
-    assert marker.annotation_reverse == '[AGAT]12'
+    assert marker.annotation_uas == '[AGAT]12'
     assert marker.canonical == 12
     assert marker.designation == ('12', '0', None)
 
@@ -178,7 +178,7 @@ def test_strobj_D10S1248():
     assert marker.uas_sequence == 'GGAAGGAAGGAAGGAAGGAAGGAAGGAAGGAAGGAAGGAAGGAAGGAAGGAA'
     assert marker.forward_sequence == 'GGAAGGAAGGAAGGAAGGAAGGAAGGAAGGAAGGAAGGAAGGAAGGAAGGAA'
     assert marker.annotation == '[GGAA]13'
-    assert marker.annotation_reverse == '[GGAA]13'
+    assert marker.annotation_uas == '[GGAA]13'
     assert marker.canonical == 13
     assert marker.designation == ('13', None, None)
 
@@ -191,6 +191,19 @@ def test_strobj_D1S1656():
     assert marker.uas_sequence == 'TAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGGTGTGTGTGTG'
     assert marker.forward_sequence == 'CACACACACACCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTA'
     assert marker.annotation == 'CA [CACA]2 CCTA [TCTA]11'
-    assert marker.annotation_reverse == '[TAGA]11 TAGG [TGTG]2 TG'
+    assert marker.annotation_uas == '[TAGA]11 TAGG [TGTG]2 TG'
     assert marker.canonical == 12
     assert marker.designation == ('11', '1', '0')
+
+
+def test_strobj_D5S818():
+    marker = STRMarkerObject(
+        'D5S818', 'TATTTATACCTCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTTCAAAAT',
+        uas=False, kit='forenseq'
+    )
+    assert marker.uas_sequence == 'AGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGAG'
+    assert marker.forward_sequence == 'CTCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCT'
+    assert marker.annotation == 'CTCT [ATCT]12'
+    assert marker.annotation_uas == '[AGAT]12 AGAG'
+    assert marker.canonical == 12
+    assert marker.designation == ('12',  None, None)

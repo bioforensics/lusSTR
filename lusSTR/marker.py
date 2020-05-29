@@ -160,16 +160,15 @@ class STRMarker():
     @property
     def annotation(self):
         if self.data['ReverseCompNeeded'] == 'Yes' and not self.cannot_split:
-            collapseseq = collapse_repeats_by_length(self.uas_sequence, self.repeat_size)
-            collapseseq = reverse_complement_bracketed(collapseseq)
+            collapseseq = collapse_repeats_by_length(self.forward_sequence, self.repeat_size)
         else:
             collapseseq = sequence_to_bracketed_form(
-                self.uas_sequence, self.repeat_size, self.repeats
+                self.forward_sequence, self.repeat_size, self.repeats
             )
         return collapseseq
 
     @property
-    def annotation_reverse(self):
+    def annotation_uas(self):
         if self.data['ReverseCompNeeded'] == 'Yes':
             return reverse_complement_bracketed(self.annotation)
         return self.annotation
@@ -201,16 +200,10 @@ class STRMarker():
                 lus_plus = f'{canon}_{lus}_{sec}'
             else:
                 lus_plus = f'{canon}_{lus}_{sec}_{ter}'
-        if self.data['ReverseCompNeeded'] == 'Yes':
-            return [
-                self.uas_sequence, self.forward_sequence, canon, self.annotation,
-                self.annotation_reverse, lus_final_output, lus_plus
-            ]
-        else:
-            return [
-                self.uas_sequence, self.forward_sequence, canon, self.annotation,
-                self.annotation, lus_final_output, lus_plus
-            ]
+        return [
+            self.uas_sequence, self.forward_sequence, canon, self.annotation,
+            self.annotation_uas, lus_final_output, lus_plus
+        ]
 
 
 class STRMarker_D8S1179(STRMarker):
