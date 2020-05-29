@@ -168,7 +168,8 @@ class STRMarker():
     @property
     def annotation(self):
         bylength = (
-            (self.data['ReverseCompNeeded'] == 'Yes' and not self.cannot_split)
+            (self.data['ReverseCompNeeded'] == 'Yes' and self.split_compatible)
+            or (self.locus == 'D3S1358' and self.split_compatible)
             or self.locus == 'D16S539'
         )
         if bylength:

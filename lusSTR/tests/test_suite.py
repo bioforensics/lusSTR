@@ -82,6 +82,8 @@ def test_flank_anno():
         lusSTR.annot.main(args)
         outfile_name = os.path.splitext(outfile.name)[0]
         outfile_name_output = f'{outfile_name}_flanks_anno.txt'
+        import subprocess
+        subprocess.check_call(['cp', outfile_name_output, 'FLANKY'])
         assert filecmp.cmp(testflanks, outfile_name_output) is True
 
 
