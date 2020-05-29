@@ -233,3 +233,11 @@ def test_strobj_D7S820():
     assert marker.flank_5p == 'T ATTT AGTG AGAT AAAAAA'
     assert marker.flank_3p == 'GTTA [GTTC]2 TAAA CTAT'
     assert marker.annotation == 'A AAAC TATC AATC TGTC [TATC]10'
+
+
+def test_strobj_D3S1358():
+    sequence = 'TCTATCTGTCTGTCTATCTATCTATCTATCTATCTATCTATCTATCTAACTAACTATCTATCTA'
+    marker = STRMarkerObject('D3S1358', sequence, uas=True, kit='forenseq')
+    assert marker.forward_sequence == sequence
+    assert marker.uas_sequence == sequence
+    assert marker.annotation == 'TCTA [TCTG]2 [TCTA]9 [ACTA]2 [TCTA]2'
