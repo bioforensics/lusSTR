@@ -167,7 +167,11 @@ class STRMarker():
 
     @property
     def annotation(self):
-        if (self.data['ReverseCompNeeded'] == 'Yes' and not self.cannot_split) or self.locus == 'D16S539':
+        bylength = (
+            (self.data['ReverseCompNeeded'] == 'Yes' and not self.cannot_split)
+            or self.locus == 'D16S539'
+        )
+        if bylength:
             collapseseq = collapse_repeats_by_length(self.forward_sequence, self.repeat_size)
         else:
             collapseseq = sequence_to_bracketed_form(
@@ -199,7 +203,7 @@ class STRMarker():
     @property
     def summary(self):
         lus, sec, ter = self.designation
-        canon  = self.canonical
+        canon = self.canonical
         lus_final_output = f'{canon}_{lus}'
         if sec is None:
             lus_plus = lus_final_output
