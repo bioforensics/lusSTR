@@ -11,22 +11,12 @@ import csv
 import json
 import os
 import pandas as pd
-from pkg_resources import resource_filename
 import re
-import sys
 
 import lusSTR
 from lusSTR.repeat import collapse_all_repeats, collapse_repeats_by_length
 from lusSTR.repeat import sequence_to_bracketed_form, split_by_n
 from lusSTR.repeat import reverse_complement, reverse_complement_bracketed
-
-
-def get_str_metadata_file():
-    return resource_filename('lusSTR', 'str_markers.json')
-
-
-with open(get_str_metadata_file(), 'r') as fh:
-    str_dict = json.load(fh)
 
 
 def split_sequence_into_two_strings(sequence, repeat_for_split):

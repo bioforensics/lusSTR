@@ -10,7 +10,6 @@
 from lusSTR import annot
 from lusSTR import marker
 from lusSTR import repeat
-from lusSTR.annot import str_dict
 from lusSTR import format
 from lusSTR import cli
 from ._version import get_versions
