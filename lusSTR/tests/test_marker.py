@@ -41,7 +41,7 @@ from lusSTR.repeat import reverse_complement as rc
     )
 ])
 def test_D21_bracket(sequence, bracket_form):
-    marker = STRMarkerObject('D21S11', sequence)
+    marker = STRMarkerObject('D21S11', sequence, uas=True)
     assert marker.annotation == bracket_form
 
 
@@ -49,12 +49,12 @@ def test_D19_annotation():
     sequence = (
         'AAGGAAAAGGTAGGAAGGAAGGAAGGAAGGAAGGAAGGAAGGAAGGAAGGAAGGAAGGAAGGAAGGAAGGAGAGAAGAAGAAAGAGAG'
     )
-    marker = STRMarkerObject('D19S433', sequence)
+    marker = STRMarkerObject('D19S433', sequence, uas=True)
     assert marker.annotation == 'CT CTCT TTCT TCTT CTCT [CCTT]14 CCTA CCTT TT CCTT'
 
 
 def test_D1_annotation():
-    marker = STRMarkerObject('D1S1656', 'TAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATGTGTATGTG')
+    marker = STRMarkerObject('D1S1656', 'TAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATGTGTATGTG', uas=True)
     assert marker.annotation == 'CA CATA CACA [TCTA]11'
 
 
@@ -68,7 +68,7 @@ def test_D1_annotation():
     ('AAAAGAAAAAAAAGAAAAGAAAAGAAAAGAAAAGAAAAGAAAAGAAAAGA', 'AAAAG AAAAA [AAAGA]8')
 ])
 def test_PentaD_annotation(sequence, bracket_form):
-    marker = STRMarkerObject('PentaD', sequence)
+    marker = STRMarkerObject('PentaD', sequence, uas=True)
     assert marker.annotation == bracket_form
 
 
@@ -78,14 +78,14 @@ def test_FGA_anno():
         'TCTTTCTTTCTTTCTTTCTTTCTTTCTTTCTTTCTTTCTTTCTTCCTTCCTTCCTTTCTTTCTTTCTCCTTCCTTCCTTCCTTCC'
     )
     annotation = '[GGAA]4 GGAG [AAAG]3 [GAAG]3 [AAAG]15 [ACAG]3 [AAAG]9 AA AAAA [GAAA]4'
-    marker = STRMarkerObject('FGA', sequence)
+    marker = STRMarkerObject('FGA', sequence, uas=True)
     print(annotation)
     print(marker.annotation)
     assert marker.annotation == annotation
 
 
 def test_THO1():
-    marker = STRMarkerObject('TH01', 'AATGAATGAATGAATGAATGATGATGAATGAATGAATG')
+    marker = STRMarkerObject('TH01', 'AATGAATGAATGAATGAATGATGATGAATGAATGAATG', uas=True)
     assert marker.annotation == '[AATG]5 ATG ATG [AATG]3'
 
 
@@ -104,7 +104,7 @@ def test_THO1():
     ),
 ])
 def test_D21_anno(sequence, lus_allele, sec_allele, tert_allele):
-    marker = STRMarkerObject('D21S11', sequence)
+    marker = STRMarkerObject('D21S11', sequence, uas=True)
     lus, sec, tert = marker.designation
     assert str(lus) == lus_allele
     assert str(sec) == sec_allele
@@ -116,7 +116,7 @@ def test_D21_lus_sec():
         'TCTATCTATCTATCTATCTGTCTGTCTGTCTGTCTGTCTGTCTATCTATCTATATCTATCTATCTATCATCTATCTATCCATATCTATC'
         'TATCTATCTATCTATCTATCTATCTATCTATCTA'
     )
-    marker = STRMarkerObject('D21S11', sequence)
+    marker = STRMarkerObject('D21S11', sequence, uas=True)
     lus, sec, tert = marker.designation
     assert str(lus) == '10'
     assert str(sec) == '4'
@@ -148,7 +148,7 @@ def test_D21_lus_sec():
         )
     ])
 def test_annotation_and_lus(locus, sequence, forward_bracket, lus, sec, tert):
-    marker = STRMarkerObject(locus, sequence)
+    marker = STRMarkerObject(locus, sequence, uas=True)
     assert marker.annotation == forward_bracket
     lus_out, sec_out, tert_out = marker.designation
     assert str(lus_out) == lus
