@@ -74,6 +74,7 @@ def collapse_repeats_by_length(sequence, n):
     '''Convert to bracketed annotation form by splitting the sequence into blocks of size n.'''
     units = list()
     for unit, count in get_blocks(sequence, n):
+        assert unit is not None, (sequence, n)
         if count == 1:
             units.append(unit)
         else:
@@ -127,6 +128,26 @@ def reverse_complement_bracketed(forward_bracket):
             count = match.group(2)
             rcblock = f'[{rcrep}]{count}'
         else:
+            if re.match(r'[^ACGT]', block):
+                raise ValueError(f'annotation block "{block}" includes invalid characters')
             rcblock = reverse_complement(block)
         outblocks.append(rcblock)
     return ' '.join(outblocks)
+
+
+def repeat_copy_number(bf, repeat):
+    '''Determine the longest uninterrupted stretch of the specified repeat.
+
+    The input is a sequence string collapsed to bracketed annotation form.
+    '''
+    longest = 0
+    for block in bf.split(' '):
+        if block == repeat:
+            if 1 > longest:
+                longest = 1
+        match = re.match(r'\[' + repeat + r'\](\d+)', block)
+        if match:
+            length = int(match.group(1))
+            if length > longest:
+                longest = length
+    return str(longest)

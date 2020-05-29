@@ -8,7 +8,7 @@
 # -----------------------------------------------------------------------------
 
 import lusSTR
-from lusSTR.repeat import collapse_tandem_repeat, collapse_all_repeats
+from lusSTR.repeat import collapse_tandem_repeat, collapse_all_repeats, repeat_copy_number
 from lusSTR.repeat import split_by_n, get_blocks, reverse_complement, reverse_complement_bracketed
 from lusSTR.repeat import collapse_repeats_by_length, sequence_to_bracketed_form
 import pytest
@@ -65,3 +65,10 @@ def test_reverse_complement_bracketed():
     foward_strand = '[AGGT]3 [CGAA]2 TTGG'
     rev_comp_bracket = reverse_complement_bracketed(foward_strand)
     assert rev_comp_bracket == 'CCAA [TTCG]2 [ACCT]3'
+
+
+def test_repeat_copy_number():
+    s = '[ATCT]3 ATGT [ATCT]12'
+    repeat = 'ATCT'
+    final_output = repeat_copy_number(s, repeat)
+    assert str(final_output) == '12'
