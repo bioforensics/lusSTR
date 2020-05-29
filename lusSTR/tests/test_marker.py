@@ -46,7 +46,7 @@ def test_D21_bracket(sequence, bracket_form):
 
 
 def test_D19_annotation():
-    uas_sequence = revcom(
+    uas_sequence = (
         'AAGGAAAAGGTAGGAAGGAAGGAAGGAAGGAAGGAAGGAAGGAAGGAAGGAAGGAAGGAAGGAAGGAAGGAGAGAAGAAGAAAGAGAG'
     )
     marker = STRMarkerObject('D19S433', uas_sequence, uas=True)
@@ -132,7 +132,7 @@ def test_D21_lus_sec():
             '13', '5', '5'
         ),
         (
-            'D7S820', 'TATCTATCTATCTATCTATCTATCTGTCTATCTATCTATCTATC',
+            'D7S820', revcom('TATCTATCTATCTATCTATCTATCTGTCTATCTATCTATCTATC'),
             '[TATC]6 TGTC [TATC]4', '6', '1', '0'
         ),
         (

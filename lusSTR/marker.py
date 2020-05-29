@@ -272,31 +272,32 @@ class STRMarker_D7S820(STRMarker):
         in order to correctly bracket the sequence. Microvariant N.2 has a third repeat motif
         added in order to bracket the sequence correctly.
         '''
+        sequence = self.forward_sequence
         if type(self.canonical) == int:
             forward_strand_brack_form = sequence_to_bracketed_form(
-                self.uas_sequence, self.repeat_size, self.repeats
+                sequence, self.repeat_size, self.repeats
             )
         else:
             if re.search(r'\d{1,2}.1', self.canonical):
                 if self.uas_sequence[-1] == 'T':
                     forward_strand_brack_form = sequence_to_bracketed_form(
-                        self.uas_sequence, self.repeat_size, self.repeats
+                        sequence, self.repeat_size, self.repeats
                     )
                 else:
                     bf = sequence_to_bracketed_form(
-                        self.uas_sequence[1:], self.repeat_size, self.repeats
+                        sequence[1:], self.repeat_size, self.repeats
                     )
-                    forward_strand_brack_form = f'{self.uas_sequence[0]} {bf}'
+                    forward_strand_brack_form = f'{sequence[0]} {bf}'
             elif re.search(r'\d{1,2}.2', self.canonical):
                 new_repeat_list = ['TATC', 'TGTC', 'AATC']
                 forward_strand_brack_form = sequence_to_bracketed_form(
-                    self.uas_sequence, self.repeat_size, new_repeat_list
+                    sequence, self.repeat_size, new_repeat_list
                 )
             else:
                 bf = sequence_to_bracketed_form(
-                    self.uas_sequence[3:], self.repeat_size, self.repeats
+                    sequence[3:], self.repeat_size, self.repeats
                 )
-                forward_strand_brack_form = f'{self.uas_sequence[:3]} {bf}'
+                forward_strand_brack_form = f'{sequence[:3]} {bf}'
         return forward_strand_brack_form
 
     @property
@@ -660,7 +661,7 @@ class STRMarker_D19S433(STRMarker):
         Simply identifying repeat units in a specified order does not result in the final
         annotation which is consistent with previously published annotation for this locus.
         '''
-        sequence = self.uas_sequence
+        sequence = self.forward_sequence
         final = list()
         last = 0
         prev = 0
