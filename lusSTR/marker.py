@@ -43,7 +43,7 @@ class STRMarker():
         self.uas = uas
         if kit.lower() not in ('forenseq', 'powerseq'):
             raise UnsupportedKitError(kit)
-        self.kit = kit.lower()
+        self.kit = kit.lower()   
         if uas and self.data['ReverseCompNeeded'] == "Yes":
             self.sequence = reverse_complement(sequence)
 
@@ -455,7 +455,6 @@ class STRMarker_FGA(STRMarker):
         '''
         sequence = self.forward_sequence
         if len(sequence) % self.repeat_size == 0:
-            print('no')
             return collapse_repeats_by_length(sequence, self.repeat_size)
         else:
             final = list()
@@ -470,9 +469,6 @@ class STRMarker_FGA(STRMarker):
                         break
                 first_string = sequence[:prev]
                 second_string = sequence[prev:]
-                print('yes')
-                print(first_string)
-                print(second_string)
                 prev = 0
                 for m in re.finditer('AAAA', second_string):
                     prev = m.start()
@@ -569,7 +565,9 @@ class STRMarker_D21S11(STRMarker):
             prev = m.end()
         if (
             prev == (len(forward_strand_brack_form) - 1) or
-            prev == (len(forward_strand_brack_form) - 2)
+            prev == (len(forward_strand_brack_form) - 2) or
+            prev == (len(forward_strand_brack_form) - 4) or
+            prev == (len(forward_strand_brack_form) - 5)
            ):
             return forward_strand_brack_form
         else:
