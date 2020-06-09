@@ -455,6 +455,7 @@ class STRMarker_FGA(STRMarker):
         '''
         sequence = self.forward_sequence
         if len(sequence) % self.repeat_size == 0:
+            print('no')
             return collapse_repeats_by_length(sequence, self.repeat_size)
         else:
             final = list()
@@ -469,6 +470,9 @@ class STRMarker_FGA(STRMarker):
                         break
                 first_string = sequence[:prev]
                 second_string = sequence[prev:]
+                print('yes')
+                print(first_string)
+                print(second_string)
                 prev = 0
                 for m in re.finditer('AAAA', second_string):
                     prev = m.start()
@@ -690,13 +694,15 @@ class STRMarker_D19S433(STRMarker):
             final.append(sequence_to_bracketed_form(first_string, 4, self.repeats))
         else:
             final.append(collapse_repeats_by_length(first_string, 4))
-        if (len(second_string) % 4 != 0):
-            third_string = second_string[:-6]
-            final.append(collapse_repeats_by_length(third_string, 4))
-            final.append(second_string[-6:-4])
-            final.append(second_string[-4:])
-        else:
-            final.append(collapse_repeats_by_length(second_string, 4))
+        if (second_string != ""):
+            if (len(second_string) % 4 != 0):
+                if (len(second_string) > 6):
+                    third_string = second_string[:-6]
+                    final.append(collapse_repeats_by_length(third_string, 4))
+                final.append(second_string[-6:-4])
+                final.append(second_string[-4:])
+            else:
+                final.append(collapse_repeats_by_length(second_string, 4))
         final_string = ' '.join(final)
         return re.sub(r' +', ' ', final_string)
 
