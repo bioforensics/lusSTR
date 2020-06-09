@@ -454,7 +454,7 @@ class STRMarker_FGA(STRMarker):
         annotation which is consistent with previously published annotation for this locus.
         '''
         sequence = self.forward_sequence
-        if len(sequence) % self.repeat_size == 0:
+        if len(sequence) % self.repeat_size == 0 or (not ('GGAA') in sequence):
             return collapse_repeats_by_length(sequence, self.repeat_size)
         else:
             final = list()
