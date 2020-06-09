@@ -43,7 +43,7 @@ class STRMarker():
         self.uas = uas
         if kit.lower() not in ('forenseq', 'powerseq'):
             raise UnsupportedKitError(kit)
-        self.kit = kit.lower()   
+        self.kit = kit.lower()
         if uas and self.data['ReverseCompNeeded'] == "Yes":
             self.sequence = reverse_complement(sequence)
 
