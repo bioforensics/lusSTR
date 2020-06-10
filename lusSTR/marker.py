@@ -13,7 +13,6 @@ from lusSTR.annot import get_str_metadata_file, split_sequence_into_two_strings
 from lusSTR.repeat import collapse_repeats_by_length, sequence_to_bracketed_form
 from lusSTR.repeat import reverse_complement, reverse_complement_bracketed
 from lusSTR.repeat import repeat_copy_number, collapse_all_repeats, split_by_n
-from pkg_resources import resource_filename
 import re
 
 
@@ -617,8 +616,12 @@ class STRMarker_D21S11(STRMarker):
                         repeats = repeat_copy_number(i, repeat)
                         lus_sec.append(repeats)
         if lus_allele is None:
-            lus_allele = lus_sec[1]
-            sec_allele = lus_sec[0]
+            if len(lus_sec) == 2:
+                lus_allele = lus_sec[1]
+                sec_allele = lus_sec[0]
+            else:
+                lus_allele = 0
+                sec_allele = lus_sec[0]
 
         finalcount = 0
         for m in re.finditer(self.data['Tert'], self.annotation):
