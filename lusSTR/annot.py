@@ -44,7 +44,6 @@ def split_sequence_into_two_strings(sequence, repeat_for_split):
     return first_string, second_string
 
 
-
 def main(args):
     data = pd.read_csv(args.input)
     list_of_lists = []
@@ -62,11 +61,12 @@ def main(args):
             analysis = 'NA'
         metadata = str_marker_data[locus]
         if (
-            len(sequence) <= (metadata['Foren_5'] + metadata['Foren_3']) and not args.uas 
+            len(sequence) <= (metadata['Foren_5'] + metadata['Foren_3']) and not args.uas
             and args.kit == 'forenseq'
         ):
             flank_summary = [
-                sampleid, project, analysis, locus, reads, 'NA', sequence, 'NA', 'NA', 'NA', 'Partial sequence'
+                sampleid, project, analysis, locus, reads, 'NA', sequence, 'NA', 'NA', 'NA',
+                'Partial sequence'
             ]
             flanks_list.append(flank_summary)
             continue
@@ -90,7 +90,8 @@ def main(args):
     name = os.path.splitext(args.out)[0]
     if not args.uas:
         flanks_columns = [
-            'SampleID', 'Project', 'Analysis', 'Locus', 'Reads', 'Length_Allele', 'Full_Sequence','5_Flank_Anno', 'UAS_Region_Anno', '3_Flank_Anno', 
+            'SampleID', 'Project', 'Analysis', 'Locus', 'Reads', 'Length_Allele',
+            'Full_Sequence', '5_Flank_Anno', 'UAS_Region_Anno', '3_Flank_Anno',
             'Potential_Issues'
         ]
         final_flank_output = pd.DataFrame(flanks_list, columns=flanks_columns)
