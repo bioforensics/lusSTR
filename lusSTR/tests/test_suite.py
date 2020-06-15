@@ -12,6 +12,7 @@ import os
 import pandas as pd
 import pytest
 import lusSTR
+from lusSTR.marker import STRMarkerObject
 from lusSTR.repeat import reverse_complement
 from lusSTR.tests import data_file
 import re
@@ -107,3 +108,9 @@ def test_FGA_short_seq():
         lusSTR.annot.main(args)
         with open(outfile.name, 'r') as fh:
             assert len(fh.readlines()) == 1
+
+def test_indel_flag():
+    marker = STRMarkerObject(
+        'CSF1PO', 'CTTCCTATCTATCTATCTATCTAATCTATCTATCTT', uas=False, kit='forenseq'
+    )
+    assert marker.indel_flag == 'Possible indel or partial sequence'
