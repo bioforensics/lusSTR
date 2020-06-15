@@ -165,7 +165,7 @@ def test_strobj_CSF1PO():
     assert marker.forward_sequence == 'ATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCT'
     assert marker.annotation == '[ATCT]12'
     assert marker.annotation_uas == '[AGAT]12'
-    assert marker.canonical == 12
+    assert marker.canonical == 12, ' '
     assert marker.designation == ('12', '0', None)
     assert marker.flank_5p == 'CT TCCT'
 
@@ -179,7 +179,7 @@ def test_strobj_D10S1248():
     assert marker.forward_sequence == 'GGAAGGAAGGAAGGAAGGAAGGAAGGAAGGAAGGAAGGAAGGAAGGAAGGAA'
     assert marker.annotation == '[GGAA]13'
     assert marker.annotation_uas == '[GGAA]13'
-    assert marker.canonical == 13
+    assert marker.canonical == 13, ' '
     assert marker.designation == ('13', None, None)
 
 
@@ -192,7 +192,7 @@ def test_strobj_D1S1656():
     assert marker.forward_sequence == 'CACACACACACCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTA'
     assert marker.annotation == 'CA [CACA]2 CCTA [TCTA]11'
     assert marker.annotation_uas == '[TAGA]11 TAGG [TGTG]2 TG'
-    assert marker.canonical == 12
+    assert marker.canonical == 12, ' '
     assert marker.designation == ('11', '1', '0')
 
 
@@ -205,7 +205,7 @@ def test_strobj_D5S818():
     assert marker.forward_sequence == 'CTCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCT'
     assert marker.annotation == 'CTCT [ATCT]12'
     assert marker.annotation_uas == '[AGAT]12 AGAG'
-    assert marker.canonical == 12
+    assert marker.canonical == 12, ' '
     assert marker.designation == ('12',  None, None)
 
 
@@ -241,3 +241,32 @@ def test_strobj_D3S1358():
     assert marker.forward_sequence == sequence
     assert marker.uas_sequence == sequence
     assert marker.annotation == 'TCTA [TCTG]2 [TCTA]9 [ACTA]2 [TCTA]2'
+
+
+def test_strobj_D19S433_newformat():
+    marker = STRMarkerObject(
+        'D19S433',
+        'AATAAAAATCTTCTCTCTTTCTTCCTCTCTCCTTCCTTCCTTCCTTCCTTCCTTCCTTCCTTCCTTCCTTCCTTCCTTCCTACCT'
+        'TCCTTCCTTCAACAGAATCTTATTCTGTTGCCCAGGCTGGAGTCCAGTGTTACAATTATAGCT', uas=False,
+        kit='forenseq'
+    )
+    assert marker.annotation == 'CT CTCT TTCT TCCT CTCT [CCTT]12 CCTA [CCTT]3'
+
+
+def test_strobj_D21S11_newformat():
+    marker = STRMarkerObject(
+        'D21S11',
+        'AAATATGTGAGTCAATTCCCCAAGTGAATTGCCTTCTATCTATCTATCTATCTATCTGTCTGTCTGTCTGTCTGTCTGTCTATCT'
+        'ATCTATATCTATCTATCTATCATCTATCTATCCATATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATATCT'
+        'ACTATCTAT', uas=False, kit='forenseq'
+    )
+    assert marker.annotation == (
+        '[TCTA]5 [TCTG]6 [TCTA]3 TA [TCTA]3 TCA [TCTA]2 TCCATA [TCTA]11 TA'
+    )
+
+
+def test_strb_FGA_newformat():
+    marker = STRMarkerObject(
+        'FGA', 'CCAGCAAAAAAGAAAGAAAGAGAAAAAAGAAAGAAAGAAA', uas=False, kit='forenseq'
+    )
+    assert marker.annotation == 'AAAA [AGAA]3 A'

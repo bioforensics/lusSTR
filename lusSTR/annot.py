@@ -17,6 +17,15 @@ import lusSTR
 from lusSTR.repeat import collapse_all_repeats, collapse_repeats_by_length
 from lusSTR.repeat import sequence_to_bracketed_form, split_by_n
 from lusSTR.repeat import reverse_complement, reverse_complement_bracketed
+from pkg_resources import resource_filename
+
+
+def get_str_metadata_file():
+    return resource_filename('lusSTR', 'str_markers.json')
+
+
+with open(get_str_metadata_file(), 'r') as fh:
+    str_marker_data = json.load(fh)
 
 
 def split_sequence_into_two_strings(sequence, repeat_for_split):
@@ -50,7 +59,17 @@ def main(args):
         except IndexError:
             project = 'NA'
             analysis = 'NA'
-
+        metadata = str_marker_data[locus]
+        if (
+            len(sequence) <= (metadata['Foren_5'] + metadata['Foren_3']) and not args.uas
+            and args.kit == 'forenseq'
+        ):
+            flank_summary = [
+                sampleid, project, analysis, locus, reads, 'NA', sequence, 'NA', 'NA', 'NA',
+                'Partial sequence'
+            ]
+            flanks_list.append(flank_summary)
+            continue
         marker = lusSTR.marker.STRMarkerObject(locus, sequence, uas=args.uas, kit=args.kit)
         summary = [sampleid, project, analysis, locus] + marker.summary + [reads]
         list_of_lists.append(summary)
@@ -58,7 +77,7 @@ def main(args):
         if not args.uas and args.kit == 'forenseq':
             flank_summary = [
                 sampleid, project, analysis, locus, reads, marker.canonical, marker.sequence,
-                marker.flank_5p, marker.annotation, marker.flank_3p
+                marker.flank_5p, marker.annotation, marker.flank_3p, "NA"
             ]
             flanks_list.append(flank_summary)
 
@@ -71,8 +90,9 @@ def main(args):
     name = os.path.splitext(args.out)[0]
     if not args.uas:
         flanks_columns = [
-            'SampleID', 'Project', 'Analysis', 'Locus', 'Reads', 'Length_Allele', 'Full_Sequence',
-            '5_Flank_Anno', 'UAS_Region_Anno', '3_Flank_Anno'
+            'SampleID', 'Project', 'Analysis', 'Locus', 'Reads', 'Length_Allele',
+            'Full_Sequence', '5_Flank_Anno', 'UAS_Region_Anno', '3_Flank_Anno',
+            'Potential_Issues'
         ]
         final_flank_output = pd.DataFrame(flanks_list, columns=flanks_columns)
         final_flank_output.to_csv(f'{name}_flanks_anno.txt', sep='\t', index=False)

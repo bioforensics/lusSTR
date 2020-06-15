@@ -69,7 +69,7 @@ def main(args):
         path = args.input
         analysisID = path.rstrip(os.sep)
         analysisID_final = os.path.basename(analysisID)
-        results_final['Project'] = "NA"
+        results_final['Project'] = analysisID_final
         results_final['Analysis'] = analysisID_final
 
     output_file = sys.stdout

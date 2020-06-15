@@ -9,16 +9,11 @@
 
 import json
 import lusSTR
-from lusSTR.annot import split_sequence_into_two_strings
+from lusSTR.annot import get_str_metadata_file, split_sequence_into_two_strings
 from lusSTR.repeat import collapse_repeats_by_length, sequence_to_bracketed_form
 from lusSTR.repeat import reverse_complement, reverse_complement_bracketed
 from lusSTR.repeat import repeat_copy_number, collapse_all_repeats, split_by_n
-from pkg_resources import resource_filename
 import re
-
-
-def get_str_metadata_file():
-    return resource_filename('lusSTR', 'str_markers.json')
 
 
 with open(get_str_metadata_file(), 'r') as fh:
@@ -145,6 +140,15 @@ class STRMarker():
             allele_dec = int(len(new_seq) % n)
             canon_allele = f'{allele_int}.{allele_dec}'
         return canon_allele
+
+    @property
+    def indel_flag(self):
+        '''Check for potential indels within flanking regions'''
+        if str(self.canonical) not in self.data['Alleles']:
+            flag = 'Possible indel or partial sequence'
+        else:
+            flag = ' '
+        return flag
 
     @property
     def cannot_split(self):
@@ -454,7 +458,7 @@ class STRMarker_FGA(STRMarker):
         annotation which is consistent with previously published annotation for this locus.
         '''
         sequence = self.forward_sequence
-        if len(sequence) % self.repeat_size == 0:
+        if len(sequence) % self.repeat_size == 0 or (not ('GGAA') in sequence):
             return collapse_repeats_by_length(sequence, self.repeat_size)
         else:
             final = list()
@@ -565,7 +569,9 @@ class STRMarker_D21S11(STRMarker):
             prev = m.end()
         if (
             prev == (len(forward_strand_brack_form) - 1) or
-            prev == (len(forward_strand_brack_form) - 2)
+            prev == (len(forward_strand_brack_form) - 2) or
+            prev == (len(forward_strand_brack_form) - 4) or
+            prev == (len(forward_strand_brack_form) - 5)
            ):
             return forward_strand_brack_form
         else:
@@ -619,8 +625,12 @@ class STRMarker_D21S11(STRMarker):
                         repeats = repeat_copy_number(i, repeat)
                         lus_sec.append(repeats)
         if lus_allele is None:
-            lus_allele = lus_sec[1]
-            sec_allele = lus_sec[0]
+            if len(lus_sec) == 2:
+                lus_allele = lus_sec[1]
+                sec_allele = lus_sec[0]
+            else:
+                lus_allele = 0
+                sec_allele = lus_sec[0]
 
         finalcount = 0
         for m in re.finditer(self.data['Tert'], self.annotation):
@@ -690,13 +700,15 @@ class STRMarker_D19S433(STRMarker):
             final.append(sequence_to_bracketed_form(first_string, 4, self.repeats))
         else:
             final.append(collapse_repeats_by_length(first_string, 4))
-        if (len(second_string) % 4 != 0):
-            third_string = second_string[:-6]
-            final.append(collapse_repeats_by_length(third_string, 4))
-            final.append(second_string[-6:-4])
-            final.append(second_string[-4:])
-        else:
-            final.append(collapse_repeats_by_length(second_string, 4))
+        if (second_string != ""):
+            if (len(second_string) % 4 != 0):
+                if (len(second_string) > 6):
+                    third_string = second_string[:-6]
+                    final.append(collapse_repeats_by_length(third_string, 4))
+                final.append(second_string[-6:-4])
+                final.append(second_string[-4:])
+            else:
+                final.append(collapse_repeats_by_length(second_string, 4))
         final_string = ' '.join(final)
         return re.sub(r' +', ' ', final_string)
 
