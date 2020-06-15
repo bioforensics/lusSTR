@@ -95,3 +95,15 @@ def test_annotate_combine():
         lusSTR.annot.main(args)
         with open(outfile.name, 'r') as fh:
             assert len(fh.readlines()) == 952
+
+
+def test_FGA_short_seq():
+    with NamedTemporaryFile(suffix='.txt') as outfile:
+        input = data_file('test_FGA_short_seq.csv')
+        arglist = [
+            'annotate', input, '-o', outfile.name, '--kit', 'forenseq'
+        ]
+        args = lusSTR.cli.get_parser().parse_args(arglist)
+        lusSTR.annot.main(args)
+        with open(outfile.name, 'r') as fh:
+            assert len(fh.readlines()) == 1

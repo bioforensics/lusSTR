@@ -142,6 +142,15 @@ class STRMarker():
         return canon_allele
 
     @property
+    def indel_flag(self):
+        '''Check for potential indels within flanking regions'''
+        if str(self.canonical) not in self.data['Alleles']:
+            flag = 'Possible indel or partial sequence'
+        else:
+            flag = ' '
+        return flag
+
+    @property
     def cannot_split(self):
         return self.locus in [
             'D19S433', 'D6S1043', 'TH01', 'D21S11', 'D1S1656', 'D7S820', 'D5S818', 'D12S391',
