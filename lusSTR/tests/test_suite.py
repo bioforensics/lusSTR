@@ -109,6 +109,7 @@ def test_FGA_short_seq():
         with open(outfile.name, 'r') as fh:
             assert len(fh.readlines()) == 1
 
+
 def test_indel_flag():
     marker = STRMarkerObject(
         'CSF1PO', 'CTTCCTATCTATCTATCTATCTAATCTATCTATCTT', uas=False, kit='forenseq'
