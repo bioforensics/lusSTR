@@ -54,8 +54,8 @@ def main(args):
         sequence = data.iloc[i, 2]
         sampleid = re.sub(" ", "_", data.iloc[i, 3])
         try:
-            project = data.iloc[i, 4]
-            analysis = data.iloc[i, 5]
+            project = re.sub(" ", "_", data.iloc[i, 4])
+            analysis = re.sub(" ", "_", data.iloc[i, 5])
         except IndexError:
             project = 'NA'
             analysis = 'NA'
