@@ -49,16 +49,20 @@ def main(args):
     list_of_lists = []
     flanks_list = []
     for i, row in data.iterrows():
-        locus = data.iloc[i, 0]
+        locus = data.iloc[i, 0].upper()
         reads = data.iloc[i, 1]
         sequence = data.iloc[i, 2]
-        sampleid = data.iloc[i, 3]
+        sampleid = re.sub(" ", "_", data.iloc[i, 3])
         try:
             project = data.iloc[i, 4]
             analysis = data.iloc[i, 5]
         except IndexError:
             project = 'NA'
             analysis = 'NA'
+        if locus == 'PENTAD' or locus == 'PENTA_D':
+            locus = 'PENTA D'
+        if locus == 'PENTAE' or locus == 'PENTA_E':
+            locus = 'PENTA E'
         metadata = str_marker_data[locus]
         if (
             len(sequence) <= (metadata['Foren_5'] + metadata['Foren_3']) and not args.uas

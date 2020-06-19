@@ -427,7 +427,7 @@
             "26", "26.2", "27" 
         ]
     },
-    "PentaD": {
+    "PENTA D": {
         "BasesToSubtract": 5,
         "NumRepeats": 1,
         "Repeats": [
@@ -447,7 +447,7 @@
             "14", "14.1", "15", "16", "17"
         ]
     },
-    "PentaE": {
+    "PENTA E": {
         "BasesToSubtract": 0,
         "NumRepeats": 1,
         "Repeats": [
@@ -501,7 +501,7 @@
         "Power_3": 14,
         "Alleles": ["5", "6", "7", "8", "9", "10", "11", "12", "13", "14"]
     },
-    "vWA": {
+    "VWA": {
         "BasesToSubtract": 8,
         "NumRepeats": 3,
         "Repeats": [
