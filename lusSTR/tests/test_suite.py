@@ -53,7 +53,7 @@ def test_annotate_uas():
 def test_annotate_full_nocombine():
     with NamedTemporaryFile() as outfile:
         inputfile = data_file('2800M_formatted_full.csv')
-        testfullanno = data_file('2800M_full_anno.txt')
+        testfullanno = data_file('2800M_full_anno_no_combined_reads.txt')
         arglist = [
             'annotate', inputfile, '-o', outfile.name, '--kit', 'forenseq', '--nocombine'
         ]

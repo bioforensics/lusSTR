@@ -154,7 +154,7 @@ class STRMarker():
     def cannot_split(self):
         return self.locus in [
             'D19S433', 'D6S1043', 'TH01', 'D21S11', 'D1S1656', 'D7S820', 'D5S818', 'D12S391',
-            'D9S1122', 'PentaE'
+            'D9S1122', 'PENTA E'
         ]
 
     @property
@@ -722,7 +722,7 @@ def STRMarkerObject(locus, sequence, uas=False, kit='forenseq'):
         'D7S820': STRMarker_D7S820,
         'D16S539': STRMarker_D16S539,
         'D1S1656': STRMarker_D1S1656,
-        'PentaD': STRMarker_PentaD,
+        'PENTA D': STRMarker_PentaD,
         'vWA': STRMarker_vWA,
         'D10S1248': STRMarker_D10S1248,
         'D22S1045': STRMarker_D22S1045,
