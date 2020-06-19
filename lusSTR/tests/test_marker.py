@@ -68,7 +68,7 @@ def test_D1_annotation():
     ('AAAAGAAAAAAAAGAAAAGAAAAGAAAAGAAAAGAAAAGAAAAGAAAAGA', 'AAAAG AAAAA [AAAGA]8')
 ])
 def test_PentaD_annotation(sequence, bracket_form):
-    marker = STRMarkerObject('PentaD', sequence, uas=True)
+    marker = STRMarkerObject('PENTA D', sequence, uas=True)
     assert marker.annotation == bracket_form
 
 
