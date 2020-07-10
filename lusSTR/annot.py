@@ -81,7 +81,7 @@ def main(args):
         summary = [sampleid, project, analysis, locus] + marker.summary + [reads]
         list_of_lists.append(summary)
 
-        if not args.uas and args.kit == 'forenseq':
+        if not args.uas:
             flank_summary = [
                 sampleid, project, analysis, locus, reads, marker.canonical, marker.sequence,
                 marker.flank_5p, marker.annotation, marker.flank_3p, marker.indel_flag
