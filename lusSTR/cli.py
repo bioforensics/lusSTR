@@ -16,7 +16,7 @@ def format_subparser(subparsers):
     cli = subparsers.add_parser('format')
     cli.add_argument(
         '-o', '--out', metavar='FILE',
-        help='file to which output will be written; default is terminal (stdout)'
+        help='File to which output will be written; default is terminal (stdout)'
     )
     cli.add_argument(
         'input',
