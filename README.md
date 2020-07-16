@@ -26,7 +26,7 @@ make devenv
 lusSTR accomodates three different input formats:
 (1) UAS Sample Details Report in .xlsx format
 (2) STRait Razor output with one sample per file
-(2) Sample(s) sequences in CSV format; first four columns must be Locus, NumReads, Sequence, SampleID; Optional last two columns can be Project and Analysis IDs.
+(3) Sample(s) sequences in CSV format; first four columns must be Locus, NumReads, Sequence, SampleID; Optional last two columns can be Project and Analysis IDs.
 
 ### Formatting input
 
@@ -41,7 +41,7 @@ The ```format``` command removes unnecessary rows/columns and outputs a table in
 *  Analysis ID (if provided)
 
 
-**UAS Sample Details Report
+#### UAS Sample Details Report
 
 If using the UAS Sample Details Report, the user must specify the input file as well an output file and the ```--uas``` flag:
 ```
@@ -53,9 +53,9 @@ Example:
 lusstr format UAS_Sample_Details_Report.xlsx -o UAS_test_file.csv --uas
 ```
 
-**STRait Razor
+#### STRait Razor
 
-If using the output from STRait Razor, the files must be labeled as ```SampleID_STRaitRazor.txt``` (example: ```Sample0001_STRaitRazor.txt```) and must be compiled in a separate folder (labeled with the project ID). The user must specify the folder name for the ```format``` command as well as an output filename (all sample files will be compiled into one file):
+If using the output from STRait Razor, the files **must** be labeled as ```SampleID_STRaitRazor.txt``` (example: ```Sample0001_STRaitRazor.txt```) and must be compiled in a separate folder (labeled with the project ID). The user **must** specify the folder name for the ```format``` command as well as an output filename (all sample files will be compiled into one file):
 ```
 lusstr format <input> -o <output>
 ```
@@ -67,7 +67,7 @@ lusstr format STRaitRazorOutputFolder/ -o STRaitRazor_test_file.csv
 ```
 
 
-###Annotation
+### Annotation
 
 The ```annotate``` command produces a tab-delineated table with the following columns:
 *  Sample ID
@@ -94,12 +94,16 @@ For the ```annotate``` command, the following must be specified:
 ```
 lusstr annotate <input> -o <output> --kit forenseq --uas
 ```
+Example:
+```
+lusstr annotate UAS_test_file.csv -o UAS_final_table.txt --kit forenseq --uas
+```
 
 If no ```--uas``` flag is provided, several additional processes occur with the ```annotate``` command:
-*  The full sequences are filtered to the UAS region before the annotation step. The number of bases to remove is determined based on the provided kit.
-*  Once the sequences are filtered to the UAS region, any duplicated sequences are removed and their reads are summed in the remaining sequence ```Reads``` column. NOTE: This step can be skipped with the ```--nocombine``` flag.
+*  The full sequences are filtered to the UAS region before the annotation step. The number of bases to remove is determined based on the specified kit.
+*  Once the sequences are filtered to the UAS region, any duplicated sequences are removed and their reads are summed in with the remaining sequence ```Reads``` column. NOTE: This step can be skipped with the ```--nocombine``` flag.
   
-Further, a second table containing information related to the flanking sequences surrounding the UAS sequence region is also produced with the following columns:
+Further, a second table (labled as ```*_flanks_anno.txt```) containing information related to the flanking sequences surrounding the UAS sequence region is also produced with the following columns:
 *  Sample ID
 *  Project ID
 *  Analysis ID (same as Project ID)
@@ -108,14 +112,19 @@ Further, a second table containing information related to the flanking sequences
 *  Length-based Allele
 *  Full Sequence
 *  5' Flanking Sequence Annotation
-*  UAS Region Sequence Annotation (same as column 'UAS Output Bracketed annotation' in the main table)
+*  UAS Region Sequence Annotation (same as column ```UAS Output Bracketed annotation``` in the main table)
 *  3' Flanking Sequence Annotation
 *  Potential Issues (such as: Possible indel or partial sequence)
 
+The ```Potential Issues``` column in this report is to draw attention to potential problem sequences (due to perhaps an indel or partial sequence) and requires the attention of the user to further evaluate the sequence for it's authenticity.
+ 
 Example:
 ```
 lusstr annotate STRaitRazor_test_file.csv -o STRaitRazor_powerseq_final.txt --kit powerseq
 ```
+The above example would produce two files: (1) ```STRaitRazor_powerseq_final.txt``` and (2) ```STRaitRazor_powerseq_final_flanks_anno.txt```. 
+
+
 
 
 
