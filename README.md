@@ -55,7 +55,7 @@ lusstr format UAS_Sample_Details_Report.xlsx -o UAS_test_file.csv --uas
 
 #### STRait Razor
 
-If using the output from STRait Razor, the files **must** be labeled as ```SampleID_STRaitRazor.txt``` (example: ```Sample0001_STRaitRazor.txt```) and must be compiled in a separate folder (labeled with the project ID). The user **must** specify the folder name for the ```format``` command as well as an output filename (all sample files will be compiled into one file):
+If using the output from STRait Razor, the files **must** be labeled as ```SampleID_STRaitRazor.txt``` (example: ```Sample0001_STRaitRazor.txt```) and **must** be compiled in a separate folder (labeled with the project ID). The user must specify the folder name for the ```format``` command as well as an output filename (all sample files will be compiled into one file):
 ```
 lusstr format <input> -o <output>
 ```
@@ -103,7 +103,7 @@ If no ```--uas``` flag is provided, several additional processes occur with the 
 *  The full sequences are filtered to the UAS region before the annotation step. The number of bases to remove is determined based on the specified kit.
 *  Once the sequences are filtered to the UAS region, any duplicated sequences are removed and their reads are summed in with the remaining sequence ```Reads``` column. NOTE: This step can be skipped with the ```--nocombine``` flag.
   
-Further, a second table (labled as ```*_flanks_anno.txt```) containing information related to the flanking sequences surrounding the UAS sequence region is also produced with the following columns:
+Further, a second table (labeled as ```*_flanks_anno.txt```) containing information related to the flanking sequences surrounding the UAS sequence region is also produced with the following columns:
 *  Sample ID
 *  Project ID
 *  Analysis ID (same as Project ID)
@@ -124,9 +124,6 @@ lusstr annotate STRaitRazor_test_file.csv -o STRaitRazor_powerseq_final.txt --ki
 ```
 The above example would produce two files: (1) ```STRaitRazor_powerseq_final.txt``` and (2) ```STRaitRazor_powerseq_final_flanks_anno.txt```. 
 
-
-
-
-
+----
 
 lusSTR is still under development and any suggestions/issues found are welcome!
