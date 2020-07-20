@@ -10,7 +10,8 @@
 import lusSTR
 from lusSTR.repeat import collapse_tandem_repeat, collapse_all_repeats, repeat_copy_number
 from lusSTR.repeat import split_by_n, get_blocks, reverse_complement, reverse_complement_bracketed
-from lusSTR.repeat import collapse_repeats_by_length, collapse_repeats_by_length_flanks, sequence_to_bracketed_form
+from lusSTR.repeat import collapse_repeats_by_length, collapse_repeats_by_length_flanks
+from lusSTR.repeat import sequence_to_bracketed_form
 import pytest
 
 
@@ -75,6 +76,6 @@ def test_repeat_copy_number():
 
 
 def test_reverse_flanking():
-    sequence='AATACATAGGATGGATGGA'
+    sequence = 'AATACATAGGATGGATGGA'
     bracketed_flank = collapse_repeats_by_length_flanks(sequence, 4)
     assert bracketed_flank == 'AAT ACAT AGGA [TGGA]2'

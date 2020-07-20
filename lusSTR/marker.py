@@ -10,7 +10,8 @@
 import json
 import lusSTR
 from lusSTR.annot import get_str_metadata_file, split_sequence_into_two_strings
-from lusSTR.repeat import collapse_repeats_by_length, collapse_repeats_by_length_flanks, sequence_to_bracketed_form
+from lusSTR.repeat import collapse_repeats_by_length, collapse_repeats_by_length_flanks
+from lusSTR.repeat import sequence_to_bracketed_form
 from lusSTR.repeat import reverse_complement, reverse_complement_bracketed
 from lusSTR.repeat import repeat_copy_number, collapse_all_repeats, split_by_n
 import re
@@ -503,7 +504,7 @@ class STRMarker_FGA(STRMarker):
                             if i == 'AAAAAA':
                                 tmp.append('AA AAAA')
                             elif len(i) > 4:
-                                for x in split_by_n(i, 4):
+                                for x in split_by_n(i, 4, False):
                                     tmp.append(x)
                             else:
                                 tmp.append(i)
@@ -663,7 +664,7 @@ class STRMarker_TH01(STRMarker):
             if '[' not in unit and len(unit) > 3 and (len(unit) % 4 != 0) and unit[:3] == 'ATG':
                 group1 = unit[:3]
                 final_string.append(group1)
-                for x in split_by_n(unit[3:], n=4):
+                for x in split_by_n(unit[3:], n=4, rev=False):
                     final_string.append(x)
             else:
                 final_string.append(unit)

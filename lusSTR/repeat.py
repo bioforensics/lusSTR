@@ -52,7 +52,7 @@ def collapse_all_repeats(sequence, repeats):
 def split_by_n(sequence, n, rev):
     '''Split a sequence into non-overlapping chunks of length n.'''
     while sequence:
-        if rev == False:
+        if rev is False:
             yield sequence[:n]
             sequence = sequence[n:]
         else:
@@ -72,8 +72,6 @@ def get_blocks(sequence, n, rev):
             count = 0
         count += 1
     yield prev, count
-
-
 
 
 def collapse_repeats_by_length(sequence, n):
@@ -163,14 +161,11 @@ def collapse_repeats_by_length_flanks(sequence, n):
     '''Convert to bracketed annotation form by splitting the sequence into blocks of size n.'''
     units = list()
     for unit, count in get_blocks(sequence, n, True):
-        print(unit)
         assert unit is not None, (sequence, n)
         if count == 1:
             units.append(unit)
         else:
             units.append(f'[{unit}]{count}')
-    
     result = '  '.join(reversed(units))
-    print(result)
     result = re.sub(r' +', ' ', result)
     return result
