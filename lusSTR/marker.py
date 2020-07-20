@@ -10,7 +10,7 @@
 import json
 import lusSTR
 from lusSTR.annot import get_str_metadata_file, split_sequence_into_two_strings
-from lusSTR.repeat import collapse_repeats_by_length, sequence_to_bracketed_form
+from lusSTR.repeat import collapse_repeats_by_length, collapse_repeats_by_length_flanks, sequence_to_bracketed_form
 from lusSTR.repeat import reverse_complement, reverse_complement_bracketed
 from lusSTR.repeat import repeat_copy_number, collapse_all_repeats, split_by_n
 import re
@@ -104,8 +104,7 @@ class STRMarker():
     def flank_5p(self):
         if self.uas:
             return None
-        flank_rev = collapse_repeats_by_length(self.flankseq_5p[::-1], self.repeat_size)
-        flank = flank_rev[::-1]
+        flank = collapse_repeats_by_length_flanks(self.flankseq_5p, self.repeat_size)
         return flank
 
     @property

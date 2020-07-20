@@ -49,31 +49,46 @@ def collapse_all_repeats(sequence, repeats):
     return collapsed_seq
 
 
-def split_by_n(sequence, n):
+def split_by_n(sequence, n, rev):
     '''Split a sequence into non-overlapping chunks of length n.'''
     while sequence:
-        yield sequence[:n]
-        sequence = sequence[n:]
+        if rev == False:
+            yield sequence[:n]
+            sequence = sequence[n:]
+        else:
+            yield sequence[-n:]
+            sequence = sequence[:-n]
 
 
-def get_blocks(sequence, n):
+def get_blocks(sequence, n, rev):
     '''Split a sequence into chunks of length n, and count adjacent repeated chunks.'''
     count = 0
     prev = None
-    for unit in split_by_n(sequence, n):
-        if unit != prev:
-            if prev is not None:
-                yield prev, count
-            prev = unit
-            count = 0
-        count += 1
-    yield prev, count
+    if rev == False:
+        for unit in split_by_n(sequence, n, False):
+            if unit != prev:
+                if prev is not None:
+                    yield prev, count
+                prev = unit
+                count = 0
+            count += 1
+        yield prev, count
+    else:
+        for unit in split_by_n(sequence, n, True):
+            if unit != prev:
+                if prev is not None:
+                    yield prev, count
+                prev = unit
+                count = 0
+            count += 1
+        yield prev, count
+
 
 
 def collapse_repeats_by_length(sequence, n):
     '''Convert to bracketed annotation form by splitting the sequence into blocks of size n.'''
     units = list()
-    for unit, count in get_blocks(sequence, n):
+    for unit, count in get_blocks(sequence, n, False):
         assert unit is not None, (sequence, n)
         if count == 1:
             units.append(unit)
@@ -151,3 +166,35 @@ def repeat_copy_number(bf, repeat):
             if length > longest:
                 longest = length
     return str(longest)
+
+
+
+def get_blocks_rev(sequence, n):
+    '''Split a sequence into chunks of length n, and count adjacent repeated chunks.'''
+    count = 0
+    prev = None
+    for unit in split_by_n_rev(sequence, n):
+        if unit != prev:
+            if prev is not None:
+                yield prev, count
+            prev = unit
+            count = 0
+        count += 1
+    yield prev, count
+
+
+def collapse_repeats_by_length_flanks(sequence, n):
+    '''Convert to bracketed annotation form by splitting the sequence into blocks of size n.'''
+    units = list()
+    for unit, count in get_blocks(sequence, n, True):
+        print(unit)
+        assert unit is not None, (sequence, n)
+        if count == 1:
+            units.append(unit)
+        else:
+            units.append(f'[{unit}]{count}')
+    
+    result = '  '.join(reversed(units))
+    print(result)
+    result = re.sub(r' +', ' ', result)
+    return result
