@@ -64,24 +64,15 @@ def get_blocks(sequence, n, rev):
     '''Split a sequence into chunks of length n, and count adjacent repeated chunks.'''
     count = 0
     prev = None
-    if rev == False:
-        for unit in split_by_n(sequence, n, False):
-            if unit != prev:
-                if prev is not None:
-                    yield prev, count
-                prev = unit
-                count = 0
-            count += 1
-        yield prev, count
-    else:
-        for unit in split_by_n(sequence, n, True):
-            if unit != prev:
-                if prev is not None:
-                    yield prev, count
-                prev = unit
-                count = 0
-            count += 1
-        yield prev, count
+    for unit in split_by_n(sequence, n, rev):
+        if unit != prev:
+            if prev is not None:
+                yield prev, count
+            prev = unit
+            count = 0
+        count += 1
+    yield prev, count
+
 
 
 
@@ -109,7 +100,7 @@ def sequence_to_bracketed_form(sequence, n, repeats):
     blocks = list()
     for unit in collapsed.split(' '):
         if len(unit) > n and '[' not in unit:
-            for x in split_by_n(unit, n):
+            for x in split_by_n(unit, n, False):
                 blocks.append(x)
         else:
             blocks.append(unit)
@@ -166,21 +157,6 @@ def repeat_copy_number(bf, repeat):
             if length > longest:
                 longest = length
     return str(longest)
-
-
-
-def get_blocks_rev(sequence, n):
-    '''Split a sequence into chunks of length n, and count adjacent repeated chunks.'''
-    count = 0
-    prev = None
-    for unit in split_by_n_rev(sequence, n):
-        if unit != prev:
-            if prev is not None:
-                yield prev, count
-            prev = unit
-            count = 0
-        count += 1
-    yield prev, count
 
 
 def collapse_repeats_by_length_flanks(sequence, n):
