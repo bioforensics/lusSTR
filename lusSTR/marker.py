@@ -90,7 +90,7 @@ class STRMarker():
 
         The UAS software outputs the reverse complement of the forward sequence for some loci.
         '''
-        if self.data['ReverseCompNeeded'] == "Yes":
+        if self.data['ReverseCompNeeded'] == 'Yes':
             return reverse_complement(self.forward_sequence)
         return self.forward_sequence
 
@@ -105,7 +105,16 @@ class STRMarker():
     def flank_5p(self):
         if self.uas:
             return None
-        flank = collapse_repeats_by_length_flanks(self.flankseq_5p, self.repeat_size)
+        elif self.kit == 'powerseq' and self.data['Power_5'] > self.data['Foren_5']:
+            power_seq_flank = collapse_repeats_by_length_flanks(
+                self.flankseq_5p[:-self.data['Foren_5']], 4
+            )
+            foren_seq_flank = collapse_repeats_by_length_flanks(
+                self.flankseq_5p[-self.data['Foren_5']:], 4
+            )
+            flank = f'{power_seq_flank} {foren_seq_flank}'
+        else:
+            flank = collapse_repeats_by_length_flanks(self.flankseq_5p, self.repeat_size)
         return flank
 
     @property
@@ -189,11 +198,6 @@ class STRMarker():
         if self.data['ReverseCompNeeded'] == 'Yes':
             return reverse_complement_bracketed(self.annotation)
         return self.annotation
-
-    @property
-    def annotation_with_flanks(self):
-        full_annot = f'{self.flank_5p} {self.annotation} {self.flank_3p}'
-        return full_annot.strip()
 
     @property
     def designation(self):
@@ -723,7 +727,7 @@ def STRMarkerObject(locus, sequence, uas=False, kit='forenseq'):
         'D16S539': STRMarker_D16S539,
         'D1S1656': STRMarker_D1S1656,
         'PENTA D': STRMarker_PentaD,
-        'vWA': STRMarker_vWA,
+        'VWA': STRMarker_vWA,
         'D10S1248': STRMarker_D10S1248,
         'D22S1045': STRMarker_D22S1045,
         'FGA': STRMarker_FGA,
