@@ -49,18 +49,22 @@ def collapse_all_repeats(sequence, repeats):
     return collapsed_seq
 
 
-def split_by_n(sequence, n):
+def split_by_n(sequence, n, rev=False):
     '''Split a sequence into non-overlapping chunks of length n.'''
     while sequence:
-        yield sequence[:n]
-        sequence = sequence[n:]
+        if rev is False:
+            yield sequence[:n]
+            sequence = sequence[n:]
+        else:
+            yield sequence[-n:]
+            sequence = sequence[:-n]
 
 
-def get_blocks(sequence, n):
+def get_blocks(sequence, n, rev=False):
     '''Split a sequence into chunks of length n, and count adjacent repeated chunks.'''
     count = 0
     prev = None
-    for unit in split_by_n(sequence, n):
+    for unit in split_by_n(sequence, n, rev):
         if unit != prev:
             if prev is not None:
                 yield prev, count
@@ -73,7 +77,7 @@ def get_blocks(sequence, n):
 def collapse_repeats_by_length(sequence, n):
     '''Convert to bracketed annotation form by splitting the sequence into blocks of size n.'''
     units = list()
-    for unit, count in get_blocks(sequence, n):
+    for unit, count in get_blocks(sequence, n, False):
         assert unit is not None, (sequence, n)
         if count == 1:
             units.append(unit)
@@ -94,7 +98,7 @@ def sequence_to_bracketed_form(sequence, n, repeats):
     blocks = list()
     for unit in collapsed.split(' '):
         if len(unit) > n and '[' not in unit:
-            for x in split_by_n(unit, n):
+            for x in split_by_n(unit, n, False):
                 blocks.append(x)
         else:
             blocks.append(unit)
@@ -151,3 +155,17 @@ def repeat_copy_number(bf, repeat):
             if length > longest:
                 longest = length
     return str(longest)
+
+
+def collapse_repeats_by_length_flanks(sequence, n):
+    '''Convert to bracketed annotation form by splitting the sequence into blocks of size n.'''
+    units = list()
+    for unit, count in get_blocks(sequence, n, True):
+        assert unit is not None, (sequence, n)
+        if count == 1:
+            units.append(unit)
+        else:
+            units.append(f'[{unit}]{count}')
+    result = '  '.join(reversed(units))
+    result = re.sub(r' +', ' ', result)
+    return result
