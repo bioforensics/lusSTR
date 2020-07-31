@@ -49,7 +49,7 @@ def collapse_all_repeats(sequence, repeats):
     return collapsed_seq
 
 
-def split_by_n(sequence, n, rev):
+def split_by_n(sequence, n, rev=False):
     '''Split a sequence into non-overlapping chunks of length n.'''
     while sequence:
         if rev is False:
@@ -60,7 +60,7 @@ def split_by_n(sequence, n, rev):
             sequence = sequence[:-n]
 
 
-def get_blocks(sequence, n, rev):
+def get_blocks(sequence, n, rev=False):
     '''Split a sequence into chunks of length n, and count adjacent repeated chunks.'''
     count = 0
     prev = None
