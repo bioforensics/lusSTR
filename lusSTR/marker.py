@@ -580,7 +580,11 @@ class STRMarker_PentaE(STRMarker):
 
     @property
     def flank_3p(self):
-        return ''
+        if self.kit == 'powerseq':
+            flank = ''
+        else:
+            flank = collapse_repeats_by_length(self.flankseq_3p, 5)
+        return flank
 
 
 class STRMarker_vWA(STRMarker):
