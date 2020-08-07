@@ -64,10 +64,13 @@ def main(args):
         if locus == 'PENTAE' or locus == 'PENTA_E':
             locus = 'PENTA E'
         metadata = str_marker_data[locus]
-        if (
-            len(sequence) <= (metadata['Foren_5'] + metadata['Foren_3']) and not args.uas
-            and args.kit == 'forenseq'
-        ):
+        if args.kit == 'forenseq':
+            remove_5p = metadata['Foren_5']
+            remove_3p = metadata['Foren_3']
+        else:
+            remove_5p = metadata['Power_5']
+            remove_3p = metadata['Power_3']
+        if len(sequence) <= (remove_5p + remove_3p) and not args.uas:
             flank_summary = [
                 sampleid, project, analysis, locus, reads, 'NA', sequence, 'NA', 'NA', 'NA',
                 'Partial sequence'
@@ -78,7 +81,7 @@ def main(args):
         summary = [sampleid, project, analysis, locus] + marker.summary + [reads]
         list_of_lists.append(summary)
 
-        if not args.uas and args.kit == 'forenseq':
+        if not args.uas:
             flank_summary = [
                 sampleid, project, analysis, locus, reads, marker.canonical, marker.sequence,
                 marker.flank_5p, marker.annotation, marker.flank_3p, marker.indel_flag

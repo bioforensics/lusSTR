@@ -33,9 +33,9 @@ def strait_razor_concat(input_dir):
     locus_list = [
         'CSF1PO', 'D10S1248', 'D12S391', 'D13S317', 'D16S539', 'D17S1301', 'D18S51', 'D19S433',
         'D1S1656', 'D20S482', 'D21S11', 'D22S1045', 'D2S1338', 'D2S441', 'D3S1358', 'D4S2408',
-        'D5S818', 'D6S1043', 'D7S820', 'D8S1179', 'D9S1122', 'FGA', 'PentaD', 'PentaE', 'TH01',
-        'TPOX', 'vWA'
-    ]
+        'D5S818', 'D6S1043', 'D7S820', 'D8S1179', 'D9S1122', 'FGA', 'PentaD', 'PENTAD',
+        'Penta D', 'PentaE', 'PENTAE', 'Penta E', 'TH01', 'TPOX', 'vWA', 'VWA'
+        ]
     myfiles = os.listdir(input_dir)
     alldata = pd.DataFrame()
     for filename in sorted(myfiles):
