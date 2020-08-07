@@ -95,3 +95,17 @@ def test_indel_flag():
         'CSF1PO', 'CTTCCTATCTATCTATCTATCTAATCTATCTATCTT', uas=False, kit='forenseq'
     )
     assert marker.indel_flag == 'Possible indel or partial sequence'
+
+
+def test_powerseq_flanking_anno():
+    with NamedTemporaryFile(suffix='.txt') as outfile:
+        input = data_file('powerseq_flanking_anno_test.csv')
+        test_powerseq = data_file('powerseq_flanking_anno_test_flanks_anno.txt')
+        arglist = [
+            'annotate', input, '-o', outfile.name, '--kit', 'powerseq'
+        ]
+        args = lusSTR.cli.get_parser().parse_args(arglist)
+        lusSTR.annot.main(args)
+        outfile_name = os.path.splitext(outfile.name)[0]
+        outfile_name_output = f'{outfile_name}_flanks_anno.txt'
+        assert filecmp.cmp(test_powerseq, outfile_name_output) is True
