@@ -2,3 +2,4 @@ include versioneer.py
 include lusSTR/_version.py
 include lusSTR/str_markers.json
 include lusSTR/tests/data/*
+include lusSTR/tests/data/STRait_Razor_test_output/
