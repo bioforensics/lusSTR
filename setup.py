@@ -18,7 +18,7 @@ setup(
     description=desc,
     packages=['lusSTR', 'lusSTR.tests'],
     package_data={
-        'lusSTR': ['lusSTR/str_markers.json', 'lusSTR/tests/data/*', 'lusSTR/tests/data/STRait_Razor_test_output']
+        'lusSTR': ['lusSTR/str_markers.json', 'lusSTR/tests/data/*', 'lusSTR/tests/data/STRait_Razor_test_output/*']
     },
     include_package_data=True,
     install_requires=['pandas>=1.0', 'xlrd>=1.0'],
