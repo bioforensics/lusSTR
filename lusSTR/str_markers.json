@@ -864,7 +864,7 @@
         "Alleles": []
     },
     "DXS7423": {
-        "BasesToSubtract": 0,
+        "BasesToSubtract": 8,
         "NumRepeats": 4,
         "ReverseCompNeeded": "Yes",
         "LUS": "TGGA",
@@ -886,7 +886,7 @@
         "Alleles": []
     },
     "DXS10135": {
-        "BasesToSubtract": 0,
+        "BasesToSubtract": 56,
         "NumRepeats": 4,
         "ReverseCompNeeded": "No",
         "LUS": "AAGA",
@@ -908,7 +908,7 @@
         "Alleles": []
     },
     "DXS10103": {
-        "BasesToSubtract": 0,
+        "BasesToSubtract": 4,
         "NumRepeats": 4,
         "ReverseCompNeeded": "No",
         "LUS": "TAGA",
