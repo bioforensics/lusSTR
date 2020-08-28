@@ -521,7 +521,7 @@
         "Alleles": ["11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21"]
     },
     "Y-GATA-H4": {
-        "BasesToSubtract": 0,
+        "BasesToSubtract": 76,
         "NumRepeats": 4,
         "ReverseCompNeeded": "Yes",
         "LUS": "TCTA",
@@ -534,7 +534,7 @@
         "Alleles": []
     },
     "DYS643": {
-        "BasesToSubtract": 0,
+        "BasesToSubtract": 9,
         "NumRepeats": 5,
         "ReverseCompNeeded": "No",
         "LUS": "CTTTT",
@@ -561,7 +561,7 @@
         "Alleles": []
     },
     "DYS612": {
-        "BasesToSubtract": 0,
+        "BasesToSubtract": 18,
         "NumRepeats": 3,
         "ReverseCompNeeded": "No",
         "LUS": "TCT",
@@ -611,7 +611,7 @@
         "Alleles": []
     },
     "DYS522": {
-        "BasesToSubtract": 0,
+        "BasesToSubtract": 7,
         "NumRepeats": 4,
         "ReverseCompNeeded": "No",
         "LUS": "ATAG",
@@ -657,7 +657,7 @@
         "Alleles": []
     },
     "DYS458": {
-        "BasesToSubtract": 0,
+        "BasesToSubtract": 74,
         "NumRepeats": 4,
         "ReverseCompNeeded": "No",
         "LUS": "GAAA",
@@ -668,7 +668,7 @@
         "Alleles": []
     },
     "DYS456": {
-        "BasesToSubtract": 0,
+        "BasesToSubtract": 51,
         "NumRepeats": 4,
         "ReverseCompNeeded": "No",
         "LUS": "AGAT",
@@ -679,7 +679,7 @@
         "Alleles": []
     },
     "DYS448": {
-        "BasesToSubtract": 0,
+        "BasesToSubtract": 42,
         "NumRepeats": 6,
         "ReverseCompNeeded": "No",
         "LUS": "AGAGAT",
@@ -690,7 +690,7 @@
         "Alleles": []
     },
     "DYS439": {
-        "BasesToSubtract": 0,
+        "BasesToSubtract": 56,
         "NumRepeats": 4,
         "ReverseCompNeeded": "No",
         "LUS": "GATA",
@@ -729,7 +729,7 @@
         "Alleles": []
     },
     "DYS393": {
-        "BasesToSubtract": 0,
+        "BasesToSubtract": 27,
         "NumRepeats": 4,
         "ReverseCompNeeded": "No",
         "LUS": "AGAT",
@@ -753,7 +753,7 @@
         "Alleles": []
     },
     "DYS391": {
-        "BasesToSubtract": 0,
+        "BasesToSubtract": 16,
         "NumRepeats": 4,
         "ReverseCompNeeded": "No",
         "LUS": "GATA",
@@ -766,7 +766,7 @@
         "Alleles": []
     },
     "DYS390": {
-        "BasesToSubtract": 0,
+        "BasesToSubtract": 8,
         "NumRepeats": 4,
         "ReverseCompNeeded": "Yes",
         "LUS": "TAGA",
@@ -779,7 +779,7 @@
         "Alleles": []
     },
     "DYS389II": {
-        "BasesToSubtract": 0,
+        "BasesToSubtract": 48,
         "NumRepeats": 4,
         "ReverseCompNeeded": "Yes",
         "LUS": "TAGA",
@@ -805,7 +805,7 @@
         "Alleles": []
     },
     "DYS385": {
-        "BasesToSubtract": 0,
+        "BasesToSubtract": 131,
         "NumRepeats": 4,
         "ReverseCompNeeded": "Yes",
         "LUS": "TTTC",
@@ -818,7 +818,7 @@
         "Alleles": []
     },
     "DYS19": {
-        "BasesToSubtract": 0,
+        "BasesToSubtract": 4,
         "NumRepeats": 4,
         "ReverseCompNeeded": "Yes",
         "LUS": "TCTA",
