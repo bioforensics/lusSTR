@@ -529,8 +529,8 @@
         "Tert": "",
         "Foren_5": 0,
         "Foren_3": 0,
-        "Power_5": 0,
-        "Power_3": 0,
+        "Power_5": 4,
+        "Power_3": 112,
         "Alleles": []
     },
     "DYS643": {
@@ -540,10 +540,10 @@
         "LUS": "CTTTT",
         "Sec": "",
         "Tert": "",
-        "Foren_5": 0,
-        "Foren_3": 0,
-        "Power_5": 0,
-        "Power_3": 0,
+        "Foren_5": 50,
+        "Foren_3": 8,
+        "Power_5": 58,
+        "Power_3": 31,
         "Alleles": []
 
     },
@@ -554,10 +554,10 @@
         "LUS": "TAGA",
         "Sec": "",
         "Tert": "",
-        "Foren_5": 0,
-        "Foren_3": 0,
-        "Power_5": 0,
-        "Power_3": 0,
+        "Foren_5": 31,
+        "Foren_3": 24,
+        "Power_5": 41,
+        "Power_3": 1,
         "Alleles": []
     },
     "DYS612": {
@@ -567,8 +567,8 @@
         "LUS": "TCT",
         "Sec": "TCT",
         "Tert": "",
-        "Foren_5": 0,
-        "Foren_3": 0,
+        "Foren_5": 23,
+        "Foren_3": 26,
         "Alleles": []
     },
     "DYS576": {
@@ -579,9 +579,9 @@
         "Sec": "",
         "Tert": "",
         "Foren_5": 0,
-        "Foren_3": 0,
-        "Power_5": 0,
-        "Power_3": 0,
+        "Foren_3": 39,
+        "Power_5": 2,
+        "Power_3": 64,
         "Alleles": []
     },
     "DYS549": {
@@ -591,10 +591,10 @@
         "LUS": "GATA",
         "Sec": "",
         "Tert": "",
-        "Foren_5": 0,
-        "Foren_3": 0,
-        "Power_5": 0,
-        "Power_3": 0,
+        "Foren_5": 61,
+        "Foren_3": 49,
+        "Power_5": 113,
+        "Power_3": 12,
         "Alleles": []
     },
     "DYS533": {
@@ -604,10 +604,10 @@
         "LUS": "TATC",
         "Sec": "",
         "Tert": "",
-        "Foren_5": 0,
-        "Foren_3": 0,
-        "Power_5": 0,
-        "Power_3": 0,
+        "Foren_5": 64,
+        "Foren_3": 21,
+        "Power_5": 105,
+        "Power_3": 62,
         "Alleles": []
     },
     "DYS522": {
@@ -617,8 +617,8 @@
         "LUS": "ATAG",
         "Sec": "",
         "Tert": "",
-        "Foren_5": 0,
-        "Foren_3": 0,
+        "Foren_5": 136,
+        "Foren_3": 22,
         "Alleles": []
     },
     "DYS505": {
@@ -628,8 +628,8 @@
         "LUS": "TCCT",
         "Sec": "",
         "Tert": "",
-        "Foren_5": 0,
-        "Foren_3": 0,
+        "Foren_5": 61,
+        "Foren_3": 24,
         "Alleles": []
     },
     "DYS481": {
@@ -639,10 +639,10 @@
         "LUS": "CTT",
         "Sec": "",
         "Tert": "",
-        "Foren_5": 0,
-        "Foren_3": 0,
-        "Power_5": 0,
-        "Power_3": 0,
+        "Foren_5": 24,
+        "Foren_3": 6,
+        "Power_5": 36,
+        "Power_3": 7,
         "Alleles": []
     },
     "DYS460": {
@@ -652,8 +652,8 @@
         "LUS": "CTAT",
         "Sec": "",
         "Tert": "",
-        "Foren_5": 0,
-        "Foren_3": 0,
+        "Foren_5": 87,
+        "Foren_3": 51,
         "Alleles": []
     },
     "DYS458": {
@@ -674,8 +674,6 @@
         "LUS": "AGAT",
         "Sec": "",
         "Tert": "",
-        "Power_5": 0,
-        "Power_3": 0,
         "Alleles": []
     },
     "DYS448": {
@@ -685,8 +683,10 @@
         "LUS": "AGAGAT",
         "Sec": "AGAGAT",
         "Tert": "",
-        "Foren_5": 0,
-        "Foren_3": 0,
+        "Foren_5": 19,
+        "Foren_3": 5,
+        "Power_5": 0,
+        "Power_3": 0,
         "Alleles": []
     },
     "DYS439": {
