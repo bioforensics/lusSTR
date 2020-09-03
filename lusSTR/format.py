@@ -56,8 +56,16 @@ def strait_razor_concat(input_dir, sex=False):
         'D5S818', 'D6S1043', 'D7S820', 'D8S1179', 'D9S1122', 'FGA', 'PentaD', 'PENTAD',
         'Penta D', 'PentaE', 'PENTAE', 'Penta E', 'TH01', 'TPOX', 'vWA', 'VWA'
         ]
+    sex_locus_list = [
+        'Y-GATA-H4', 'DYS643', 'DYS635', 'DYS612', 'DYS576', 'DYS570', 'DYS549', 'DYS533',
+        'DYS522', 'DYS505', 'DYS481', 'DYS460', 'DYS448', 'DYS439', 'DYS438', 'DYS437', 'DYS392',
+        'DYS391', 'DYS390', 'DYS389I', 'DYS389II', 'DYS385a-b', 'DYS19', 'DYF387S1', 'DYS393',
+        'DYS458', 'DYS456', 'HPRTB', 'DXS8378', 'DXS7423', 'DXS7132', 'DXS10135', 'DXS10074',
+        'DXS10103'
+    ]
     myfiles = os.listdir(input_dir)
-    alldata = pd.DataFrame()
+    autosomal_data = pd.DataFrame()
+    xydata = pd.DataFrame()
     for filename in sorted(myfiles):
         name = re.sub('_STRaitRazor.txt', '', filename)
         filepath = os.path.join(input_dir, filename)
@@ -66,23 +74,29 @@ def strait_razor_concat(input_dir, sex=False):
             names=['Locus_allele', 'Length', 'Sequence', 'Forward_Reads', 'Reverse_Reads']
         )
         data[['Locus', 'Allele']] = data.Locus_allele.str.split(":", expand=True)
-        data = data[data.Locus.isin(locus_list)]
         data['Total_Reads'] = data['Forward_Reads'] + data['Reverse_Reads']
         data['SampleID'] = name
         data = data[['Locus', 'Total_Reads', 'Sequence', 'SampleID']]
-        alldata = alldata.append(data)
+        auto_only_data = data[data.Locus.isin(locus_list)]
+        autosomal_data = autosomal_data.append(auto_only_data)
+        if sex is True:
+            sex_only_data = data[data.Locus.isin(sex_locus_list)]
+            xydata = xydata.append(sex_only_data)
     analysisID = input_dir.rstrip(os.sep)
     analysisID_final = os.path.basename(analysisID)
-    alldata['Project'] = analysisID_final
-    alldata['Analysis'] = analysisID_final
-    return alldata
+    autosomal_data['Project'] = analysisID_final
+    autosomal_data['Analysis'] = analysisID_final
+    if sex is True:
+        xydata['Project'] = analysisID_final
+        xydata['Analysis'] = analysisID_final
+    return xydata, autosomal_data
 
 
 def main(args):
     if args.uas:
         sex_results, results = uas_load(args.input, args.sex)
     else:
-        results = strait_razor_concat(args.input, args.sex)
+        sex_results, results = strait_razor_concat(args.input, args.sex)
     if args.out is None:
         args.out = sys.stdout
     results.to_csv(args.out, index=False)
