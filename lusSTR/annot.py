@@ -44,8 +44,11 @@ def split_sequence_into_two_strings(sequence, repeat_for_split):
     return first_string, second_string
 
 
-def main(args):
-    data = pd.read_csv(args.input)
+def format_table(input, uas=False, kit='forenseq'):
+    '''
+    Function to format final output table and the flanking report (if necessary).
+    '''
+    data = pd.read_csv(input)
     list_of_lists = []
     flanks_list = []
     for i, row in data.iterrows():
@@ -64,24 +67,24 @@ def main(args):
         if locus == 'PENTAE' or locus == 'PENTA_E':
             locus = 'PENTA E'
         metadata = str_marker_data[locus]
-        if args.kit == 'forenseq':
+        if kit == 'forenseq':
             remove_5p = metadata['Foren_5']
             remove_3p = metadata['Foren_3']
         else:
             remove_5p = metadata['Power_5']
             remove_3p = metadata['Power_3']
-        if len(sequence) <= (remove_5p + remove_3p) and not args.uas:
+        if len(sequence) <= (remove_5p + remove_3p) and not uas:
             flank_summary = [
                 sampleid, project, analysis, locus, reads, 'NA', sequence, 'NA', 'NA', 'NA',
                 'Partial sequence'
             ]
             flanks_list.append(flank_summary)
             continue
-        marker = lusSTR.marker.STRMarkerObject(locus, sequence, uas=args.uas, kit=args.kit)
+        marker = lusSTR.marker.STRMarkerObject(locus, sequence, uas=uas, kit=kit)
         summary = [sampleid, project, analysis, locus] + marker.summary + [reads]
         list_of_lists.append(summary)
 
-        if not args.uas:
+        if not uas:
             flank_summary = [
                 sampleid, project, analysis, locus, reads, marker.canonical, marker.sequence,
                 marker.flank_5p, marker.annotation, marker.flank_3p, marker.indel_flag
@@ -94,19 +97,38 @@ def main(args):
         'UAS_Output_Bracketed_Form', 'LUS', 'LUS_Plus', 'Reads'
     ]
     final_output = pd.DataFrame(list_of_lists, columns=columns)
-    name = os.path.splitext(args.out)[0]
-    if not args.uas:
+    if not uas:
         flanks_columns = [
             'SampleID', 'Project', 'Analysis', 'Locus', 'Reads', 'Length_Allele',
             'Full_Sequence', '5_Flank_Anno', 'UAS_Region_Anno', '3_Flank_Anno',
             'Potential_Issues'
         ]
         final_flank_output = pd.DataFrame(flanks_list, columns=flanks_columns)
-        final_flank_output.to_csv(f'{name}_flanks_anno.txt', sep='\t', index=False)
-        if args.combine:
-            final_output = final_output.groupby(columns[:-1], as_index=False)['Reads'].sum()
-            final_output.to_csv(args.out, sep='\t', index=False)
-        else:
-            final_output.to_csv(f'{name}_no_combined_reads.txt', sep='\t', index=False)
     else:
-        final_output.to_csv(args.out, sep='\t', index=False)
+        final_flank_output = ''
+    return final_output, final_flank_output
+
+
+def main(args):
+    output_name = os.path.splitext(args.out)[0]
+    input_name = os.path.splitext(args.input)[0]
+    autosomal_final_table, autosomal_flank_table = format_table(args.input, args.uas, args.kit)
+    if args.sex:
+        sex_final_table, sex_flank_table = format_table(
+            f'{input_name}_sexloci.csv', args.uas, args.kit
+        )
+        sex_final_table.to_csv(f'{output_name}_sexloci.txt', sep='\t', index=False)
+        sex_flank_table.to_csv(f'{output_name}_sexloci_flanks_anno.txt', sep='\t', index=False)
+    if not args.uas:
+        autosomal_flank_table.to_csv(f'{output_name}_flanks_anno.txt', sep='\t', index=False)
+        if args.combine:
+            autosomal_final_table = (
+                autosomal_final_table.groupby(columns[:-1], as_index=False)['Reads'].sum()
+            )
+            autosomal_final_table.to_csv(args.out, sep='\t', index=False)
+        else:
+            autosomal_final_table.to_csv(
+                f'{output_name}_no_combined_reads.txt', sep='\t', index=False
+            )
+    else:
+        autosomal_final_table.to_csv(args.out, sep='\t', index=False)
