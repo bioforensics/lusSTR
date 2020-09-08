@@ -584,6 +584,19 @@
         "Power_3": 64,
         "Alleles": []
     },
+    "DYS570":{
+        "BasesToSubtract": 0,
+        "NumRepeats": 4,
+        "ReverseCompNeeded": "No",
+        "LUS": "TTTC",
+        "Sec": "",
+        "Tert": "",
+        "Foren_5": 32,
+        "Foren_3": 14,
+        "Power_5": 52,
+        "Power_3": 7,
+        "Alleles": []
+    },
     "DYS549": {
         "BasesToSubtract": 0,
         "NumRepeats": 4,
@@ -674,6 +687,7 @@
         "LUS": "AGAT",
         "Sec": "",
         "Tert": "",
+
         "Alleles": []
     },
     "DYS448": {
@@ -735,6 +749,8 @@
         "LUS": "AGAT",
         "Sec": "",
         "Tert": "",
+        "Foren_5": 0,
+        "Foren_3": 1,
         "Alleles": []
     },
     "DYS392": {
@@ -828,7 +844,7 @@
         "Power_3": 60,
         "Alleles": []
     },
-    "DYF87S1": {
+    "DYF387S1": {
         "BasesToSubtract": 0,
         "NumRepeats": 4,
         "ReverseCompNeeded": "No",

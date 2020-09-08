@@ -1005,6 +1005,98 @@ class STRMarker_D19S433(STRMarker):
         return re.sub(r' +', ' ', final_string)
 
 
+class STRMarker_DYS643(STRMarker):
+    @property
+    def flank_3p(self):
+        flank_seq = self.flankseq_3p
+        if self.kit == 'powerseq':
+            flank = (
+                f'{collapse_repeats_by_length(flank_seq[:8], 5)} '
+                f'{collapse_repeats_by_length(flank_seq[8:], 5)}'
+            )
+        else:
+            flank = collapse_repeats_by_length(flank_seq, 5)
+        return flank
+
+
+class STRMarker_DYS635(STRMarker):
+    @property
+    def flank_5p(self):
+        flank_seq = self.flankseq_5p
+        if self.kit == 'powerseq':
+            flank = (
+                f'{collapse_repeats_by_length_flanks(flank_seq[:10], 4)} {flank_seq[10]} '
+                f'{collapse_repeats_by_length(flank_seq[11:41], 4)}'
+            )
+        else:
+            flank = f'{flank_seq[0]} {collapse_repeats_by_length(flank_seq[1:31], 4)}'
+        return flank
+
+
+class STRMarker_DYS612(STRMarker):
+    @property
+    def flank_3p(self):
+        flank_seq = self.flankseq_3p
+        flank = (
+            f'{flank_seq[0]} {collapse_repeats_by_length(flank_seq[1:], 3)}'
+        )
+        return flank
+
+
+class STRMarker_DYS576(STRMarker):
+    @property
+    def flank_3p(self):
+        flank_seq = self.flankseq_3p
+        if self.kit == 'powerseq':
+            flank = (
+                f'{collapse_repeats_by_length(flank_seq[-64:-25], 4)} '
+                f'{collapse_repeats_by_length(flank_seq[-25:], 4)}'
+            )
+        else:
+            flank = collapse_repeats_by_length(flank_seq), 4
+        return flank
+
+
+class STRMarker_DYS549(STRMarker):
+    @property
+    def flank_5p(self):
+        flank_seq = self.flankseq_5p
+        if self.kit == 'powerseq':
+            flank = (
+                f'{collapse_repeats_by_length_flanks(flank_seq[:52], 4)} {flank_seq[52:54]} '
+                f'{collapse_repeats_by_length(flank_seq[54:], 4)}'
+            )
+        else:
+            flank = (
+                f'{flank_seq[:2]} {collapse_repeats_by_length(flank_seq[2:], 4)}'
+            )
+        return flank
+
+
+class STRMarker_DYS533(STRMarker):
+    @property
+    def flank_3p(self):
+        flank_seq = self.flankseq_3p
+        if self.kit == 'powerseq':
+            flank = (
+                f'{collapse_repeats_by_length(flank_seq[:21], 4)} '
+                f'{collapse_repeats_by_length)flank_seq[21:], 4)}'
+            )
+        else:
+            flank = collapse_repeats_by_length(flank_seq, 4)
+        return flank
+
+
+class STRMarker_DYS522(STRMarker):
+    @property
+    def annotation(self):
+        sequence = self.forward_sequence
+        final_seq = (
+            f'{sequence[:3]} {collapse_repeats_by_length(sequence[3:], 4)}'
+        )
+        return final_seq
+
+
 def STRMarkerObject(locus, sequence, uas=False, kit='forenseq'):
     constructors = {
         'D8S1179': STRMarker_D8S1179,
@@ -1027,7 +1119,14 @@ def STRMarkerObject(locus, sequence, uas=False, kit='forenseq'):
         'D2S1338': STRMarker_D2S1338,
         'D5S818': STRMarker_D5S818,
         'PENTA E': STRMarker_PentaE,
-        'TPOX': STRMarker_TPOX
+        'TPOX': STRMarker_TPOX,
+        'DYS643': STRMarker_DYS643,
+        'DYS635': STRMarker_DYS635,
+        'DYS612': STRMarker_DYS612,
+        'DYS576': STRMarker_DYS576,
+        'DYS549': STRMarker_DYS549,
+        'DYS533': STRMarker_DYS533,
+        'DYS522': STRMarker_DYS522
     }
     if locus in constructors:
         constructor = constructors[locus]
