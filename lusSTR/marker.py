@@ -1097,6 +1097,69 @@ class STRMarker_DYS522(STRMarker):
         return final_seq
 
 
+class STRMarker_DYS481(STRMarker):
+    @property
+    def flank_3p(self):
+        flank_seq = self.flankseq_3p
+        if self.kit == 'powerseq':
+            flank = (
+                f'{collapse_repeats_by_length(flank_seq[-7:-1], 4)} {flank_seq[-1]}'
+            )
+        else:
+            flank = collapse_repeats_by_length(flank_seq, 4)
+        return flank
+
+
+class STRMarker_DYS439(STRMarker):
+    @property
+    def flank_5p(self):
+        flank_seq = self.flankseq_5p
+        flank = (
+            f'{collapse_repeats_by_length_flanks(flank_seq[:13], 4)} '
+            f'{collapse_repeats_by_length_flanks(flank_seq[13:], 4)}'
+        )
+        return flank
+
+
+class STRMarker_DYS437(STRMarker):
+    @property
+    def flank_3p(self):
+        flank_seq = self.flankseq_3p
+        flank = (
+            f'{flank_seq[:3]} {collapse_repeats_by_length(flank_seq[3:], 4)}'
+        )
+    return flank
+
+
+class STRMarker_DYS392(STRMarker):
+    @property
+    def flank_3p(self):
+        flank_seq = self.flankseq_3p
+        flank = (
+            f'{collapse_repeats_by_length(flank_seq[:72], 3)} '
+            f'{collapse_repeats_by_length(flank_seq[72:], 3)}'
+        )
+        return flank
+
+
+class STRMarker_DYS391(STRMarker):
+    @property
+    def flank_3p(self):
+        flank_seq = self.flankseq_3p
+        if self.kit == 'powerseq':
+            flank = (
+                f'{collapse_repeats_by_length(flank_seq[:7], 4)} '
+                f'{collapse_repeats_by_length(flank_seq[7:29], 4)} '
+                f'{collapse_repeats_by_length(flank_seq[29:], 4)}'
+            )
+        else:
+            flank = (
+                f'{collapse_repeats_by_length(flank_seq[:7], 4)} '
+                f'{collapse_repeats_by_length(flank_seq[7:], 4)}'
+            )
+        return flank
+
+
 def STRMarkerObject(locus, sequence, uas=False, kit='forenseq'):
     constructors = {
         'D8S1179': STRMarker_D8S1179,
@@ -1126,7 +1189,11 @@ def STRMarkerObject(locus, sequence, uas=False, kit='forenseq'):
         'DYS576': STRMarker_DYS576,
         'DYS549': STRMarker_DYS549,
         'DYS533': STRMarker_DYS533,
-        'DYS522': STRMarker_DYS522
+        'DYS522': STRMarker_DYS522,
+        'DYS481': STRMarker_DYS481,
+        'DYS439': STRMarker_DYS439,
+        'DYS392': STRMarker_DYS392,
+        'DYS391': STRMarker_DYS391
     }
     if locus in constructors:
         constructor = constructors[locus]
