@@ -1160,6 +1160,31 @@ class STRMarker_DYS391(STRMarker):
         return flank
 
 
+class STRMarker_DYS19(STRMarker):
+    @property
+    def flank_3p(self):
+        flank_seq = self.flankseq_3p
+        if self.kit == 'powerseq':
+            flank = (
+                f'{collapse_repeats_by_length_flanks(flank_seq[:30], 4)} '
+                f'{collapse_repeats_by_length_flanks(flank_seq[30:], 4)}'
+            )
+        else:
+            flank = ''
+        return flank
+
+
+class STRMarker_DYS458(STRMarker):
+    @property
+    def annotation(self):
+        sequence = self.forward_sequence
+        final_string = (
+            f'{collapse_repeats_by_length(sequence[:14], 4)} '
+            f'{collapse_repeats_by_length(sequence[14:], 4)}'
+        )
+        return final_string
+
+
 def STRMarkerObject(locus, sequence, uas=False, kit='forenseq'):
     constructors = {
         'D8S1179': STRMarker_D8S1179,
@@ -1193,7 +1218,9 @@ def STRMarkerObject(locus, sequence, uas=False, kit='forenseq'):
         'DYS481': STRMarker_DYS481,
         'DYS439': STRMarker_DYS439,
         'DYS392': STRMarker_DYS392,
-        'DYS391': STRMarker_DYS391
+        'DYS391': STRMarker_DYS391,
+        'DYS19': STRMarker_DYS19,
+        'DYS458': STRMarker_DYS458
     }
     if locus in constructors:
         constructor = constructors[locus]
