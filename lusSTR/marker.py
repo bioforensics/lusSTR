@@ -173,7 +173,7 @@ class STRMarker():
     def cannot_split(self):
         return self.locus in [
             'D19S433', 'D6S1043', 'TH01', 'D21S11', 'D1S1656', 'D7S820', 'D5S818', 'D12S391',
-            'D9S1122', 'PENTA E'
+            'D9S1122', 'PENTA E', 'DXS7132'
         ]
 
     @property
@@ -1185,6 +1185,82 @@ class STRMarker_DYS458(STRMarker):
         return final_string
 
 
+class STRMarker_HPRTB(STRMarker):
+    @property
+    def flank_5p(self):
+        flank_seq = self.flankseq_5p
+        flank = (
+            f'{collapse_repeats_by_length(flank_seq[:-4], 4)} {flank_seq[-4]} {flank_seq[-3:]}'
+        )
+        return flank
+
+
+class STRMarker_DXS8378(STRMarker):
+    @property
+    def flank_5p(self):
+        flank_seq = self.flankseq_5p
+        flank = (
+            f'{collapse_repeats_by_length(flank_seq[:21], 4)} '
+            f'{collapse_repeats_by_length(flank_seq[21:47], 4)} '
+            f'{collapse_repeats_by_length_flanks(flank_seq[47:], 4)}'
+        )
+        return flank
+
+    @property
+    def flank_3p(self):
+        flank_seq = self.flankseq_3p
+        flank = (
+            f'{collapse_repeats_by_length(flank_seq[:26], 4)} {flank_seq[26]} '
+            f'{collapse_repeats_by_length(flank_seq[27:], 4)}'
+        )
+        return flank
+
+
+class STRMarker_DXS7132(STRMarker):
+    @property
+    def flank_3p(self):
+        flank_seq = self.flankseq_3p
+        flank = (
+            f'{collapse_repeats_by_length(flank_seq[:5], 4)} '
+            f'{collapse_repeats_by_length(flank_seq[5:36], 4)} {flank_seq[36]} '
+            f'{collapse_repeats_by_length(flank_seq[37:], 4)}'
+        )
+        return flank
+
+
+class STRMarker_DXS10135(STRMarker):
+    @property
+    def annotation(self):
+        sequence = self.forward_sequence
+        if sequence[:19] is not 'AAGAAAGAAAGAGAAAGGA':
+            raise InvalidSequenceError(sequence)
+        else:
+            final_string = (
+                f'[AAGA]3 gaaagga {collapse_repeats_by_length(sequence[19:], 4)}'
+            )
+        return final_string
+
+
+class STRMarker_DXS10074(STRMarker):
+    @property
+    def flank_5p(self):
+        flank_seq = self.flankseq_5p
+        flank = (
+            f'{collapse_repeats_by_length(flank_seq[:22], 4)} {flank_seq[22]} '
+            f'{collapse_repeats_by_length(flank_seq[23:], 4)}'
+        )
+        return flank
+
+    @property
+    def flank_3p(self):
+        flank_seq = self.flankseq_3p
+        flank = (
+            f'{collapse_repeats_by_length(flank_seq[:5], 4)} '
+            f'{collapse_repeats_by_length(flank_seq[:-3], 4)} {flank_seq[-2:]'
+        )
+        return flank
+
+
 def STRMarkerObject(locus, sequence, uas=False, kit='forenseq'):
     constructors = {
         'D8S1179': STRMarker_D8S1179,
@@ -1220,7 +1296,12 @@ def STRMarkerObject(locus, sequence, uas=False, kit='forenseq'):
         'DYS392': STRMarker_DYS392,
         'DYS391': STRMarker_DYS391,
         'DYS19': STRMarker_DYS19,
-        'DYS458': STRMarker_DYS458
+        'DYS458': STRMarker_DYS458,
+        'HPRTB': STRMarker_HPRTB,
+        'DXS8378': STRMarker_DXS8378,
+        'DXS7132': STRMarker_DXS7132,
+        'DXS10135': STRMarker_DXS10135,
+        'DXS10074': STRMarker_DXS10074
     }
     if locus in constructors:
         constructor = constructors[locus]

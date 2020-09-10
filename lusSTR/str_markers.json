@@ -687,7 +687,8 @@
         "LUS": "AGAT",
         "Sec": "",
         "Tert": "",
-
+        "Power_5": 0,
+        "Power_3": 0,
         "Alleles": []
     },
     "DYS448": {
@@ -747,8 +748,8 @@
         "LUS": "AGAT",
         "Sec": "",
         "Tert": "",
-        "Foren_5": 0,
-        "Foren_3": 1,
+        "Power_5": 0,
+        "Power_3": 0,
         "Alleles": []
     },
     "DYS392": {
@@ -849,7 +850,7 @@
         "LUS": "CTTT",
         "Sec": "CTTC",
         "Tert": "",
-        "Foren_5": 0,
+        "Foren_5": 14,
         "Foren_3": 0,
         "Alleles": []
     },
