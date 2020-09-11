@@ -53,6 +53,7 @@ def format_table(input, uas=False, kit='forenseq'):
     flanks_list = []
     for i, row in data.iterrows():
         locus = data.iloc[i, 0].upper()
+        print(locus)
         reads = data.iloc[i, 1]
         sequence = data.iloc[i, 2]
         sampleid = re.sub(" ", "_", data.iloc[i, 3])
@@ -106,15 +107,17 @@ def format_table(input, uas=False, kit='forenseq'):
         final_flank_output = pd.DataFrame(flanks_list, columns=flanks_columns)
     else:
         final_flank_output = ''
-    return final_output, final_flank_output
+    return final_output, final_flank_output, columns
 
 
 def main(args):
     output_name = os.path.splitext(args.out)[0]
     input_name = os.path.splitext(args.input)[0]
-    autosomal_final_table, autosomal_flank_table = format_table(args.input, args.uas, args.kit)
+    autosomal_final_table, autosomal_flank_table, columns = format_table(
+        args.input, args.uas, args.kit
+    )
     if args.sex:
-        sex_final_table, sex_flank_table = format_table(
+        sex_final_table, sex_flank_table, sex_columns = format_table(
             f'{input_name}_sexloci.csv', args.uas, args.kit
         )
         sex_final_table.to_csv(f'{output_name}_sexloci.txt', sep='\t', index=False)

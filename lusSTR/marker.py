@@ -103,11 +103,13 @@ class STRMarker():
         if self.uas:
             return None
         front, back = self._uas_bases_to_trim()
+        if front == 0:
+            return ''
         return self.sequence[:front]
 
     @property
     def flank_5p(self):
-        if self.uas:
+        if self.uas or self.flankseq_5p == '':
             return None
         elif self.kit == 'powerseq' and self.data['Power_5'] > self.data['Foren_5']:
             power_seq_flank = collapse_repeats_by_length_flanks(
@@ -118,6 +120,7 @@ class STRMarker():
             )
             flank = f'{power_seq_flank} {foren_seq_flank}'
         else:
+            print(self.flankseq_5p)
             flank = collapse_repeats_by_length_flanks(self.flankseq_5p, self.repeat_size)
         return flank
 
@@ -132,7 +135,7 @@ class STRMarker():
 
     @property
     def flank_3p(self):
-        if self.uas:
+        if self.uas or self.flankseq_3p == '':
             return None
         elif self.kit == 'powerseq' and self.data['Power_3'] > self.data['Foren_3']:
             foren_seq_flank = collapse_repeats_by_length(
@@ -186,7 +189,7 @@ class STRMarker():
             'D13S317', 'D18S51', 'DYS643', 'DYS635', 'DYS635', 'DYS612', 'DYS576', 'DYS570',
             'DYS549', 'DYS533', 'DYS505', 'DYS481', 'DYS460', 'DYS448', 'DYS439', 'DYS438',
             'DYS437', 'DYS392', 'DYS391', 'DYS390', 'DYS389II', 'DYS389I', 'DYS385A-B', 'DYS19',
-            'DYF387S1', 'DYS393', 'DYS456'
+            'DYF387S1', 'DYS393', 'DYS456', 'HPRTB', 'DXS8378', 'DXS7423', 'DXS10074', 'DXS10103'
         ]
 
     @property
@@ -200,8 +203,8 @@ class STRMarker():
     @property
     def annotation(self):
         bylength = (
-            (self.data['ReverseCompNeeded'] == 'Yes' and self.split_compatible)
-            or self.split_compatible
+            self.split_compatible
+            or (self.data['ReverseCompNeeded'] == 'Yes' and self.split_compatible)
             or (self.locus == 'D3S1358' and self.split_compatible)
             or self.locus == 'D16S539'
         )
@@ -1063,7 +1066,7 @@ class STRMarker_DYS576(STRMarker):
                 f'{collapse_repeats_by_length(flank_seq[-25:], 4)}'
             )
         else:
-            flank = collapse_repeats_by_length(flank_seq), 4
+            flank = collapse_repeats_by_length(flank_seq, 4)
         return flank
 
 
@@ -1105,19 +1108,6 @@ class STRMarker_DYS522(STRMarker):
             f'{sequence[:3]} {collapse_repeats_by_length(sequence[3:], 4)}'
         )
         return final_seq
-
-
-class STRMarker_DYS481(STRMarker):
-    @property
-    def flank_3p(self):
-        flank_seq = self.flankseq_3p
-        if self.kit == 'powerseq':
-            flank = (
-                f'{collapse_repeats_by_length(flank_seq[-7:-1], 4)} {flank_seq[-1]}'
-            )
-        else:
-            flank = collapse_repeats_by_length(flank_seq, 4)
-        return flank
 
 
 class STRMarker_DYS439(STRMarker):
@@ -1242,12 +1232,11 @@ class STRMarker_DXS10135(STRMarker):
     @property
     def annotation(self):
         sequence = self.forward_sequence
-        if sequence[:19] != 'AAGAAAGAAAGAGAAAGGA':
-            raise InvalidSequenceError(sequence[:19])
-        else:
-            final_string = (
-                f'[AAGA]3 gaaagga {collapse_repeats_by_length(sequence[19:], 4)}'
-            )
+        print(sequence)
+        final_string = (
+            f'{collapse_repeats_by_length(sequence[:12], 4)} '
+            f'{sequence[12:19].lower()} {collapse_repeats_by_length(sequence[19:], 4)}'
+        )
         return final_string
 
 
@@ -1311,8 +1300,8 @@ def STRMarkerObject(locus, sequence, uas=False, kit='forenseq'):
         'DYS549': STRMarker_DYS549,
         'DYS533': STRMarker_DYS533,
         'DYS522': STRMarker_DYS522,
-        'DYS481': STRMarker_DYS481,
         'DYS439': STRMarker_DYS439,
+        'DYS437': STRMarker_DYS437,
         'DYS392': STRMarker_DYS392,
         'DYS391': STRMarker_DYS391,
         'DYS19': STRMarker_DYS19,

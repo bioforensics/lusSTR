@@ -963,8 +963,8 @@
         "LUS": "TAGA",
         "Sec": "TAGA",
         "Tert": "",
-        "Foren_5": 0,
-        "Foren_3": 0,
+        "Foren_5": 20,
+        "Foren_3": 2,
         "Alleles": []
     }
 }
