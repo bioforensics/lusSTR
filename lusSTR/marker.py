@@ -29,6 +29,10 @@ class UnsupportedKitError(ValueError):
     pass
 
 
+class InvalidSequenceError(ValueError):
+    pass
+
+
 class STRMarker():
     def __init__(self, locus, sequence, uas=False, kit='forenseq'):
         self.locus = locus
@@ -178,7 +182,12 @@ class STRMarker():
 
     @property
     def must_split(self):
-        return self.locus in ['D13S317', 'D18S51']
+        return self.locus in [
+            'D13S317', 'D18S51', 'DYS643', 'DYS635', 'DYS635', 'DYS612', 'DYS576', 'DYS570',
+            'DYS549', 'DYS533', 'DYS505', 'DYS481', 'DYS460', 'DYS448', 'DYS439', 'DYS438',
+            'DYS437', 'DYS392', 'DYS391', 'DYS390', 'DYS389II', 'DYS389I', 'DYS385A-B', 'DYS19',
+            'DYF387S1', 'DYS393', 'DYS456'
+        ]
 
     @property
     def split_compatible(self):
@@ -192,6 +201,7 @@ class STRMarker():
     def annotation(self):
         bylength = (
             (self.data['ReverseCompNeeded'] == 'Yes' and self.split_compatible)
+            or self.split_compatible
             or (self.locus == 'D3S1358' and self.split_compatible)
             or self.locus == 'D16S539'
         )
@@ -1080,7 +1090,7 @@ class STRMarker_DYS533(STRMarker):
         if self.kit == 'powerseq':
             flank = (
                 f'{collapse_repeats_by_length(flank_seq[:21], 4)} '
-                f'{collapse_repeats_by_length)flank_seq[21:], 4)}'
+                f'{collapse_repeats_by_length(flank_seq[21:], 4)}'
             )
         else:
             flank = collapse_repeats_by_length(flank_seq, 4)
@@ -1128,7 +1138,7 @@ class STRMarker_DYS437(STRMarker):
         flank = (
             f'{flank_seq[:3]} {collapse_repeats_by_length(flank_seq[3:], 4)}'
         )
-    return flank
+        return flank
 
 
 class STRMarker_DYS392(STRMarker):
@@ -1232,8 +1242,8 @@ class STRMarker_DXS10135(STRMarker):
     @property
     def annotation(self):
         sequence = self.forward_sequence
-        if sequence[:19] is not 'AAGAAAGAAAGAGAAAGGA':
-            raise InvalidSequenceError(sequence)
+        if sequence[:19] != 'AAGAAAGAAAGAGAAAGGA':
+            raise InvalidSequenceError(sequence[:19])
         else:
             final_string = (
                 f'[AAGA]3 gaaagga {collapse_repeats_by_length(sequence[19:], 4)}'
@@ -1256,9 +1266,19 @@ class STRMarker_DXS10074(STRMarker):
         flank_seq = self.flankseq_3p
         flank = (
             f'{collapse_repeats_by_length(flank_seq[:5], 4)} '
-            f'{collapse_repeats_by_length(flank_seq[:-3], 4)} {flank_seq[-2:]'
+            f'{collapse_repeats_by_length(flank_seq[:-3], 4)} {flank_seq[-2:]}'
         )
         return flank
+
+
+class STRMarker_Y_GATA_H4(STRMarker):
+    @property
+    def annotation(self):
+        sequence = self.forward_sequence
+        final_string = (
+            f'{sequence[0]} {collapse_repeats_by_length(sequence[1:], 4)}'
+        )
+        return final_string
 
 
 def STRMarkerObject(locus, sequence, uas=False, kit='forenseq'):
@@ -1301,7 +1321,8 @@ def STRMarkerObject(locus, sequence, uas=False, kit='forenseq'):
         'DXS8378': STRMarker_DXS8378,
         'DXS7132': STRMarker_DXS7132,
         'DXS10135': STRMarker_DXS10135,
-        'DXS10074': STRMarker_DXS10074
+        'DXS10074': STRMarker_DXS10074,
+        'Y-GATA-H4': STRMarker_Y_GATA_H4
     }
     if locus in constructors:
         constructor = constructors[locus]

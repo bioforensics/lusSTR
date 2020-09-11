@@ -523,6 +523,7 @@
     "Y-GATA-H4": {
         "BasesToSubtract": 76,
         "NumRepeats": 4,
+        "Repeats": [],
         "ReverseCompNeeded": "Yes",
         "LUS": "TCTA",
         "Sec": "",
@@ -536,6 +537,7 @@
     "DYS643": {
         "BasesToSubtract": 9,
         "NumRepeats": 5,
+        "Repeats": [],
         "ReverseCompNeeded": "No",
         "LUS": "CTTTT",
         "Sec": "",
@@ -550,6 +552,7 @@
     "DYS635": {
         "BasesToSubtract": 0,
         "NumRepeats": 4,
+        "Repeats": [],
         "ReverseCompNeeded": "Yes",
         "LUS": "TAGA",
         "Sec": "",
@@ -563,6 +566,7 @@
     "DYS612": {
         "BasesToSubtract": 18,
         "NumRepeats": 3,
+        "Repeats": [],
         "ReverseCompNeeded": "No",
         "LUS": "TCT",
         "Sec": "TCT",
@@ -574,6 +578,7 @@
     "DYS576": {
         "BasesToSubtract": 0,
         "NumRepeats": 4,
+        "Repeats": [],
         "ReverseCompNeeded": "No",
         "LUS": "AAAG",
         "Sec": "",
@@ -587,6 +592,7 @@
     "DYS570":{
         "BasesToSubtract": 0,
         "NumRepeats": 4,
+        "Repeats": [],
         "ReverseCompNeeded": "No",
         "LUS": "TTTC",
         "Sec": "",
@@ -600,6 +606,7 @@
     "DYS549": {
         "BasesToSubtract": 0,
         "NumRepeats": 4,
+        "Repeats": [],
         "ReverseCompNeeded": "No",
         "LUS": "GATA",
         "Sec": "",
@@ -613,6 +620,7 @@
     "DYS533": {
         "BasesToSubtract": 0,
         "NumRepeats": 4,
+        "Repeats": [],
         "ReverseCompNeeded": "No",
         "LUS": "TATC",
         "Sec": "",
@@ -626,6 +634,7 @@
     "DYS522": {
         "BasesToSubtract": 7,
         "NumRepeats": 4,
+        "Repeats": [],
         "ReverseCompNeeded": "No",
         "LUS": "ATAG",
         "Sec": "",
@@ -637,6 +646,7 @@
     "DYS505": {
         "BasesToSubtract": 0,
         "NumRepeats": 4,
+        "Repeats": [],
         "ReverseCompNeeded": "No",
         "LUS": "TCCT",
         "Sec": "",
@@ -648,6 +658,7 @@
     "DYS481": {
         "BasesToSubtract": 0,
         "NumRepeats": 3,
+        "Repeats": [],
         "ReverseCompNeeded": "No",
         "LUS": "CTT",
         "Sec": "",
@@ -661,6 +672,7 @@
     "DYS460": {
         "BasesToSubtract": 0,
         "NumRepeats": 4,
+        "Repeats": [],
         "ReverseCompNeeded": "Yes",
         "LUS": "CTAT",
         "Sec": "",
@@ -672,6 +684,7 @@
     "DYS458": {
         "BasesToSubtract": 74,
         "NumRepeats": 4,
+        "Repeats": [],
         "ReverseCompNeeded": "No",
         "LUS": "GAAA",
         "Sec": "",
@@ -683,6 +696,7 @@
     "DYS456": {
         "BasesToSubtract": 51,
         "NumRepeats": 4,
+        "Repeats": [],
         "ReverseCompNeeded": "No",
         "LUS": "AGAT",
         "Sec": "",
@@ -694,6 +708,7 @@
     "DYS448": {
         "BasesToSubtract": 42,
         "NumRepeats": 6,
+        "Repeats": [],
         "ReverseCompNeeded": "No",
         "LUS": "AGAGAT",
         "Sec": "AGAGAT",
@@ -705,6 +720,7 @@
     "DYS439": {
         "BasesToSubtract": 56,
         "NumRepeats": 4,
+        "Repeats": [],
         "ReverseCompNeeded": "No",
         "LUS": "GATA",
         "Sec": "",
@@ -718,6 +734,7 @@
     "DYS438": {
         "BasesToSubtract": 0,
         "NumRepeats": 5,
+        "Repeats": [],
         "ReverseCompNeeded": "No",
         "LUS": "TTTTC",
         "Sec": "",
@@ -731,6 +748,7 @@
     "DYS437": {
         "BasesToSubtract": 0,
         "NumRepeats": 4,
+        "Repeats": [],
         "ReverseCompNeeded": "No",
         "LUS": "TCTA",
         "Sec": "",
@@ -744,6 +762,7 @@
     "DYS393": {
         "BasesToSubtract": 27,
         "NumRepeats": 4,
+        "Repeats": [],
         "ReverseCompNeeded": "No",
         "LUS": "AGAT",
         "Sec": "",
@@ -755,6 +774,7 @@
     "DYS392": {
         "BasesToSubtract": 0,
         "NumRepeats": 3,
+        "Repeats": [],
         "ReverseCompNeeded": "Yes",
         "LUS": "ATA",
         "Sec": "",
@@ -768,6 +788,7 @@
     "DYS391": {
         "BasesToSubtract": 16,
         "NumRepeats": 4,
+        "Repeats": [],
         "ReverseCompNeeded": "No",
         "LUS": "GATA",
         "Sec": "",
@@ -781,6 +802,7 @@
     "DYS390": {
         "BasesToSubtract": 8,
         "NumRepeats": 4,
+        "Repeats": [],
         "ReverseCompNeeded": "Yes",
         "LUS": "TAGA",
         "Sec": "CAGA",
@@ -794,6 +816,7 @@
     "DYS389II": {
         "BasesToSubtract": 48,
         "NumRepeats": 4,
+        "Repeats": [],
         "ReverseCompNeeded": "Yes",
         "LUS": "TAGA",
         "Sec": "TAGA",
@@ -807,6 +830,7 @@
     "DYS389I": {
         "BasesToSubtract": 0,
         "NumRepeats": 4,
+        "Repeats": [],
         "ReverseCompNeeded": "Yes",
         "LUS": "TAGA",
         "Sec": "",
@@ -817,9 +841,10 @@
         "Power_3": 5,
         "Alleles": []
     },
-    "DYS385": {
+    "DYS385A-B": {
         "BasesToSubtract": 131,
         "NumRepeats": 4,
+        "Repeats": [],
         "ReverseCompNeeded": "Yes",
         "LUS": "TTTC",
         "Sec": "",
@@ -833,6 +858,7 @@
     "DYS19": {
         "BasesToSubtract": 4,
         "NumRepeats": 4,
+        "Repeats": [],
         "ReverseCompNeeded": "Yes",
         "LUS": "TCTA",
         "Sec": "",
@@ -846,6 +872,7 @@
     "DYF387S1": {
         "BasesToSubtract": 0,
         "NumRepeats": 4,
+        "Repeats": [],
         "ReverseCompNeeded": "No",
         "LUS": "CTTT",
         "Sec": "CTTC",
@@ -857,6 +884,7 @@
     "HPRTB": {
         "BasesToSubtract": 0,
         "NumRepeats": 4,
+        "Repeats": [],
         "ReverseCompNeeded": "Yes",
         "LUS": "TCTA",
         "Sec": "",
@@ -868,6 +896,7 @@
     "DXS8378": {
         "BasesToSubtract": 0,
         "NumRepeats": 4,
+        "Repeats": [],
         "ReverseCompNeeded": "Yes",
         "LUS": "ATAG",
         "Sec": "",
@@ -879,6 +908,7 @@
     "DXS7423": {
         "BasesToSubtract": 8,
         "NumRepeats": 4,
+        "Repeats": [],
         "ReverseCompNeeded": "Yes",
         "LUS": "TGGA",
         "Sec": "",
@@ -890,6 +920,9 @@
     "DXS7132": {
         "BasesToSubtract": 0,
         "NumRepeats": 4,
+        "Repeats": [
+            "TAGA"
+        ],
         "ReverseCompNeeded": "No",
         "LUS": "TAGA",
         "Sec": "",
@@ -901,6 +934,7 @@
     "DXS10135": {
         "BasesToSubtract": 56,
         "NumRepeats": 4,
+        "Repeats": [],
         "ReverseCompNeeded": "No",
         "LUS": "AAGA",
         "Sec": "AAGG",
@@ -912,6 +946,7 @@
     "DXS10074": {
         "BasesToSubtract": 0,
         "NumRepeats": 4,
+        "Repeats": [],
         "ReverseCompNeeded": "No",
         "LUS": "AAGA",
         "Sec": "AAAA",
@@ -923,6 +958,7 @@
     "DXS10103": {
         "BasesToSubtract": 4,
         "NumRepeats": 4,
+        "Repeats": [],
         "ReverseCompNeeded": "No",
         "LUS": "TAGA",
         "Sec": "TAGA",
