@@ -324,7 +324,7 @@ class STRMarker_D20S482(STRMarker):
         flank_seq = self.flankseq_5p
         return (
             f'{flank_seq[:2]} {flank_seq[2:6]} {flank_seq[6]} {flank_seq[7:10]} '
-            f'{flank_seq[10:]} {flank_seq[14:18]}'
+            f'{flank_seq[10:14]} {flank_seq[14:18]}'
         )
 
 
