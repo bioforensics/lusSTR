@@ -111,7 +111,10 @@ class STRMarker():
     def flank_5p(self):
         if self.uas or self.flankseq_5p == '':
             return None
-        elif self.kit == 'powerseq' and self.data['Power_5'] > self.data['Foren_5']:
+        elif (
+            self.kit == 'powerseq' and self.data['Power_5'] > self.data['Foren_5']
+            and self.data['Foren_5'] > 0
+        ):
             power_seq_flank = collapse_repeats_by_length_flanks(
                 self.flankseq_5p[:-self.data['Foren_5']], self.repeat_size
             )
@@ -120,7 +123,6 @@ class STRMarker():
             )
             flank = f'{power_seq_flank} {foren_seq_flank}'
         else:
-            print(self.flankseq_5p)
             flank = collapse_repeats_by_length_flanks(self.flankseq_5p, self.repeat_size)
         return flank
 
@@ -137,7 +139,10 @@ class STRMarker():
     def flank_3p(self):
         if self.uas or self.flankseq_3p == '':
             return None
-        elif self.kit == 'powerseq' and self.data['Power_3'] > self.data['Foren_3']:
+        elif (
+            self.kit == 'powerseq' and self.data['Power_3'] > self.data['Foren_3']
+            and self.data['Foren_3'] > 0
+        ):
             foren_seq_flank = collapse_repeats_by_length(
                 self.flankseq_3p[:self.data['Foren_3']], self.repeat_size
             )
