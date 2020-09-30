@@ -521,7 +521,7 @@
         "Alleles": ["11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21"]
     },
     "Y-GATA-H4": {
-        "BasesToSubtract": 76,
+        "BasesToSubtract": 88,
         "NumRepeats": 4,
         "Repeats": [],
         "ReverseCompNeeded": "Yes",
@@ -530,9 +530,9 @@
         "Tert": "",
         "Foren_5": 0,
         "Foren_3": 0,
-        "Power_5": 4,
+        "Power_5": 0,
         "Power_3": 112,
-        "Alleles": ["12", "13"]
+        "Alleles": ["11", "12", "13"]
     },
     "DYS643": {
         "BasesToSubtract": 9,
@@ -731,7 +731,7 @@
         "Foren_5": 23,
         "Foren_3": 5,
         "Power_5": 0,
-        "Power_3": 0,
+        "Power_3": 22,
         "Alleles": ["10", "11", "12", "13"]
     },
     "DYS438": {
@@ -810,7 +810,7 @@
         "LUS": "TAGA",
         "Sec": "CAGA",
         "Tert": "GAGA",
-        "Foren_5": 0,
+        "Foren_5": 71,
         "Foren_3": 0,
         "Power_5": 0,
         "Power_3": 58,

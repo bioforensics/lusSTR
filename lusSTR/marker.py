@@ -1125,6 +1125,36 @@ class STRMarker_DYS439(STRMarker):
         )
         return flank
 
+    @property
+    def flank_3p(self):
+        flank_seq = self.flankseq_3p
+        if self.kit == 'forenseq':
+            flank = collapse_repeats_by_length(flank_seq, 4)
+        else:
+            flank = (
+                f'{collapse_repeats_by_length(flank_seq[:5], 3)} '
+                f'{collapse_repeats_by_length(flank_seq[5:], 4)}'
+            )
+        return flank
+
+    @property
+    def canonical(self):
+        '''Canonical STR allele designation'''
+        n = self.repeat_size
+        if self.kit == 'powerseq':
+            nsubout = self.data['BasesToSubtract'] - 46
+        else:
+            nsubout = self.data['BasesToSubtract']
+        nsubout *= -1
+        new_seq = self.uas_sequence[:nsubout]
+        if len(new_seq) % n == 0:
+            canon_allele = int(len(new_seq) / n)
+        else:
+            allele_int = int(len(new_seq) / n)
+            allele_dec = int(len(new_seq) % n)
+            canon_allele = f'{allele_int}.{allele_dec}'
+        return canon_allele
+
 
 class STRMarker_DYS437(STRMarker):
     @property
@@ -1274,6 +1304,93 @@ class STRMarker_Y_GATA_H4(STRMarker):
         )
         return final_string
 
+    @property
+    def canonical(self):
+        '''Canonical STR allele designation'''
+        n = self.repeat_size
+        if self.uas:
+            nsubout = self.data['BasesToSubtract']
+        elif self.kit == 'forenseq':
+            nsubout = self.data['BasesToSubtract'] - 12
+        else:
+            nsubout = self.data['BasesToSubtract'] - 46
+        nsubout *= -1
+        new_seq = self.uas_sequence[:nsubout]
+        if len(new_seq) % n == 0:
+            canon_allele = int(len(new_seq) / n)
+        else:
+            allele_int = int(len(new_seq) / n)
+            allele_dec = int(len(new_seq) % n)
+            canon_allele = f'{allele_int}.{allele_dec}'
+        return canon_allele
+
+
+class STRMarker_DYS390(STRMarker):
+    @property
+    def canonical(self):
+        '''Canonical STR allele designation'''
+        n = self.repeat_size
+        if self.uas or self.kit == 'powerseq':
+            nsubout = self.data['BasesToSubtract']
+        else:
+            nsubout = self.data['BasesToSubtract'] - 3
+        nsubout *= -1
+        new_seq = self.uas_sequence[:nsubout]
+        if len(new_seq) % n == 0:
+            canon_allele = int(len(new_seq) / n)
+        else:
+            allele_int = int(len(new_seq) / n)
+            allele_dec = int(len(new_seq) % n)
+            canon_allele = f'{allele_int}.{allele_dec}'
+        return canon_allele
+
+    @property
+    def designation(self):
+        lus, sec, ter = None, None, None
+        lus = repeat_copy_number(self.annotation, self.data['LUS'])
+        sec = repeat_copy_number(self.annotation, self.data['Sec'])
+        ter = 'GAG'
+        return lus, sec, ter
+
+    @property
+    def flank_5p(self):
+        flank_seq = self.flankseq_5p
+        if self.kit == 'forenseq':
+            flank = (
+                f'{flank_seq[:2]} {collapse_repeats_by_length(flank_seq[2:], 4)}'
+            )
+        else:
+            flank = ''
+        return flank
+
+
+def STRMarker_DYS385(STRMarker):
+    @property
+    def canonical(self):
+        '''Canonical STR allele designation'''
+        n = self.repeat_size
+        if self.uas:
+            nsubout = self.data['BasesToSubtract']
+        else:
+            nsubout = self.data['BasesToSubtract'] - 2
+        nsubout *= -1
+        new_seq = self.uas_sequence[:nsubout]
+        if len(new_seq) % n == 0:
+            canon_allele = int(len(new_seq) / n)
+        else:
+            allele_int = int(len(new_seq) / n)
+            allele_dec = int(len(new_seq) % n)
+            canon_allele = f'{allele_int}.{allele_dec}'
+        return canon_allele
+
+    @property
+    def annotation(self):
+        sequence = self.forward_sequence
+        final_string = (
+            f'{sequence[:2]} {collapse_repeats_by_length(sequence[2:], 4)}'
+        )
+        return final_string
+
 
 def STRMarkerObject(locus, sequence, uas=False, kit='forenseq'):
     constructors = {
@@ -1316,7 +1433,9 @@ def STRMarkerObject(locus, sequence, uas=False, kit='forenseq'):
         'DXS7132': STRMarker_DXS7132,
         'DXS10135': STRMarker_DXS10135,
         'DXS10074': STRMarker_DXS10074,
-        'Y-GATA-H4': STRMarker_Y_GATA_H4
+        'Y-GATA-H4': STRMarker_Y_GATA_H4,
+        'DYS390': STRMarker_DYS390,
+        'DYS385A-B': STRMarker_DYS385
     }
     if locus in constructors:
         constructor = constructors[locus]
