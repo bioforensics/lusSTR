@@ -174,11 +174,18 @@ class STRMarker():
 
     @property
     def indel_flag(self):
+        powerseq_loci = ['DYS393', 'DYS458', 'DYS456']
         '''Check for potential indels within flanking regions'''
         if str(self.canonical) not in self.data['Alleles']:
-            flag = 'Possible indel or partial sequence'
+            if self.locus in powerseq_loci:
+                flag = 'UAS region indicates entire sequence; Possible indel or partial sequence'
+            else:
+                flag = 'Possible indel or partial sequence'
         else:
-            flag = ' '
+            if self.locus in powerseq_loci:
+                flag = 'UAS region indicates entire sequence'
+            else:
+                flag = ' '
         return flag
 
     @property
@@ -1365,9 +1372,12 @@ class STRMarker_DYS385(STRMarker):
     @property
     def annotation(self):
         sequence = self.forward_sequence
-        final_string = (
-            f'{sequence[:2]} {collapse_repeats_by_length(sequence[2:], 4)}'
-        )
+        if self.uas:
+            final_string = collapse_repeats_by_length(sequence, 4)
+        else:
+            final_string = (
+                f'{sequence[:2]} {collapse_repeats_by_length(sequence[2:], 4)}'
+            )
         return final_string
 
 

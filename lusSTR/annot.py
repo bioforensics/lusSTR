@@ -100,6 +100,8 @@ def format_table(input, uas=False, kit='forenseq'):
         'UAS_Output_Bracketed_Form', 'LUS', 'LUS_Plus', 'Reads'
     ]
     final_output = pd.DataFrame(list_of_lists, columns=columns)
+    if kit == 'powerseq':
+        final_output = final_output[final_output.Locus != 'DYS389II']
     if not uas:
         flanks_columns = [
             'SampleID', 'Project', 'Analysis', 'Locus', 'Reads', 'Length_Allele',
@@ -107,6 +109,8 @@ def format_table(input, uas=False, kit='forenseq'):
             'Potential_Issues'
         ]
         final_flank_output = pd.DataFrame(flanks_list, columns=flanks_columns)
+        if kit == 'powerseq':
+            final_flank_output = final_flank_output[final_flank_output.Locus != 'DYS389II']
     else:
         final_flank_output = ''
     return final_output, final_flank_output, columns
@@ -123,7 +127,8 @@ def main(args):
             f'{input_name}_sexloci.csv', args.uas, args.kit
         )
         sex_final_table.to_csv(f'{output_name}_sexloci.txt', sep='\t', index=False)
-        sex_flank_table.to_csv(f'{output_name}_sexloci_flanks_anno.txt', sep='\t', index=False)
+        if not args.uas:
+            sex_flank_table.to_csv(f'{output_name}_sexloci_flanks_anno.txt', sep='\t', index=False)
     if not args.uas:
         autosomal_flank_table.to_csv(f'{output_name}_flanks_anno.txt', sep='\t', index=False)
         if args.combine:
