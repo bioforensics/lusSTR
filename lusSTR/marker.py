@@ -1060,6 +1060,21 @@ class STRMarker_DYS635(STRMarker):
 
 class STRMarker_DYS612(STRMarker):
     @property
+    def designation(self):
+        lus, sec, ter = None, None, None
+        anno = self.annotation
+        repeat = 'TCT'
+        match_list = []
+        for block in anno.split(' '):
+            match = re.match(r'\[' + repeat + r'\](\d+)', block)
+            if match:
+                length = int(match.group(1))
+                match_list.append(length)
+        lus = match_list[-1]
+        sec = match_list[-2]
+        return lus, sec, ter
+
+    @property
     def flank_3p(self):
         flank_seq = self.flankseq_3p
         flank = (
@@ -1335,7 +1350,10 @@ class STRMarker_DYS390(STRMarker):
         lus, sec, ter = None, None, None
         lus = repeat_copy_number(self.annotation, self.data['LUS'])
         sec = repeat_copy_number(self.annotation, self.data['Sec'])
-        ter = 'GAG'
+        if self.uas:
+            ter = repeat_copy_number(self.annotation, self.data['Tert'])
+        else:
+            ter = repeat_copy_number(self.annotation, 'GAG')
         return lus, sec, ter
 
     @property
@@ -1381,6 +1399,41 @@ class STRMarker_DYS385(STRMarker):
         return final_string
 
 
+class STRMarker_DYS448(STRMarker):
+    @property
+    def designation(self):
+        lus, sec, ter = None, None, None
+        anno = self.annotation
+        repeat = 'AGAGAT'
+        match_list = []
+        for block in anno.split(' '):
+            match = re.match(r'\[' + repeat + r'\](\d+)', block)
+            if match:
+                length = int(match.group(1))
+                match_list.append(length)
+        print(match_list)
+        lus = match_list[0]
+        sec = match_list[-1]
+        return lus, sec, ter
+
+
+class STRMarker_DXS10103(STRMarker):
+    @property
+    def designation(self):
+        lus, sec, ter = None, None, None
+        anno = self.annotation
+        repeat = 'TAGA'
+        match_list = []
+        for block in anno.split(' '):
+            match = re.match(r'\[' + repeat + r'\](\d+)', block)
+            if match:
+                length = int(match.group(1))
+                match_list.append(length)
+        lus = match_list[1]
+        sec = match_list[0]
+        return lus, sec, ter
+
+
 def STRMarkerObject(locus, sequence, uas=False, kit='forenseq'):
     constructors = {
         'D8S1179': STRMarker_D8S1179,
@@ -1424,7 +1477,9 @@ def STRMarkerObject(locus, sequence, uas=False, kit='forenseq'):
         'DXS10074': STRMarker_DXS10074,
         'Y-GATA-H4': STRMarker_Y_GATA_H4,
         'DYS390': STRMarker_DYS390,
-        'DYS385A-B': STRMarker_DYS385
+        'DYS385A-B': STRMarker_DYS385,
+        'DYS448': STRMarker_DYS448,
+        'DXS10103': STRMarker_DXS10103
     }
     if locus in constructors:
         constructor = constructors[locus]
