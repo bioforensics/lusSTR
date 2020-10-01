@@ -61,7 +61,7 @@ def strait_razor_concat(input_dir, sex=False):
         'DYS522', 'DYS505', 'DYS481', 'DYS460', 'DYS448', 'DYS439', 'DYS438', 'DYS437', 'DYS392',
         'DYS391', 'DYS390', 'DYS389I', 'DYS389II', 'DYS385a-b', 'DYS19', 'DYF387S1', 'DYS393',
         'DYS458', 'DYS456', 'HPRTB', 'DXS8378', 'DXS7423', 'DXS7132', 'DXS10135', 'DXS10074',
-        'DXS10103'
+        'DXS10103', 'DYS385'
     ]
     myfiles = os.listdir(input_dir)
     autosomal_data = pd.DataFrame()

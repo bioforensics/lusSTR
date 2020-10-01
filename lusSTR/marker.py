@@ -1117,27 +1117,6 @@ class STRMarker_DYS522(STRMarker):
 
 class STRMarker_DYS439(STRMarker):
     @property
-    def flank_5p(self):
-        flank_seq = self.flankseq_5p
-        flank = (
-            f'{collapse_repeats_by_length_flanks(flank_seq[:13], 4)} '
-            f'{collapse_repeats_by_length_flanks(flank_seq[13:], 4)}'
-        )
-        return flank
-
-    @property
-    def flank_3p(self):
-        flank_seq = self.flankseq_3p
-        if self.kit == 'forenseq':
-            flank = collapse_repeats_by_length(flank_seq, 4)
-        else:
-            flank = (
-                f'{collapse_repeats_by_length(flank_seq[:5], 3)} '
-                f'{collapse_repeats_by_length(flank_seq[5:], 4)}'
-            )
-        return flank
-
-    @property
     def canonical(self):
         '''Canonical STR allele designation'''
         n = self.repeat_size
@@ -1236,8 +1215,8 @@ class STRMarker_DXS8378(STRMarker):
         flank_seq = self.flankseq_5p
         flank = (
             f'{collapse_repeats_by_length(flank_seq[:21], 4)} '
-            f'{collapse_repeats_by_length(flank_seq[21:47], 4)} '
-            f'{collapse_repeats_by_length_flanks(flank_seq[47:], 4)}'
+            f'{collapse_repeats_by_length(flank_seq[21:47], 4)} {flank_seq[47]} '
+            f'{collapse_repeats_by_length_flanks(flank_seq[48:-1], 4)} {flank_seq[-1]}'
         )
         return flank
 
@@ -1364,12 +1343,12 @@ class STRMarker_DYS390(STRMarker):
         return flank
 
 
-def STRMarker_DYS385(STRMarker):
+class STRMarker_DYS385(STRMarker):
     @property
     def canonical(self):
         '''Canonical STR allele designation'''
         n = self.repeat_size
-        if self.uas:
+        if self.uas or self.kit == 'forenseq':
             nsubout = self.data['BasesToSubtract']
         else:
             nsubout = self.data['BasesToSubtract'] - 2

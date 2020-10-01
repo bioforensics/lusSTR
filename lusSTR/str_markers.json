@@ -728,8 +728,8 @@
         "LUS": "GATA",
         "Sec": "",
         "Tert": "",
-        "Foren_5": 23,
-        "Foren_3": 5,
+        "Foren_5": 5,
+        "Foren_3": 23,
         "Power_5": 0,
         "Power_3": 22,
         "Alleles": ["10", "11", "12", "13"]
