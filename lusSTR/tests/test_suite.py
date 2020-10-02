@@ -90,18 +90,22 @@ def test_FGA_short_seq():
             assert len(fh.readlines()) == 1
 
 
-def test_indel_flag():
-    marker = STRMarkerObject(
-        'CSF1PO', 'CTTCCTATCTATCTATCTATCTAATCTATCTATCTT', uas=False, kit='forenseq'
-    )
-    assert marker.indel_flag == 'Possible indel or partial sequence'
-    marker = STRMarkerObject(
+@pytest.mark.parametrize('locus, sequence, uas, kit, output', [
+    (
+        'CSF1PO', 'CTTCCTATCTATCTATCTATCTAATCTATCTATCTT', False, 'forenseq',
+        'Possible indel or partial sequence'
+    ),
+    (
         'DYS393', 'AGATAGATAGATAGATAGATAGATAGATAGATAGATAGATATGTATGTCTTTTCTATGAGACATACC',
-        uas=False, kit='powerseq'
-    )
-    assert marker.indel_flag == (
+        False, 'powerseq',
         'UAS region indicates entire sequence; Possible indel or partial sequence'
     )
+])
+def test_indel_flag(locus, sequence, uas, kit, output):
+    marker = STRMarkerObject(
+        locus, sequence, uas=uas, kit=kit
+    )
+    assert marker.indel_flag == output
 
 
 def test_powerseq_flanking_anno():
