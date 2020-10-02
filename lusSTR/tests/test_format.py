@@ -9,6 +9,7 @@
 
 import filecmp
 import lusSTR
+import os
 from lusSTR.tests import data_file
 from tempfile import NamedTemporaryFile
 
@@ -44,3 +45,27 @@ def test_format_straitrazor():
         args = lusSTR.cli.get_parser().parse_args(arglist)
         lusSTR.format.main(args)
         assert filecmp.cmp(testformat, outfile.name) is True
+
+
+def test_format_sexloci_uas():
+    UAStestfile = data_file('UAS_Sample_Details_Report_test.xlsx')
+    formatoutput = data_file('testformat_uas_sexloci.csv')
+    with NamedTemporaryFile(suffix='.csv') as outfile:
+        arglist = ['format', UAStestfile, '-o', outfile.name, '--uas', '--include-sex']
+        args = lusSTR.cli.get_parser().parse_args(arglist)
+        lusSTR.format.main(args)
+        outfile_name = os.path.splitext(outfile.name)[0]
+        outfile_name_output = f'{outfile_name}_sexloci.csv'
+        assert filecmp.cmp(formatoutput, outfile_name_output) is True
+
+
+def test_format_sex_loci_straitrazor():
+    with NamedTemporaryFile() as outfile:
+        inputdb = data_file('STRait_Razor_test_output/')
+        testformat = data_file('testformat_sr_sexloci.csv')
+        arglist = ['format', inputdb, '-o', outfile.name, '--include-sex']
+        args = lusSTR.cli.get_parser().parse_args(arglist)
+        lusSTR.format.main(args)
+        outfile_name = os.path.splitext(outfile.name)[0]
+        outfile_name_output = f'{outfile_name}_sexloci.csv'
+        assert filecmp.cmp(testformat, outfile_name_output) is True
