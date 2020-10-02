@@ -95,6 +95,13 @@ def test_indel_flag():
         'CSF1PO', 'CTTCCTATCTATCTATCTATCTAATCTATCTATCTT', uas=False, kit='forenseq'
     )
     assert marker.indel_flag == 'Possible indel or partial sequence'
+    marker = STRMarkerObject(
+        'DYS393', 'AGATAGATAGATAGATAGATAGATAGATAGATAGATAGATATGTATGTCTTTTCTATGAGACATACC',
+        uas=False, kit='powerseq'
+    )
+    assert marker.indel_flag == (
+        'UAS region indicates entire sequence; Possible indel or partial sequence'
+    )
 
 
 def test_powerseq_flanking_anno():
