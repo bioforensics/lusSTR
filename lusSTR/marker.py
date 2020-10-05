@@ -199,7 +199,7 @@ class STRMarker():
     def must_split(self):
         return self.locus in [
             'D13S317', 'D18S51', 'DYS643', 'DYS635', 'DYS635', 'DYS612', 'DYS576', 'DYS570',
-            'DYS549', 'DYS533', 'DYS505', 'DYS481', 'DYS460', 'DYS448', 'DYS439', 'DYS438',
+            'DYS549', 'DYS533', 'DYS505', 'DYS481', 'DYS460', 'DYS439', 'DYS438',
             'DYS437', 'DYS392', 'DYS391', 'DYS390', 'DYS389II', 'DYS389I', 'DYS385A-B', 'DYS19',
             'DYF387S1', 'DYS393', 'DYS456', 'HPRTB', 'DXS8378', 'DXS7423', 'DXS10074', 'DXS10103'
         ]
@@ -1061,17 +1061,35 @@ class STRMarker_DYS635(STRMarker):
 class STRMarker_DYS612(STRMarker):
     @property
     def designation(self):
+        '''
+        The LUS and Secondary motif allele are the same, "TCT".
+        The LUS motif is always the last "TCT" in the sequence.
+        The secondary motif, however, is not as easily identified given there could be
+        multiple instances of "TCT" within the sequence. After the LUS motif is identified,
+        the LUS allele is identified as the "TCT" repeat sequence with the largest number of
+        repeats.
+        '''
         lus, sec, ter = None, None, None
         anno = self.annotation
+        print(anno)
         repeat = 'TCT'
         match_list = []
         for block in anno.split(' '):
+            if block == repeat:
+                match_list.append(1)
             match = re.match(r'\[' + repeat + r'\](\d+)', block)
             if match:
                 length = int(match.group(1))
                 match_list.append(length)
-        lus = match_list[-1]
-        sec = match_list[-2]
+        print(match_list)
+        if len(match_list) == 1:
+            lus = match_list[0]
+            sec = 0
+        elif len(match_list) > 1:
+            lus = match_list[-1]
+            sec = match_list[-2]
+        else:
+            pass
         return lus, sec, ter
 
     @property
@@ -1407,30 +1425,88 @@ class STRMarker_DYS448(STRMarker):
         repeat = 'AGAGAT'
         match_list = []
         for block in anno.split(' '):
+            if block == repeat:
+                match_list.append(1)
             match = re.match(r'\[' + repeat + r'\](\d+)', block)
             if match:
                 length = int(match.group(1))
                 match_list.append(length)
-        print(match_list)
-        lus = match_list[0]
-        sec = match_list[-1]
+        if len(match_list) == 1:
+            lus = match_list[0]
+            sec = 0
+        else:
+            lus = match_list[0]
+            sec = match_list[-1]
         return lus, sec, ter
 
 
 class STRMarker_DXS10103(STRMarker):
     @property
     def designation(self):
+        '''
+        The LUS and Secondary motif allele are the same, "TAGA".
+        The Secondary motif is always the first "TAGA" in the sequence.
+        The LUS, however, is not as easily identified given there could be multiple instances
+        of "TAGA" within the sequence. After the Secondary motif is identified, the LUS allele
+        is identified as the "TAGA" repeat sequence with the largest number of repeats.
+        '''
         lus, sec, ter = None, None, None
         anno = self.annotation
         repeat = 'TAGA'
         match_list = []
         for block in anno.split(' '):
+            if block == repeat:
+                match_list.append(1)
             match = re.match(r'\[' + repeat + r'\](\d+)', block)
             if match:
                 length = int(match.group(1))
                 match_list.append(length)
-        lus = match_list[1]
-        sec = match_list[0]
+        if len(match_list) == 1:
+            lus = match_list[0]
+            sec = 0
+        elif len(match_list) == 2:
+            lus = match_list[-1]
+            sec = match_list[0]
+        elif len(match_list) > 2:
+            lus = max(match_list)
+            sec = match_list[0]
+        else:
+            pass
+        return lus, sec, ter
+
+
+class STRMarker_DYS389II(STRMarker):
+    @property
+    def designation(self):
+        '''
+        The LUS and Secondary motif allele are the same, "TAGA".
+        The Secondary motif is always the first "TAGA" in the sequence.
+        The LUS, however, is not as easily identified given there could be multiple instances
+        of "TAGA" within the sequence. After the Secondary motif is identified, the LUS allele
+        is identified as the "TAGA" repeat sequence with the largest number of repeats.
+        '''
+        lus, sec, ter = None, None, None
+        anno = self.annotation
+        repeat = 'TAGA'
+        match_list = []
+        for block in anno.split(' '):
+            if block == repeat:
+                match_list.append(1)
+            match = re.match(r'\[' + repeat + r'\](\d+)', block)
+            if match:
+                length = int(match.group(1))
+                match_list.append(length)
+        if len(match_list) == 1:
+            lus = match_list[0]
+            sec = 0
+        elif len(match_list) == 2:
+            lus = match_list[-1]
+            sec = match_list[0]
+        elif len(match_list) > 2:
+            lus = max(match_list)
+            sec = match_list[0]
+        else:
+            pass
         return lus, sec, ter
 
 
@@ -1479,7 +1555,8 @@ def STRMarkerObject(locus, sequence, uas=False, kit='forenseq'):
         'DYS390': STRMarker_DYS390,
         'DYS385A-B': STRMarker_DYS385,
         'DYS448': STRMarker_DYS448,
-        'DXS10103': STRMarker_DXS10103
+        'DXS10103': STRMarker_DXS10103,
+        'DYS389II': STRMarker_DYS389II
     }
     if locus in constructors:
         constructor = constructors[locus]
