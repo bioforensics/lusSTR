@@ -1071,7 +1071,6 @@ class STRMarker_DYS612(STRMarker):
         '''
         lus, sec, ter = None, None, None
         anno = self.annotation
-        print(anno)
         repeat = 'TCT'
         match_list = []
         for block in anno.split(' '):
@@ -1081,7 +1080,6 @@ class STRMarker_DYS612(STRMarker):
             if match:
                 length = int(match.group(1))
                 match_list.append(length)
-        print(match_list)
         if len(match_list) == 1:
             lus = match_list[0]
             sec = 0
@@ -1286,7 +1284,6 @@ class STRMarker_DXS10135(STRMarker):
     @property
     def annotation(self):
         sequence = self.forward_sequence
-        print(sequence)
         final_string = (
             f'{collapse_repeats_by_length(sequence[:12], 4)} '
             f'{sequence[12:19].lower()} {collapse_repeats_by_length(sequence[19:], 4)}'

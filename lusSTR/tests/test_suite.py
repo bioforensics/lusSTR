@@ -120,3 +120,34 @@ def test_powerseq_flanking_anno():
         outfile_name = os.path.splitext(outfile.name)[0]
         outfile_name_output = f'{outfile_name}_flanks_anno.txt'
         assert filecmp.cmp(test_powerseq, outfile_name_output) is True
+
+
+def test_annotate_uas_sexloci():
+    with NamedTemporaryFile() as outfile:
+        os.unlink(outfile.name)
+        inputfile = data_file('testformat_uas.csv')
+        testanno = data_file('testformat_uas_sexloci.txt')
+        arglist = [
+            'annotate', inputfile, '-o', outfile.name, '--kit', 'forenseq', '--uas',
+            '--include-sex'
+            ]
+        args = lusSTR.cli.get_parser().parse_args(arglist)
+        lusSTR.annot.main(args)
+        outfile_name = os.path.splitext(outfile.name)[0]
+        outfile_name_output = f'{outfile_name}_sexloci.txt'
+        assert filecmp.cmp(testanno, outfile_name_output) is True
+
+
+def test_annotate_sr_sexloci():
+    with NamedTemporaryFile() as outfile:
+        os.unlink(outfile.name)
+        inputfile = data_file('testformat_sr.csv')
+        testanno = data_file('testformat_sr_sexloci.txt')
+        arglist = [
+            'annotate', inputfile, '-o', outfile.name, '--kit', 'forenseq', '--include-sex'
+            ]
+        args = lusSTR.cli.get_parser().parse_args(arglist)
+        lusSTR.annot.main(args)
+        outfile_name = os.path.splitext(outfile.name)[0]
+        outfile_name_output = f'{outfile_name}_sexloci.txt'
+        assert filecmp.cmp(testanno, outfile_name_output) is True
