@@ -69,3 +69,17 @@ def test_format_sex_loci_straitrazor():
         outfile_name = os.path.splitext(outfile.name)[0]
         outfile_name_output = f'{outfile_name}_sexloci.csv'
         assert filecmp.cmp(testformat, outfile_name_output) is True
+
+
+def test_uas_directory():
+    with NamedTemporaryFile() as outfile:
+        inputdb = data_file('UAS_bulk_input/')
+        testformat_auto = data_file('UAS_bulk_test.csv')
+        testformat_sex = data_file('UAS_bulk_test_sexloci.csv')
+        arglist = ['format', inputdb, '-o', outfile.name, '--uas', '--include-sex']
+        args = lusSTR.cli.get_parser().parse_args(arglist)
+        lusSTR.format.main(args)
+        assert filecmp.cmp(testformat_auto, outfile.name) is True
+        outfile_name = os.path.splitext(outfile.name)[0]
+        outfile_name_output = f'{outfile_name}_sexloci.csv'
+        assert filecmp.cmp(testformat_sex, outfile_name_output) is True
