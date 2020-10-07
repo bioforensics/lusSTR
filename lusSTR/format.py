@@ -28,7 +28,7 @@ def uas_load(input_file, sex=False):
             if sex is True:
                 sex_data = sex_data.append(sex_final)
     else:
-        sex_data, autosomal_data = uas_format(filepath, sex)
+        sex_data, autosomal_data = uas_format(input_file, sex)
     return sex_data, autosomal_data
 
 
