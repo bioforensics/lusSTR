@@ -17,6 +17,22 @@ import sys
 
 def uas_load(input_file, sex=False):
     '''Format a UAS Sample Details Report (.xlsx) for use with `lusSTR annotate`.'''
+    if os.path.isdir(input_file):
+        myfiles = os.listdir(input_file)
+        autosomal_data = pd.DataFrame()
+        sex_data = pd.DataFrame()
+        for filename in sorted(myfiles):
+            filepath = os.path.join(input_file, filename)
+            sex_final, results = uas_format(filepath, sex)
+            autosomal_data = autosomal_data.append(results)
+            if sex is True:
+                sex_data = sex_data.append(sex_final)
+    else:
+        sex_data, autosomal_data = uas_format(filepath, sex)
+    return sex_data, autosomal_data
+
+
+def uas_format(input_file, sex=False):
     data = pd.read_excel(io=input_file, sheet_name=0)
     sampleID = data.iloc[1, 1]
     projectID = data.iloc[2, 1]
