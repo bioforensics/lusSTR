@@ -265,8 +265,49 @@ def test_strobj_D21S11_newformat():
     )
 
 
-def test_strb_FGA_newformat():
+def test_strobj_FGA_newformat():
     marker = STRMarkerObject(
         'FGA', 'CCAGCAAAAAAGAAAGAAAGAGAAAAAAGAAAGAAAGAAA', uas=False, kit='forenseq'
     )
     assert marker.annotation == 'AAAA [AGAA]3 A'
+
+
+@pytest.mark.parametrize('sequence, bracketed, conc, lus, sec, tert, flank_3p, kit', [
+    (
+        'TGATTTTTGCAGGTGTTCACTGCAAGCCATGCCTGGTTAAACTACTGTGCCTTTTCTTTTCTTTTCTTTTCTTTTCTTTTCTTTTCTT'
+        'TTCTTTTCTTTTCTTTCTTTTTAAAACTT', '[CTTTT]10 CTTTC TTTT', '10', '10', None, None,
+        'TAAAA CTT', 'forenseq'
+    ),
+    (
+        'ATGCTCTGTGATTTTTGCAGGTGTTCACTGCAAGCCATGCCTGGTTAAACTACTGTGCCTTTTCTTTTCTTTTCTTTTCTTTTCTTTT'
+        'CTTTTCTTTTCTTTTCTTTTCTTTCTTTTTAAAACTTTTTACTTCAGTAGAATTTTGGGG', '[CTTTT]10 CTTTC TTTT',
+        '10', '10', None, None, 'TAAAA CTT TTTAC TTCAG TAGAA TTTTG GGG', 'powerseq'
+    )
+])
+def test_strobj_DYS643(sequence, bracketed, conc, lus, sec, tert, flank_3p, kit):
+    marker = STRMarkerObject('DYS643', sequence, uas=False, kit=kit)
+    assert marker.annotation == bracketed
+    assert str(marker.canonical) == conc
+    assert marker.designation == (lus, sec, tert)
+    assert marker.flank_3p == flank_3p
+
+
+@pytest.mark.parametrize('sequence, bracketed, conc, lus, sec, tert, flank_5p, kit', [
+    (
+        'ATCAATCAATGAATGGATAAAGAAAATGTGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATACATACAT'
+        'AGATAGATACATACATAGATAGATAGATAGAGATTCTATGCAAAGTGAGAAGCCA',
+        '[TAGA]12 [TACA]2 [TAGA]2 [TACA]2 [TAGA]4', '22', '12', None, None,
+        'A [TCAA]2 TGAA TGGA TAAA GAAA ATGT GA', 'forenseq'
+    ),
+    (
+        'CCAAATATCCATCAATCAATGAATGGATAAAGAAAATGTGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAC'
+        'ATACATAGATAGATACATACATAGATAGATAGATAGAG', '[TAGA]11 [TACA]2 [TAGA]2 [TACA]2 [TAGA]4',
+        '21', '11', None, None, 'CC AAAT ATCC A [TCAA]2 TGAA TGGA TAAA GAAA ATGT GA', 'powerseq'
+    )
+])
+def test_strobj_DYS635(sequence, bracketed, conc, lus, sec, tert, flank_5p, kit):
+    marker = STRMarkerObject('DYS635', sequence, uas=False, kit=kit)
+    assert marker.annotation == bracketed
+    assert str(marker.canonical) == conc
+    assert marker.designation == (lus, sec, tert)
+    assert marker.flank_5p == flank_5p
