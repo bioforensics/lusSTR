@@ -1171,7 +1171,7 @@ class STRMarker_DYS439(STRMarker):
             allele_dec = int(len(new_seq) % n)
             canon_allele = f'{allele_int}.{allele_dec}'
         return canon_allele
-    
+
     @property
     def annotation(self):
         sequence = self.forward_sequence
