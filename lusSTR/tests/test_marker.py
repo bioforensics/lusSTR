@@ -417,3 +417,104 @@ def test_strobj_DYS439(sequence, bracketed, conc, lus, sec, tert, kit):
     assert marker.annotation == bracketed
     assert str(marker.canonical) == conc
     assert marker.designation == (lus, sec, tert)
+
+
+@pytest.mark.parametrize('sequence, bracketed, conc, lus, sec, tert, flank_3p, kit', [
+    (
+        'ATGCCCATCCGGTCTATCTATCTATCTATCTATCTATCTATCTATCTATCTGTCTGTCTGTCTATCTATCTATCTATCATCTATCATC'
+        'TGTGAATGATGTCTATCTACTTATCTATGAATGATATTTATCTGTGGTTATCTATCTATCTATATCATCTGTGAATGACAGGGTCTTC'
+        'CTCTG', '[TCTA]9 [TCTG]3 [TCTA]4', '16', '9', None, None, 'TCA TCTA TCAT CTGT GAAT GATG '
+        '[TCTA]2 CTTA TCTA TGAA TGAT ATTT ATCT GTGG TTAT [CTAT]3 ATCA TCTG TGAA TGAC AGGG TCTT '
+        'CCTC TG', 'forenseq'
+    ),
+    (
+        'CCATCCGGTCTATCTATCTATCTATCTATCTATCTATCTATCTGTCTGTCTATCTATCTATCTATCATCTATCATCTGTGAATGATGT'
+        'CTATCTACTTATCTATGAATGATATTTATCTGTGGTTATCTATCTATCTATA', '[TCTA]8 [TCTG]2 [TCTA]4', '14',
+        '8', None, None, 'TCA TCTA TCAT CTGT GAAT GATG [TCTA]2 CTTA TCTA TGAA TGAT ATTT ATCT '
+        'GTGG TTAT [CTAT]3 A', 'powerseq'
+    )
+])
+def test_strobj_DYS437(sequence, bracketed, conc, lus, sec, tert, flank_3p, kit):
+    marker = STRMarkerObject('DYS437', sequence, uas=False, kit=kit)
+    assert marker.annotation == bracketed
+    assert str(marker.canonical) == conc
+    assert marker.designation == (lus, sec, tert)
+    assert marker.flank_3p == flank_3p
+
+
+@pytest.mark.parametrize('sequence, bracketed, conc, lus, sec, tert, flank_3p, kit', [
+    (
+        'TTAAACCTACCAATCCCATTCCTTAGTAAATAATAATAATAATAATAATAATAATAATAATAATAATAAATAAATGGTGATACAAGAA'
+        'AAAAATTTGTTTTCCTTCTTGGCTTTTAAATAACAAACACTTGAAATCAAATTAGTTGTTTTTAAAAGCTAGATTAATGAAGAA',
+        '[ATA]13', '13', '13', None, None, 'AAT AAA TGG TGA TAC AAG [AAA]2 ATT TGT TTT CCT TCT '
+        'TGG CTT TTA AAT AAC AAA CAC TTG AAA TCA AAT TAG TTG TTT TTA AAA GCT AGA TTA ATG AAG AA',
+        'forenseq'
+    ),
+    (
+        'TAAATAATAATAATAATAATAATAATAATAATAATAATAATAAATAAATGGTGATACAAGAAAAAAATTTGTTTTCCTTCTTGGCTTT'
+        'TAAATAACAAACACTTGAAATCAAATTAGTT', '[ATA]13', '13', '13', None, None, 'AAT AAA TGG TGA '
+        'TAC AAG [AAA]2 ATT TGT TTT CCT TCT TGG CTT TTA AAT AAC AAA CAC TTG AAA TCA AAT TAG TT',
+        'powerseq'
+    )
+])
+def test_strobj_DYS392(sequence, bracketed, conc, lus, sec, tert, flank_3p, kit):
+    marker = STRMarkerObject('DYS392', sequence, uas=False, kit=kit)
+    assert marker.annotation == bracketed
+    assert str(marker.canonical) == conc
+    assert marker.designation == (lus, sec, tert)
+    assert marker.flank_3p == flank_3p
+
+
+@pytest.mark.parametrize('sequence, bracketed, conc, lus, sec, tert, flank_3p, kit', [
+    (
+        'ATATCTGTCTGTCTGTCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTGCCTATCTGCCTGCCTAC'
+        'CTATCCCTCTAT', '[TCTG]3 [TCTA]13 TCTG', '13', '13', None, None, 'CCTA TCT [GCCT]2 ACCT '
+        'ATCC CTCT AT', 'forenseq'
+    ),
+    (
+        'ATATCTGTCTGTCTGTCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTGCCTATCTGCCTGCCTACCTATCCCTCTAT'
+        'GGCAATTGCTTGCAACCAGGGAGATTTTAT', '[TCTG]3 [TCTA]10 TCTG', '10', '10', None, None,
+        'CCTA TCT [GCCT]2 ACCT ATCC CTCT AT GGCA ATTG CTTG CAAC CAGG GAGA TTTT AT', 'powerseq'
+    )
+])
+def test_strobj_DYS391(sequence, bracketed, conc, lus, sec, tert, flank_3p, kit):
+    marker = STRMarkerObject('DYS391', sequence, uas=False, kit=kit)
+    assert marker.annotation == bracketed
+    assert str(marker.canonical) == conc
+    assert marker.designation == (lus, sec, tert)
+    assert marker.flank_3p == flank_3p
+
+
+@pytest.mark.parametrize('sequence, bracketed, conc, lus, sec, tert, flank_3p, kit', [
+    (
+        'TGGTCAATCTCTGCACCTGGAAATAGTGGCTGGGGCACCAGGAGTAATACTTCGGGCCATGGCCATGTAGTGAGGACAAGGAGTCCAT'
+        'CTGGGTTAAGGAGAGTGTCACTATATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTACCTATCTATCTATCTA',
+        '[TCTA]11 CCTA [TCTA]3', '14', '11', None, None, '', 'forenseq'
+    ),
+    (
+        'CTGGGTTAAGGAGAGTGTCACTATATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTACCTATCTATCTATCTAAAA'
+        'CACTATATATATATAACACTATATATATAATACTATATATATATTAAAAAACACTAT', '[TCTA]11 CCTA [TCTA]3',
+        '14', '11', None, None, 'AA ACAC [TATA]3 ACAC [TATA]2 TA ATAC [TATA]2 TATT AAAA AACA '
+        'CTAT', 'powerseq'
+    )
+])
+def test_strobj_DYS19(sequence, bracketed, conc, lus, sec, tert, flank_3p, kit):
+    marker = STRMarkerObject('DYS19', sequence, uas=False, kit=kit)
+    assert marker.annotation == bracketed
+    assert str(marker.canonical) == conc
+    assert marker.designation == (lus, sec, tert)
+    assert marker.flank_3p == flank_3p
+
+
+def test_strobj_DYS458():
+    marker = STRMarkerObject(
+        'DYS458', 'GAAAGAAAGAAAAGGAAGGAAAGAAAGAAAGAAAGAAAGAAAGAAAGAAAGAAAGAAAGAAAGAAAGAAAGAAAGAAA'
+        'GAAAGAAAGGAGGGTGGGCGTGGTGGCTCATGCTTGTAATGCCAGAACTTTGGGAGGCCGAGGT', uas=False,
+        kit='powerseq'
+    )
+    assert marker.annotation == (
+        '[GAAA]3 AG GAAG [GAAA]17 GGAG GGTG GGCG TGGT GGCT CATG CTTG TAAT GCCA GAAC TTTG GGAG '
+        'GCCG AGGT'
+    )
+    assert marker.canonical == 17
+    assert marker.designation == ('17', None, None)
