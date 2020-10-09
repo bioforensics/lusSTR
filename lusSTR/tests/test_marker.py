@@ -563,10 +563,32 @@ def test_strobj_DXS7132():
         'TGAGAGGGGATTTATTATGAAAATGGGCTCACACTATTAAGGAGGCTAAGAAGTTCCACAGTAT', uas=False,
         kit='forenseq'
     )
-    marker.annotation == '[TAGA]13'
-    marker.canonical == 13
-    marker.designation == ('13', None, None)
-    marker.flank_3p == (
+    assert marker.annotation == '[TAGA]13'
+    assert marker.canonical == 13
+    assert marker.designation == ('13', None, None)
+    assert marker.flank_3p == (
         'CAGT C [AGAT]2 GAGA GGGG ATTT ATTA TGAA AAT G GGCT CACA CTAT TAAG GAGG CTAA GAAG TTCC '
         'ACAG TAT'
     )
+
+
+@pytest.mark.parametrize('sequence, bracketed, conc, lus, sec, tert', [
+    (
+        'AAGAAAGAAAGAGAAAGGAAAGAAAGAAAGAAAGAAAGAAAGAAAGAAAGAAAGAAAGAAAGAAAGAAAGAAAGAAAGAAAGAAAGAA'
+        'AAGAGAATAGAAAAGAAGAGAAGAGAAAAGAGAAAAGAAAAAAGAAAAGAAA', '[AAGA]3 gaaagga [AAGA]17 AAAG '
+        'AGAA TAGA AAAG AAGA GAAG AGAA AAGA GAAA AGAA AAAA GAAA AGAA A', '21', '17', '0', None
+    ),
+    (
+        'AAGAAAGAAAGAGAAAGGAAAGAAAGAAAGAAAGAAAGAAAGAAAGAAAGAAAGAAAGAAAGAAAGAAAGAAAGAAAGAAAGAAAGAA'
+        'AGAAAGGAAGAAAGAAAGAAAGGAAGAAAAGAGAATAGAAAAGAAGAGAAGAGAAAAGAGAAAAGAAAAAAGAAAAGAAA',
+        '[AAGA]3 gaaagga [AAGA]18 AAGG [AAGA]3 AAGG AAGA AAAG AGAA TAGA AAAG AAGA GAAG AGAA AAGA '
+        'GAAA AGAA AAAA GAAA AGAA A', '28', '18', '1', None
+    )
+])
+def test_strobj_DXS10135(sequence, bracketed, conc, lus, sec, tert):
+    marker = STRMarkerObject(
+        'DXS10135', sequence, uas=False, kit='forenseq'
+    )
+    assert marker.annotation == bracketed
+    assert str(marker.canonical) == conc
+    assert marker.designation == (lus, sec, tert)
