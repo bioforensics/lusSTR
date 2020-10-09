@@ -518,3 +518,55 @@ def test_strobj_DYS458():
     )
     assert marker.canonical == 17
     assert marker.designation == ('17', None, None)
+
+
+def test_strobj_HPRTB():
+    marker = STRMarkerObject(
+        'HPRTB',
+        'CTAGAACTTATCTTCTGTAAATCTGTCTCTATTTCCATCTCTGTCTCCATCTTTGTCTCTATCTCTATCTGTCTATCTCTATCTATCT'
+        'ATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTAAAGCAAATTCATGCCCTTCTCCTATTT', uas=False,
+        kit='forenseq'
+    )
+    assert marker.annotation == '[ATCT]12'
+    assert marker.canonical == 12
+    assert marker.designation == ('12', None, None)
+    assert marker.flank_5p == (
+        'CTAG AACT TATC TTCT GTAA ATCT GTCT CTAT TTCC ATCT CTGT CTCC ATCT TTGT CTCT ATCT CTAT '
+        'CTGT CTAT C TCT'
+    )
+
+
+def test_strobj_DXS8378():
+    marker = STRMarkerObject(
+        'DXS8378',
+        'AGTGAGCTGAGATGGTGCCACTGAACTCCAGCCTGGGCGACAAGAGCGAAACTCCAACTCAAAAAATAAATAAATAAAATATAGATAG'
+        'ATAGATAGATAGATAGATAGATAGATAGATAGATAGTGACCTGCCAGGAGCAGGGGACCACCGGGTTGCCTAAGGAGGGGTGAACTGT'
+        'CCCAGGATGGAAATGAAACA', uas=False, kit='forenseq'
+    )
+    assert marker.annotation == '[ATAG]11'
+    assert marker.canonical == 11
+    assert marker.designation == ('11', None, None)
+    assert marker.flank_5p == (
+        'AGTG AGCT GAGA TGGT GCCA C TGAA CTCC AGCC TGGG CGAC AAGA GC G AAA CTCC AACT CAAA [AAAT]3'
+        ' AAAA T'
+    )
+    assert marker.flank_3p == (
+        'TGAC CTGC CAGG AGCA GGGG ACCA CC G GGTT GCCT AAGG AGGG GTGA ACTG TCCC AGGA TGGA AATG '
+        'AAAC A'
+    )
+
+
+def test_strobj_DXS7132():
+    marker = STRMarkerObject(
+        'DXS7132',
+        'TCCAGAGAAACAGAACCAATAGGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGACAGTCAGATAGA'
+        'TGAGAGGGGATTTATTATGAAAATGGGCTCACACTATTAAGGAGGCTAAGAAGTTCCACAGTAT', uas=False,
+        kit='forenseq'
+    )
+    marker.annotation == '[TAGA]13'
+    marker.canonical == 13
+    marker.designation == ('13', None, None)
+    marker.flank_3p == (
+        'CAGT C [AGAT]2 GAGA GGGG ATTT ATTA TGAA AAT G GGCT CACA CTAT TAAG GAGG CTAA GAAG TTCC '
+        'ACAG TAT'
+    )
