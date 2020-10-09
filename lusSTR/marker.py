@@ -1171,6 +1171,15 @@ class STRMarker_DYS439(STRMarker):
             allele_dec = int(len(new_seq) % n)
             canon_allele = f'{allele_int}.{allele_dec}'
         return canon_allele
+    
+    @property
+    def annotation(self):
+        sequence = self.forward_sequence
+        if self.kit == 'powerseq' or (len(sequence) % 4 != 0):
+            final_seq = sequence_to_bracketed_form(sequence, self.repeat_size, self.repeats)
+        else:
+            final_seq = collapse_repeats_by_length(sequence, self.repeat_size)
+        return final_seq
 
 
 class STRMarker_DYS437(STRMarker):
