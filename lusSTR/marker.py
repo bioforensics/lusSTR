@@ -94,7 +94,7 @@ class STRMarker():
 
         The UAS software outputs the reverse complement of the forward sequence for some loci.
         '''
-        if self.data['ReverseCompNeeded'] == 'Yes' and self.uas:
+        if self.data['ReverseCompNeeded'] == 'Yes':
             return reverse_complement(self.forward_sequence)
         return self.forward_sequence
 
@@ -230,7 +230,7 @@ class STRMarker():
 
     @property
     def annotation_uas(self):
-        if self.data['ReverseCompNeeded'] == 'Yes' and self.uas:
+        if self.data['ReverseCompNeeded'] == 'Yes':
             return reverse_complement_bracketed(self.annotation)
         return self.annotation
 
