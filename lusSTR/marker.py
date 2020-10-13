@@ -1377,10 +1377,13 @@ class STRMarker_DYS390(STRMarker):
         lus, sec, ter = None, None, None
         lus = repeat_copy_number(self.annotation, self.data['LUS'])
         sec = repeat_copy_number(self.annotation, self.data['Sec'])
-        if self.uas:
+        if self.uas or self.kit == 'powerseq':
             ter = repeat_copy_number(self.annotation, self.data['Tert'])
         else:
-            ter = repeat_copy_number(self.annotation, 'GAG')
+            if self.annotation[-1] == 'G':
+                ter = '1'
+            else:
+                ter = '0'
         return lus, sec, ter
 
     @property
@@ -1417,7 +1420,7 @@ class STRMarker_DYS385(STRMarker):
     @property
     def annotation(self):
         sequence = self.forward_sequence
-        if self.uas:
+        if self.kit == 'forenseq':
             final_string = collapse_repeats_by_length(sequence, 4)
         else:
             final_string = (
