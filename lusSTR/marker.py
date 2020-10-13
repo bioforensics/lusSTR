@@ -94,7 +94,7 @@ class STRMarker():
 
         The UAS software outputs the reverse complement of the forward sequence for some loci.
         '''
-        if self.data['ReverseCompNeeded'] == 'Yes':
+        if self.data['ReverseCompNeeded'] == 'Yes' and self.uas:
             return reverse_complement(self.forward_sequence)
         return self.forward_sequence
 
@@ -201,7 +201,7 @@ class STRMarker():
             'D13S317', 'D18S51', 'DYS643', 'DYS635', 'DYS635', 'DYS612', 'DYS576', 'DYS570',
             'DYS549', 'DYS533', 'DYS505', 'DYS481', 'DYS460', 'DYS439', 'DYS438',
             'DYS437', 'DYS392', 'DYS391', 'DYS390', 'DYS389II', 'DYS389I', 'DYS385A-B', 'DYS19',
-            'DYF387S1', 'DYS393', 'DYS456', 'HPRTB', 'DXS8378', 'DXS7423', 'DXS10074', 'DXS10103'
+            'DYF387S1', 'DYS393', 'DYS456', 'HPRTB', 'DXS8378', 'DXS7423', 'DXS10103'
         ]
 
     @property
@@ -230,7 +230,7 @@ class STRMarker():
 
     @property
     def annotation_uas(self):
-        if self.data['ReverseCompNeeded'] == 'Yes':
+        if self.data['ReverseCompNeeded'] == 'Yes' and self.uas:
             return reverse_complement_bracketed(self.annotation)
         return self.annotation
 
@@ -1324,9 +1324,12 @@ class STRMarker_Y_GATA_H4(STRMarker):
     @property
     def annotation(self):
         sequence = self.forward_sequence
-        final_string = (
-            f'{sequence[0]} {collapse_repeats_by_length(sequence[1:], 4)}'
-        )
+        if self.kit == 'powerseq':
+            final_string = sequence_to_bracketed_form(sequence, self.repeat_size, self.repeats)
+        else:
+            final_string = (
+                f'{sequence[0]} {collapse_repeats_by_length(sequence[1:], 4)}'
+            )
         return final_string
 
     @property
