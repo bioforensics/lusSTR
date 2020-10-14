@@ -138,16 +138,26 @@ def test_annotate_uas_sexloci():
         assert filecmp.cmp(testanno, outfile_name_output) is True
 
 
-def test_annotate_sr_sexloci():
+@pytest.mark.parametrize('inputfile, testoutput, flank_output, kit', [
+    (
+        'testformat_sr.csv', 'testformat_sr_sexloci.txt', 'testformat_sr_sexloci_flanks_anno.txt',
+        'forenseq'
+    ),
+    ('powerseq.csv', 'powerseq_sexloci.txt', 'powerseq_sexloci_flanks_anno.txt', 'powerseq')
+])
+def test_annotate_sr_sexloci(inputfile, testoutput, flank_output, kit):
     with NamedTemporaryFile() as outfile:
         os.unlink(outfile.name)
-        inputfile = data_file('testformat_sr.csv')
-        testanno = data_file('testformat_sr_sexloci.txt')
+        inputfile = data_file(inputfile)
+        testanno = data_file(testoutput)
+        flankanno = data_file(flank_output)
         arglist = [
-            'annotate', inputfile, '-o', outfile.name, '--kit', 'forenseq', '--include-sex'
+            'annotate', inputfile, '-o', outfile.name, '--kit', kit, '--include-sex'
             ]
         args = lusSTR.cli.get_parser().parse_args(arglist)
         lusSTR.annot.main(args)
         outfile_name = os.path.splitext(outfile.name)[0]
         outfile_name_output = f'{outfile_name}_sexloci.txt'
         assert filecmp.cmp(testanno, outfile_name_output) is True
+        flank_outfile = f'{outfile_name}_sexloci_flanks_anno.txt'
+        assert filecmp.cmp(flankanno, flank_outfile) is True
