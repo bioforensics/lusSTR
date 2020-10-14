@@ -2,7 +2,7 @@
 
 lusSTR is a tool written in Python to convert NGS sequence data of forensic STR loci to different annotation types for ease in downstream analyses.
 
-This Python package has been written for use with either the 27 autosomal STR loci, 24 Y-chromosome STR loci and 7 X-chromosome STR loci from the Verogen ForenSeq panel or the 22 autosomal STR loci and 21 Y-chromosome loci from the Promega PowerSeq panel. The package accomodates either the Sample Details Report from the ForenSeq Universal Analysis Software (UAS) or STRait Razor output. If STRait Razor output is provided, sequences are filtered to the UAS sequence region for annotation.
+This Python package has been written for use with either: (1) the 27 autosomal STR loci, 24 Y-chromosome STR loci and 7 X-chromosome STR loci from the Verogen ForenSeq panel, or (2) the 22 autosomal STR loci and 21 Y-chromosome loci from the Promega PowerSeq panel. The package accomodates either the Sample Details Report from the ForenSeq Universal Analysis Software (UAS) or STRait Razor output. If STRait Razor output is provided, sequences are filtered to the UAS sequence region for annotation.
 
 ## Installation
 
@@ -37,7 +37,7 @@ The ```format``` command removes unnecessary rows/columns and outputs a table in
 *  Project ID (if provided)
 *  Analysis ID (if provided)
 
-If including the sex chromosome loci (using the ```--include-sex``` flag), the ```format``` command will output a second table for the sex loci with the above columns.
+If including the sex chromosome loci (using the ```--include-sex``` flag), the ```format``` command will output a second table for the sex loci with the same columns.
 
 
 #### **UAS Sample Details Report**
@@ -108,7 +108,7 @@ For the ```annotate``` command, the following must be specified:
 *  Kit (forenseq or powerseq; default is forenseq)
 
 ```--uas``` flag indicates the sequences are only of the UAS region; otherwise, lusSTR assumes full length sequences.  
-```--include-sex``` flag to include sex chromosome loci.
+```--include-sex``` flag indicates to include the sex chromosome loci.
 
 ```
 lusstr annotate <input> -o <output> --kit forenseq --uas --include-sex
@@ -148,6 +148,9 @@ If the ```--include-sex``` flag is included, as below:
 lusstr annotate STRaitRazor_test_file.csv -o STRaitRazor_powerseq_final.txt --kit powerseq --include-sex
 ```
  Two additional tables will be produced: (1) ```STRaitRazor_powerseq_final_sexloci.txt``` and (2) ```STRaitRazor_powerseq_final_sexloci_flanks_anno.txt``` for annotation of the sex chromosome loci and their flanking regions.
+
+ **NOTE:**  
+ Currently, lusSTR does not annotate the DYS389II sequences from PowerSeq data; lusSTR removes any DYS389II sequences in any provided file before performing annotation. We plan to include annotation for this locus in future releases.
 
 ----
 
