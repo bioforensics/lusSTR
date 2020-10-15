@@ -76,6 +76,8 @@ def format_table(input, uas=False, kit='forenseq'):
         else:
             remove_5p = metadata['Power_5']
             remove_3p = metadata['Power_3']
+        print(locus)
+        print(sequence)
         if len(sequence) <= (remove_5p + remove_3p) and not uas:
             flank_summary = [
                 sampleid, project, analysis, locus, reads, 'NA', sequence, 'NA', 'NA', 'NA',
@@ -83,6 +85,14 @@ def format_table(input, uas=False, kit='forenseq'):
             ]
             flanks_list.append(flank_summary)
             continue
+        elif 'N' in sequence:
+            flank_summary = [
+                sampleid, project, analysis, locus, reads, 'NA', sequence, 'NA', 'NA', 'NA',
+                'Sequence contains Ns'
+            ]
+            flanks_list.append(flank_summary)
+            continue
+
         marker = lusSTR.marker.STRMarkerObject(locus, sequence, uas=uas, kit=kit)
         summary = [sampleid, project, analysis, locus] + marker.summary + [reads]
         list_of_lists.append(summary)
