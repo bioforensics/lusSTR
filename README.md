@@ -2,7 +2,7 @@
 
 lusSTR is a tool written in Python to convert NGS sequence data of forensic STR loci to different annotation types for ease in downstream analyses.
 
-This Python package has been written for use with either: (1) the 27 autosomal STR loci, 24 Y-chromosome STR loci and 7 X-chromosome STR loci from the Verogen ForenSeq panel, or (2) the 22 autosomal STR loci and 21 Y-chromosome loci from the Promega PowerSeq panel. The package accomodates either the Sample Details Report from the ForenSeq Universal Analysis Software (UAS) or STRait Razor output. If STRait Razor output is provided, sequences are filtered to the UAS sequence region for annotation.
+This Python package has been written for use with either: (1) the 27 autosomal STR loci, 24 Y-chromosome STR loci and 7 X-chromosome STR loci from the Verogen ForenSeq panel, or (2) the 22 autosomal STR loci and 22 Y-chromosome loci from the Promega PowerSeq panel. The package accomodates either the Sample Details Report from the ForenSeq Universal Analysis Software (UAS) or STRait Razor output. If STRait Razor output is provided, sequences are filtered to the UAS sequence region for annotation.
 
 ## Installation
 
@@ -148,9 +148,6 @@ If the ```--include-sex``` flag is included, as below:
 lusstr annotate STRaitRazor_test_file.csv -o STRaitRazor_powerseq_final.txt --kit powerseq --include-sex
 ```
  Two additional tables will be produced: (1) ```STRaitRazor_powerseq_final_sexloci.txt``` and (2) ```STRaitRazor_powerseq_final_sexloci_flanks_anno.txt``` for annotation of the sex chromosome loci and their flanking regions.
-
- **NOTE:**  
- Currently, lusSTR does not annotate the DYS389II sequences from PowerSeq data; lusSTR removes any DYS389II sequences in any provided file before performing annotation. We plan to include annotation for this locus in future releases.
 
 ----
 
