@@ -76,8 +76,6 @@ def format_table(input, uas=False, kit='forenseq'):
         else:
             remove_5p = metadata['Power_5']
             remove_3p = metadata['Power_3']
-        print(locus)
-        print(sequence)
         if len(sequence) <= (remove_5p + remove_3p) and not uas:
             flank_summary = [
                 sampleid, project, analysis, locus, reads, 'NA', sequence, 'NA', 'NA', 'NA',
@@ -110,8 +108,6 @@ def format_table(input, uas=False, kit='forenseq'):
         'UAS_Output_Bracketed_Form', 'LUS', 'LUS_Plus', 'Reads'
     ]
     final_output = pd.DataFrame(list_of_lists, columns=columns)
-    if kit == 'powerseq':
-        final_output = final_output[final_output.Locus != 'DYS389II']
     if not uas:
         flanks_columns = [
             'SampleID', 'Project', 'Analysis', 'Locus', 'Reads', 'Length_Allele',
@@ -119,8 +115,6 @@ def format_table(input, uas=False, kit='forenseq'):
             'Potential_Issues'
         ]
         final_flank_output = pd.DataFrame(flanks_list, columns=flanks_columns)
-        if kit == 'powerseq':
-            final_flank_output = final_flank_output[final_flank_output.Locus != 'DYS389II']
     else:
         final_flank_output = ''
     return final_output, final_flank_output, columns

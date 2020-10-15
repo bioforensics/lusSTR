@@ -1011,12 +1011,15 @@ class STRMarker_D19S433(STRMarker):
             else:
                 last = m.end()
         final.append(sequence[:2])
-        first_string = sequence[2:prev]
-        second_string = sequence[prev:]
-        if (len(first_string) % 4 != 0):
-            final.append(sequence_to_bracketed_form(first_string, 4, self.repeats))
+        if prev != 0:
+            first_string = sequence[2:prev]
+            second_string = sequence[prev:]
+            if (len(first_string) % 4 != 0):
+                final.append(sequence_to_bracketed_form(first_string, 4, self.repeats))
+            else:
+                final.append(collapse_repeats_by_length(first_string, 4))
         else:
-            final.append(collapse_repeats_by_length(first_string, 4))
+            second_string = sequence[2:]
         if (second_string != ""):
             if (len(second_string) % 4 != 0):
                 if (len(second_string) > 6):

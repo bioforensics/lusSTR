@@ -748,6 +748,8 @@
         "Tert": "",
         "Foren_5": 19,
         "Foren_3": 5,
+        "Power_5": 0,
+        "Power_3": 5,
         "Alleles": ["19", "20", "21", "22"]
     },
     "DYS439": {
@@ -875,9 +877,9 @@
         "Tert": "CAGG",
         "Foren_5": 0,
         "Foren_3": 22,
-        "Power_5": 0,
-        "Power_3": 0,
-        "Alleles": ["26", "28", "29", "30", "31"]
+        "Power_5": 1,
+        "Power_3": 4,
+        "Alleles": ["26", "28", "29", "30", "31", "32"]
     },
     "DYS389I": {
         "BasesToSubtract": 0,
