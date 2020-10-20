@@ -63,8 +63,6 @@ def test_flank_anno():
         lusSTR.annot.main(args)
         outfile_name = os.path.splitext(outfile.name)[0]
         outfile_name_output = f'{outfile_name}_flanks_anno.txt'
-        import subprocess
-        subprocess.check_call(['cp', outfile_name_output, 'FLANKY'])
         assert filecmp.cmp(testflanks, outfile_name_output) is True
 
 
@@ -90,8 +88,74 @@ def test_FGA_short_seq():
             assert len(fh.readlines()) == 1
 
 
-def test_indel_flag():
-    marker = STRMarkerObject(
-        'CSF1PO', 'CTTCCTATCTATCTATCTATCTAATCTATCTATCTT', uas=False, kit='forenseq'
+@pytest.mark.parametrize('locus, sequence, uas, kit, output', [
+    (
+        'CSF1PO', 'CTTCCTATCTATCTATCTATCTAATCTATCTATCTT', False, 'forenseq',
+        'Possible indel or partial sequence'
+    ),
+    (
+        'DYS393', 'AGATAGATAGATAGATAGATAGATAGATAGATAGATAGATATGTATGTCTTTTCTATGAGACATACC',
+        False, 'powerseq',
+        'UAS region indicates entire sequence; Possible indel or partial sequence'
     )
-    assert marker.indel_flag == 'Possible indel or partial sequence'
+])
+def test_indel_flag(locus, sequence, uas, kit, output):
+    marker = STRMarkerObject(
+        locus, sequence, uas=uas, kit=kit
+    )
+    assert marker.indel_flag == output
+
+
+def test_powerseq_flanking_anno():
+    with NamedTemporaryFile(suffix='.txt') as outfile:
+        input = data_file('powerseq_flanking_anno_test.csv')
+        test_powerseq = data_file('powerseq_flanking_anno_test_flanks_anno.txt')
+        arglist = [
+            'annotate', input, '-o', outfile.name, '--kit', 'powerseq'
+        ]
+        args = lusSTR.cli.get_parser().parse_args(arglist)
+        lusSTR.annot.main(args)
+        outfile_name = os.path.splitext(outfile.name)[0]
+        outfile_name_output = f'{outfile_name}_flanks_anno.txt'
+        assert filecmp.cmp(test_powerseq, outfile_name_output) is True
+
+
+def test_annotate_uas_sexloci():
+    with NamedTemporaryFile() as outfile:
+        os.unlink(outfile.name)
+        inputfile = data_file('testformat_uas.csv')
+        testanno = data_file('testformat_uas_sexloci.txt')
+        arglist = [
+            'annotate', inputfile, '-o', outfile.name, '--kit', 'forenseq', '--uas',
+            '--include-sex'
+            ]
+        args = lusSTR.cli.get_parser().parse_args(arglist)
+        lusSTR.annot.main(args)
+        outfile_name = os.path.splitext(outfile.name)[0]
+        outfile_name_output = f'{outfile_name}_sexloci.txt'
+        assert filecmp.cmp(testanno, outfile_name_output) is True
+
+
+@pytest.mark.parametrize('inputfile, testoutput, flank_output, kit', [
+    (
+        'testformat_sr.csv', 'testformat_sr_sexloci.txt', 'testformat_sr_sexloci_flanks_anno.txt',
+        'forenseq'
+    ),
+    ('powerseq.csv', 'powerseq_sexloci.txt', 'powerseq_sexloci_flanks_anno.txt', 'powerseq')
+])
+def test_annotate_sr_sexloci(inputfile, testoutput, flank_output, kit):
+    with NamedTemporaryFile() as outfile:
+        os.unlink(outfile.name)
+        inputfile = data_file(inputfile)
+        testanno = data_file(testoutput)
+        flankanno = data_file(flank_output)
+        arglist = [
+            'annotate', inputfile, '-o', outfile.name, '--kit', kit, '--include-sex'
+            ]
+        args = lusSTR.cli.get_parser().parse_args(arglist)
+        lusSTR.annot.main(args)
+        outfile_name = os.path.splitext(outfile.name)[0]
+        outfile_name_output = f'{outfile_name}_sexloci.txt'
+        assert filecmp.cmp(testanno, outfile_name_output) is True
+        flank_outfile = f'{outfile_name}_sexloci_flanks_anno.txt'
+        assert filecmp.cmp(flankanno, flank_outfile) is True

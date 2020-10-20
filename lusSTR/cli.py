@@ -31,6 +31,10 @@ def format_subparser(subparsers):
         '--uas', action='store_true',
         help='Use if sequences have been previously run through the ForenSeq UAS.'
     )
+    cli.add_argument(
+        '--include-sex', dest='sex', action='store_true',
+        help='Use if including the X and Y STR markers'
+    )
 
 
 def annot_subparser(subparsers):
@@ -56,6 +60,11 @@ def annot_subparser(subparsers):
         '--nocombine', dest='combine', action='store_false',
         help='Do not combine read counts for duplicate sequences within the UAS region. '
         'By default, read counts are combined for sequences not run through the UAS.'
+    )
+    cli.add_argument(
+        '--include-sex', dest='sex', action='store_true',
+        help='Use if including the X and Y STR markers. Separate reports for these markers '
+        'will be created.'
     )
 
 

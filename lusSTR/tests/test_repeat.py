@@ -10,7 +10,8 @@
 import lusSTR
 from lusSTR.repeat import collapse_tandem_repeat, collapse_all_repeats, repeat_copy_number
 from lusSTR.repeat import split_by_n, get_blocks, reverse_complement, reverse_complement_bracketed
-from lusSTR.repeat import collapse_repeats_by_length, sequence_to_bracketed_form
+from lusSTR.repeat import collapse_repeats_by_length, collapse_repeats_by_length_flanks
+from lusSTR.repeat import sequence_to_bracketed_form
 import pytest
 
 
@@ -32,7 +33,7 @@ def test_collapse_all_repeats(sequence, repeat_list, output):
 
 def test_split_by_n():
     sequence = 'AGGTAGGTAGGTCGAACGAATTGG'
-    blocks = list(split_by_n(sequence, n=4))
+    blocks = list(split_by_n(sequence, n=4, rev=False))
     assert blocks == [
         'AGGT', 'AGGT', 'AGGT', 'CGAA', 'CGAA', 'TTGG'
     ]
@@ -72,3 +73,9 @@ def test_repeat_copy_number():
     repeat = 'ATCT'
     final_output = repeat_copy_number(s, repeat)
     assert str(final_output) == '12'
+
+
+def test_reverse_flanking():
+    sequence = 'AATACATAGGATGGATGGA'
+    bracketed_flank = collapse_repeats_by_length_flanks(sequence, 4)
+    assert bracketed_flank == 'AAT ACAT AGGA [TGGA]2'
