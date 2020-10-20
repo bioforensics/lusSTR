@@ -60,16 +60,15 @@ def test_format_sexloci_uas():
         assert filecmp.cmp(formatoutput, outfile_name_output) is True
 
 
-def test_format_sex_loci_straitrazor():
-    with NamedTemporaryFile() as outfile:
-        inputdb = data_file('STRait_Razor_test_output/')
-        testformat = data_file('testformat_sr_sexloci.csv')
-        arglist = ['format', inputdb, '-o', outfile.name, '--include-sex']
-        args = lusSTR.cli.get_parser().parse_args(arglist)
-        lusSTR.format.main(args)
-        outfile_name = os.path.splitext(outfile.name)[0]
-        outfile_name_output = f'{outfile_name}_sexloci.csv'
-        assert filecmp.cmp(testformat, outfile_name_output) is True
+def test_format_sex_loci_straitrazor(tmp_path):
+    inputdb = data_file('STRait_Razor_test_output/')
+    exp_out = data_file('testformat_sr_sexloci.csv')
+    obs_out = str(tmp_path / 'sr.csv')
+    obs_out_sex = str(tmp_path / 'sr_sexloci.csv')
+    arglist = ['format', inputdb, '-o', obs_out, '--include-sex']
+    args = lusSTR.cli.get_parser().parse_args(arglist)
+    lusSTR.format.main(args)
+    assert filecmp.cmp(exp_out, obs_out_sex) is True
 
 
 def test_uas_directory_autosomal_only(tmp_path):
