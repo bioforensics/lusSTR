@@ -40,7 +40,7 @@ def test_format_stdout(capsys):
 
 def test_format_straitrazor():
     with NamedTemporaryFile() as outfile:
-        inputdb = data_file('STRait_Razor_test_output/')
+        inputdb = data_file('STRait_Razor_test_output')
         testformat = data_file('STRait_Razor_test_output.csv')
         arglist = ['format', inputdb, '-o', outfile.name]
         args = lusSTR.cli.get_parser().parse_args(arglist)
@@ -61,7 +61,7 @@ def test_format_sexloci_uas():
 
 
 def test_format_sex_loci_straitrazor(tmp_path):
-    inputdb = data_file('STRait_Razor_test_output/')
+    inputdb = data_file('STRait_Razor_test_output')
     exp_out = data_file('testformat_sr_sexloci.csv')
     obs_out = str(tmp_path / 'sr.csv')
     obs_out_sex = str(tmp_path / 'sr_sexloci.csv')
@@ -72,10 +72,11 @@ def test_format_sex_loci_straitrazor(tmp_path):
 
 
 def test_uas_directory_autosomal_only(tmp_path):
-    inputdb = data_file('UAS_bulk_input/')
-    copydb = str(tmp_path / 'UAS_bulk_input/')
+    inputdb = data_file('UAS_bulk_input')
+    copydb = str(tmp_path / 'UAS_bulk_input')
     copytree(inputdb, copydb)
-    with open(f'{copydb}/bogusfile.txt', 'w') as fh:
+    bogusfile = os.path.join(copydb, 'bogusfile.txt')
+    with open(bogusfile, 'w') as fh:
         pass
     exp_out_auto = data_file('UAS_bulk_test.csv')
     obs_out_auto = str(tmp_path / 'format_output.csv')
@@ -86,7 +87,7 @@ def test_uas_directory_autosomal_only(tmp_path):
 
 
 def test_uas_directory_with_xy(tmp_path):
-    inputdb = data_file('UAS_bulk_input/')
+    inputdb = data_file('UAS_bulk_input')
     exp_out_auto = data_file('UAS_bulk_test.csv')
     exp_out_sex = data_file('UAS_bulk_test_sexloci.csv')
     obs_out_auto = str(tmp_path / 'format_output.csv')
