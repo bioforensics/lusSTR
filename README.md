@@ -2,10 +2,7 @@
 
 lusSTR is a tool written in Python to convert NGS sequence data of forensic STR loci to different annotation types for ease in downstream analyses.
 
-This Python package has been written for use with either the 27 autosomal STR loci from the Verogen ForenSeq panel or the 22 autosomal STR loci from the Promega PowerSeq panel. The
-package accomodates either the Sample Details Report from the ForenSeq Universay Analysis
-Software (UAS) or STRait Razor output. If STRait Razor output is provided, sequences are
-filtered to the UAS sequence region for annotation.
+This Python package has been written for use with either: (1) the 27 autosomal STR loci, 24 Y-chromosome STR loci and 7 X-chromosome STR loci from the Verogen ForenSeq panel, or (2) the 22 autosomal STR loci and 22 Y-chromosome loci from the Promega PowerSeq panel. The package accomodates either the Sample Details Report from the ForenSeq Universal Analysis Software (UAS) or STRait Razor output. If STRait Razor output is provided, sequences are filtered to the UAS sequence region for annotation.
 
 ## Installation
 
@@ -40,10 +37,12 @@ The ```format``` command removes unnecessary rows/columns and outputs a table in
 *  Project ID (if provided)
 *  Analysis ID (if provided)
 
+If including the sex chromosome loci (using the ```--include-sex``` flag), the ```format``` command will output a second table for the sex loci with the same columns.
 
-#### UAS Sample Details Report
 
-If using the UAS Sample Details Report, the user must specify the input file as well an output file and the ```--uas``` flag:
+#### **UAS Sample Details Report**
+
+If using the UAS Sample Details Report, the user must specify the input file or folder as well an output file and the ```--uas``` flag:
 ```
 lusstr format <input> -o <output> --uas
 ```
@@ -52,8 +51,20 @@ Example:
 ```
 lusstr format UAS_Sample_Details_Report.xlsx -o UAS_test_file.csv --uas
 ```
+Example using a folder of UAS Sample Details Reports:
+```
+lusstr format Run01/ -o Run01_compiled_file.csv --uas
+```
 
-#### STRait Razor
+Including the sex chromosome loci using the ```--include-sex```:
+
+```
+lusstr format UAS_Sample_Details_Report.xlsx -o UAS_test_file.csv --uas --include-sex
+```
+
+The above command will output two tables which are used in the ```annotate``` command: ```UAS_test_file.csv``` and ```UAS_test_file_sexloci.csv```.  
+
+#### **STRait Razor**
 
 If using the output from STRait Razor, the files **must** be labeled as ```SampleID_STRaitRazor.txt``` (example: ```Sample0001_STRaitRazor.txt```) and **must** be compiled in a separate folder (labeled with the project ID). The user must specify the folder name for the ```format``` command as well as an output filename (all sample files will be compiled into one file):
 ```
@@ -65,6 +76,12 @@ Example:
 ```
 lusstr format STRaitRazorOutputFolder/ -o STRaitRazor_test_file.csv
 ```
+
+Again, sex loci can be included using the ```--include-sex``` flag.
+```
+lusstr format STRaitRazorOutputFolder/ -o STRaitRazor_test_file.csv --include-sex
+```
+With this, two tables will be produced: ```STRaitRazor_test_file.csv``` and ```STRaitRazor_test_file_sex_loci.csv```.
 
 
 ### Annotation
@@ -83,16 +100,18 @@ The ```annotate``` command produces a tab-delineated table with the following co
 *  LUS+: annotation combining multiple annotations including traditional STR allele designation, LUS, secondary motif (if applicable) and tertiary motif (if applicable)
 *  Reads: number of reads observed with the specified sequence
 
+If the ```--include-sex``` flag is included, a second table with the above columns for the sex chromosome loci will be outputted as well.
 
 For the ```annotate``` command, the following must be specified:
 *  Input filename
 *  Output filename
 *  Kit (forenseq or powerseq; default is forenseq)
 
-```--uas``` flag indicates the sequences are only of the UAS region; otherwise, lusSTR assumes full length sequences.
+```--uas``` flag indicates the sequences are only of the UAS region; otherwise, lusSTR assumes full length sequences.  
+```--include-sex``` flag indicates to include the sex chromosome loci.
 
 ```
-lusstr annotate <input> -o <output> --kit forenseq --uas
+lusstr annotate <input> -o <output> --kit forenseq --uas --include-sex
 ```
 Example:
 ```
@@ -123,6 +142,12 @@ Example:
 lusstr annotate STRaitRazor_test_file.csv -o STRaitRazor_powerseq_final.txt --kit powerseq
 ```
 The above example would produce two files: (1) ```STRaitRazor_powerseq_final.txt``` and (2) ```STRaitRazor_powerseq_final_flanks_anno.txt```. 
+
+If the ```--include-sex``` flag is included, as below:
+```
+lusstr annotate STRaitRazor_test_file.csv -o STRaitRazor_powerseq_final.txt --kit powerseq --include-sex
+```
+ Two additional tables will be produced: (1) ```STRaitRazor_powerseq_final_sexloci.txt``` and (2) ```STRaitRazor_powerseq_final_sexloci_flanks_anno.txt``` for annotation of the sex chromosome loci and their flanking regions.
 
 ----
 

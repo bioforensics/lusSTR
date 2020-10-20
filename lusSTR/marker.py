@@ -29,6 +29,10 @@ class UnsupportedKitError(ValueError):
     pass
 
 
+class InvalidSequenceError(ValueError):
+    pass
+
+
 class STRMarker():
     def __init__(self, locus, sequence, uas=False, kit='forenseq'):
         self.locus = locus
@@ -99,13 +103,18 @@ class STRMarker():
         if self.uas:
             return None
         front, back = self._uas_bases_to_trim()
+        if front == 0:
+            return ''
         return self.sequence[:front]
 
     @property
     def flank_5p(self):
-        if self.uas:
+        if self.uas or self.flankseq_5p == '':
             return None
-        elif self.kit == 'powerseq' and self.data['Power_5'] > self.data['Foren_5']:
+        elif (
+            self.kit == 'powerseq' and self.data['Power_5'] > self.data['Foren_5']
+            and self.data['Foren_5'] > 0
+        ):
             power_seq_flank = collapse_repeats_by_length_flanks(
                 self.flankseq_5p[:-self.data['Foren_5']], self.repeat_size
             )
@@ -128,9 +137,12 @@ class STRMarker():
 
     @property
     def flank_3p(self):
-        if self.uas:
+        if self.uas or self.flankseq_3p == '':
             return None
-        elif self.kit == 'powerseq' and self.data['Power_3'] > self.data['Foren_3']:
+        elif (
+            self.kit == 'powerseq' and self.data['Power_3'] > self.data['Foren_3']
+            and self.data['Foren_3'] > 0
+        ):
             foren_seq_flank = collapse_repeats_by_length(
                 self.flankseq_3p[:self.data['Foren_3']], self.repeat_size
             )
@@ -162,23 +174,35 @@ class STRMarker():
 
     @property
     def indel_flag(self):
+        powerseq_loci = ['DYS393', 'DYS458', 'DYS456']
         '''Check for potential indels within flanking regions'''
         if str(self.canonical) not in self.data['Alleles']:
-            flag = 'Possible indel or partial sequence'
+            if self.locus in powerseq_loci:
+                flag = 'UAS region indicates entire sequence; Possible indel or partial sequence'
+            else:
+                flag = 'Possible indel or partial sequence'
         else:
-            flag = ' '
+            if self.locus in powerseq_loci:
+                flag = 'UAS region indicates entire sequence'
+            else:
+                flag = ' '
         return flag
 
     @property
     def cannot_split(self):
         return self.locus in [
             'D19S433', 'D6S1043', 'TH01', 'D21S11', 'D1S1656', 'D7S820', 'D5S818', 'D12S391',
-            'D9S1122', 'PENTA E'
+            'D9S1122', 'PENTA E', 'DXS7132'
         ]
 
     @property
     def must_split(self):
-        return self.locus in ['D13S317', 'D18S51']
+        return self.locus in [
+            'D13S317', 'D18S51', 'DYS643', 'DYS635', 'DYS635', 'DYS612', 'DYS576', 'DYS570',
+            'DYS549', 'DYS533', 'DYS505', 'DYS481', 'DYS460', 'DYS439', 'DYS438',
+            'DYS437', 'DYS392', 'DYS391', 'DYS390', 'DYS389II', 'DYS389I', 'DYS385A-B', 'DYS19',
+            'DYF387S1', 'DYS393', 'DYS456', 'HPRTB', 'DXS8378', 'DXS7423', 'DXS10103'
+        ]
 
     @property
     def split_compatible(self):
@@ -191,7 +215,8 @@ class STRMarker():
     @property
     def annotation(self):
         bylength = (
-            (self.data['ReverseCompNeeded'] == 'Yes' and self.split_compatible)
+            self.split_compatible
+            or (self.data['ReverseCompNeeded'] == 'Yes' and self.split_compatible)
             or (self.locus == 'D3S1358' and self.split_compatible)
             or self.locus == 'D16S539'
         )
@@ -311,7 +336,7 @@ class STRMarker_D20S482(STRMarker):
         flank_seq = self.flankseq_5p
         return (
             f'{flank_seq[:2]} {flank_seq[2:6]} {flank_seq[6]} {flank_seq[7:10]} '
-            f'{flank_seq[10:]} {flank_seq[14:18]}'
+            f'{flank_seq[10:14]} {flank_seq[14:18]}'
         )
 
 
@@ -986,12 +1011,15 @@ class STRMarker_D19S433(STRMarker):
             else:
                 last = m.end()
         final.append(sequence[:2])
-        first_string = sequence[2:prev]
-        second_string = sequence[prev:]
-        if (len(first_string) % 4 != 0):
-            final.append(sequence_to_bracketed_form(first_string, 4, self.repeats))
+        if prev != 0:
+            first_string = sequence[2:prev]
+            second_string = sequence[prev:]
+            if (len(first_string) % 4 != 0):
+                final.append(sequence_to_bracketed_form(first_string, 4, self.repeats))
+            else:
+                final.append(collapse_repeats_by_length(first_string, 4))
         else:
-            final.append(collapse_repeats_by_length(first_string, 4))
+            second_string = sequence[2:]
         if (second_string != ""):
             if (len(second_string) % 4 != 0):
                 if (len(second_string) > 6):
@@ -1003,6 +1031,498 @@ class STRMarker_D19S433(STRMarker):
                 final.append(collapse_repeats_by_length(second_string, 4))
         final_string = ' '.join(final)
         return re.sub(r' +', ' ', final_string)
+
+
+class STRMarker_DYS643(STRMarker):
+    @property
+    def flank_3p(self):
+        flank_seq = self.flankseq_3p
+        if self.kit == 'powerseq':
+            flank = (
+                f'{collapse_repeats_by_length(flank_seq[:8], 5)} '
+                f'{collapse_repeats_by_length(flank_seq[8:], 5)}'
+            )
+        else:
+            flank = collapse_repeats_by_length(flank_seq, 5)
+        return flank
+
+
+class STRMarker_DYS635(STRMarker):
+    @property
+    def flank_5p(self):
+        flank_seq = self.flankseq_5p
+        if self.kit == 'powerseq':
+            flank = (
+                f'{collapse_repeats_by_length_flanks(flank_seq[:10], 4)} {flank_seq[10]} '
+                f'{collapse_repeats_by_length(flank_seq[11:41], 4)}'
+            )
+        else:
+            flank = f'{flank_seq[0]} {collapse_repeats_by_length(flank_seq[1:31], 4)}'
+        return flank
+
+
+class STRMarker_DYS612(STRMarker):
+    @property
+    def designation(self):
+        '''
+        The LUS and Secondary motif allele are the same, "TCT".
+        The LUS motif is always the last "TCT" in the sequence.
+        The secondary motif, however, is not as easily identified given there could be
+        multiple instances of "TCT" within the sequence. After the LUS motif is identified,
+        the LUS allele is identified as the "TCT" repeat sequence with the largest number of
+        repeats.
+        '''
+        lus, sec, ter = None, None, None
+        anno = self.annotation
+        repeat = 'TCT'
+        match_list = []
+        for block in anno.split(' '):
+            if block == repeat:
+                match_list.append(1)
+            match = re.match(r'\[' + repeat + r'\](\d+)', block)
+            if match:
+                length = int(match.group(1))
+                match_list.append(length)
+        if len(match_list) == 1:
+            lus = match_list[0]
+            sec = 0
+        elif len(match_list) > 1:
+            lus = match_list[-1]
+            sec = match_list[-2]
+        else:
+            pass
+        return lus, sec, ter
+
+    @property
+    def flank_3p(self):
+        flank_seq = self.flankseq_3p
+        flank = (
+            f'{flank_seq[0]} {collapse_repeats_by_length(flank_seq[1:], 3)}'
+        )
+        return flank
+
+
+class STRMarker_DYS576(STRMarker):
+    @property
+    def flank_3p(self):
+        flank_seq = self.flankseq_3p
+        if self.kit == 'powerseq':
+            flank = (
+                f'{collapse_repeats_by_length(flank_seq[-64:-25], 4)} '
+                f'{collapse_repeats_by_length(flank_seq[-25:], 4)}'
+            )
+        else:
+            flank = collapse_repeats_by_length(flank_seq, 4)
+        return flank
+
+
+class STRMarker_DYS549(STRMarker):
+    @property
+    def flank_5p(self):
+        flank_seq = self.flankseq_5p
+        if self.kit == 'powerseq':
+            flank = (
+                f'{collapse_repeats_by_length_flanks(flank_seq[:52], 4)} {flank_seq[52:54]} '
+                f'{collapse_repeats_by_length(flank_seq[54:], 4)}'
+            )
+        else:
+            flank = (
+                f'{flank_seq[:2]} {collapse_repeats_by_length(flank_seq[2:], 4)}'
+            )
+        return flank
+
+
+class STRMarker_DYS533(STRMarker):
+    @property
+    def flank_3p(self):
+        flank_seq = self.flankseq_3p
+        if self.kit == 'powerseq':
+            flank = (
+                f'{collapse_repeats_by_length(flank_seq[:21], 4)} '
+                f'{collapse_repeats_by_length(flank_seq[21:], 4)}'
+            )
+        else:
+            flank = collapse_repeats_by_length(flank_seq, 4)
+        return flank
+
+
+class STRMarker_DYS522(STRMarker):
+    @property
+    def annotation(self):
+        sequence = self.forward_sequence
+        final_seq = (
+            f'{sequence[:3]} {collapse_repeats_by_length(sequence[3:], 4)}'
+        )
+        return final_seq
+
+
+class STRMarker_DYS439(STRMarker):
+    @property
+    def canonical(self):
+        '''Canonical STR allele designation'''
+        n = self.repeat_size
+        if self.kit == 'powerseq':
+            nsubout = self.data['BasesToSubtract'] - 46
+        else:
+            nsubout = self.data['BasesToSubtract']
+        nsubout *= -1
+        new_seq = self.uas_sequence[:nsubout]
+        if len(new_seq) % n == 0:
+            canon_allele = int(len(new_seq) / n)
+        else:
+            allele_int = int(len(new_seq) / n)
+            allele_dec = int(len(new_seq) % n)
+            canon_allele = f'{allele_int}.{allele_dec}'
+        return canon_allele
+
+    @property
+    def annotation(self):
+        sequence = self.forward_sequence
+        if self.kit == 'powerseq' or (len(sequence) % 4 != 0):
+            final_seq = sequence_to_bracketed_form(sequence, self.repeat_size, self.repeats)
+        else:
+            final_seq = collapse_repeats_by_length(sequence, self.repeat_size)
+        return final_seq
+
+
+class STRMarker_DYS437(STRMarker):
+    @property
+    def flank_3p(self):
+        flank_seq = self.flankseq_3p
+        flank = (
+            f'{flank_seq[:3]} {collapse_repeats_by_length(flank_seq[3:], 4)}'
+        )
+        return flank
+
+
+class STRMarker_DYS392(STRMarker):
+    @property
+    def flank_3p(self):
+        flank_seq = self.flankseq_3p
+        flank = (
+            f'{collapse_repeats_by_length(flank_seq[:72], 3)} '
+            f'{collapse_repeats_by_length(flank_seq[72:], 3)}'
+        )
+        return flank
+
+
+class STRMarker_DYS391(STRMarker):
+    @property
+    def flank_3p(self):
+        flank_seq = self.flankseq_3p
+        if self.kit == 'powerseq':
+            flank = (
+                f'{collapse_repeats_by_length(flank_seq[:7], 4)} '
+                f'{collapse_repeats_by_length(flank_seq[7:29], 4)} '
+                f'{collapse_repeats_by_length(flank_seq[29:], 4)}'
+            )
+        else:
+            flank = (
+                f'{collapse_repeats_by_length(flank_seq[:7], 4)} '
+                f'{collapse_repeats_by_length(flank_seq[7:], 4)}'
+            )
+        return flank
+
+
+class STRMarker_DYS19(STRMarker):
+    @property
+    def flank_3p(self):
+        flank_seq = self.flankseq_3p
+        if self.kit == 'powerseq':
+            flank = (
+                f'{collapse_repeats_by_length_flanks(flank_seq[:30], 4)} '
+                f'{collapse_repeats_by_length_flanks(flank_seq[30:], 4)}'
+            )
+        else:
+            flank = ''
+        return flank
+
+
+class STRMarker_DYS458(STRMarker):
+    @property
+    def annotation(self):
+        sequence = self.forward_sequence
+        final_string = (
+            f'{collapse_repeats_by_length(sequence[:14], 4)} '
+            f'{collapse_repeats_by_length(sequence[14:], 4)}'
+        )
+        return final_string
+
+
+class STRMarker_HPRTB(STRMarker):
+    @property
+    def flank_5p(self):
+        flank_seq = self.flankseq_5p
+        flank = (
+            f'{collapse_repeats_by_length(flank_seq[:-4], 4)} {flank_seq[-4]} {flank_seq[-3:]}'
+        )
+        return flank
+
+
+class STRMarker_DXS8378(STRMarker):
+    @property
+    def flank_5p(self):
+        flank_seq = self.flankseq_5p
+        flank = (
+            f'{collapse_repeats_by_length(flank_seq[:21], 4)} '
+            f'{collapse_repeats_by_length(flank_seq[21:47], 4)} {flank_seq[47]} '
+            f'{collapse_repeats_by_length_flanks(flank_seq[48:-1], 4)} {flank_seq[-1]}'
+        )
+        return flank
+
+    @property
+    def flank_3p(self):
+        flank_seq = self.flankseq_3p
+        flank = (
+            f'{collapse_repeats_by_length(flank_seq[:26], 4)} {flank_seq[26]} '
+            f'{collapse_repeats_by_length(flank_seq[27:], 4)}'
+        )
+        return flank
+
+
+class STRMarker_DXS7132(STRMarker):
+    @property
+    def flank_3p(self):
+        flank_seq = self.flankseq_3p
+        flank = (
+            f'{collapse_repeats_by_length(flank_seq[:5], 4)} '
+            f'{collapse_repeats_by_length(flank_seq[5:36], 4)} {flank_seq[36]} '
+            f'{collapse_repeats_by_length(flank_seq[37:], 4)}'
+        )
+        return flank
+
+
+class STRMarker_DXS10135(STRMarker):
+    @property
+    def annotation(self):
+        sequence = self.forward_sequence
+        final_string = (
+            f'{collapse_repeats_by_length(sequence[:12], 4)} '
+            f'{sequence[12:19].lower()} {collapse_repeats_by_length(sequence[19:], 4)}'
+        )
+        return final_string
+
+
+class STRMarker_DXS10074(STRMarker):
+    @property
+    def flank_5p(self):
+        flank_seq = self.flankseq_5p
+        flank = (
+            f'{collapse_repeats_by_length(flank_seq[:22], 4)} {flank_seq[22]} '
+            f'{collapse_repeats_by_length(flank_seq[23:], 4)}'
+        )
+        return flank
+
+    @property
+    def flank_3p(self):
+        flank_seq = self.flankseq_3p
+        flank = (
+            f'{collapse_repeats_by_length(flank_seq[:5], 4)} '
+            f'{collapse_repeats_by_length(flank_seq[:-3], 4)} {flank_seq[-2:]}'
+        )
+        return flank
+
+
+class STRMarker_Y_GATA_H4(STRMarker):
+    @property
+    def annotation(self):
+        sequence = self.forward_sequence
+        if self.kit == 'powerseq':
+            final_string = sequence_to_bracketed_form(sequence, self.repeat_size, self.repeats)
+        else:
+            final_string = (
+                f'{sequence[0]} {collapse_repeats_by_length(sequence[1:], 4)}'
+            )
+        return final_string
+
+    @property
+    def canonical(self):
+        '''Canonical STR allele designation'''
+        n = self.repeat_size
+        if self.uas:
+            nsubout = self.data['BasesToSubtract']
+        elif self.kit == 'forenseq':
+            nsubout = self.data['BasesToSubtract'] - 12
+        else:
+            nsubout = self.data['BasesToSubtract'] - 46
+        nsubout *= -1
+        new_seq = self.uas_sequence[:nsubout]
+        if len(new_seq) % n == 0:
+            canon_allele = int(len(new_seq) / n)
+        else:
+            allele_int = int(len(new_seq) / n)
+            allele_dec = int(len(new_seq) % n)
+            canon_allele = f'{allele_int}.{allele_dec}'
+        return canon_allele
+
+
+class STRMarker_DYS390(STRMarker):
+    @property
+    def canonical(self):
+        '''Canonical STR allele designation'''
+        n = self.repeat_size
+        if self.uas or self.kit == 'powerseq':
+            nsubout = self.data['BasesToSubtract']
+        else:
+            nsubout = self.data['BasesToSubtract'] - 3
+        nsubout *= -1
+        new_seq = self.uas_sequence[:nsubout]
+        if len(new_seq) % n == 0:
+            canon_allele = int(len(new_seq) / n)
+        else:
+            allele_int = int(len(new_seq) / n)
+            allele_dec = int(len(new_seq) % n)
+            canon_allele = f'{allele_int}.{allele_dec}'
+        return canon_allele
+
+    @property
+    def designation(self):
+        lus, sec, ter = None, None, None
+        lus = repeat_copy_number(self.annotation, self.data['LUS'])
+        sec = repeat_copy_number(self.annotation, self.data['Sec'])
+        if self.uas or self.kit == 'powerseq':
+            ter = repeat_copy_number(self.annotation, self.data['Tert'])
+        else:
+            if self.annotation[-1] == 'G':
+                ter = '1'
+            else:
+                ter = '0'
+        return lus, sec, ter
+
+    @property
+    def flank_5p(self):
+        flank_seq = self.flankseq_5p
+        if self.kit == 'forenseq':
+            flank = (
+                f'{flank_seq[:2]} {collapse_repeats_by_length(flank_seq[2:], 4)}'
+            )
+        else:
+            flank = ''
+        return flank
+
+
+class STRMarker_DYS385(STRMarker):
+    @property
+    def canonical(self):
+        '''Canonical STR allele designation'''
+        n = self.repeat_size
+        if self.uas or self.kit == 'forenseq':
+            nsubout = self.data['BasesToSubtract']
+        else:
+            nsubout = self.data['BasesToSubtract'] - 2
+        nsubout *= -1
+        new_seq = self.uas_sequence[:nsubout]
+        if len(new_seq) % n == 0:
+            canon_allele = int(len(new_seq) / n)
+        else:
+            allele_int = int(len(new_seq) / n)
+            allele_dec = int(len(new_seq) % n)
+            canon_allele = f'{allele_int}.{allele_dec}'
+        return canon_allele
+
+    @property
+    def annotation(self):
+        sequence = self.forward_sequence
+        if self.kit == 'forenseq':
+            final_string = collapse_repeats_by_length(sequence, 4)
+        else:
+            final_string = (
+                f'{sequence[:2]} {collapse_repeats_by_length(sequence[2:], 4)}'
+            )
+        return final_string
+
+
+class STRMarker_DYS448(STRMarker):
+    @property
+    def designation(self):
+        lus, sec, ter = None, None, None
+        anno = self.annotation
+        repeat = 'AGAGAT'
+        match_list = []
+        for block in anno.split(' '):
+            if block == repeat:
+                match_list.append(1)
+            match = re.match(r'\[' + repeat + r'\](\d+)', block)
+            if match:
+                length = int(match.group(1))
+                match_list.append(length)
+        if len(match_list) == 1:
+            lus = match_list[0]
+            sec = 0
+        else:
+            lus = match_list[0]
+            sec = match_list[-1]
+        return lus, sec, ter
+
+
+class STRMarker_DXS10103(STRMarker):
+    @property
+    def designation(self):
+        '''
+        The LUS and Secondary motif allele are the same, "TAGA".
+        The Secondary motif is always the first "TAGA" in the sequence.
+        The LUS, however, is not as easily identified given there could be multiple instances
+        of "TAGA" within the sequence. After the Secondary motif is identified, the LUS allele
+        is identified as the "TAGA" repeat sequence with the largest number of repeats.
+        '''
+        lus, sec, ter = None, None, None
+        anno = self.annotation
+        repeat = 'TAGA'
+        match_list = []
+        for block in anno.split(' '):
+            if block == repeat:
+                match_list.append(1)
+            match = re.match(r'\[' + repeat + r'\](\d+)', block)
+            if match:
+                length = int(match.group(1))
+                match_list.append(length)
+        if len(match_list) == 1:
+            lus = match_list[0]
+            sec = 0
+        elif len(match_list) == 2:
+            lus = match_list[-1]
+            sec = match_list[0]
+        elif len(match_list) > 2:
+            lus = max(match_list)
+            sec = match_list[0]
+        else:
+            pass
+        return lus, sec, ter
+
+
+class STRMarker_DYS389II(STRMarker):
+    @property
+    def designation(self):
+        '''
+        The LUS and Secondary motif allele are the same, "TAGA".
+        The Secondary motif is always the first "TAGA" in the sequence.
+        The LUS, however, is not as easily identified given there could be multiple instances
+        of "TAGA" within the sequence. After the Secondary motif is identified, the LUS allele
+        is identified as the "TAGA" repeat sequence with the largest number of repeats.
+        '''
+        lus, sec, ter = None, None, None
+        anno = self.annotation
+        repeat = 'TAGA'
+        match_list = []
+        for block in anno.split(' '):
+            if block == repeat:
+                match_list.append(1)
+            match = re.match(r'\[' + repeat + r'\](\d+)', block)
+            if match:
+                length = int(match.group(1))
+                match_list.append(length)
+        if len(match_list) == 1:
+            lus = match_list[0]
+            sec = 0
+        elif len(match_list) == 2:
+            lus = match_list[-1]
+            sec = match_list[0]
+        elif len(match_list) > 2:
+            lus = max(match_list)
+            sec = match_list[0]
+        else:
+            pass
+        return lus, sec, ter
 
 
 def STRMarkerObject(locus, sequence, uas=False, kit='forenseq'):
@@ -1027,7 +1547,31 @@ def STRMarkerObject(locus, sequence, uas=False, kit='forenseq'):
         'D2S1338': STRMarker_D2S1338,
         'D5S818': STRMarker_D5S818,
         'PENTA E': STRMarker_PentaE,
-        'TPOX': STRMarker_TPOX
+        'TPOX': STRMarker_TPOX,
+        'DYS643': STRMarker_DYS643,
+        'DYS635': STRMarker_DYS635,
+        'DYS612': STRMarker_DYS612,
+        'DYS576': STRMarker_DYS576,
+        'DYS549': STRMarker_DYS549,
+        'DYS533': STRMarker_DYS533,
+        'DYS522': STRMarker_DYS522,
+        'DYS439': STRMarker_DYS439,
+        'DYS437': STRMarker_DYS437,
+        'DYS392': STRMarker_DYS392,
+        'DYS391': STRMarker_DYS391,
+        'DYS19': STRMarker_DYS19,
+        'DYS458': STRMarker_DYS458,
+        'HPRTB': STRMarker_HPRTB,
+        'DXS8378': STRMarker_DXS8378,
+        'DXS7132': STRMarker_DXS7132,
+        'DXS10135': STRMarker_DXS10135,
+        'DXS10074': STRMarker_DXS10074,
+        'Y-GATA-H4': STRMarker_Y_GATA_H4,
+        'DYS390': STRMarker_DYS390,
+        'DYS385A-B': STRMarker_DYS385,
+        'DYS448': STRMarker_DYS448,
+        'DXS10103': STRMarker_DXS10103,
+        'DYS389II': STRMarker_DYS389II
     }
     if locus in constructors:
         constructor = constructors[locus]
