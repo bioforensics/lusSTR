@@ -15,53 +15,52 @@ import re
 import sys
 
 
-def uas_load(input_file, sex=False):
-    '''Format a UAS Sample Details Report (.xlsx) for use with `lusSTR annotate`.'''
-    if os.path.isdir(input_file):
-        myfiles = os.listdir(input_file)
-        autosomal_data = pd.DataFrame()
-        sex_data = pd.DataFrame()
-        for filename in sorted(myfiles):
-            filepath = os.path.join(input_file, filename)
-            sex_final, results = uas_format(filepath, sex)
-            autosomal_data = autosomal_data.append(results)
-            if sex is True:
-                sex_data = sex_data.append(sex_final)
+def uas_load(inpath, sexloci=False):
+    '''Format a UAS Sample Details Report (.xlsx) for use with `lusSTR annotate`.
+
+    The `inpath` argument can refer to a report file or a directory of report files. Any files
+    without the `.xlsx` file extension are ignored. The `sexloci` argument determines whether X and
+    Y chromosome STRs are included along with autosomal STRs.
+    '''
+    if os.path.isdir(inpath):
+        files = os.listdir(inpath)
+        auto_strs = pd.DataFrame()
+        sex_strs = pd.DataFrame() if sexloci is True else None
+        for filename in sorted(files):
+            if not filename.endswith('.xlsx'):
+                continue
+            filepath = os.path.join(inpath, filename)
+            sexdata, autodata = uas_format(filepath, sexloci)
+            auto_strs = auto_strs.append(autodata)
+            if sexloci is True:
+                sex_strs = sex_strs.append(sexdata)
     else:
-        sex_data, autosomal_data = uas_format(input_file, sex)
-    return sex_data, autosomal_data
+        sex_strs, auto_strs = uas_format(inpath, sexloci)
+    return sex_strs, auto_strs
 
 
-def uas_format(input_file, sex=False):
-    data = pd.read_excel(io=input_file, sheet_name=0)
-    sampleID = data.iloc[1, 1]
-    projectID = data.iloc[2, 1]
-    analysisID = data.iloc[3, 1]
-    offset = data[data.iloc[:, 0] == "Coverage Information"].index.tolist()[0]
-    results = data.iloc[offset + 2:]
-    results.columns = data.iloc[offset + 1]
-    results = results[results.Locus != 'Amelogenin'][['Locus', 'Reads', 'Repeat Sequence']]
-    results['SampleID'] = sampleID
-    results['Project'] = projectID
-    results['Analysis'] = analysisID
-    if sex is True:
-        y_data = pd.read_excel(io=input_file, sheet_name='Y STRs')
-        y_offset = y_data[y_data.iloc[:, 0] == "Coverage Information"].index.tolist()[0]
-        y_strs = y_data.iloc[y_offset + 2:]
-        y_strs.columns = y_data.iloc[y_offset + 1]
-        y_strs = y_strs[['Locus', 'Reads', 'Repeat Sequence']]
-        x_data = pd.read_excel(io=input_file, sheet_name='X STRs')
-        x_offset = x_data[x_data.iloc[:, 0] == "Coverage Information"].index.tolist()[0]
-        x_strs = x_data.iloc[x_offset + 2:]
-        x_strs.columns = x_data.iloc[x_offset + 1]
-        x_strs = x_strs[['Locus', 'Reads', 'Repeat Sequence']]
-        sex_final = pd.concat([y_strs, x_strs], ignore_index=True)
-        sex_final['SampleID'] = sampleID
-        sex_final['Project'] = projectID
-        sex_final['Analysis'] = analysisID
-    else:
-        sex_final = ''
-    return sex_final, results
+def parse_str_table_from_sheet(infile, sheet, exclude=None):
+    table = pd.read_excel(io=infile, sheet_name=sheet)
+    offset = table[table.iloc[:, 0] == "Coverage Information"].index.tolist()[0]
+    data = table.iloc[offset + 2:]
+    data.columns = table.iloc[offset + 1]
+    if exclude is not None:
+        data = data[~data.Locus.isin(exclude)]
+    data = data[['Locus', 'Reads', 'Repeat Sequence']]
+    data['SampleID'] = table.iloc[1, 1]
+    data['Project'] = table.iloc[2, 1]
+    data['Analysis'] = table.iloc[3, 1]
+    return data
+
+
+def uas_format(infile, sexloci=False):
+    auto_strs = parse_str_table_from_sheet(infile, sheet=0, exclude=['Amelogenin'])
+    sex_strs = None
+    if sexloci is True:
+        y_strs = parse_str_table_from_sheet(infile, 'Y STRs')
+        x_strs = parse_str_table_from_sheet(infile, 'X STRs')
+        sex_strs = pd.concat([y_strs, x_strs], ignore_index=True)
+    return sex_strs, auto_strs
 
 
 def strait_razor_concat(input_dir, sex=False):
