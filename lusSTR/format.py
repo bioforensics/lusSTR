@@ -30,13 +30,13 @@ def uas_load(inpath, sexloci=False):
             if not filename.endswith('.xlsx'):
                 continue
             filepath = os.path.join(inpath, filename)
-            sexdata, autodata = uas_format(filepath, sexloci)
+            autodata, sexdata = uas_format(filepath, sexloci)
             auto_strs = auto_strs.append(autodata)
             if sexloci is True:
                 sex_strs = sex_strs.append(sexdata)
     else:
-        sex_strs, auto_strs = uas_format(inpath, sexloci)
-    return sex_strs, auto_strs
+        auto_strs, sex_strs = uas_format(inpath, sexloci)
+    return auto_strs, sex_strs
 
 
 def parse_str_table_from_sheet(infile, sheet, exclude=None):
@@ -60,7 +60,7 @@ def uas_format(infile, sexloci=False):
         y_strs = parse_str_table_from_sheet(infile, 'Y STRs')
         x_strs = parse_str_table_from_sheet(infile, 'X STRs')
         sex_strs = pd.concat([y_strs, x_strs], ignore_index=True)
-    return sex_strs, auto_strs
+    return auto_strs, sex_strs
 
 
 def strait_razor_concat(input_dir, sex=False):
@@ -109,7 +109,7 @@ def strait_razor_concat(input_dir, sex=False):
 
 def main(args):
     if args.uas:
-        sex_results, results = uas_load(args.input, args.sex)
+        results, sex_results = uas_load(args.input, args.sex)
     else:
         sex_results, results = strait_razor_concat(args.input, args.sex)
     if args.out is None:

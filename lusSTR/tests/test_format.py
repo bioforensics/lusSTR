@@ -9,8 +9,9 @@
 
 import filecmp
 import lusSTR
-import os
 from lusSTR.tests import data_file
+import os
+from shutil import copytree
 from tempfile import NamedTemporaryFile
 
 
@@ -71,15 +72,28 @@ def test_format_sex_loci_straitrazor():
         assert filecmp.cmp(testformat, outfile_name_output) is True
 
 
-def test_uas_directory():
-    with NamedTemporaryFile() as outfile:
-        inputdb = data_file('UAS_bulk_input/')
-        testformat_auto = data_file('UAS_bulk_test.csv')
-        testformat_sex = data_file('UAS_bulk_test_sexloci.csv')
-        arglist = ['format', inputdb, '-o', outfile.name, '--uas', '--include-sex']
-        args = lusSTR.cli.get_parser().parse_args(arglist)
-        lusSTR.format.main(args)
-        assert filecmp.cmp(testformat_auto, outfile.name) is True
-        outfile_name = os.path.splitext(outfile.name)[0]
-        outfile_name_output = f'{outfile_name}_sexloci.csv'
-        assert filecmp.cmp(testformat_sex, outfile_name_output) is True
+def test_uas_directory_autosomal_only(tmp_path):
+    inputdb = data_file('UAS_bulk_input/')
+    copydb = str(tmp_path / 'UAS_bulk_input/')
+    copytree(inputdb, copydb)
+    with open(f'{copydb}/bogusfile.txt', 'w') as fh:
+        pass
+    exp_out_auto = data_file('UAS_bulk_test.csv')
+    obs_out_auto = str(tmp_path / 'format_output.csv')
+    arglist = ['format', '-o', obs_out_auto, '--uas', copydb]
+    args = lusSTR.cli.get_parser().parse_args(arglist)
+    lusSTR.format.main(args)
+    assert filecmp.cmp(exp_out_auto, obs_out_auto) is True
+
+
+def test_uas_directory_with_xy(tmp_path):
+    inputdb = data_file('UAS_bulk_input/')
+    exp_out_auto = data_file('UAS_bulk_test.csv')
+    exp_out_sex = data_file('UAS_bulk_test_sexloci.csv')
+    obs_out_auto = str(tmp_path / 'format_output.csv')
+    obs_out_sex = str(tmp_path / 'format_output_sexloci.csv')
+    arglist = ['format', '-o', obs_out_auto, '--uas', '--include-sex', inputdb]
+    args = lusSTR.cli.get_parser().parse_args(arglist)
+    lusSTR.format.main(args)
+    assert filecmp.cmp(exp_out_auto, obs_out_auto) is True
+    assert filecmp.cmp(exp_out_sex, obs_out_sex) is True
