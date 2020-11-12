@@ -1162,7 +1162,7 @@ class STRMarker_DYS439(STRMarker):
         '''Canonical STR allele designation'''
         n = self.repeat_size
         if self.kit == 'powerseq':
-            nsubout = self.data['BasesToSubtract'] - 46
+            nsubout = self.data['BasesToSubtract'] - 47
         else:
             nsubout = self.data['BasesToSubtract']
         nsubout *= -1
