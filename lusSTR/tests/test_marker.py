@@ -408,8 +408,8 @@ def test_strobj_DYS522():
         'TAGA TGAT AAAT AGAA [GATA]11', '11', '11', None, None, 'forenseq'
     ),
     (
-        'ATAAATAGAAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGAAAGTATAAGTAAAGAGATGA',
-        'ATAA ATAG AA [GATA]12', '12', '12', None, None, 'powerseq'
+        'AAATAGAAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGAAAGTATAAGTAAAGAGATGATGG',
+        'AAAT AGAA [GATA]12', '12', '12', None, None, 'powerseq'
     )
 ])
 def test_strobj_DYS439(sequence, bracketed, conc, lus, sec, tert, kit):
