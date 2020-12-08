@@ -1406,7 +1406,7 @@ class STRMarker_DYS385(STRMarker):
         if self.uas or self.kit == 'forenseq':
             nsubout = self.data['BasesToSubtract']
         else:
-            nsubout = self.data['BasesToSubtract'] - 2
+            nsubout = self.data['BasesToSubtract'] - 4
         nsubout *= -1
         new_seq = self.uas_sequence[:nsubout]
         if len(new_seq) % n == 0:
@@ -1416,17 +1416,6 @@ class STRMarker_DYS385(STRMarker):
             allele_dec = int(len(new_seq) % n)
             canon_allele = f'{allele_int}.{allele_dec}'
         return canon_allele
-
-    @property
-    def annotation(self):
-        sequence = self.forward_sequence
-        if self.kit == 'forenseq':
-            final_string = collapse_repeats_by_length(sequence, 4)
-        else:
-            final_string = (
-                f'{sequence[:2]} {collapse_repeats_by_length(sequence[2:], 4)}'
-            )
-        return final_string
 
 
 class STRMarker_DYS448(STRMarker):
