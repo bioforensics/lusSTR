@@ -1392,12 +1392,9 @@ class STRMarker_DYS390(STRMarker):
     @property
     def flank_5p(self):
         flank_seq = self.flankseq_5p
-        if self.kit == 'forenseq':
-            flank = (
-                f'{flank_seq[:2]} {collapse_repeats_by_length(flank_seq[2:], 4)}'
-            )
-        else:
-            flank = ''
+        flank = (
+            f'{flank_seq[:2]} {collapse_repeats_by_length(flank_seq[2:], 4)}'
+        )
         return flank
 
 
