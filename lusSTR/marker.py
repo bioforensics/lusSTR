@@ -651,6 +651,15 @@ class STRMarker_D10S1248(STRMarker):
             flank = collapse_repeats_by_length_flanks(flank_seq, 4)
         return flank
 
+    @property
+    def flank_3p(self):
+        flank_seq = self.flankseq_3p
+        if self.kit == 'forenseq':
+            flank = collapse_repeats_by_length(flank_seq, 4)
+        else:
+            flank = ''
+        return flank
+
 
 class STRMarker_D22S1045(STRMarker):
     @property

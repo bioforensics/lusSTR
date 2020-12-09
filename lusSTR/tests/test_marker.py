@@ -156,6 +156,21 @@ def test_annotation_and_lus(locus, sequence, forward_bracket, lus, sec, tert):
     assert str(tert_out) == tert
 
 
+@pytest.mark.parametrize('sequence, bracketed, conc, lus, sec, tert', [
+    (
+        'TAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGACAGACAGACAGATACATAGATAATACAGATGAGAGTTGGATACA'
+        'GAAGTAGGTATAATGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGACAGACAGACAGACAGACACA'
+        'CACATAGATAATACAGAT', '[TAGA]11 [CAGA]3 TACA TAGA TAAT ACAG ATGA GAGT TGGA TACA GAAG TAGG'
+        ' TATA ATGA [TAGA]13 [CAGA]4', 31, 13, 11, None
+    )
+])
+def test_strobj_DYS389II(sequence, bracketed, conc, lus, sec, tert):
+    marker = STRMarkerObject('DYS389II', sequence, uas=False, kit='forenseq')
+    assert marker.annotation == bracketed
+    assert marker.canonical == conc
+    assert marker.designation == (lus, sec, tert)
+
+
 def test_strobj_CSF1PO():
     marker = STRMarkerObject(
         'CSF1PO', 'CTTCCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTAATCTATCTATCTT',
@@ -738,3 +753,30 @@ def test_strobj_DYS389II(sequence, bracketed, conc, lus, sec, tert):
     assert marker.annotation == bracketed
     assert marker.canonical == conc
     assert marker.designation == (lus, sec, tert)
+
+
+def test_strobj_CSF1PO_newpower():
+    marker = STRMarkerObject(
+        'CSF1PO',
+        'CTAAGTACTTCCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTAATCTATCTATCTTCTATCTATGAAGG'
+        'CAGTTACTGTTAATATCTTCATTTTACAGGTAGGAAAACTGAGACACAGGGTGGTTAGCAACCTGCTAGTCCTTGGCAGACTCAG',
+        uas=False, kit='powerseq'
+    )
+    assert marker.annotation == '[ATCT]12'
+    assert marker.canonical == 12
+    assert marker.designation == ('12', '0', None)
+    assert marker.flank_3p == (
+        'A [ATCT]3 T [CTAT]2 GAAG GCAG TTAC TGTT AATA TCTT CATT TTAC AGGT AGGA AAAC TGAG ACAC '
+        'AGGG TGGT TAG CA ACCT GCTA GTCC TTGG CAGA CTCA G'
+    )
+
+
+def test_strobj_D10S1248_newpower():
+    marker = STRMarkerObject(
+        'D10S1248', 'CCCCAGGACCAATCTGGTCACAAACATATTAATGAATTGAACAAATGAGTGAGTGGAAGGAAGGAAGGAAGGAAGG'
+        'AAGGAAGGAAGGAAGGAAGGAAGGAAGGAA', uas=False, kit='powerseq'
+    )
+    assert marker.annotation == '[GGAA]13'
+    assert marker.canonical == 13
+    assert marker.flank_5p == 'CCCC AGGA CCAA TCTG GTCA CAAA CATA TTAA TGAA TT GAAC AAAT [GAGT]2'
+    assert marker.flank_3p == ''
