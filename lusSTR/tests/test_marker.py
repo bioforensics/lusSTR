@@ -780,3 +780,33 @@ def test_strobj_D10S1248_newpower():
     assert marker.canonical == 13
     assert marker.flank_5p == 'CCCC AGGA CCAA TCTG GTCA CAAA CATA TTAA TGAA TT GAAC AAAT [GAGT]2'
     assert marker.flank_3p == ''
+
+
+def test_strobj_D13S317_newpower():
+    marker = STRMarkerObject(
+        'D13S317', 'TTCTTTAGTGGGCATCCGTGACTCTCTGGACTCTGACCCATCTAACGCCTATCTGTATTTACAAATACATTATCTA'
+        'TCTATCTATCTATCTATCTATCTATCTATCAATCAATCATCTATCTATCTTTCTGTCTGTCTTTTTGGGCTGCCTATGGCTCAACCCA'
+        'AGTTGAAGGAGGAGATTT', uas=False, kit='powerseq'
+    )
+    assert marker.annotation == '[TATC]9 [AATC]2 [ATCT]3 TTCT GTCT GTC'
+    assert marker.designation == ('9', '3', '1')
+    assert marker.flank_5p == (
+        'TT CTT TAGT GGGC ATCC G TGAC TCTCT GGAC TC TGAC CCAT CTAA C G CCT ATCT GTAT TTAC AAAT '
+        'ACAT'
+    )
+    assert marker.flank_3p == 'TTTT TGGG CTGC CTAT GGCT CAAC CCAA GTTG AAGG AGGA GATT T'
+
+
+def test_strobj_D16S539_newpower():
+    marker = STRMarkerObject(
+        'D16S539', 'GTGCACAAATCTAAATGCAGAAAAGCACTGAAAGAAGAATCCAGAAAACCACAGTTCCCATTTTTATATGGGAGCAA'
+        'ACAAAGGCAGATCCCAAGCTCTTCCTCTTCCCTAGATCAATACAGACAGACAGACAGGTGGATAGATAGATAGATAGATAGATAGATA'
+        'GATAGATATCAT', uas=False, kit='powerseq'
+    )
+    assert marker.annotation == '[GATA]9'
+    assert marker.designation == ('9', '0', None)
+    assert marker.flank_5p == (
+        'GT GCAC AAAT CTAA ATGC AGAA AAGC ACTG AAAG AAGA ATCC AG AAAA CCAC AGTT CCCA TTTT TATA '
+        'TGGG AG [CAAA]2 GGCA GATC CCAA G CTCT TC CTCT T CCCT AGAT CAAT [ACAG]4 GTG'
+    )
+    assert marker.flank_3p == 'TCAT'
