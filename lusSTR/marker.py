@@ -494,7 +494,7 @@ class STRMarker_D1S1656(STRMarker):
     def flank_5p(self):
         flank_seq = self.flankseq_5p
         if self.kit == 'powerseq':
-            flank = f'{flank_seq[:2]} {collapse_repeats_by_length(flank_seq[2:], 4)}'
+            flank = f'{flank_seq[0]} {collapse_repeats_by_length(flank_seq[1:], 4)}'
         else:
             flank = f'{flank_seq[:3]} {collapse_repeats_by_length(flank_seq[3:], 4)}'
         return flank

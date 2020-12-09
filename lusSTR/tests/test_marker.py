@@ -755,58 +755,75 @@ def test_strobj_DYS389II(sequence, bracketed, conc, lus, sec, tert):
     assert marker.designation == (lus, sec, tert)
 
 
-def test_strobj_CSF1PO_newpower():
-    marker = STRMarkerObject(
-        'CSF1PO',
-        'CTAAGTACTTCCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTAATCTATCTATCTTCTATCTATGAAGG'
-        'CAGTTACTGTTAATATCTTCATTTTACAGGTAGGAAAACTGAGACACAGGGTGGTTAGCAACCTGCTAGTCCTTGGCAGACTCAG',
-        uas=False, kit='powerseq'
+@pytest.mark.parametrize('sequence, bracketed, lus, sec, tert, flank_5, flank_3, kit', [
+    (
+        'GTCTCAGAAAGAAAGAAAGAAAGAAAGAAAGAAAGAAAGAAAGAAAGAAAGAAAGAAAGAAAAAGAGAGAGGAAAGAAAGAGAAAAAG'
+        'AAAAGAAATAGTAGCAACTGTTATTGTAAGA', '[AGAA]14 AAAG AGAG AG', '14', '1', None, 'G TCTC',
+        'GA [AAGA]2 GAAA AAGA AAAG AAAT AGTA GCA A CTGT TATT GT AAGA', 'forenseq'
+    ),
+    (
+        'AGGCTGCAGTGAGCCATGTTCATGCCACTGCACTTCACTCTGAGTGACAAATTGAGACCTTGTCTCAGAAAGAAAGAAAGAAAGAAAG'
+        'AAAGAAAGAAAGAAAGAAAGAAAGAAAGAAAGAAAGAAAGAAAGAAAGAAAAAGAGAGAGGAAAGAAAGAGAAAAAGAAAAGAAATAG'
+        'TAGCAACTGTTATTG', '[AGAA]18 AAAG AGAG AG', '18', '1', None, 'A GGCT GCAG TGAG CCAT GTTC '
+        'ATGC CACT GCAC TTCA CTCT GAGT GACA AATT GAGA CCTT G TCTC', 'GA [AAGA]2 GAAA AAGA AAAG '
+        'AAAT AGTA GCA A ACTG TTAT TG', 'powerseq'
     )
-    assert marker.annotation == '[ATCT]12'
-    assert marker.canonical == 12
-    assert marker.designation == ('12', '0', None)
-    assert marker.flank_3p == (
-        'A [ATCT]3 T [CTAT]2 GAAG GCAG TTAC TGTT AATA TCTT CATT TTAC AGGT AGGA AAAC TGAG ACAC '
-        'AGGG TGGT TAG CA ACCT GCTA GTCC TTGG CAGA CTCA G'
-    )
+])
+def test_strobj_D18S51(sequence, bracketed, lus, sec, tert, flank_5, flank_3, kit):
+    marker = STRMarkerObject('D18S51', sequence, uas=False, kit=kit)
+    assert marker.annotation == bracketed
+    assert marker.designation == (lus, sec, tert)
+    assert marker.flank_5p == flank_5
+    assert marker.flank_3p == flank_3
 
 
-def test_strobj_D10S1248_newpower():
-    marker = STRMarkerObject(
+@pytest.mark.parametrize('locus, sequence, bracketed, conc, lus, sec, tert, flank_5, flank_3', [
+    (
+        'CSF1PO', 'CTAAGTACTTCCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTAATCTATCTATCTTCTA'
+        'TCTATGAAGGCAGTTACTGTTAATATCTTCATTTTACAGGTAGGAAAACTGAGACACAGGGTGGTTAGCAACCTGCTAGTCCTTGGCA'
+        'GACTCAG', '[ATCT]12', '12', '12', '0', None, 'CTA AGTA CT TCCT', 'A [ATCT]3 T [CTAT]2 '
+        'GAAG GCAG TTAC TGTT AATA TCTT CATT TTAC AGGT AGGA AAAC TGAG ACAC AGGG TGGT TAG CA ACCT '
+        'GCTA GTCC TTGG CAGA CTCA G'
+    ),
+    (
         'D10S1248', 'CCCCAGGACCAATCTGGTCACAAACATATTAATGAATTGAACAAATGAGTGAGTGGAAGGAAGGAAGGAAGGAAGG'
-        'AAGGAAGGAAGGAAGGAAGGAAGGAAGGAA', uas=False, kit='powerseq'
-    )
-    assert marker.annotation == '[GGAA]13'
-    assert marker.canonical == 13
-    assert marker.flank_5p == 'CCCC AGGA CCAA TCTG GTCA CAAA CATA TTAA TGAA TT GAAC AAAT [GAGT]2'
-    assert marker.flank_3p == ''
-
-
-def test_strobj_D13S317_newpower():
-    marker = STRMarkerObject(
+        'AAGGAAGGAAGGAAGGAAGGAAGGAAGGAA', '[GGAA]13', '13', '13', None, None, 'CCCC AGGA CCAA '
+        'TCTG GTCA CAAA CATA TTAA TGAA TT GAAC AAAT [GAGT]2', ''
+    ),
+    (
         'D13S317', 'TTCTTTAGTGGGCATCCGTGACTCTCTGGACTCTGACCCATCTAACGCCTATCTGTATTTACAAATACATTATCTA'
         'TCTATCTATCTATCTATCTATCTATCTATCAATCAATCATCTATCTATCTTTCTGTCTGTCTTTTTGGGCTGCCTATGGCTCAACCCA'
-        'AGTTGAAGGAGGAGATTT', uas=False, kit='powerseq'
-    )
-    assert marker.annotation == '[TATC]9 [AATC]2 [ATCT]3 TTCT GTCT GTC'
-    assert marker.designation == ('9', '3', '1')
-    assert marker.flank_5p == (
-        'TT CTT TAGT GGGC ATCC G TGAC TCTCT GGAC TC TGAC CCAT CTAA C G CCT ATCT GTAT TTAC AAAT '
-        'ACAT'
-    )
-    assert marker.flank_3p == 'TTTT TGGG CTGC CTAT GGCT CAAC CCAA GTTG AAGG AGGA GATT T'
-
-
-def test_strobj_D16S539_newpower():
-    marker = STRMarkerObject(
+        'AGTTGAAGGAGGAGATTT', '[TATC]9 [AATC]2 [ATCT]3 TTCT GTCT GTC', '9', '9', '3', '1', 'TT '
+        'CTT TAGT GGGC ATCC G TGAC TCTCT GGAC TC TGAC CCAT CTAA C G CCT ATCT GTAT TTAC AAAT ACAT',
+        'TTTT TGGG CTGC CTAT GGCT CAAC CCAA GTTG AAGG AGGA GATT T'
+    ),
+    (
         'D16S539', 'GTGCACAAATCTAAATGCAGAAAAGCACTGAAAGAAGAATCCAGAAAACCACAGTTCCCATTTTTATATGGGAGCAA'
         'ACAAAGGCAGATCCCAAGCTCTTCCTCTTCCCTAGATCAATACAGACAGACAGACAGGTGGATAGATAGATAGATAGATAGATAGATA'
-        'GATAGATATCAT', uas=False, kit='powerseq'
+        'GATAGATATCAT', '[GATA]9', '9', '9', '0', None, 'GT GCAC AAAT CTAA ATGC AGAA AAGC ACTG '
+        'AAAG AAGA ATCC AG AAAA CCAC AGTT CCCA TTTT TATA TGGG AG [CAAA]2 GGCA GATC CCAA G CTCT TC'
+        ' CTCT T CCCT AGAT CAAT [ACAG]4 GTG', 'TCAT'
+    ),
+    (
+        'D19S433', 'AAGTTCTTTAGCAGTGATTTCTGATATTTTGGTGCACCCATTACCCGAATAAAAATCTTCTCTCTTTCTTCCTCTCT'
+        'CCTTCCTTCCTTCCTTCCTTCCTTCCTTCCTTCCTTCCTTCCTTCCTACCTTCTTTCCTTCAACAGAATCTTATTCTGTTGCCCAGGC'
+        'TGGAGTGCA', 'CT CTCT TTCT TCCT CTCT [CCTT]11 CCTA CCTT CTTT CCTT', '13', '11', '1', '0',
+        'AAG TTCT TTAG CAGT GATT TCTG ATAT TTTG GTGC ACCC ATTA CCCG AATA AAAA TCTT', 'CAAC AGAA '
+        'TCTT ATTC TGTT GCCC AGGC TGGA GTGC A'
+    ),
+    (
+        'D1S1656', 'GAAATAGAATCACTAGGGAACCAAATATATATACATACAATTAAACACACACACATCTATCTATCTATCTATCTATC'
+        'TATCTATCTATCTATCTATCTATCTATCTACATCACACAGTTGACCCTTGA', 'CA [CACA]2 [TCTA]13', '13', '13',
+        '0', '0', 'G AAAT AGAA TCAC TAGG GAAC CAAA [TATA]2 CATA CAAT TAAA', 'CATC AC ACA GTTG '
+        'ACCC TTGA'
     )
-    assert marker.annotation == '[GATA]9'
-    assert marker.designation == ('9', '0', None)
-    assert marker.flank_5p == (
-        'GT GCAC AAAT CTAA ATGC AGAA AAGC ACTG AAAG AAGA ATCC AG AAAA CCAC AGTT CCCA TTTT TATA '
-        'TGGG AG [CAAA]2 GGCA GATC CCAA G CTCT TC CTCT T CCCT AGAT CAAT [ACAG]4 GTG'
-    )
-    assert marker.flank_3p == 'TCAT'
+])
+def test_new_power_config(
+        locus, sequence, bracketed, conc, lus, sec, tert, flank_5, flank_3
+    ):
+    marker = STRMarkerObject(locus, sequence, uas=False, kit='powerseq')
+    assert marker.annotation == bracketed
+    assert str(marker.canonical) == conc
+    assert marker.designation == (lus, sec, tert)
+    assert marker.flank_5p == flank_5
+    assert marker.flank_3p == flank_3
