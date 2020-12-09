@@ -819,8 +819,8 @@ def test_strobj_D18S51(sequence, bracketed, lus, sec, tert, flank_5, flank_3, ki
     )
 ])
 def test_new_power_config(
-        locus, sequence, bracketed, conc, lus, sec, tert, flank_5, flank_3
-    ):
+    locus, sequence, bracketed, conc, lus, sec, tert, flank_5, flank_3
+):
     marker = STRMarkerObject(locus, sequence, uas=False, kit='powerseq')
     assert marker.annotation == bracketed
     assert str(marker.canonical) == conc
