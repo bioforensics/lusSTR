@@ -678,8 +678,8 @@ class STRMarker_D2S1338(STRMarker):
         flank_seq = self.flankseq_5p
         if self.kit == 'powerseq':
             flank = (
-                f'{collapse_repeats_by_length_flanks(flank_seq[:31], 4)} {flank_seq[31]} '
-                f'{collapse_repeats_by_length(flank_seq[32:-3], 4)} {flank_seq[-3:]}'
+                f'{collapse_repeats_by_length_flanks(flank_seq[:30], 4)} {flank_seq[30]} '
+                f'{collapse_repeats_by_length(flank_seq[31:-3], 4)} {flank_seq[-3:]}'
             )
         else:
             flank = flank_seq
