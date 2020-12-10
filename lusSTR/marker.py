@@ -540,10 +540,13 @@ class STRMarker_PentaD(STRMarker):
     @property
     def flank_5p(self):
         flank_seq = self.flankseq_5p
-        flank = (
-            f'{collapse_repeats_by_length(flank_seq[:20], 5)} {flank_seq[20]} '
-            f'{flank_seq[21:25]} {collapse_repeats_by_length(flank_seq[25:], 5)}'
-        )
+        if self.kit == 'powerseq':
+            flank = collapse_repeats_by_length_flanks(flank_seq, 5)
+        else:
+            flank = (
+                f'{collapse_repeats_by_length(flank_seq[:20], 5)} {flank_seq[20]} '
+                f'{flank_seq[21:25]} {collapse_repeats_by_length(flank_seq[25:], 5)}'
+            )
         return flank
 
     @property
@@ -553,7 +556,7 @@ class STRMarker_PentaD(STRMarker):
             foren_seq_flank = flank_seq[:self.data['Foren_3']]
             foren_flank_anno = collapse_repeats_by_length(foren_seq_flank, 5)
             power_seq_flank = flank_seq[self.data['Foren_3']:]
-            power_flank_anno = f'{power_seq_flank[:5]} {power_seq_flank[5:]}'
+            power_flank_anno = f'{collapse_repeats_by_length(power_seq_flank, 5)}'
             flank = f'{foren_flank_anno} {power_flank_anno}'
         else:
             flank = collapse_repeats_by_length(flank_seq, 5)
@@ -603,7 +606,7 @@ class STRMarker_PentaE(STRMarker):
     @property
     def flank_3p(self):
         if self.kit == 'powerseq':
-            flank = ''
+            flank = self.flankseq_3p
         else:
             flank = collapse_repeats_by_length(self.flankseq_3p, 5)
         return flank
@@ -971,11 +974,11 @@ class STRMarker_TPOX(STRMarker):
         flank_seq = self.flankseq_5p
         if self.kit == 'powerseq':
             flank = (
-                f'{collapse_repeats_by_length(flank_seq[:13], 4)} '
-                f'{collapse_repeats_by_length(flank_seq[13:20], 4)} '
-                f'{collapse_repeats_by_length(flank_seq[20:26], 4)} '
-                f'{collapse_repeats_by_length(flank_seq[26:69], 4)} '
-                f'{flank_seq[69:71]} {collapse_repeats_by_length(flank_seq[71:-2], 4)} '
+                f'{flank_seq[:3]} {collapse_repeats_by_length(flank_seq[3:16], 4)} '
+                f'{collapse_repeats_by_length(flank_seq[16:23], 4)} '
+                f'{collapse_repeats_by_length(flank_seq[23:29], 4)} '
+                f'{collapse_repeats_by_length(flank_seq[29:72], 4)} '
+                f'{flank_seq[72:74]} {collapse_repeats_by_length(flank_seq[74:-2], 4)} '
                 f'{flank_seq[-2:]}'
             )
         else:
