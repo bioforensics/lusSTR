@@ -352,8 +352,8 @@ class STRMarker_D2S441(STRMarker):
             )
             power_seq_flank = flank_seq[:-self.data['Foren_5']]
             power_flank_anno = (
-                f'{collapse_repeats_by_length(power_seq_flank[:47], 4)} {power_seq_flank[47]} '
-                f'{collapse_repeats_by_length(power_seq_flank[-6:], 4)}'
+                f'{power_seq_flank[:2]} {collapse_repeats_by_length(power_seq_flank[2:45], 4)}'
+                f' {power_seq_flank[45]} {collapse_repeats_by_length(power_seq_flank[-6:], 4)}'
             )
             flank = f'{power_flank_anno} {foren_flank_anno}'
         else:
