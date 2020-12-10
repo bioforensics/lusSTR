@@ -391,8 +391,8 @@ class STRMarker_D7S820(STRMarker):
             )
             power_seq_flank = flank_seq[:-self.data['Foren_5']]
             power_flank_anno = (
-                f'{power_seq_flank[:2]} {collapse_repeats_by_length(power_seq_flank[2:15], 4)} '
-                f'{collapse_repeats_by_length(power_seq_flank[15:40], 4)} {power_seq_flank[-4:]}'
+                f'{collapse_repeats_by_length(power_seq_flank[:13], 4)} '
+                f'{collapse_repeats_by_length(power_seq_flank[13:38], 4)} {power_seq_flank[-4:]}'
             )
             flank = f'{power_flank_anno} {foren_flank_anno}'
         else:
@@ -540,13 +540,10 @@ class STRMarker_PentaD(STRMarker):
     @property
     def flank_5p(self):
         flank_seq = self.flankseq_5p
-        if self.kit == 'powerseq':
-            flank = collapse_repeats_by_length_flanks(flank_seq, 5)
-        else:
-            flank = (
-                f'{collapse_repeats_by_length(flank_seq[:20], 5)} {flank_seq[20]} '
-                f'{flank_seq[21:25]} {collapse_repeats_by_length(flank_seq[25:], 5)}'
-            )
+        flank = (
+            f'{collapse_repeats_by_length(flank_seq[:20], 5)} {flank_seq[20]} '
+            f'{flank_seq[21:25]} {collapse_repeats_by_length(flank_seq[25:], 5)}'
+        )
         return flank
 
     @property
