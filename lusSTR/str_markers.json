@@ -709,7 +709,7 @@
         "Alleles": ["9", "10"]
     },
     "DYS458": {
-        "BasesToSubtract": 74,
+        "BasesToSubtract": 76,
         "NumRepeats": 4,
         "Repeats": [
             "GAAA"
