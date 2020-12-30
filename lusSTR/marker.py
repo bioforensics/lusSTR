@@ -1062,8 +1062,8 @@ class STRMarker_DYS635(STRMarker):
         flank_seq = self.flankseq_5p
         if self.kit == 'powerseq':
             flank = (
-                f'{collapse_repeats_by_length_flanks(flank_seq[:10], 4)} {flank_seq[10]} '
-                f'{collapse_repeats_by_length(flank_seq[11:41], 4)}'
+                f'{collapse_repeats_by_length_flanks(flank_seq[:11], 4)} {flank_seq[11]} '
+                f'{collapse_repeats_by_length(flank_seq[12:42], 4)}'
             )
         else:
             flank = f'{flank_seq[0]} {collapse_repeats_by_length(flank_seq[1:31], 4)}'
