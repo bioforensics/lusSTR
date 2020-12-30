@@ -1449,6 +1449,15 @@ class STRMarker_DYS448(STRMarker):
             sec = match_list[-1]
         return lus, sec, ter
 
+    @property
+    def flank_3p(self):
+        flank_seq = self.flankseq_3p
+        if self.kit == 'powerseq':
+            flank = f'{flank_seq[:5]} {collapse_repeats_by_length(flank_seq[5:], 6)}'
+        else:
+            flank = flank_seq
+        return flank
+
 
 class STRMarker_DXS10103(STRMarker):
     @property
