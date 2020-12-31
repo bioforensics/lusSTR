@@ -1563,6 +1563,15 @@ class STRMarker_DYS389II(STRMarker):
             pass
         return lus, sec, ter
 
+    @property
+    def flank_5p(self):
+        flank_seq = self.flankseq_5p
+        if self.kit == 'powerseq':
+            flank = f'{flank_seq[:3]} {collapse_repeats_by_length(flank_seq[3:], 4)}'
+        else:
+            flank = ''
+        return flank
+
 
 def STRMarkerObject(locus, sequence, uas=False, kit='forenseq'):
     constructors = {
