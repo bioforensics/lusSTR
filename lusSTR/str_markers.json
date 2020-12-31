@@ -801,7 +801,7 @@
         "Alleles": ["13", "14", "15", "16"]
     },
     "DYS393": {
-        "BasesToSubtract": 27,
+        "BasesToSubtract": 25,
         "NumRepeats": 4,
         "Repeats": [
             "AGAT"
@@ -842,8 +842,8 @@
         "Tert": "",
         "Foren_5": 3,
         "Foren_3": 29,
-        "Power_5": 3,
-        "Power_3": 59,
+        "Power_5": 0,
+        "Power_3": 58,
         "Alleles": ["8", "9", "9.3", "10", "11", "12", "13", "14"]
     },
     "DYS390": {

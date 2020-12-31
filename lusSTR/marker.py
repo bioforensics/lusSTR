@@ -175,6 +175,7 @@ class STRMarker():
     @property
     def indel_flag(self):
         powerseq_loci = ['DYS393', 'DYS458', 'DYS456']
+        partial_loci = ['DYS439', 'DYS391']
         '''Check for potential indels within flanking regions'''
         if str(self.canonical) not in self.data['Alleles']:
             if self.locus in powerseq_loci:
@@ -184,6 +185,8 @@ class STRMarker():
         else:
             if self.locus in powerseq_loci:
                 flag = 'UAS region indicates entire sequence'
+            elif self.locus in partial_loci and self.kit == 'powerseq':
+                flag = 'Partial UAS region sequence'
             else:
                 flag = ' '
         return flag
@@ -1231,6 +1234,38 @@ class STRMarker_DYS391(STRMarker):
                 f'{collapse_repeats_by_length(flank_seq[7:], 4)}'
             )
         return flank
+
+    @property
+    def canonical(self):
+        '''Canonical STR allele designation'''
+        n = self.repeat_size
+        if self.kit == 'powerseq':
+            nsubout = self.data['BasesToSubtract'] - 6
+        else:
+            nsubout = self.data['BasesToSubtract']
+        nsubout *= -1
+        new_seq = self.uas_sequence[:nsubout]
+        if len(new_seq) % n == 0:
+            canon_allele = int(len(new_seq) / n)
+        else:
+            allele_int = int(len(new_seq) / n)
+            allele_dec = int(len(new_seq) % n)
+            canon_allele = f'{allele_int}.{allele_dec}'
+        return canon_allele
+
+    @property
+    def annotation(self):
+        sequence = self.forward_sequence
+        if self.kit == 'powerseq':
+            final_seq = (
+                f'{collapse_repeats_by_length_flanks(sequence[:6], 4)} '
+                f'{collapse_repeats_by_length(sequence[6:], 4)}'
+            )
+        elif len(sequence) % 4 != 0:
+            final_seq = sequence_to_bracketed_form(sequence, self.repeat_size, self.repeats)
+        else:
+            final_seq = collapse_repeats_by_length(sequence, self.repeat_size)
+        return final_seq
 
 
 class STRMarker_DYS19(STRMarker):
