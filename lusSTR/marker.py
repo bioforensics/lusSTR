@@ -175,7 +175,7 @@ class STRMarker():
     @property
     def indel_flag(self):
         powerseq_loci = ['DYS393', 'DYS458', 'DYS456']
-        partial_loci = ['DYS439', 'DYS391']
+        partial_loci = ['DYS439', 'DYS391', 'DYS385A-B']
         '''Check for potential indels within flanking regions'''
         if str(self.canonical) not in self.data['Alleles']:
             if self.locus in powerseq_loci:
@@ -1274,8 +1274,8 @@ class STRMarker_DYS19(STRMarker):
         flank_seq = self.flankseq_3p
         if self.kit == 'powerseq':
             flank = (
-                f'{collapse_repeats_by_length_flanks(flank_seq[:30], 4)} '
-                f'{collapse_repeats_by_length_flanks(flank_seq[30:], 4)}'
+                f'{collapse_repeats_by_length_flanks(flank_seq[:30], 4)} {flank_seq[30:32]} '
+                f'{collapse_repeats_by_length(flank_seq[32:], 4)}'
             )
         else:
             flank = ''
