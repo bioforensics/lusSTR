@@ -535,30 +535,15 @@ def test_strobj_DXS10074(sequence, bracketed, conc, lus, sec, tert, flank_5p, fl
     assert marker.flank_3p == flank_3p
 
 
-@pytest.mark.parametrize('sequence, bracketed, conc, lus, sec, tert, kit', [
-    (
-        'CTATCTATCTATCTATTCATCCATCTAATCTATCCATTCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTACCTACCT'
-        'ACCTATCTATCTATAGATCTATCTATCTATCT', 'C [TATC]3 TATT [CATC]2 TAAT CTAT CCAT [TCTA]11 '
-        '[CCTA]3 [TCTA]2 TAGA [TCTA]3 TCT', '11', '11', None, None, 'forenseq'
-    ),
-    (
-        'CATTCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTACCTACCTACCTATCTATCTATAGATCTATCTATCTATCTTA'
-        'AATTTGGAAATTCTCCTCAGCATAACATTTTAATGATGATTCCTAGGATACAAGTGATGTGCTGAAAGTATCAATGTGTATCAGAAAA'
-        'CCAACATCTCTGCTTAGGTCTC', 'CAT [TCTA]11 CCTA CCTA CCTA [TCTA]2 TAGA [TCTA]3 TCT', '11',
-        '11', None, None, 'powerseq'
-    ),
-    (
-        'CATTCTATCTATCTATCTATCCATCTATCTATCTATCTATCTATCTACCTACCTACCTATCTATCTATAGATCTATCTATCTATCTTA'
-        'AATTTGGAAATTCTCCTCAGCATAACATTTTAATGATGATTCCTAGGATACAAGTGATGTGCTGAAAGTATCAATGTGTATCAGAAAA'
-        'CCAACATCTCTGCTTAGGTCTC', 'CAT [TCTA]4 TCCA [TCTA]6 CCTA CCTA CCTA [TCTA]2 TAGA [TCTA]3 '
-        'TCT', '11', '6', None, None, 'powerseq'
+def test_strobj_Y_GATA_H4():
+    marker = STRMarkerObject(
+        'Y-GATA-H4', 'CTATCTATCTATCTATTCATCCATCTAATCTATCCATTCTATCTATCTATCTATCTATCTATCTATCTATCTATC'
+        'TATCTACCTACCTACCTATCTATCTATAGATCTATCTATCTATCT', uas=False, kit='forenseq')
+    assert marker.annotation == (
+        'C [TATC]3 TATT [CATC]2 TAAT CTAT CCAT [TCTA]11 [CCTA]3 [TCTA]2 TAGA [TCTA]3 TCT'
     )
-])
-def test_strobj_Y_GATA_H4(sequence, bracketed, conc, lus, sec, tert, kit):
-    marker = STRMarkerObject('Y-GATA-H4', sequence, uas=False, kit=kit)
-    assert marker.annotation == bracketed
-    assert str(marker.canonical) == conc
-    assert marker.designation == (lus, sec, tert)
+    assert str(marker.canonical) == '11'
+    assert marker.designation == ('11', None, None)
 
 
 @pytest.mark.parametrize('sequence, bracketed, conc, lus, sec, tert, flank_5p, kit', [
@@ -923,6 +908,13 @@ def test_strobj_D18S51(sequence, bracketed, lus, sec, tert, flank_5, flank_3, ki
         'CTATCTAAAACACTATATATATATAACACTATATATATAATACTATATATATATTA', '[TCTA]11 CCTA [TCTA]3', '14',
         '11', None, None, 'TC TGGG TTAA GGAG AGTG TCAC TATA', 'AA ACAC [TATA]3 ACAC [TATA]2 TA '
         'ATAC [TATA]2 TATT A'
+    ),
+    (
+        'Y-GATA-H4', 'TCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTACCTACCTACCTATCTATCTATAGATCTATCT'
+        'ATCTATCTTAAATTTGGAAATTCTCCTCAGCATAACATTTTAATGATGATTCCTAGGATACAAGTGATGTGCTGAAAGTATCAATGTG'
+        'TATCAGAAAACCAACATCTCTGCTTAGGTCTCT', '[TCTA]11 [CCTA]3 [TCTA]2 TAGA [TCTA]3 TCT', '11',
+        '11', None, None, None, 'TAAA TTTG GAAA TTCT CCTC AGCA TAAC ATTT TAAT GATG ATTC CTAG GATA'
+        ' CAAG TGAT GTGC TGAA AGTA TCAA TGTG TATC AGAA AACC AACA TCTC TGCT TAGG TCTC T'
     )
 ])
 def test_new_power_config(

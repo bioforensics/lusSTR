@@ -185,7 +185,10 @@ class STRMarker():
         else:
             if self.locus in powerseq_loci:
                 flag = 'UAS region indicates entire sequence'
-            elif self.locus in partial_loci and self.kit == 'powerseq':
+            elif (
+                (self.locus in partial_loci and self.kit == 'powerseq')
+                or self.locus == 'Y-GATA-H4'
+            ):
                 flag = 'Partial UAS region sequence'
             else:
                 flag = ' '
@@ -1372,7 +1375,7 @@ class STRMarker_Y_GATA_H4(STRMarker):
     def annotation(self):
         sequence = self.forward_sequence
         if self.kit == 'powerseq':
-            final_string = sequence_to_bracketed_form(sequence, self.repeat_size, self.repeats)
+            final_string = collapse_repeats_by_length(sequence, self.repeat_size)
         else:
             final_string = (
                 f'{sequence[0]} {collapse_repeats_by_length(sequence[1:], 4)}'
@@ -1388,7 +1391,7 @@ class STRMarker_Y_GATA_H4(STRMarker):
         elif self.kit == 'forenseq':
             nsubout = self.data['BasesToSubtract'] - 12
         else:
-            nsubout = self.data['BasesToSubtract'] - 46
+            nsubout = self.data['BasesToSubtract'] - 49
         nsubout *= -1
         new_seq = self.uas_sequence[:nsubout]
         if len(new_seq) % n == 0:
