@@ -79,9 +79,9 @@ def strait_razor_concat(indir, sexloci=False):
     auto_strs = pd.DataFrame()
     sex_strs = pd.DataFrame() if sexloci is True else None
     analysisID = os.path.basename(indir.rstrip(os.sep))
-    files = glob.glob(os.path.join(indir, '*_STRaitRazor.txt'))
+    files = glob.glob(os.path.join(indir, '*.txt'))
     for filename in sorted(files):
-        name = filename.replace('_STRaitRazor.txt', '').split(os.sep)[-1]
+        name = filename.replace('.txt', '').split(os.sep)[-1]
         table = pd.read_csv(
             filename, sep='\t', header=None,
             names=['Locus_allele', 'Length', 'Sequence', 'Forward_Reads', 'Reverse_Reads']
