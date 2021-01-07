@@ -141,7 +141,10 @@ def test_annotate_uas_sexloci():
         'testformat_sr.csv', 'testformat_sr_sexloci.txt', 'testformat_sr_sexloci_flanks_anno.txt',
         'forenseq'
     ),
-    ('powerseq.csv', 'powerseq_sexloci.txt', 'powerseq_sexloci_flanks_anno.txt', 'powerseq')
+    (
+        'powerseq_flanking_anno_test.csv', 'powerseq_flanking_anno_test_sexloci.txt',
+        'powerseq_flanking_anno_test_sexloci_flanks_anno.txt', 'powerseq'
+    )
 ])
 def test_annotate_sr_sexloci(inputfile, testoutput, flank_output, kit):
     with NamedTemporaryFile() as outfile:
