@@ -24,7 +24,7 @@ setup(
          ]
     },
     include_package_data=True,
-    install_requires=['pandas>=1.0', 'xlrd>=1.0'],
+    install_requires=['pandas>=1.0', 'xlrd=1.2.0'],
     entry_points={
         'console_scripts': ['lusstr = lusSTR.__main__:main']
     },
