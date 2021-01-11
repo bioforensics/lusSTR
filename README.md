@@ -4,6 +4,7 @@ lusSTR is a tool written in Python to convert NGS sequence data of forensic STR 
 
 This Python package has been written for use with either: (1) the 27 autosomal STR loci, 24 Y-chromosome STR loci and 7 X-chromosome STR loci from the Verogen ForenSeq panel, or (2) the 22 autosomal STR loci and 22 Y-chromosome loci from the Promega PowerSeq panel. The package accomodates either the Sample Details Report from the ForenSeq Universal Analysis Software (UAS) or STRait Razor output. If STRait Razor output is provided, sequences are filtered to the UAS sequence region for annotation.
 
+
 ## Installation
 
 For best results, install from bioconda.
@@ -66,7 +67,9 @@ The above command will output two tables which are used in the ```annotate``` co
 
 #### **STRait Razor**
 
-If using the output from STRait Razor, the files **must** be labeled as ```SampleID_STRaitRazor.txt``` (example: ```Sample0001_STRaitRazor.txt```) and **must** be compiled in a separate folder (labeled with the project ID). The user must specify the folder name for the ```format``` command as well as an output filename (all sample files will be compiled into one file):
+If using lusSTR version 0.4 or above, STRait Razor data **must** be produced using the STRait Razor config file released in October 2020 (ForenSeqv1.25.config and PowerSeqv2.1.config). These config files are available [here](https://github.com/Ahhgust/STRaitRazor).
+
+If using the output from STRait Razor, the files **must** be labeled as ```SampleID.txt``` (example: ```Sample0001.txt```) and **must** be compiled in a separate folder (labeled with the project ID). The user must specify the folder name for the ```format``` command as well as an output filename (all sample files will be compiled into one file):
 ```
 lusstr format <input> -o <output>
 ```
