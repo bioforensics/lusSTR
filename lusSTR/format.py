@@ -82,11 +82,19 @@ def strait_razor_concat(indir, sexloci=False):
     files = glob.glob(os.path.join(indir, '*.txt'))
     for filename in sorted(files):
         name = filename.replace('.txt', '').split(os.sep)[-1]
+        print(filename)
         table = pd.read_csv(
             filename, sep='\t', header=None,
             names=['Locus_allele', 'Length', 'Sequence', 'Forward_Reads', 'Reverse_Reads']
         )
-        table[['Locus', 'Allele']] = table.Locus_allele.str.split(":", expand=True)
+        try:
+            table[['Locus', 'Allele']] = table.Locus_allele.str.split(":", expand=True)
+        except ValueError:
+            print(
+                f'Error found with {filename}. Will bypass and continue. Please check file'
+                f' and rerun the command, if necessary.'
+            )
+            continue
         table['Total_Reads'] = table['Forward_Reads'] + table['Reverse_Reads']
         table['SampleID'] = name
         table['Project'] = analysisID
