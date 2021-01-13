@@ -82,7 +82,6 @@ def strait_razor_concat(indir, sexloci=False):
     files = glob.glob(os.path.join(indir, '*.txt'))
     for filename in sorted(files):
         name = filename.replace('.txt', '').split(os.sep)[-1]
-        print(filename)
         table = pd.read_csv(
             filename, sep='\t', header=None,
             names=['Locus_allele', 'Length', 'Sequence', 'Forward_Reads', 'Reverse_Reads']
