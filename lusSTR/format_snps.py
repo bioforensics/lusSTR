@@ -37,8 +37,11 @@ def uas_load(indir, type='i'):
     files = glob.glob(os.path.join(indir, '*.xlsx'))
     for filename in sorted(files):
         filepath = os.path.join(filename)
-        snps = uas_format(filepath, type)
-        snp_final_output = snp_final_output.append(snps)
+        if 'Phenotype' in filename or 'Sample Details' in filename:
+            snps = uas_format(filepath, type)
+            snp_final_output = snp_final_output.append(snps)
+        else:
+            continue
     return snp_final_output
 
 
@@ -70,7 +73,7 @@ def parse_snp_table_from_sheet(infile, sheet, snp_type_arg):
 def uas_format(infile, type):
     if 'Phenotype' in infile and 'i' in type:
         snp_data = parse_snp_table_from_sheet(infile, 'SNP Data', type)
-    elif 'Sample Details' in infile and 'a' or '':
+    elif 'Sample Details' in infile and ('a' or 'p' in type):
         snp_data = parse_snp_table_from_sheet(infile, 'iSNPs', type)
     else:
         snp_data = ''
@@ -108,6 +111,9 @@ def strait_razor_concat(indir, snp_type_arg):
                 except KeyError:
                     continue
                 snp_type = metadata['Type']
+                seq = snps_only.iloc[j, 3]
+                snp_coord = metadata['Coord']
+                snp_loc = seq[snp_coord]
                 row_tmp = [
                     snpid, snps_only.iloc[j, 2], snps_only.iloc[j, 3], snps_only.iloc[j, 6],
                     snp_type_dict[snp_type]
