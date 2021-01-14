@@ -36,9 +36,8 @@ def uas_load(indir, type='i'):
     snp_final_output = pd.DataFrame()
     files = glob.glob(os.path.join(indir, '*.xlsx'))
     for filename in sorted(files):
-        filepath = os.path.join(filename)
         if 'Phenotype' in filename or 'Sample Details' in filename:
-            snps = uas_format(filepath, type)
+            snps = uas_format(filename, type)
             snp_final_output = snp_final_output.append(snps)
         else:
             continue
@@ -70,7 +69,11 @@ def parse_snp_table_from_sheet(infile, sheet, snp_type_arg):
     return final_df
 
 
-def uas_format(infile, type):
+def uas_format(infile, snp_type_arg):
+    if 'all' in snp_type_arg:
+        type = ['i', 'a', 'p']
+    else:
+        type = snp_type_arg
     if 'Phenotype' in infile and 'i' in type:
         snp_data = parse_snp_table_from_sheet(infile, 'SNP Data', type)
     elif 'Sample Details' in infile and ('a' or 'p' in type):
@@ -100,7 +103,8 @@ def strait_razor_concat(indir, snp_type_arg):
             )
             continue
         snps = []
-        if snp_type_arg == 'all':
+        if 'all' in snp_type_arg:
+            print('yes')
             snps_only = pd.DataFrame(
                 table[table['SNP'].str.contains('rs')]
             ).reset_index(drop=True)
@@ -111,12 +115,11 @@ def strait_razor_concat(indir, snp_type_arg):
                 except KeyError:
                     continue
                 snp_type = metadata['Type']
-                seq = snps_only.iloc[j, 3]
-                snp_coord = metadata['Coord']
-                snp_loc = seq[snp_coord]
+                seq = snps_only.iloc[j, 2]
+                snp_call = seq[metadata['Coord']]
                 row_tmp = [
-                    snpid, snps_only.iloc[j, 2], snps_only.iloc[j, 3], snps_only.iloc[j, 6],
-                    snp_type_dict[snp_type]
+                    snpid, snps_only.iloc[j, 3], snp_call, snp_type_dict[snp_type], name,
+                    analysisID, analysisID, seq, snps_only.iloc[j, 6]
                 ]
                 snps.append(row_tmp)
         else:
@@ -128,19 +131,19 @@ def strait_razor_concat(indir, snp_type_arg):
                     except KeyError:
                         continue
                     snp_type = metadata['Type']
+                    seq = snps_only.iloc[j, 3]
+                    snp_call = seq[metadata['Coord']]
                     if type in snp_type:
                         row_tmp = [
-                            snpid, table.iloc[j, 2], table.iloc[j, 3], table.iloc[j, 6],
-                            snp_type_dict[snp_type]
+                            snpid, snps_only.iloc[j, 3], snp_call, snp_type_dict[snp_type], name,
+                            analysisID, analysisID, seq, snps_only.iloc[j, 6]
                         ]
                         snps.append(row_tmp)
         snps_tmp = pd.DataFrame(snps)
-        snps_tmp['SampleID'] = name
-        snps_tmp['Project'] = analysisID
-        snps_tmp['Analysis'] = analysisID
         snps_final = snps_final.append(snps_tmp)
         snps_final.columns = [
-            'SNP', 'Sequence', 'Reads', 'Bases_off', 'Type', 'SampleID', 'Project', 'Analysis'
+            'SNP', 'Reads', 'Allele', 'Type', 'SampleID', 'Project', 'Analysis', 'Sequence',
+            'Bases_off'
         ]
     return snps_final
 
