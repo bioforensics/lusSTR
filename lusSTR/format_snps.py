@@ -31,7 +31,53 @@ snp_type_dict = {
 }
 
 
-def strait_razor_concat(indir, type):
+def uas_load(indir, type='i'):
+    '''Format SNP data from UAS output files for use with `lusSTR annotate_snps`'''
+    snp_final_output = pd.DataFrame()
+    files = glob.glob(os.path.join(indir, '*.xlsx'))
+    for filename in sorted(files):
+        filepath = os.path.join(filename)
+        snps = uas_format(filepath, type)
+        snp_final_output = snp_final_output.append(snps)
+    return snp_final_output
+
+
+def parse_snp_table_from_sheet(infile, sheet, snp_type_arg):
+    table = pd.read_excel(io=infile, sheet_name=sheet)
+    offset = table[table.iloc[:, 0] == "Coverage Information"].index.tolist()[0]
+    data = table.iloc[offset + 2:]
+    data.columns = table.iloc[offset + 1]
+    data = data[['Locus', 'Reads', 'Allele Name']]
+    final_df = pd.DataFrame()
+    for type in snp_type_arg:
+        filtered_dict = {k: v for k, v in snp_marker_data.items() if type in v['Type']}
+        filtered_data = data[data['Locus'].isin(filtered_dict)].reset_index()
+        if type == 'i':
+            filtered_data['Type'] = 'Identity'
+        elif type == 'p':
+            filtered_data['Type'] = 'Phenotype'
+        elif type == 'a':
+            filtered_data['Type'] = 'Ancestry'
+        else:
+            filtered_data['Type'] = 'Phenotype;Ancestry'
+        final_df = final_df.append(filtered_data)
+    final_df['SampleID'] = table.iloc[1, 1]
+    final_df['Project'] = table.iloc[2, 1]
+    final_df['Analysis'] = table.iloc[3, 1]
+    return final_df
+
+
+def uas_format(infile, type):
+    if 'Phenotype' in infile and 'i' in type:
+        snp_data = parse_snp_table_from_sheet(infile, 'SNP Data', type)
+    elif 'Sample Details' in infile and 'a' or '':
+        snp_data = parse_snp_table_from_sheet(infile, 'iSNPs', type)
+    else:
+        snp_data = ''
+    return snp_data
+
+
+def strait_razor_concat(indir, snp_type_arg):
     '''Format a directory of STRait Razor output files for use with `lusSTR annotate_snps`.'''
     snps_final = pd.DataFrame()
     analysisID = os.path.basename(indir.rstrip(os.sep))
@@ -51,8 +97,10 @@ def strait_razor_concat(indir, type):
             )
             continue
         snps = []
-        if type == 'all':
-            snps_only = pd.DataFrame(table[table['SNP'].str.contains('rs')]).reset_index(drop=True)
+        if snp_type_arg == 'all':
+            snps_only = pd.DataFrame(
+                table[table['SNP'].str.contains('rs')]
+            ).reset_index(drop=True)
             for j, row in snps_only.iterrows():
                 snpid = snps_only.iloc[j, 5]
                 try:
@@ -66,7 +114,7 @@ def strait_razor_concat(indir, type):
                 ]
                 snps.append(row_tmp)
         else:
-            for type in ['i']:
+            for type in snp_type_arg:
                 for j, row in table.iterrows():
                     snpid = table.iloc[j, 5]
                     try:
