@@ -27,8 +27,7 @@ def uas_load(inpath, sexloci=False):
         sex_strs = pd.DataFrame() if sexloci is True else None
         files = glob.glob(os.path.join(inpath, '*.xlsx'))
         for filename in sorted(files):
-            filepath = os.path.join(inpath, filename)
-            autodata, sexdata = uas_format(filepath, sexloci)
+            autodata, sexdata = uas_format(filename, sexloci)
             auto_strs = auto_strs.append(autodata)
             if sexloci is True:
                 sex_strs = sex_strs.append(sexdata)
