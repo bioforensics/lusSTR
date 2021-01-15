@@ -625,9 +625,9 @@
     },
     "rs312262906_N29insA": {
         "Type": "p",
-        "Alleles": ["C", "CA"],
+        "Alleles": ["C", "insA"],
         "ReverseCompNeeded": "No",
-        "Coord": ""
+        "Coord": 45
     },
     "rs1805005": {
         "Type": "p",
@@ -1030,5 +1030,11 @@
         "Alleles": ["A", "G"],
         "ReverseCompNeeded": "No",
         "Coord": 6
+    },
+    "mh16-MCR1B": {
+        "Type": "p",
+        "Alleles": [],
+        "ReverseCompNeeded": "No",
+        "Coord": ""
     }
 }
