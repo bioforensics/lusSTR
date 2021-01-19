@@ -48,13 +48,19 @@ snps_within_loci = {
 }
 
 
+def complement_base(base):
+    complement = {'A': 'T', 'C': 'G', 'G': 'C', 'T': 'A'}
+    comp_base = complement[base]
+    return comp_base
+
+
 def uas_load(indir, type='i'):
-    '''Format SNP data from UAS output files for use with `lusSTR annotate_snps`'''
+    '''Format SNP data from UAS output files'''
     snp_final_output = pd.DataFrame()
     files = glob.glob(os.path.join(indir, '*.xlsx'))
     for filename in sorted(files):
         if 'Phenotype' in filename or 'Sample Details' in filename:
-            snps = uas_format(filename, type)
+            snps = uas_types(filename, type)
             if snps is not None:
                 snp_final_output = snp_final_output.append(snps)
         else:
@@ -72,7 +78,6 @@ def parse_snp_table_from_sheet(infile, sheet, snp_type_arg):
     for type in snp_type_arg:
         filtered_dict = {k: v for k, v in snp_marker_data.items() if type in v['Type']}
         filtered_data = data[data['Locus'].isin(filtered_dict)].reset_index()
-        filtered_data['Type'] = snp_type_dict[type]
         final_df = final_df.append(filtered_data)
     final_df['SampleID'] = table.iloc[1, 1]
     final_df['Project'] = table.iloc[2, 1]
@@ -80,18 +85,50 @@ def parse_snp_table_from_sheet(infile, sheet, snp_type_arg):
     return final_df
 
 
-def uas_format(infile, snp_type_arg):
+def uas_types(infile, snp_type_arg):
     if 'all' in snp_type_arg:
         type = ['i', 'a', 'p']
     else:
         type = snp_type_arg
-    if 'Phenotype' in infile and 'i' in type:
-        snp_data = parse_snp_table_from_sheet(infile, 'SNP Data', type)
-    elif 'Sample Details' in infile and ('a' or 'p' in type):
+    if 'Sample Details' in infile and 'i' in type:
         snp_data = parse_snp_table_from_sheet(infile, 'iSNPs', type)
+    elif 'Phenotype' in infile and ('a' or 'p' in type):
+        snp_data = parse_snp_table_from_sheet(infile, 'SNP Data', type)
     else:
         snp_data = None
     return snp_data
+
+
+def uas_format(infile, snp_type_arg):
+    data = uas_load(infile, snp_type_arg)
+    data_filt = data.loc[data['Reads'] != 0].reset_index()
+    data_df = []
+    for j, row in data_filt.iterrows():
+        snpid = data_filt.iloc[j, 2]
+        metadata = snp_marker_data[snpid]
+        type = metadata['Type']
+        uas_allele = data_filt.iloc[j, 4]
+        if metadata['ReverseCompNeeded'] == 'Yes':
+            forward_strand_allele = complement_base(uas_allele)
+        else:
+            forward_strand_allele = uas_allele
+        row_tmp = [
+            snpid, data_filt.iloc[j, 3], forward_strand_allele, uas_allele, snp_type_dict[type],
+            data_filt.iloc[j, 5], data_filt.iloc[j, 6], data_filt.iloc[j, 7]
+        ]
+        if snpid == 'rs16891982' or snpid == 'rs12913832':
+            match_on = [
+                snpid, data_filt.iloc[j, 3], forward_strand_allele, uas_allele,
+                data_filt.iloc[j, 5], data_filt.iloc[j, 6], data_filt.iloc[j, 7]
+            ]
+            if [s for s in data_df if all(xs in s for xs in match_on)]:
+                continue
+        data_df.append(row_tmp)
+    data_final = pd.DataFrame(data_df, columns=[
+        'SNP', 'Reads', 'Forward_Strand_Allele', 'UAS_Allele', 'Type', 'SampleID', 'Project',
+        'Analysis'
+    ])
+    return data_final
 
 
 def compile_row_of_snp_data(infile, snp, table_loc, type, name, analysis):
@@ -112,7 +149,6 @@ def compile_row_of_snp_data(infile, snp, table_loc, type, name, analysis):
 
 
 def collect_snp_info(infile, snpid, j, type, name, analysis):
-    complement = {'A': 'T', 'C': 'G', 'G': 'C', 'T': 'A'}
     if snpid == 'N29insA':
         snpid = 'rs312262906_N29insA'
     metadata = snp_marker_data[snpid]
@@ -124,18 +160,18 @@ def collect_snp_info(infile, snpid, j, type, name, analysis):
     if snpid == 'rs312262906_N29insA' and snp_call == 'A':
         snp_call = 'insA'
     if metadata['ReverseCompNeeded'] == 'Yes':
-        snp_call_uas = complement[snp_call]
+        snp_call_uas = complement_base(snp_call)
     else:
         snp_call_uas = snp_call
     expected_size = infile.iloc[j, 6]
-    if snp_call_uas not in expected_alleles and expected_size != 0:
+    if snp_call not in expected_alleles and expected_size != '0':
         allele_flag = (
             'Allele call does not match expected allele! Check for indels '
             '(does not match expected sequence length)'
         )
-    elif snp_call_uas not in expected_alleles:
+    elif snp_call not in expected_alleles:
         allele_flag = 'Allele call does not match expected allele!'
-    elif expected_size != 0:
+    elif expected_size != '0':
         allele_flag = 'Check for indels (does not match expected sequence length)'
     else:
         allele_flag = ''
@@ -223,7 +259,7 @@ def strait_razor_format(infile, snp_type_arg):
 
 def main(args):
     if args.uas:
-        results = uas_load(args.input, args.type)
+        results = uas_format(args.input, args.type)
     else:
         results, results_combined = strait_razor_format(args.input, args.type)
         output_name = os.path.splitext(args.out)[0]
