@@ -55,7 +55,8 @@ def uas_load(indir, type='i'):
     for filename in sorted(files):
         if 'Phenotype' in filename or 'Sample Details' in filename:
             snps = uas_format(filename, type)
-            snp_final_output = snp_final_output.append(snps)
+            if snps is not None:
+                snp_final_output = snp_final_output.append(snps)
         else:
             continue
     return snp_final_output
@@ -71,14 +72,7 @@ def parse_snp_table_from_sheet(infile, sheet, snp_type_arg):
     for type in snp_type_arg:
         filtered_dict = {k: v for k, v in snp_marker_data.items() if type in v['Type']}
         filtered_data = data[data['Locus'].isin(filtered_dict)].reset_index()
-        if type == 'i':
-            filtered_data['Type'] = 'Identity'
-        elif type == 'p':
-            filtered_data['Type'] = 'Phenotype'
-        elif type == 'a':
-            filtered_data['Type'] = 'Ancestry'
-        else:
-            filtered_data['Type'] = 'Phenotype;Ancestry'
+        filtered_data['Type'] = snp_type_dict[type]
         final_df = final_df.append(filtered_data)
     final_df['SampleID'] = table.iloc[1, 1]
     final_df['Project'] = table.iloc[2, 1]
@@ -96,7 +90,7 @@ def uas_format(infile, snp_type_arg):
     elif 'Sample Details' in infile and ('a' or 'p' in type):
         snp_data = parse_snp_table_from_sheet(infile, 'iSNPs', type)
     else:
-        snp_data = ''
+        snp_data = None
     return snp_data
 
 
@@ -107,15 +101,18 @@ def compile_row_of_snp_data(infile, snp, table_loc, type, name, analysis):
         for k in range(0, len(locus_data['SNPs'])):
             snp_id = locus_data['SNPs'][k]
             row_tmp = collect_snp_info(infile, snp_id, table_loc, type, name, analysis)
-            snp_df.append(row_tmp)
+            if row_tmp is not None:
+                snp_df.append(row_tmp)
     else:
         row_tmp = collect_snp_info(infile, snp, table_loc, type, name, analysis)
-        snp_df.append(row_tmp)
+        if row_tmp is not None:
+            snp_df.append(row_tmp)
     final_snp_df = pd.DataFrame(snp_df)
     return final_snp_df
 
 
 def collect_snp_info(infile, snpid, j, type, name, analysis):
+    complement = {'A': 'T', 'C': 'G', 'G': 'C', 'T': 'A'}
     if snpid == 'N29insA':
         snpid = 'rs312262906_N29insA'
     metadata = snp_marker_data[snpid]
@@ -126,23 +123,35 @@ def collect_snp_info(infile, snpid, j, type, name, analysis):
     snp_call = seq[snp_loc]
     if snpid == 'rs312262906_N29insA' and snp_call == 'A':
         snp_call = 'insA'
-    if snp_call in expected_alleles:
-        allele_flag = ''
+    if metadata['ReverseCompNeeded'] == 'Yes':
+        snp_call_uas = complement[snp_call]
     else:
+        snp_call_uas = snp_call
+    expected_size = infile.iloc[j, 6]
+    if snp_call_uas not in expected_alleles and expected_size != 0:
+        allele_flag = (
+            'Allele call does not match expected allele! Check for indels '
+            '(does not match expected sequence length)'
+        )
+    elif snp_call_uas not in expected_alleles:
         allele_flag = 'Allele call does not match expected allele!'
+    elif expected_size != 0:
+        allele_flag = 'Check for indels (does not match expected sequence length)'
+    else:
+        allele_flag = ''
     if type in snp_type or 'all' in type:
         row_tmp = [
-            snpid, infile.iloc[j, 3], snp_call, snp_type_dict[snp_type], name,
+            snpid, infile.iloc[j, 3], snp_call, snp_call_uas, snp_type_dict[snp_type], name,
             analysis, analysis, allele_flag, seq, infile.iloc[j, 6]
         ]
     else:
-        row_tmp is None
+        row_tmp = None
     return row_tmp
 
 
 def strait_razor_concat(indir, snp_type_arg):
     '''Format a directory of STRait Razor output files for use with `lusSTR annotate_snps`.'''
-    snps_final = pd.DataFrame()
+    snps = pd.DataFrame()
     analysisID = os.path.basename(indir.rstrip(os.sep))
     files = glob.glob(os.path.join(indir, '*.txt'))
     for filename in sorted(files):
@@ -159,7 +168,6 @@ def strait_razor_concat(indir, snp_type_arg):
                 f' and rerun the command, if necessary.'
             )
             continue
-        snps = pd.DataFrame()
         if 'all' in snp_type_arg:
             snps_only = pd.DataFrame(
                 table[table['SNP'].str.contains('rs|mh16|insA')]
@@ -170,7 +178,8 @@ def strait_razor_concat(indir, snp_type_arg):
                     row = compile_row_of_snp_data(snps_only, snpid, j, 'all', name, analysisID)
                 except KeyError:
                     continue
-                snps = snps.append(row)
+                if row is not None:
+                    snps = snps.append(row)
         else:
             for type in snp_type_arg:
                 for j, row in table.iterrows():
@@ -182,17 +191,43 @@ def strait_razor_concat(indir, snp_type_arg):
                     if row is not None:
                         snps = snps.append(row)
         snps.columns = [
-            'SNP', 'Reads', 'Allele', 'Type', 'SampleID', 'Project', 'Analysis',
-            'Potential_Issues', 'Sequence', 'Bases_off'
+            'SNP', 'Reads', 'Forward_Strand_Allele', 'UAS_Allele', 'Type', 'SampleID', 'Project',
+            'Analysis', 'Potential_Issues', 'Sequence', 'Bases_off'
         ]
     return snps
+
+
+def strait_razor_format(infile, snp_type_arg):
+    '''
+    This function formats STRait Razor input data for two separate reports. The Reads are summed
+     for identical allele calls per SNP. Because rs16891982 and rs12913832 are listed as both
+     ancestry and phenotype SNPs, they are double counted when both 'a' and 'p' are specified as
+     arguments; therefore, their read totals are divided by two.
+    '''
+    results = strait_razor_concat(infile, snp_type_arg)
+    results_combine = results.groupby(
+            [
+                'SNP', 'Forward_Strand_Allele', 'UAS_Allele', 'Type', 'SampleID', 'Project',
+                'Analysis'
+            ],
+            as_index=False
+        )['Reads'].sum()
+    if 'a' in snp_type_arg and 'p' in snp_type_arg:
+        results_combine.loc[
+            (results_combine['SNP'] == 'rs16891982') |
+            (results_combine['SNP'] == 'rs12913832'), 'Reads'
+        ] = results_combine['Reads']/2
+        results_combine = results_combine.astype({'Reads': int})
+    return results, results_combine
 
 
 def main(args):
     if args.uas:
         results = uas_load(args.input, args.type)
     else:
-        results = strait_razor_concat(args.input, args.type)
+        results, results_combined = strait_razor_format(args.input, args.type)
+        output_name = os.path.splitext(args.out)[0]
+        results_combined.to_csv(f'{output_name}_full_output.txt', index=False, sep='\t')
     if args.out is None:
         args.out = sys.stdout
-    results.to_csv(args.out, index=False)
+    results.to_csv(args.out, index=False, sep='\t')
