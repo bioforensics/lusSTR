@@ -177,7 +177,7 @@ def collect_snp_info(infile, snpid, j, type, name, analysis):
         allele_flag = ''
     if type in snp_type or 'all' in type:
         row_tmp = [
-            snpid, infile.iloc[j, 3], snp_call, snp_call_uas, snp_type_dict[snp_type], name,
+            snpid, infile.iloc[j, 7], snp_call, snp_call_uas, snp_type_dict[snp_type], name,
             analysis, analysis, allele_flag, seq, infile.iloc[j, 6]
         ]
     else:
@@ -194,7 +194,7 @@ def strait_razor_concat(indir, snp_type_arg):
         name = filename.replace('.txt', '').split(os.sep)[-1]
         table = pd.read_csv(
             filename, sep='\t', header=None,
-            names=['Locus_allele', 'Length', 'Sequence', 'Total_Reads', 'Other_Reads']
+            names=['Locus_allele', 'Length', 'Sequence', 'Forward_Reads', 'Reverse_Reads']
         )
         try:
             table[['SNP', 'Bases_off']] = table.Locus_allele.str.split(":", expand=True)
@@ -204,6 +204,7 @@ def strait_razor_concat(indir, snp_type_arg):
                 f' and rerun the command, if necessary.'
             )
             continue
+        table['Total_Reads'] = table['Forward_Reads'] + table['Reverse_Reads']
         if 'all' in snp_type_arg:
             snps_only = pd.DataFrame(
                 table[table['SNP'].str.contains('rs|mh16|insA')]
@@ -242,18 +243,22 @@ def strait_razor_format(infile, snp_type_arg):
     '''
     results = strait_razor_concat(infile, snp_type_arg)
     results_combine = results.groupby(
-            [
-                'SNP', 'Forward_Strand_Allele', 'UAS_Allele', 'Type', 'SampleID', 'Project',
-                'Analysis'
-            ],
-            as_index=False
-        )['Reads'].sum()
+        [
+            'SNP', 'Forward_Strand_Allele', 'UAS_Allele', 'Type', 'SampleID', 'Project',
+            'Analysis'
+        ],
+        as_index=False
+    )['Reads'].sum()
     if 'a' in snp_type_arg and 'p' in snp_type_arg:
         results_combine.loc[
             (results_combine['SNP'] == 'rs16891982') |
             (results_combine['SNP'] == 'rs12913832'), 'Reads'
         ] = results_combine['Reads']/2
         results_combine = results_combine.astype({'Reads': int})
+    results_combine = results_combine[[
+        'SNP', 'Reads', 'Forward_Strand_Allele', 'UAS_Allele', 'Type', 'SampleID', 'Project',
+        'Analysis'
+    ]]
     return results, results_combine
 
 
