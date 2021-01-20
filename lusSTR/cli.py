@@ -9,7 +9,7 @@
 
 import argparse
 import lusSTR
-from . import format, annot, format_snps
+from . import format, annot, snps
 
 
 def format_subparser(subparsers):
@@ -68,8 +68,8 @@ def annot_subparser(subparsers):
     )
 
 
-def format_snps_subparser(subparsers):
-    cli = subparsers.add_parser('format_snps')
+def snps_subparser(subparsers):
+    cli = subparsers.add_parser('snps')
     cli.add_argument(
         '-o', '--out', metavar='FILE',
         help='file to which output will be written; default is terminal (stdout)'
@@ -83,11 +83,10 @@ def format_snps_subparser(subparsers):
         'final annotation table.'
     )
     cli.add_argument(
-        '--type', choices=['all', 'p', 'i', 'a'], default='i', nargs='+',
-        help='Specify the type of SNPs to include in the final report. "p" will include the '
-        'Phenotype SNPs; "a" will include the Ancestry SNPs; "i" will include the Identity SNPs; '
-        'and "all" will include all SNPS. More than one type can be specified (e.g. a,p; i,a). '
-        'Default is Identity SNPs only (i).'
+        '--type', choices=['all', 'p', 'i'], default='i',
+        help='Specify the type of SNPs to include in the final report. "p" will include only the '
+        'Phenotype and Ancestry SNPs; "i" will include only the Identity SNPs; and "all" will '
+        'include all SNPs. Default is Identity SNPs only (i).'
     )
     cli.add_argument(
         '--uas', action='store_true',
@@ -98,13 +97,13 @@ def format_snps_subparser(subparsers):
 mains = {
     'format': lusSTR.format.main,
     'annotate': lusSTR.annot.main,
-    'format_snps': lusSTR.format_snps.main,
+    'snps': lusSTR.snps.main,
 }
 
 subparser_funcs = {
     'format': format_subparser,
     'annotate': annot_subparser,
-    'format_snps': format_snps_subparser,
+    'snps': snps_subparser,
 }
 
 
