@@ -290,8 +290,8 @@
     "rs901398": {
         "Type": "i",
         "Alleles": ["C", "T"],
-        "ReverseCompNeeded": "Yes",
-        "Coord": 22
+        "ReverseCompNeeded": "No",
+        "Coord": 25
     },
     "rs10488710": {
         "Type": "i",
