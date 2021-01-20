@@ -175,10 +175,13 @@ def collect_snp_info(infile, snpid, j, type, name, analysis):
         allele_flag = 'Check for indels (does not match expected sequence length)'
     else:
         allele_flag = ''
-    if type in snp_type or 'all' in type:
+    if (
+        (type == 'p' and (snp_type == 'p' or snp_type == 'a' or snp_type == 'p/a')) or
+        (type == 'i' and snp_type == 'i') or (type == 'all')
+    ):
         row_tmp = [
-            snpid, infile.iloc[j, 7], snp_call, snp_call_uas, snp_type_dict[snp_type], name,
-            analysis, analysis, allele_flag, seq, infile.iloc[j, 6]
+            snpid, seq, infile.iloc[j, 7], snp_call, snp_call_uas, snp_type_dict[snp_type], name,
+            analysis, analysis, allele_flag,
         ]
     else:
         row_tmp = None
@@ -205,31 +208,20 @@ def strait_razor_concat(indir, snp_type_arg):
             )
             continue
         table['Total_Reads'] = table['Forward_Reads'] + table['Reverse_Reads']
-        if 'all' in snp_type_arg:
-            snps_only = pd.DataFrame(
-                table[table['SNP'].str.contains('rs|mh16|insA')]
-            ).reset_index(drop=True)
-            for j, row in snps_only.iterrows():
-                snpid = snps_only.iloc[j, 5]
-                try:
-                    row = compile_row_of_snp_data(snps_only, snpid, j, 'all', name, analysisID)
-                except KeyError:
-                    continue
-                if row is not None:
-                    snps = snps.append(row)
-        else:
-            for type in snp_type_arg:
-                for j, row in table.iterrows():
-                    snpid = table.iloc[j, 5]
-                    try:
-                        row = compile_row_of_snp_data(table, snpid, j, type, name, analysisID)
-                    except KeyError:
-                        continue
-                    if row is not None:
-                        snps = snps.append(row)
+        snps_only = pd.DataFrame(
+            table[table['SNP'].str.contains('rs|mh16|insA')]
+        ).reset_index(drop=True)
+        for j, row in snps_only.iterrows():
+            snpid = snps_only.iloc[j, 5]
+            try:
+                row = compile_row_of_snp_data(snps_only, snpid, j, snp_type_arg, name, analysisID)
+            except KeyError:
+                continue
+            if row is not None:
+                snps = snps.append(row)
         snps.columns = [
-            'SNP', 'Reads', 'Forward_Strand_Allele', 'UAS_Allele', 'Type', 'SampleID', 'Project',
-            'Analysis', 'Potential_Issues', 'Sequence', 'Bases_off'
+            'SNP', 'Sequence', 'Reads', 'Forward_Strand_Allele', 'UAS_Allele', 'Type', 'SampleID',
+            'Project', 'Analysis', 'Potential_Issues'
         ]
     return snps
 
@@ -237,9 +229,7 @@ def strait_razor_concat(indir, snp_type_arg):
 def strait_razor_format(infile, snp_type_arg):
     '''
     This function formats STRait Razor input data for two separate reports. The Reads are summed
-     for identical allele calls per SNP. Because rs16891982 and rs12913832 are listed as both
-     ancestry and phenotype SNPs, they are double counted when both 'a' and 'p' are specified as
-     arguments; therefore, their read totals are divided by two.
+     for identical allele calls per SNP.
     '''
     results = strait_razor_concat(infile, snp_type_arg)
     results_combine = results.groupby(
@@ -249,12 +239,6 @@ def strait_razor_format(infile, snp_type_arg):
         ],
         as_index=False
     )['Reads'].sum()
-    if 'a' in snp_type_arg and 'p' in snp_type_arg:
-        results_combine.loc[
-            (results_combine['SNP'] == 'rs16891982') |
-            (results_combine['SNP'] == 'rs12913832'), 'Reads'
-        ] = results_combine['Reads']/2
-        results_combine = results_combine.astype({'Reads': int})
     results_combine = results_combine[[
         'SNP', 'Reads', 'Forward_Strand_Allele', 'UAS_Allele', 'Type', 'SampleID', 'Project',
         'Analysis'
@@ -265,10 +249,9 @@ def strait_razor_format(infile, snp_type_arg):
 def main(args):
     if args.uas:
         results = uas_format(args.input, args.type)
+        results.to_csv(args.out, index=False, sep='\t')
     else:
         results, results_combined = strait_razor_format(args.input, args.type)
         output_name = os.path.splitext(args.out)[0]
-        results_combined.to_csv(f'{output_name}_full_output.txt', index=False, sep='\t')
-    if args.out is None:
-        args.out = sys.stdout
-    results.to_csv(args.out, index=False, sep='\t')
+        results_combined.to_csv(args.out, index=False, sep='\t')
+        results.to_csv(f'{output_name}_full_output.txt', index=False, sep='\t')

@@ -151,7 +151,7 @@
     },
     "rs13218440": {
         "Type": "i",
-        "Alleles": ["G", ""],
+        "Alleles": ["G", "A"],
         "ReverseCompNeeded": "No",
         "Coord": 6
     },
@@ -1030,11 +1030,5 @@
         "Alleles": ["A", "G"],
         "ReverseCompNeeded": "No",
         "Coord": 6
-    },
-    "mh16-MCR1B": {
-        "Type": "p",
-        "Alleles": [],
-        "ReverseCompNeeded": "No",
-        "Coord": ""
     }
 }
