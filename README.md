@@ -4,6 +4,8 @@ lusSTR is a tool written in Python to convert NGS sequence data of forensic STR 
 
 This Python package has been written for use with either: (1) the 27 autosomal STR loci, 24 Y-chromosome STR loci and 7 X-chromosome STR loci from the Verogen ForenSeq panel, or (2) the 22 autosomal STR loci and 22 Y-chromosome loci from the Promega PowerSeq panel. The package accomodates either the Sample Details Report from the ForenSeq Universal Analysis Software (UAS) or STRait Razor output. If STRait Razor output is provided, sequences are filtered to the UAS sequence region for annotation.
 
+lusSTR also processes SNP data from the Verogen ForenSeq panel. ForenSeq consists of 94 identity SNPs, 22 phenotype (hair/eye color) SNPs, 54 ancestry SNPs and 2 phenotype and ancestry SNPs. Identity SNP data is provided in the UAS Sample Details Report; phenotype and ancestry SNP data is provided in the UAS Phenotype Report. All SNP calls are also reported in the STRait Razor output.
+
 
 ## Installation
 
@@ -22,11 +24,11 @@ make devenv
 ## Usage
 
 lusSTR accomodates three different input formats:
-(1) UAS Sample Details Report in .xlsx format
+(1) UAS Sample Details Report and UAS Phenotype Report (for SNP processing) in .xlsx format
 (2) STRait Razor output with one sample per file
 (3) Sample(s) sequences in CSV format; first four columns must be Locus, NumReads, Sequence, SampleID; Optional last two columns can be Project and Analysis IDs.
 
-### Formatting input
+### Formatting input for STR loci sequences
 
 If inputting data from either the UAS Sample Details Report or STRait Razor output, the user must first invoke the ```format``` command to extract necessary information and format for the ```annotate``` command.
 
@@ -87,7 +89,7 @@ lusstr format STRaitRazorOutputFolder/ -o STRaitRazor_test_file.csv --include-se
 With this, two tables will be produced: ```STRaitRazor_test_file.csv``` and ```STRaitRazor_test_file_sex_loci.csv```.
 
 
-### Annotation
+### Annotation of STR loci sequences
 
 The ```annotate``` command produces a tab-delineated table with the following columns:
 *  Sample ID
@@ -151,6 +153,49 @@ If the ```--include-sex``` flag is included, as below:
 lusstr annotate STRaitRazor_test_file.csv -o STRaitRazor_powerseq_final.txt --kit powerseq --include-sex
 ```
  Two additional tables will be produced: (1) ```STRaitRazor_powerseq_final_sexloci.txt``` and (2) ```STRaitRazor_powerseq_final_sexloci_flanks_anno.txt``` for annotation of the sex chromosome loci and their flanking regions.
+
+ ## SNP Data Processing
+
+ The ```snp``` command produces tab-delineated table with the following columns:
+ * Sample ID
+ * Project ID
+ * Analysis ID (same as Project ID)
+ * SNP (rsID)
+ * Reads: number of reads observed for the specified allele
+ * Foward Strand Allele: allele call on the forward strand
+ * UAS Allele: allele call as reported from the UAS
+ * Type: SNP type (identity/phenotype/ancestry)
+
+If STRait Razor data is used as input, the number of reads for identical alleles within a SNP are combined in the above table. Further, if STRait Razor data is used as input, a second table (```*_full_output.txt```) is produced containing information for each sequence (not combined) with the following columns:
+ * Sample ID
+ * Project ID
+ * Analysis ID
+ * SNP
+ * Sequence: sequence containing the SNP of interest
+ * Reads
+ * Forward Strand Allele
+ * UAS Allele
+ * Type
+ * Potential issues: flags sequences which may contains errors, such as an unexpected allele call or short than expected sequence length.
+
+ ### Usage
+
+ ```
+ lusstr snps <input_directory> -o <output file name> --type <all, i, p> --uas
+ ```
+
+The ```snp``` command requires a folder of either UAS Reports (Sample Details Report and/or Phenotype Report) or STRait Razor output file(s).
+The ```-o``` flag specifies the name of the output file (should end in ```.txt```)
+The ```--type``` flag specifies the type of SNPs to include in the output file(s). The options are: ```all```, ```i```, or ```p```. If ```p``` is specified, both ancestry and phenotype SNPs are included. The default is ```i```.
+Similar to the processing of STR loci sequences, the ```--uas``` flag indicates the input files are Reports from the UAS. Absence of this flag indicates the provided files are STRait Razor output files.
+
+**Examples**:
+```
+lusstr snps UAS_files/ -o uas_output.txt --type all --uas
+```
+```
+lusstr snps STRait_Razor_output/ -o strait_razor.txt --type p
+```
 
 ----
 
