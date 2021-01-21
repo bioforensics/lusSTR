@@ -57,7 +57,7 @@ def complement_base(base):
 def uas_load(indir, type='i'):
     '''Format SNP data from UAS output files'''
     snp_final_output = pd.DataFrame()
-    files = glob.glob(os.path.join(indir, '*.xlsx'))
+    files = glob.glob(os.path.join(indir, '[!~]*.xlsx'))
     for filename in sorted(files):
         if 'Phenotype' in filename or 'Sample Details' in filename:
             snps = uas_types(filename, type)
@@ -75,8 +75,14 @@ def parse_snp_table_from_sheet(infile, sheet, snp_type_arg):
     data.columns = table.iloc[offset + 1]
     data = data[['Locus', 'Reads', 'Allele Name']]
     final_df = pd.DataFrame()
-    for type in snp_type_arg:
-        filtered_dict = {k: v for k, v in snp_marker_data.items() if type in v['Type']}
+    if snp_type_arg == 'all':
+        final_df = data
+    elif snp_type_arg == 'i':
+        filtered_dict = {k: v for k, v in snp_marker_data.items() if 'i' in v['Type']}
+        filtered_data = data[data['Locus'].isin(filtered_dict)].reset_index()
+        final_df = final_df.append(filtered_data)
+    else:
+        filtered_dict = {k: v for k, v in snp_marker_data.items() if 'i' not in v['Type']}
         filtered_data = data[data['Locus'].isin(filtered_dict)].reset_index()
         final_df = final_df.append(filtered_data)
     final_df['SampleID'] = table.iloc[1, 1]
@@ -86,14 +92,10 @@ def parse_snp_table_from_sheet(infile, sheet, snp_type_arg):
 
 
 def uas_types(infile, snp_type_arg):
-    if 'all' in snp_type_arg:
-        type = ['i', 'a', 'p']
-    else:
-        type = snp_type_arg
-    if 'Sample Details' in infile and 'i' in type:
-        snp_data = parse_snp_table_from_sheet(infile, 'iSNPs', type)
-    elif 'Phenotype' in infile and ('a' or 'p' in type):
-        snp_data = parse_snp_table_from_sheet(infile, 'SNP Data', type)
+    if 'Sample Details' in infile and (snp_type_arg == 'all' or snp_type_arg == 'i'):
+        snp_data = parse_snp_table_from_sheet(infile, 'iSNPs', snp_type_arg)
+    elif 'Phenotype' in infile and (snp_type_arg == 'all' or snp_type_arg == 'p'):
+        snp_data = parse_snp_table_from_sheet(infile, 'SNP Data', snp_type_arg)
     else:
         snp_data = None
     return snp_data
@@ -116,13 +118,6 @@ def uas_format(infile, snp_type_arg):
             snpid, data_filt.iloc[j, 3], forward_strand_allele, uas_allele, snp_type_dict[type],
             data_filt.iloc[j, 5], data_filt.iloc[j, 6], data_filt.iloc[j, 7]
         ]
-        if snpid == 'rs16891982' or snpid == 'rs12913832':
-            match_on = [
-                snpid, data_filt.iloc[j, 3], forward_strand_allele, uas_allele,
-                data_filt.iloc[j, 5], data_filt.iloc[j, 6], data_filt.iloc[j, 7]
-            ]
-            if [s for s in data_df if all(xs in s for xs in match_on)]:
-                continue
         data_df.append(row_tmp)
     data_final = pd.DataFrame(data_df, columns=[
         'SNP', 'Reads', 'Forward_Strand_Allele', 'UAS_Allele', 'Type', 'SampleID', 'Project',
@@ -189,10 +184,10 @@ def collect_snp_info(infile, snpid, j, type, name, analysis):
 
 
 def strait_razor_concat(indir, snp_type_arg):
-    '''Format a directory of STRait Razor output files for use with `lusSTR annotate_snps`.'''
+    '''Format a directory of STRait Razor output files.'''
     snps = pd.DataFrame()
     analysisID = os.path.basename(indir.rstrip(os.sep))
-    files = glob.glob(os.path.join(indir, '*.txt'))
+    files = glob.glob(os.path.join(indir, '[!~]*.txt'))
     for filename in sorted(files):
         name = filename.replace('.txt', '').split(os.sep)[-1]
         table = pd.read_csv(
