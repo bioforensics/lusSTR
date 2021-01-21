@@ -19,8 +19,9 @@ setup(
     packages=['lusSTR', 'lusSTR.tests'],
     package_data={
         'lusSTR': [
-             'lusSTR/str_markers.json', 'lusSTR/tests/data/*', 'lusSTR/tests/data/STRait_Razor_test_output/*',
-             'lusSTR/tests/data/UAS_bulk_input/*'
+             'lusSTR/str_markers.json', 'lusSTR/snp_data.json', 'lusSTR/tests/data/*', 
+             'lusSTR/tests/data/STRait_Razor_test_output/*', 'lusSTR/tests/data/UAS_bulk_input/*',
+             'lusSTR/tests/data/snps/*'
          ]
     },
     include_package_data=True,
