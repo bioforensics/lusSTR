@@ -115,13 +115,13 @@ def uas_format(infile, snp_type_arg):
         else:
             forward_strand_allele = uas_allele
         row_tmp = [
-            snpid, data_filt.iloc[j, 3], forward_strand_allele, uas_allele, snp_type_dict[type],
-            data_filt.iloc[j, 5], data_filt.iloc[j, 6], data_filt.iloc[j, 7]
+            data_filt.iloc[j, 5], data_filt.iloc[j, 6], data_filt.iloc[j, 7], snpid,
+            data_filt.iloc[j, 3], forward_strand_allele, uas_allele, snp_type_dict[type]
         ]
         data_df.append(row_tmp)
     data_final = pd.DataFrame(data_df, columns=[
-        'SNP', 'Reads', 'Forward_Strand_Allele', 'UAS_Allele', 'Type', 'SampleID', 'Project',
-        'Analysis'
+        'SampleID', 'Project', 'Analysis', 'SNP', 'Reads', 'Forward_Strand_Allele', 'UAS_Allele',
+        'Type'
     ])
     return data_final
 
@@ -175,8 +175,8 @@ def collect_snp_info(infile, snpid, j, type, name, analysis):
         (type == 'i' and snp_type == 'i') or (type == 'all')
     ):
         row_tmp = [
-            snpid, seq, infile.iloc[j, 7], snp_call, snp_call_uas, snp_type_dict[snp_type], name,
-            analysis, analysis, allele_flag,
+            name, analysis, analysis, snpid, seq, infile.iloc[j, 7], snp_call, snp_call_uas,
+            snp_type_dict[snp_type], allele_flag
         ]
     else:
         row_tmp = None
@@ -215,8 +215,8 @@ def strait_razor_concat(indir, snp_type_arg):
             if row is not None:
                 snps = snps.append(row)
         snps.columns = [
-            'SNP', 'Sequence', 'Reads', 'Forward_Strand_Allele', 'UAS_Allele', 'Type', 'SampleID',
-            'Project', 'Analysis', 'Potential_Issues'
+            'SampleID', 'Project', 'Analysis', 'SNP', 'Sequence', 'Reads', 'Forward_Strand_Allele',
+            'UAS_Allele', 'Type', 'Potential_Issues'
         ]
     return snps
 
@@ -235,8 +235,8 @@ def strait_razor_format(infile, snp_type_arg):
         as_index=False
     )['Reads'].sum()
     results_combine = results_combine[[
-        'SNP', 'Reads', 'Forward_Strand_Allele', 'UAS_Allele', 'Type', 'SampleID', 'Project',
-        'Analysis'
+        'SampleID', 'Project', 'Analysis', 'SNP', 'Reads', 'Forward_Strand_Allele',
+        'UAS_Allele', 'Type'
     ]]
     return results, results_combine
 
