@@ -103,20 +103,22 @@ def uas_types(infile, snp_type_arg):
 
 def uas_format(infile, snp_type_arg):
     data = uas_load(infile, snp_type_arg)
-    data_filt = data.loc[data['Reads'] != 0].reset_index()
+    data_filt = data.loc[data['Reads'] != 0].reset_index(drop=True)
     data_df = []
     for j, row in data_filt.iterrows():
-        snpid = data_filt.iloc[j, 2]
+        print(data_filt.head())
+        snpid = data_filt.iloc[j, 0]
+        print(snpid)
         metadata = snp_marker_data[snpid]
         type = metadata['Type']
-        uas_allele = data_filt.iloc[j, 4]
+        uas_allele = data_filt.iloc[j, 2]
         if metadata['ReverseCompNeeded'] == 'Yes':
             forward_strand_allele = complement_base(uas_allele)
         else:
             forward_strand_allele = uas_allele
         row_tmp = [
-            data_filt.iloc[j, 5], data_filt.iloc[j, 6], data_filt.iloc[j, 7], snpid,
-            data_filt.iloc[j, 3], forward_strand_allele, uas_allele, snp_type_dict[type]
+            data_filt.iloc[j, 3], data_filt.iloc[j, 4], data_filt.iloc[j, 5], snpid,
+            data_filt.iloc[j, 1], forward_strand_allele, uas_allele, snp_type_dict[type]
         ]
         data_df.append(row_tmp)
     data_final = pd.DataFrame(data_df, columns=[
