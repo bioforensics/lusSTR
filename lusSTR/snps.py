@@ -106,9 +106,7 @@ def uas_format(infile, snp_type_arg):
     data_filt = data.loc[data['Reads'] != 0].reset_index(drop=True)
     data_df = []
     for j, row in data_filt.iterrows():
-        print(data_filt.head())
         snpid = data_filt.iloc[j, 0]
-        print(snpid)
         metadata = snp_marker_data[snpid]
         type = metadata['Type']
         uas_allele = data_filt.iloc[j, 2]
@@ -116,14 +114,18 @@ def uas_format(infile, snp_type_arg):
             forward_strand_allele = complement_base(uas_allele)
         else:
             forward_strand_allele = uas_allele
+        if forward_strand_allele in metadata['Alleles']:
+            flag = ''
+        else:
+            flag = 'Allele call does not match expected allele!'
         row_tmp = [
             data_filt.iloc[j, 3], data_filt.iloc[j, 4], data_filt.iloc[j, 5], snpid,
-            data_filt.iloc[j, 1], forward_strand_allele, uas_allele, snp_type_dict[type]
+            data_filt.iloc[j, 1], forward_strand_allele, uas_allele, snp_type_dict[type], flag
         ]
         data_df.append(row_tmp)
     data_final = pd.DataFrame(data_df, columns=[
         'SampleID', 'Project', 'Analysis', 'SNP', 'Reads', 'Forward_Strand_Allele', 'UAS_Allele',
-        'Type'
+        'Type', 'Issues'
     ])
     return data_final
 
@@ -146,6 +148,11 @@ def compile_row_of_snp_data(infile, snp, table_loc, type, name, analysis):
 
 
 def snp_call_exception(seq, expected_size, metadata, base):
+    '''
+    This function accounts for insertions and deletions in sequences to identify the correct base
+     for the SNP. If the identified allele is still not one of the expected alleles, the sequence
+     will be flagged appropriately.
+    '''
     new_size = len(seq) + expected_size
     new_base_call = seq[new_size]
     if new_base_call in metadata['Alleles']:
@@ -177,12 +184,12 @@ def collect_snp_info(infile, snpid, j, type, name, analysis):
     else:
         snp_call_uas = snp_call
     if snpid == 'rs2402130':
-        expected_size = len(seq) - 73
+        differ_length = len(seq) - 73
     else:
-        expected_size = int(infile.iloc[j, 6])
-    if snp_call not in expected_alleles and expected_size != '0':
+        differ_length = int(infile.iloc[j, 6])
+    if snp_call not in expected_alleles and differ_length != 0:
         if snpid == 'rs1821380':
-            snp_call, allele_flag = snp_call_exception(seq, expected_size, metadata, snp_call)
+            snp_call, allele_flag = snp_call_exception(seq, differ_length, metadata, snp_call)
             snp_call_uas = complement_base(snp_call)
         else:
             allele_flag = (
@@ -191,7 +198,7 @@ def collect_snp_info(infile, snpid, j, type, name, analysis):
             )
     elif snp_call not in expected_alleles:
         allele_flag = 'Allele call does not match expected allele!'
-    elif expected_size != 0:
+    elif differ_length != 0:
         allele_flag = 'Check for indels (does not match expected sequence length)'
     else:
         allele_flag = ''
@@ -240,8 +247,8 @@ def strait_razor_concat(indir, snp_type_arg):
             if row is not None:
                 snps = snps.append(row)
         snps.columns = [
-            'SampleID', 'Project', 'Analysis', 'SNP', 'Sequence', 'Reads', 'Forward_Strand_Allele',
-            'UAS_Allele', 'Type', 'Potential_Issues'
+            'SampleID', 'Project', 'Analysis', 'SNP', 'Sequence', 'Reads',
+            'Forward_Strand_Allele', 'UAS_Allele', 'Type', 'Potential_Issues'
         ]
     return snps
 
@@ -263,6 +270,12 @@ def strait_razor_format(infile, snp_type_arg):
         'SampleID', 'Project', 'Analysis', 'SNP', 'Reads', 'Forward_Strand_Allele',
         'UAS_Allele', 'Type'
     ]]
+    results_combine['Issues'] = ''
+    for j, row in results_combine.iterrows():
+        snpid = results_combine.iloc[j, 3]
+        metadata = snp_marker_data[snpid]
+        if results_combine.iloc[j, 5] not in metadata['Alleles']:
+            results_combine.iloc[j, 8] = 'Allele call does not match expected allele!'
     return results, results_combine
 
 
