@@ -165,6 +165,7 @@ lusstr annotate STRaitRazor_test_file.csv -o STRaitRazor_powerseq_final.txt --ki
  * Foward Strand Allele: allele call on the forward strand
  * UAS Allele: allele call as reported from the UAS
  * Type: SNP type (identity/phenotype/ancestry)
+ * Issues: Indicates if called allele is one of two expected alleles for SNP
 
 If STRait Razor data is used as input, the number of reads for identical alleles within a SNP are combined in the above table. Further, if STRait Razor data is used as input, a second table (```*_full_output.txt```) is produced containing information for each sequence (not combined) with the following columns:
  * Sample ID
