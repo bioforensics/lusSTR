@@ -158,7 +158,10 @@ def collect_snp_info(infile, snpid, j, type, name, analysis):
         snp_call_uas = complement_base(snp_call)
     else:
         snp_call_uas = snp_call
-    expected_size = infile.iloc[j, 6]
+    if snpid == 'rs2402130':
+        expected_size = len(seq) - 73
+    else:
+        expected_size = int(infile.iloc[j, 6])
     if snp_call not in expected_alleles and expected_size != '0':
         allele_flag = (
             'Allele call does not match expected allele! Check for indels '
@@ -166,7 +169,7 @@ def collect_snp_info(infile, snpid, j, type, name, analysis):
         )
     elif snp_call not in expected_alleles:
         allele_flag = 'Allele call does not match expected allele!'
-    elif expected_size != '0':
+    elif expected_size != 0:
         allele_flag = 'Check for indels (does not match expected sequence length)'
     else:
         allele_flag = ''
