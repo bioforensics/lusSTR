@@ -143,6 +143,22 @@ def compile_row_of_snp_data(infile, snp, table_loc, type, name, analysis):
     return final_snp_df
 
 
+def snp_call_exception(seq, expected_size, metadata, base):
+    new_size = len(seq) + expected_size
+    new_base_call = seq[new_size]
+    if new_base_call in metadata['Alleles']:
+        flag = (
+            'Sequence length different than expected (check for indels); allele position adjusted'
+        )
+        return new_base_call, flag
+    else:
+        flag = (
+            'Allele call does not match expected allele! Check for indels '
+            '(does not match expected sequence length)'
+        )
+        return base, flag
+
+
 def collect_snp_info(infile, snpid, j, type, name, analysis):
     if snpid == 'N29insA':
         snpid = 'rs312262906_N29insA'
@@ -163,10 +179,14 @@ def collect_snp_info(infile, snpid, j, type, name, analysis):
     else:
         expected_size = int(infile.iloc[j, 6])
     if snp_call not in expected_alleles and expected_size != '0':
-        allele_flag = (
-            'Allele call does not match expected allele! Check for indels '
-            '(does not match expected sequence length)'
-        )
+        if snpid == 'rs1821380':
+            snp_call, allele_flag = snp_call_exception(seq, expected_size, metadata, snp_call)
+            snp_call_uas = complement_base(snp_call)
+        else:
+            allele_flag = (
+                'Allele call does not match expected allele! Check for indels '
+                '(does not match expected sequence length)'
+            )
     elif snp_call not in expected_alleles:
         allele_flag = 'Allele call does not match expected allele!'
     elif expected_size != 0:
