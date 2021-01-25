@@ -55,7 +55,11 @@ def complement_base(base):
 
 
 def uas_load(indir, type='i'):
-    '''Format SNP data from UAS output files'''
+    '''
+    This function lists input .xlsx files within the specified directory and performs a check to
+    ensure the correct file is processed (must contain either "Phenotype" or "Sample Details").
+    This also compiles the SNP data for each file within the directory.
+    '''
     snp_final_output = pd.DataFrame()
     files = glob.glob(os.path.join(indir, '[!~]*.xlsx'))
     for filename in sorted(files):
@@ -69,6 +73,10 @@ def uas_load(indir, type='i'):
 
 
 def parse_snp_table_from_sheet(infile, sheet, snp_type_arg):
+    '''
+    This function formats the SNP data from the original file and filters the SNPs based on the
+    indicated SNP type.
+    '''
     table = pd.read_excel(io=infile, sheet_name=sheet)
     offset = table[table.iloc[:, 0] == "Coverage Information"].index.tolist()[0]
     data = table.iloc[offset + 2:]
@@ -92,6 +100,10 @@ def parse_snp_table_from_sheet(infile, sheet, snp_type_arg):
 
 
 def uas_types(infile, snp_type_arg):
+    '''
+    This function determines which tab within the specified file is required to extract the SNP
+    data from based on the name of the file.
+    '''
     if 'Sample Details' in infile and (snp_type_arg == 'all' or snp_type_arg == 'i'):
         snp_data = parse_snp_table_from_sheet(infile, 'iSNPs', snp_type_arg)
     elif 'Phenotype' in infile and (snp_type_arg == 'all' or snp_type_arg == 'p'):
@@ -102,6 +114,12 @@ def uas_types(infile, snp_type_arg):
 
 
 def uas_format(infile, snp_type_arg):
+    '''
+    This function begins with the compiled data from all files within the specified directory.
+    It removes any allele with Reads of 0; identifies whether the allele call needs to be reverse
+    complemented to be reported on the forward strand; and checks that the called allele is one of
+    two expected alleles for the SNP (and flags any SNP call which is unexpected).
+    '''
     data = uas_load(infile, snp_type_arg)
     data_filt = data.loc[data['Reads'] != 0].reset_index(drop=True)
     data_df = []
@@ -131,6 +149,12 @@ def uas_format(infile, snp_type_arg):
 
 
 def compile_row_of_snp_data(infile, snp, table_loc, type, name, analysis):
+    '''
+    This function is necessary to account for the two sets of SNPs reported from the same
+    sequence amplicon. Sequences labeled as mh16-MC1RB and mh16-MC1RC contain 3 and 6 SNPs,
+    respectively. This function reports out each SNP from the sequence amplicon as individual
+    rows and calls another function to compile data on each SNP.
+    '''
     snp_df = []
     if 'mh16' in snp:
         locus_data = snps_within_loci[snp]
@@ -169,6 +193,14 @@ def snp_call_exception(seq, expected_size, metadata, base):
 
 
 def collect_snp_info(infile, snpid, j, type, name, analysis):
+    '''
+    This function compiles allele calls, reads, reverse complements allele call if necessary to
+    match how the UAS reports the allele, and any flags associated with the allele call. The flags
+    indicate potential issues, including an unexpected allele call (not one of two expected
+    alleles for the SNP) or unexpected length of the sequence amplicon which could result in an
+    incorrect allele call. This function also determines if the SNP should be included in the
+    final table based on the specified SNP type from the CLI.
+    '''
     if snpid == 'N29insA':
         snpid = 'rs312262906_N29insA'
     metadata = snp_marker_data[snpid]
@@ -216,7 +248,11 @@ def collect_snp_info(infile, snpid, j, type, name, analysis):
 
 
 def strait_razor_concat(indir, snp_type_arg):
-    '''Format a directory of STRait Razor output files.'''
+    '''
+    This function reads in all .txt files within the specified directory. For each file, the
+    forward and reverse reads are summed and each sequence is processed and compiled into one
+    final dataframe.
+    '''
     snps = pd.DataFrame()
     analysisID = os.path.basename(indir.rstrip(os.sep))
     files = glob.glob(os.path.join(indir, '[!~]*.txt'))
@@ -255,8 +291,10 @@ def strait_razor_concat(indir, snp_type_arg):
 
 def strait_razor_format(infile, snp_type_arg):
     '''
-    This function formats STRait Razor input data for two separate reports. The Reads are summed
-     for identical allele calls per SNP.
+    This function formats STRait Razor input data for two separate reports. The full output
+    includes all reads, the SNP allele calls and any results flags. In the main report, the reads
+    are summed for identical allele calls per SNP. This function also checks that the allele call
+    is one of two expected alleles for the SNP (and flags the allele if not).
     '''
     results = strait_razor_concat(infile, snp_type_arg)
     results_combine = results.groupby(
