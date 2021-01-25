@@ -25,3 +25,16 @@ def test_uas_all(tmp_path):
     args = lusSTR.cli.get_parser().parse_args(arglist)
     lusSTR.snps.main(args)
     assert filecmp.cmp(exp_out, obs_out) is True
+
+
+def test_sr_all(tmp_path):
+    inputdb = data_file('snps')
+    exp_out = data_file('snps_sr_all.txt')
+    exp_out_full = data_file('snps_sr_all_full_output.txt')
+    obs_out = str(tmp_path / 'sr.txt')
+    obs_out_full = str(tmp_path / 'sr_full_output.txt')
+    arglist = ['snps', inputdb, '-o', obs_out, '--type', 'all']
+    args = lusSTR.cli.get_parser().parse_args(arglist)
+    lusSTR.snps.main(args)
+    assert filecmp.cmp(exp_out, obs_out) is True
+    assert filecmp.cmp(exp_out_full, obs_out_full) is True

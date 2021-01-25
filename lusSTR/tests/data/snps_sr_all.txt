@@ -1,0 +1,338 @@
+SampleID	Project	Analysis	SNP	Reads	Forward_Strand_Allele	UAS_Allele	Type	Issues
+2800M_STRaitRazor	snps	snps	rs1005533	528	A	A	Identity	
+2800M_STRaitRazor	snps	snps	rs10092491	91	C	C	Identity	
+2800M_STRaitRazor	snps	snps	rs10092491	95	T	T	Identity	
+2800M_STRaitRazor	snps	snps	rs1015250	1	C	C	Identity	
+2800M_STRaitRazor	snps	snps	rs1015250	198	G	G	Identity	
+2800M_STRaitRazor	snps	snps	rs1024116	527	T	A	Identity	
+2800M_STRaitRazor	snps	snps	rs1028528	245	A	A	Identity	
+2800M_STRaitRazor	snps	snps	rs1028528	225	G	G	Identity	
+2800M_STRaitRazor	snps	snps	rs1031825	48	C	C	Identity	
+2800M_STRaitRazor	snps	snps	rs1042602	267	A	A	Phenotype	
+2800M_STRaitRazor	snps	snps	rs1042602	280	C	C	Phenotype	
+2800M_STRaitRazor	snps	snps	rs1042602	2	T	T	Phenotype	Allele call does not match expected allele!
+2800M_STRaitRazor	snps	snps	rs10488710	91	C	G	Identity	
+2800M_STRaitRazor	snps	snps	rs10488710	94	G	C	Identity	
+2800M_STRaitRazor	snps	snps	rs10488710	1	T	A	Identity	Allele call does not match expected allele!
+2800M_STRaitRazor	snps	snps	rs10495407	322	G	G	Identity	
+2800M_STRaitRazor	snps	snps	rs10497191	120	C	C	Ancestry	
+2800M_STRaitRazor	snps	snps	rs1058083	379	A	A	Identity	
+2800M_STRaitRazor	snps	snps	rs1058083	2	C	C	Identity	Allele call does not match expected allele!
+2800M_STRaitRazor	snps	snps	rs1058083	256	G	G	Identity	
+2800M_STRaitRazor	snps	snps	rs10773760	110	A	A	Identity	
+2800M_STRaitRazor	snps	snps	rs10773760	126	G	G	Identity	
+2800M_STRaitRazor	snps	snps	rs10776839	267	G	G	Identity	
+2800M_STRaitRazor	snps	snps	rs1079597	1	A	T	Ancestry	Allele call does not match expected allele!
+2800M_STRaitRazor	snps	snps	rs1079597	265	C	G	Ancestry	
+2800M_STRaitRazor	snps	snps	rs1109037	1463	G	G	Identity	
+2800M_STRaitRazor	snps	snps	rs1109037	1	T	T	Identity	Allele call does not match expected allele!
+2800M_STRaitRazor	snps	snps	rs1110400	3	C	C	Phenotype	
+2800M_STRaitRazor	snps	snps	rs1110400	1	G	G	Phenotype	Allele call does not match expected allele!
+2800M_STRaitRazor	snps	snps	rs1110400	2412	T	T	Phenotype	
+2800M_STRaitRazor	snps	snps	rs11547464	5	A	A	Phenotype	
+2800M_STRaitRazor	snps	snps	rs11547464	1	C	C	Phenotype	Allele call does not match expected allele!
+2800M_STRaitRazor	snps	snps	rs11547464	2408	G	G	Phenotype	
+2800M_STRaitRazor	snps	snps	rs11547464	2	T	T	Phenotype	Allele call does not match expected allele!
+2800M_STRaitRazor	snps	snps	rs11652805	2	C	C	Ancestry	
+2800M_STRaitRazor	snps	snps	rs11652805	619	T	T	Ancestry	
+2800M_STRaitRazor	snps	snps	rs12203592	288	C	C	Phenotype	
+2800M_STRaitRazor	snps	snps	rs12203592	1	T	T	Phenotype	
+2800M_STRaitRazor	snps	snps	rs1229984	388	C	G	Ancestry	
+2800M_STRaitRazor	snps	snps	rs1229984	2	T	A	Ancestry	
+2800M_STRaitRazor	snps	snps	rs12439433	2	A	A	Ancestry	
+2800M_STRaitRazor	snps	snps	rs12439433	661	G	G	Ancestry	
+2800M_STRaitRazor	snps	snps	rs12439433	1	T	T	Ancestry	Allele call does not match expected allele!
+2800M_STRaitRazor	snps	snps	rs12498138	135	G	G	Ancestry	
+2800M_STRaitRazor	snps	snps	rs12821256	53	C	C	Phenotype	
+2800M_STRaitRazor	snps	snps	rs12821256	4	G	G	Phenotype	Allele call does not match expected allele!
+2800M_STRaitRazor	snps	snps	rs12821256	95	T	T	Phenotype	
+2800M_STRaitRazor	snps	snps	rs12896399	423	G	G	Phenotype	
+2800M_STRaitRazor	snps	snps	rs12896399	1	T	T	Phenotype	
+2800M_STRaitRazor	snps	snps	rs12913832	100	A	A	Phenotype;Ancestry	
+2800M_STRaitRazor	snps	snps	rs12913832	177	G	G	Phenotype;Ancestry	
+2800M_STRaitRazor	snps	snps	rs1294331	2	A	T	Identity	Allele call does not match expected allele!
+2800M_STRaitRazor	snps	snps	rs1294331	259	C	G	Identity	
+2800M_STRaitRazor	snps	snps	rs1294331	218	T	A	Identity	
+2800M_STRaitRazor	snps	snps	rs12997453	165	A	A	Identity	
+2800M_STRaitRazor	snps	snps	rs12997453	1	G	G	Identity	
+2800M_STRaitRazor	snps	snps	rs13182883	175	A	A	Identity	
+2800M_STRaitRazor	snps	snps	rs13182883	211	G	G	Identity	
+2800M_STRaitRazor	snps	snps	rs13218440	105	A	A	Identity	
+2800M_STRaitRazor	snps	snps	rs13218440	125	G	G	Identity	
+2800M_STRaitRazor	snps	snps	rs1335873	951	A	T	Identity	
+2800M_STRaitRazor	snps	snps	rs1335873	1	G	C	Identity	Allele call does not match expected allele!
+2800M_STRaitRazor	snps	snps	rs1336071	382	C	G	Identity	
+2800M_STRaitRazor	snps	snps	rs1355366	63	C	G	Identity	
+2800M_STRaitRazor	snps	snps	rs1355366	55	T	A	Identity	
+2800M_STRaitRazor	snps	snps	rs1357617	34	A	A	Identity	
+2800M_STRaitRazor	snps	snps	rs1357617	35	T	T	Identity	
+2800M_STRaitRazor	snps	snps	rs1360288	1	A	A	Identity	Allele call does not match expected allele!
+2800M_STRaitRazor	snps	snps	rs1360288	307	C	C	Identity	
+2800M_STRaitRazor	snps	snps	rs1382387	838	A	T	Identity	
+2800M_STRaitRazor	snps	snps	rs1382387	701	C	G	Identity	
+2800M_STRaitRazor	snps	snps	rs1393350	253	G	G	Phenotype	
+2800M_STRaitRazor	snps	snps	rs1413212	91	C	G	Identity	
+2800M_STRaitRazor	snps	snps	rs1426654	212	A	A	Ancestry	
+2800M_STRaitRazor	snps	snps	rs1454361	472	A	A	Identity	
+2800M_STRaitRazor	snps	snps	rs1454361	1	C	C	Identity	Allele call does not match expected allele!
+2800M_STRaitRazor	snps	snps	rs1454361	576	T	T	Identity	
+2800M_STRaitRazor	snps	snps	rs1462906	95	C	C	Ancestry	
+2800M_STRaitRazor	snps	snps	rs1463729	184	C	G	Identity	
+2800M_STRaitRazor	snps	snps	rs1463729	259	T	A	Identity	
+2800M_STRaitRazor	snps	snps	rs1490413	575	A	A	Identity	
+2800M_STRaitRazor	snps	snps	rs1493232	41	A	A	Identity	
+2800M_STRaitRazor	snps	snps	rs1498553	57	C	C	Identity	
+2800M_STRaitRazor	snps	snps	rs1498553	76	T	T	Identity	
+2800M_STRaitRazor	snps	snps	rs1523537	343	C	C	Identity	
+2800M_STRaitRazor	snps	snps	rs1528460	187	T	T	Identity	
+2800M_STRaitRazor	snps	snps	rs1572018	831	C	G	Ancestry	
+2800M_STRaitRazor	snps	snps	rs1572018	681	T	A	Ancestry	
+2800M_STRaitRazor	snps	snps	rs159606	248	A	A	Identity	
+2800M_STRaitRazor	snps	snps	rs16891982	322	G	G	Phenotype;Ancestry	
+2800M_STRaitRazor	snps	snps	rs16891982	1	T	T	Phenotype;Ancestry	Allele call does not match expected allele!
+2800M_STRaitRazor	snps	snps	rs1736442	89	C	G	Identity	
+2800M_STRaitRazor	snps	snps	rs174570	1	A	A	Ancestry	Allele call does not match expected allele!
+2800M_STRaitRazor	snps	snps	rs174570	1828	C	C	Ancestry	
+2800M_STRaitRazor	snps	snps	rs174570	1	T	T	Ancestry	
+2800M_STRaitRazor	snps	snps	rs17642714	112	A	A	Ancestry	
+2800M_STRaitRazor	snps	snps	rs17642714	2	G	G	Ancestry	Allele call does not match expected allele!
+2800M_STRaitRazor	snps	snps	rs17642714	85	T	T	Ancestry	
+2800M_STRaitRazor	snps	snps	rs1800407	1089	C	G	Phenotype	
+2800M_STRaitRazor	snps	snps	rs1800407	2	G	C	Phenotype	Allele call does not match expected allele!
+2800M_STRaitRazor	snps	snps	rs1800414	566	T	A	Ancestry	
+2800M_STRaitRazor	snps	snps	rs1805005	997	G	G	Phenotype	
+2800M_STRaitRazor	snps	snps	rs1805005	3	T	T	Phenotype	
+2800M_STRaitRazor	snps	snps	rs1805006	1000	C	C	Phenotype	
+2800M_STRaitRazor	snps	snps	rs1805007	2	A	A	Phenotype	Allele call does not match expected allele!
+2800M_STRaitRazor	snps	snps	rs1805007	2401	C	C	Phenotype	
+2800M_STRaitRazor	snps	snps	rs1805007	2	G	G	Phenotype	Allele call does not match expected allele!
+2800M_STRaitRazor	snps	snps	rs1805007	11	T	T	Phenotype	
+2800M_STRaitRazor	snps	snps	rs1805008	1	A	A	Phenotype	Allele call does not match expected allele!
+2800M_STRaitRazor	snps	snps	rs1805008	2411	C	C	Phenotype	
+2800M_STRaitRazor	snps	snps	rs1805008	2	G	G	Phenotype	Allele call does not match expected allele!
+2800M_STRaitRazor	snps	snps	rs1805008	2	T	T	Phenotype	
+2800M_STRaitRazor	snps	snps	rs1805009	1	A	A	Phenotype	Allele call does not match expected allele!
+2800M_STRaitRazor	snps	snps	rs1805009	1	C	C	Phenotype	
+2800M_STRaitRazor	snps	snps	rs1805009	1453	G	G	Phenotype	
+2800M_STRaitRazor	snps	snps	rs1805009	5	T	T	Phenotype	Allele call does not match expected allele!
+2800M_STRaitRazor	snps	snps	rs1821380	1441	C	G	Identity	
+2800M_STRaitRazor	snps	snps	rs1821380	2	T	A	Identity	Allele call does not match expected allele!
+2800M_STRaitRazor	snps	snps	rs1834619	188	G	G	Ancestry	
+2800M_STRaitRazor	snps	snps	rs1871534	435	G	C	Ancestry	
+2800M_STRaitRazor	snps	snps	rs1871534	1	T	A	Ancestry	Allele call does not match expected allele!
+2800M_STRaitRazor	snps	snps	rs1876482	1343	G	C	Ancestry	
+2800M_STRaitRazor	snps	snps	rs1876482	2	T	A	Ancestry	Allele call does not match expected allele!
+2800M_STRaitRazor	snps	snps	rs1886510	144	A	T	Identity	
+2800M_STRaitRazor	snps	snps	rs1886510	242	G	C	Identity	
+2800M_STRaitRazor	snps	snps	rs1919550	1104	A	A	Ancestry	
+2800M_STRaitRazor	snps	snps	rs1919550	1	T	T	Ancestry	
+2800M_STRaitRazor	snps	snps	rs192655	329	A	A	Ancestry	
+2800M_STRaitRazor	snps	snps	rs192655	322	G	G	Ancestry	
+2800M_STRaitRazor	snps	snps	rs1979255	546	C	G	Identity	
+2800M_STRaitRazor	snps	snps	rs200354	896	G	G	Ancestry	
+2800M_STRaitRazor	snps	snps	rs200354	1	T	T	Ancestry	
+2800M_STRaitRazor	snps	snps	rs201326893_Y152OCH	2415	C	C	Phenotype	
+2800M_STRaitRazor	snps	snps	rs201326893_Y152OCH	1	T	T	Phenotype	Allele call does not match expected allele!
+2800M_STRaitRazor	snps	snps	rs2024566	1091	A	A	Ancestry	
+2800M_STRaitRazor	snps	snps	rs2024566	3	G	G	Ancestry	
+2800M_STRaitRazor	snps	snps	rs2040411	854	A	A	Identity	
+2800M_STRaitRazor	snps	snps	rs2040411	1	G	G	Identity	
+2800M_STRaitRazor	snps	snps	rs2042762	3	C	G	Ancestry	
+2800M_STRaitRazor	snps	snps	rs2042762	393	T	A	Ancestry	
+2800M_STRaitRazor	snps	snps	rs2046361	2	G	C	Identity	Allele call does not match expected allele!
+2800M_STRaitRazor	snps	snps	rs2046361	698	T	A	Identity	
+2800M_STRaitRazor	snps	snps	rs2056277	223	C	C	Identity	
+2800M_STRaitRazor	snps	snps	rs2076848	95	A	T	Identity	
+2800M_STRaitRazor	snps	snps	rs2076848	92	T	A	Identity	
+2800M_STRaitRazor	snps	snps	rs2107612	213	A	A	Identity	
+2800M_STRaitRazor	snps	snps	rs2107612	299	G	G	Identity	
+2800M_STRaitRazor	snps	snps	rs2111980	1	A	T	Identity	Allele call does not match expected allele!
+2800M_STRaitRazor	snps	snps	rs2111980	395	C	G	Identity	
+2800M_STRaitRazor	snps	snps	rs2111980	1	T	A	Identity	
+2800M_STRaitRazor	snps	snps	rs214955	603	C	G	Identity	
+2800M_STRaitRazor	snps	snps	rs214955	1	T	A	Identity	
+2800M_STRaitRazor	snps	snps	rs2166624	267	A	A	Ancestry	
+2800M_STRaitRazor	snps	snps	rs2166624	300	G	G	Ancestry	
+2800M_STRaitRazor	snps	snps	rs2196051	430	A	T	Ancestry	
+2800M_STRaitRazor	snps	snps	rs2196051	2	G	C	Ancestry	
+2800M_STRaitRazor	snps	snps	rs2196051	4	T	A	Ancestry	Allele call does not match expected allele!
+2800M_STRaitRazor	snps	snps	rs221956	419	C	C	Identity	
+2800M_STRaitRazor	snps	snps	rs221956	1	T	T	Identity	
+2800M_STRaitRazor	snps	snps	rs2228479	995	G	G	Phenotype	
+2800M_STRaitRazor	snps	snps	rs2228479	5	T	T	Phenotype	Allele call does not match expected allele!
+2800M_STRaitRazor	snps	snps	rs2238151	1	A	A	Ancestry	Allele call does not match expected allele!
+2800M_STRaitRazor	snps	snps	rs2238151	95	C	C	Ancestry	
+2800M_STRaitRazor	snps	snps	rs2238151	60	T	T	Ancestry	
+2800M_STRaitRazor	snps	snps	rs2269355	151	C	C	Identity	
+2800M_STRaitRazor	snps	snps	rs2342747	58	A	A	Identity	
+2800M_STRaitRazor	snps	snps	rs2342747	33	G	G	Identity	
+2800M_STRaitRazor	snps	snps	rs2378249	182	A	A	Phenotype	
+2800M_STRaitRazor	snps	snps	rs2399332	192	G	C	Identity	
+2800M_STRaitRazor	snps	snps	rs2399332	211	T	A	Identity	
+2800M_STRaitRazor	snps	snps	rs2402130	1098	A	A	Phenotype	
+2800M_STRaitRazor	snps	snps	rs251934	764	A	T	Identity	
+2800M_STRaitRazor	snps	snps	rs2593595	170	A	T	Ancestry	
+2800M_STRaitRazor	snps	snps	rs2593595	171	G	C	Ancestry	
+2800M_STRaitRazor	snps	snps	rs260690	520	A	A	Ancestry	
+2800M_STRaitRazor	snps	snps	rs279844	282	A	A	Identity	
+2800M_STRaitRazor	snps	snps	rs279844	321	T	T	Identity	
+2800M_STRaitRazor	snps	snps	rs2814778	1647	T	A	Ancestry	
+2800M_STRaitRazor	snps	snps	rs2830795	253	A	A	Identity	
+2800M_STRaitRazor	snps	snps	rs2830795	1	T	T	Identity	Allele call does not match expected allele!
+2800M_STRaitRazor	snps	snps	rs2831700	147	A	A	Identity	
+2800M_STRaitRazor	snps	snps	rs2831700	1	T	T	Identity	Allele call does not match expected allele!
+2800M_STRaitRazor	snps	snps	rs28777	168	A	A	Phenotype	
+2800M_STRaitRazor	snps	snps	rs2920816	73	A	T	Identity	
+2800M_STRaitRazor	snps	snps	rs2920816	1	T	A	Identity	Allele call does not match expected allele!
+2800M_STRaitRazor	snps	snps	rs310644	50	T	A	Ancestry	
+2800M_STRaitRazor	snps	snps	rs312262906_N29insA	379	C	C	Phenotype	
+2800M_STRaitRazor	snps	snps	rs321198	1	C	C	Identity	
+2800M_STRaitRazor	snps	snps	rs321198	111	T	T	Identity	
+2800M_STRaitRazor	snps	snps	rs338882	70	G	C	Identity	
+2800M_STRaitRazor	snps	snps	rs354439	98	A	T	Identity	
+2800M_STRaitRazor	snps	snps	rs3737576	173	T	A	Ancestry	
+2800M_STRaitRazor	snps	snps	rs3780962	175	A	T	Identity	
+2800M_STRaitRazor	snps	snps	rs3811801	1	C	G	Ancestry	Allele call does not match expected allele!
+2800M_STRaitRazor	snps	snps	rs3811801	106	G	C	Ancestry	
+2800M_STRaitRazor	snps	snps	rs3811801	1	T	A	Ancestry	Allele call does not match expected allele!
+2800M_STRaitRazor	snps	snps	rs3814134	229	A	T	Ancestry	
+2800M_STRaitRazor	snps	snps	rs3823159	158	A	A	Ancestry	
+2800M_STRaitRazor	snps	snps	rs3827760	756	A	T	Ancestry	
+2800M_STRaitRazor	snps	snps	rs3916235	70	C	G	Ancestry	
+2800M_STRaitRazor	snps	snps	rs3916235	40	T	A	Ancestry	
+2800M_STRaitRazor	snps	snps	rs430046	1	A	A	Identity	Allele call does not match expected allele!
+2800M_STRaitRazor	snps	snps	rs430046	1128	C	C	Identity	
+2800M_STRaitRazor	snps	snps	rs430046	4	T	T	Identity	
+2800M_STRaitRazor	snps	snps	rs4364205	1849	G	G	Identity	
+2800M_STRaitRazor	snps	snps	rs4364205	5	T	T	Identity	
+2800M_STRaitRazor	snps	snps	rs4411548	961	C	G	Ancestry	
+2800M_STRaitRazor	snps	snps	rs4411548	5	G	C	Ancestry	Allele call does not match expected allele!
+2800M_STRaitRazor	snps	snps	rs445251	187	C	C	Identity	
+2800M_STRaitRazor	snps	snps	rs445251	107	G	G	Identity	
+2800M_STRaitRazor	snps	snps	rs4471745	1	A	A	Ancestry	
+2800M_STRaitRazor	snps	snps	rs4471745	345	G	G	Ancestry	
+2800M_STRaitRazor	snps	snps	rs4471745	3	T	T	Ancestry	Allele call does not match expected allele!
+2800M_STRaitRazor	snps	snps	rs4530059	1	A	A	Identity	
+2800M_STRaitRazor	snps	snps	rs4530059	1059	G	G	Identity	
+2800M_STRaitRazor	snps	snps	rs459920	9	C	C	Ancestry	
+2800M_STRaitRazor	snps	snps	rs459920	4	G	G	Ancestry	Allele call does not match expected allele!
+2800M_STRaitRazor	snps	snps	rs459920	1610	T	T	Ancestry	
+2800M_STRaitRazor	snps	snps	rs4606077	1	A	A	Identity	Allele call does not match expected allele!
+2800M_STRaitRazor	snps	snps	rs4606077	92	C	C	Identity	
+2800M_STRaitRazor	snps	snps	rs4606077	99	T	T	Identity	
+2800M_STRaitRazor	snps	snps	rs4833103	226	A	A	Ancestry	
+2800M_STRaitRazor	snps	snps	rs4833103	210	C	C	Ancestry	
+2800M_STRaitRazor	snps	snps	rs4891825	210	A	A	Ancestry	
+2800M_STRaitRazor	snps	snps	rs4891825	169	G	G	Ancestry	
+2800M_STRaitRazor	snps	snps	rs4918664	2258	A	A	Ancestry	
+2800M_STRaitRazor	snps	snps	rs4918664	1	T	T	Ancestry	Allele call does not match expected allele!
+2800M_STRaitRazor	snps	snps	rs4959270	798	A	A	Phenotype	
+2800M_STRaitRazor	snps	snps	rs4959270	801	C	C	Phenotype	
+2800M_STRaitRazor	snps	snps	rs4959270	2	G	G	Phenotype	Allele call does not match expected allele!
+2800M_STRaitRazor	snps	snps	rs4959270	2	T	T	Phenotype	Allele call does not match expected allele!
+2800M_STRaitRazor	snps	snps	rs560681	256	A	A	Identity	
+2800M_STRaitRazor	snps	snps	rs560681	248	G	G	Identity	
+2800M_STRaitRazor	snps	snps	rs576261	185	A	A	Identity	
+2800M_STRaitRazor	snps	snps	rs576261	129	C	C	Identity	
+2800M_STRaitRazor	snps	snps	rs6444724	3	C	C	Identity	
+2800M_STRaitRazor	snps	snps	rs6444724	1247	T	T	Identity	
+2800M_STRaitRazor	snps	snps	rs671	1	A	A	Ancestry	
+2800M_STRaitRazor	snps	snps	rs671	1030	G	G	Ancestry	
+2800M_STRaitRazor	snps	snps	rs6754311	187	C	C	Ancestry	
+2800M_STRaitRazor	snps	snps	rs6754311	254	T	T	Ancestry	
+2800M_STRaitRazor	snps	snps	rs6811238	264	G	G	Identity	
+2800M_STRaitRazor	snps	snps	rs6811238	1	T	T	Identity	
+2800M_STRaitRazor	snps	snps	rs683	216	A	A	Phenotype	
+2800M_STRaitRazor	snps	snps	rs683	281	C	C	Phenotype	
+2800M_STRaitRazor	snps	snps	rs6955448	1	A	A	Identity	Allele call does not match expected allele!
+2800M_STRaitRazor	snps	snps	rs6955448	318	C	C	Identity	
+2800M_STRaitRazor	snps	snps	rs6955448	1	G	G	Identity	Allele call does not match expected allele!
+2800M_STRaitRazor	snps	snps	rs6955448	169	T	T	Identity	
+2800M_STRaitRazor	snps	snps	rs6990312	252	G	G	Ancestry	
+2800M_STRaitRazor	snps	snps	rs6990312	2	T	T	Ancestry	
+2800M_STRaitRazor	snps	snps	rs7041158	71	C	C	Identity	
+2800M_STRaitRazor	snps	snps	rs717302	1	A	A	Identity	
+2800M_STRaitRazor	snps	snps	rs717302	373	G	G	Identity	
+2800M_STRaitRazor	snps	snps	rs717302	1	T	T	Identity	Allele call does not match expected allele!
+2800M_STRaitRazor	snps	snps	rs719366	115	A	T	Identity	
+2800M_STRaitRazor	snps	snps	rs722098	437	A	A	Identity	
+2800M_STRaitRazor	snps	snps	rs722098	250	G	G	Identity	
+2800M_STRaitRazor	snps	snps	rs722290	432	C	G	Identity	
+2800M_STRaitRazor	snps	snps	rs7226659	316	G	G	Ancestry	
+2800M_STRaitRazor	snps	snps	rs7251928	1059	A	A	Ancestry	
+2800M_STRaitRazor	snps	snps	rs727811	254	T	A	Identity	
+2800M_STRaitRazor	snps	snps	rs729172	215	G	C	Identity	
+2800M_STRaitRazor	snps	snps	rs7326934	235	G	G	Ancestry	
+2800M_STRaitRazor	snps	snps	rs733164	154	A	A	Identity	
+2800M_STRaitRazor	snps	snps	rs733164	163	G	G	Identity	
+2800M_STRaitRazor	snps	snps	rs735155	1	C	G	Identity	
+2800M_STRaitRazor	snps	snps	rs735155	940	T	A	Identity	
+2800M_STRaitRazor	snps	snps	rs735480	8	C	C	Ancestry	
+2800M_STRaitRazor	snps	snps	rs735480	1400	T	T	Ancestry	
+2800M_STRaitRazor	snps	snps	rs737681	3	C	C	Identity	
+2800M_STRaitRazor	snps	snps	rs737681	880	T	T	Identity	
+2800M_STRaitRazor	snps	snps	rs740598	149	A	A	Identity	
+2800M_STRaitRazor	snps	snps	rs740598	138	G	G	Identity	
+2800M_STRaitRazor	snps	snps	rs740910	598	A	A	Identity	
+2800M_STRaitRazor	snps	snps	rs740910	1	G	G	Identity	
+2800M_STRaitRazor	snps	snps	rs7554936	87	C	C	Ancestry	
+2800M_STRaitRazor	snps	snps	rs7554936	157	T	T	Ancestry	
+2800M_STRaitRazor	snps	snps	rs763869	62	A	T	Identity	
+2800M_STRaitRazor	snps	snps	rs763869	1	C	G	Identity	Allele call does not match expected allele!
+2800M_STRaitRazor	snps	snps	rs763869	85	G	C	Identity	
+2800M_STRaitRazor	snps	snps	rs7657799	338	T	T	Ancestry	
+2800M_STRaitRazor	snps	snps	rs7722456	1	A	A	Ancestry	Allele call does not match expected allele!
+2800M_STRaitRazor	snps	snps	rs7722456	3	C	C	Ancestry	
+2800M_STRaitRazor	snps	snps	rs7722456	2	G	G	Ancestry	Allele call does not match expected allele!
+2800M_STRaitRazor	snps	snps	rs7722456	897	T	T	Ancestry	
+2800M_STRaitRazor	snps	snps	rs798443	433	A	A	Ancestry	
+2800M_STRaitRazor	snps	snps	rs798443	1	G	G	Ancestry	
+2800M_STRaitRazor	snps	snps	rs7997709	3	A	A	Ancestry	Allele call does not match expected allele!
+2800M_STRaitRazor	snps	snps	rs7997709	3	C	C	Ancestry	
+2800M_STRaitRazor	snps	snps	rs7997709	1269	T	T	Ancestry	
+2800M_STRaitRazor	snps	snps	rs8037429	2	C	C	Identity	
+2800M_STRaitRazor	snps	snps	rs8037429	1004	T	T	Identity	
+2800M_STRaitRazor	snps	snps	rs8078417	1	A	A	Identity	Allele call does not match expected allele!
+2800M_STRaitRazor	snps	snps	rs8078417	661	C	C	Identity	
+2800M_STRaitRazor	snps	snps	rs8078417	5	G	G	Identity	Allele call does not match expected allele!
+2800M_STRaitRazor	snps	snps	rs8078417	599	T	T	Identity	
+2800M_STRaitRazor	snps	snps	rs826472	1	C	C	Identity	
+2800M_STRaitRazor	snps	snps	rs826472	482	T	T	Identity	
+2800M_STRaitRazor	snps	snps	rs870347	271	A	T	Ancestry	
+2800M_STRaitRazor	snps	snps	rs873196	207	C	C	Identity	
+2800M_STRaitRazor	snps	snps	rs873196	192	T	T	Identity	
+2800M_STRaitRazor	snps	snps	rs876724	1405	C	C	Identity	
+2800M_STRaitRazor	snps	snps	rs885479	2	A	A	Phenotype	
+2800M_STRaitRazor	snps	snps	rs885479	2414	G	G	Phenotype	
+2800M_STRaitRazor	snps	snps	rs891700	365	A	A	Identity	
+2800M_STRaitRazor	snps	snps	rs891700	6	C	C	Identity	Allele call does not match expected allele!
+2800M_STRaitRazor	snps	snps	rs891700	272	G	G	Identity	
+2800M_STRaitRazor	snps	snps	rs891700	1	T	T	Identity	Allele call does not match expected allele!
+2800M_STRaitRazor	snps	snps	rs901398	339	T	T	Identity	
+2800M_STRaitRazor	snps	snps	rs907100	72	C	C	Identity	
+2800M_STRaitRazor	snps	snps	rs907100	96	G	G	Identity	
+2800M_STRaitRazor	snps	snps	rs914165	138	A	A	Identity	
+2800M_STRaitRazor	snps	snps	rs914165	1	C	C	Identity	Allele call does not match expected allele!
+2800M_STRaitRazor	snps	snps	rs914165	187	G	G	Identity	
+2800M_STRaitRazor	snps	snps	rs917115	1	A	A	Ancestry	Allele call does not match expected allele!
+2800M_STRaitRazor	snps	snps	rs917115	3	C	C	Ancestry	
+2800M_STRaitRazor	snps	snps	rs917115	421	T	T	Ancestry	
+2800M_STRaitRazor	snps	snps	rs917118	672	C	C	Identity	
+2800M_STRaitRazor	snps	snps	rs938283	2	A	A	Identity	Allele call does not match expected allele!
+2800M_STRaitRazor	snps	snps	rs938283	1	C	C	Identity	
+2800M_STRaitRazor	snps	snps	rs938283	674	T	T	Identity	
+2800M_STRaitRazor	snps	snps	rs9522149	619	C	C	Ancestry	
+2800M_STRaitRazor	snps	snps	rs9522149	1	T	T	Ancestry	
+2800M_STRaitRazor	snps	snps	rs964681	256	C	C	Identity	
+2800M_STRaitRazor	snps	snps	rs964681	258	T	T	Identity	
+2800M_STRaitRazor	snps	snps	rs987640	211	A	A	Identity	
+2800M_STRaitRazor	snps	snps	rs987640	228	T	T	Identity	
+2800M_STRaitRazor	snps	snps	rs9905977	2	A	A	Identity	
+2800M_STRaitRazor	snps	snps	rs9905977	1207	G	G	Identity	
+2800M_STRaitRazor	snps	snps	rs9905977	1	T	T	Identity	Allele call does not match expected allele!
+2800M_STRaitRazor	snps	snps	rs993934	3	A	T	Identity	
+2800M_STRaitRazor	snps	snps	rs993934	1135	G	C	Identity	
+2800M_STRaitRazor	snps	snps	rs993934	1	T	A	Identity	Allele call does not match expected allele!
+2800M_STRaitRazor	snps	snps	rs9951171	4	A	A	Identity	
+2800M_STRaitRazor	snps	snps	rs9951171	493	G	G	Identity	
+2800M_STRaitRazor	snps	snps	rs9951171	2	T	T	Identity	Allele call does not match expected allele!
