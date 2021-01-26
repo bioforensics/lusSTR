@@ -87,11 +87,11 @@ def parse_snp_table_from_sheet(infile, sheet, snp_type_arg):
         final_df = data
     elif snp_type_arg == 'i':
         filtered_dict = {k: v for k, v in snp_marker_data.items() if 'i' in v['Type']}
-        filtered_data = data[data['Locus'].isin(filtered_dict)].reset_index()
+        filtered_data = data[data['Locus'].isin(filtered_dict)].reset_index(drop=True)
         final_df = final_df.append(filtered_data)
     else:
         filtered_dict = {k: v for k, v in snp_marker_data.items() if 'i' not in v['Type']}
-        filtered_data = data[data['Locus'].isin(filtered_dict)].reset_index()
+        filtered_data = data[data['Locus'].isin(filtered_dict)].reset_index(drop=True)
         final_df = final_df.append(filtered_data)
     final_df['SampleID'] = table.iloc[1, 1]
     final_df['Project'] = table.iloc[2, 1]
