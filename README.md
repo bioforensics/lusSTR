@@ -185,17 +185,17 @@ If STRait Razor data is used as input, the number of reads for identical alleles
  lusstr snps <input_directory> -o <output file name> --type <all, i, p> --uas
  ```
 
-The ```snp``` command requires a folder of either UAS Reports (Sample Details Report and/or Phenotype Report) or STRait Razor output file(s).
+The ```snp``` command requires a folder of either UAS Reports (Sample Details Report(s) and/or Phenotype Report(s)) or STRait Razor output file(s).
 The ```-o``` flag specifies the name of the output file (should end in ```.txt```)
-The ```--type``` flag specifies the type of SNPs to include in the output file(s). The options are: ```all```, ```i```, or ```p```. If ```p``` is specified, both ancestry and phenotype SNPs are included. The default is ```i```.
+The ```--type``` flag specifies the type of SNPs to include in the output file(s). The options are: ```all``` (all SNPs), ```i``` (identity SNPs only), or ```p``` (ancestry and phenotype SNPs only).  The default is ```i```.
 Similar to the processing of STR loci sequences, the ```--uas``` flag indicates the input files are Reports from the UAS. Absence of this flag indicates the provided files are STRait Razor output files.
 
 **Examples**:
 ```
-lusstr snps UAS_files/ -o uas_output.txt --type all --uas
+lusstr snps UAS_files/ -o uas_output_all.txt --type all --uas
 ```
 ```
-lusstr snps STRait_Razor_output/ -o strait_razor.txt --type p
+lusstr snps STRait_Razor_output/ -o strait_razor_p.txt --type p
 ```
 
 ----
