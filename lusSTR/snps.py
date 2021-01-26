@@ -123,6 +123,7 @@ def uas_format(infile, snp_type_arg):
     data = uas_load(infile, snp_type_arg)
     data_filt = data.loc[data['Reads'] != 0].reset_index(drop=True)
     data_df = []
+    print(len(data_filt))
     for j, row in data_filt.iterrows():
         snpid = data_filt.iloc[j, 0]
         metadata = snp_marker_data[snpid]
