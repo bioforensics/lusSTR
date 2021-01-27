@@ -10,6 +10,7 @@
 import lusSTR
 import argparse
 import glob
+import openpyxl
 import os
 import pandas as pd
 import sys
@@ -27,7 +28,6 @@ def uas_load(inpath, sexloci=False):
         sex_strs = pd.DataFrame() if sexloci is True else None
         files = glob.glob(os.path.join(inpath, '*.xlsx'))
         for filename in sorted(files):
-            print(filename)
             autodata, sexdata = uas_format(filename, sexloci)
             auto_strs = auto_strs.append(autodata)
             if sexloci is True:
@@ -38,21 +38,23 @@ def uas_load(inpath, sexloci=False):
 
 
 def parse_str_table_from_sheet(infile, sheet, exclude=None):
-    table = pd.read_excel(io=infile, sheet_name=sheet)
+    file = openpyxl.load_workbook(infile)
+    file_sheet = file[sheet]
+    table = pd.DataFrame(file_sheet.values)
     offset = table[table.iloc[:, 0] == "Coverage Information"].index.tolist()[0]
     data = table.iloc[offset + 2:]
     data.columns = table.iloc[offset + 1]
     if exclude is not None:
         data = data[~data.Locus.isin(exclude)]
     data = data[['Locus', 'Reads', 'Repeat Sequence']]
-    data['SampleID'] = table.iloc[1, 1]
-    data['Project'] = table.iloc[2, 1]
-    data['Analysis'] = table.iloc[3, 1]
+    data['SampleID'] = table.iloc[2, 1]
+    data['Project'] = table.iloc[3, 1]
+    data['Analysis'] = table.iloc[4, 1]
     return data
 
 
 def uas_format(infile, sexloci=False):
-    auto_strs = parse_str_table_from_sheet(infile, sheet=0, exclude=['Amelogenin'])
+    auto_strs = parse_str_table_from_sheet(infile, sheet='Autosomal STRs', exclude=['Amelogenin'])
     sex_strs = None
     if sexloci is True:
         y_strs = parse_str_table_from_sheet(infile, 'Y STRs')
