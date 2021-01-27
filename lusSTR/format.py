@@ -27,8 +27,8 @@ def uas_load(inpath, sexloci=False):
         sex_strs = pd.DataFrame() if sexloci is True else None
         files = glob.glob(os.path.join(inpath, '*.xlsx'))
         for filename in sorted(files):
-            filepath = os.path.join(inpath, filename)
-            autodata, sexdata = uas_format(filepath, sexloci)
+            print(filename)
+            autodata, sexdata = uas_format(filename, sexloci)
             auto_strs = auto_strs.append(autodata)
             if sexloci is True:
                 sex_strs = sex_strs.append(sexdata)
@@ -86,7 +86,14 @@ def strait_razor_concat(indir, sexloci=False):
             filename, sep='\t', header=None,
             names=['Locus_allele', 'Length', 'Sequence', 'Forward_Reads', 'Reverse_Reads']
         )
-        table[['Locus', 'Allele']] = table.Locus_allele.str.split(":", expand=True)
+        try:
+            table[['Locus', 'Allele']] = table.Locus_allele.str.split(":", expand=True)
+        except ValueError:
+            print(
+                f'Error found with {filename}. Will bypass and continue. Please check file'
+                f' and rerun the command, if necessary.'
+            )
+            continue
         table['Total_Reads'] = table['Forward_Reads'] + table['Reverse_Reads']
         table['SampleID'] = name
         table['Project'] = analysisID

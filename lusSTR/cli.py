@@ -9,7 +9,7 @@
 
 import argparse
 import lusSTR
-from . import format, annot
+from . import format, annot, snps
 
 
 def format_subparser(subparsers):
@@ -68,14 +68,42 @@ def annot_subparser(subparsers):
     )
 
 
+def snps_subparser(subparsers):
+    cli = subparsers.add_parser('snps')
+    cli.add_argument(
+        '-o', '--out', metavar='FILE',
+        help='file to which output will be written; default is terminal (stdout)'
+    )
+    cli.add_argument(
+        'input',
+        help='Input is either a directory of either UAS output files (Sample Details Report and '
+        'Phenotype Report) or of STRait Razor output files. If input is the UAS output file(s) '
+        '(in .xlsx format), use of the --uas flag is required. If STRait Razor output is '
+        'used, the name of the provided directory will be used as the Analysis ID in the '
+        'final annotation table.'
+    )
+    cli.add_argument(
+        '--type', choices=['all', 'p', 'i'], default='i',
+        help='Specify the type of SNPs to include in the final report. "p" will include only the '
+        'Phenotype and Ancestry SNPs; "i" will include only the Identity SNPs; and "all" will '
+        'include all SNPs. Default is Identity SNPs only (i).'
+    )
+    cli.add_argument(
+        '--uas', action='store_true',
+        help='Use if sequences have been run through the ForenSeq UAS.'
+    )
+
+
 mains = {
     'format': lusSTR.format.main,
     'annotate': lusSTR.annot.main,
+    'snps': lusSTR.snps.main,
 }
 
 subparser_funcs = {
     'format': format_subparser,
     'annotate': annot_subparser,
+    'snps': snps_subparser,
 }
 
 

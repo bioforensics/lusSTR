@@ -1,0 +1,1034 @@
+{
+    "rs1490413": {
+        "Type": "i",
+        "Alleles": [ "G", "A"],
+        "ReverseCompNeeded": "No",
+        "Coord": 44
+    },
+    "rs560681": {
+        "Type": "i",
+        "Alleles": ["G", "A"],
+        "ReverseCompNeeded": "No",
+        "Coord": 9
+    },
+    "rs1294331": {
+        "Type": "i",
+        "Alleles": ["C", "T"],
+        "ReverseCompNeeded": "Yes",
+        "Coord": 27
+    },
+    "rs10495407": {
+        "Type": "i",
+        "Alleles": ["G", "A"],
+        "ReverseCompNeeded": "No",
+        "Coord": 53
+    },
+    "rs891700": {
+        "Type": "i",
+        "Alleles": ["G", "A"],
+        "ReverseCompNeeded": "No",
+        "Coord": 0
+    },
+    "rs1413212": {
+        "Type": "i",
+        "Alleles": ["C", "T"],
+        "ReverseCompNeeded": "Yes",
+        "Coord": 7
+    },
+    "rs876724": {
+        "Type": "i",
+        "Alleles": ["C", "T"],
+        "ReverseCompNeeded": "No",
+        "Coord": 4
+    },
+    "rs1109037": {
+        "Type": "i",
+        "Alleles": ["G", "A"],
+        "ReverseCompNeeded": "No",
+        "Coord": 11
+    },
+    "rs993934": {
+        "Type": "i",
+        "Alleles": ["A", "G"],
+        "ReverseCompNeeded": "Yes",
+        "Coord": 66
+    },
+    "rs12997453": {
+        "Type": "i",
+        "Alleles": ["A", "G"],
+        "ReverseCompNeeded": "No",
+        "Coord": 39
+    },
+    "rs907100": {
+        "Type": "i",
+        "Alleles": ["C", "G"],
+        "ReverseCompNeeded": "No",
+        "Coord": 14
+    },
+    "rs1357617": {
+        "Type": "i",
+        "Alleles": ["A", "T"],
+        "ReverseCompNeeded": "No",
+        "Coord": 60
+    },
+    "rs4364205": {
+        "Type": "i",
+        "Alleles": ["T", "G"],
+        "ReverseCompNeeded": "No",
+        "Coord": 44
+    },
+    "rs2399332": {
+        "Type": "i",
+        "Alleles": ["T", "G"],
+        "ReverseCompNeeded": "Yes",
+        "Coord": 102
+    },
+    "rs1355366": {
+        "Type": "i",
+        "Alleles": ["C", "T"],
+        "ReverseCompNeeded": "Yes",
+        "Coord": 47
+    },
+    "rs6444724": {
+        "Type": "i",
+        "Alleles": ["T", "C"],
+        "ReverseCompNeeded": "No",
+        "Coord": 48
+    },
+    "rs2046361": {
+        "Type": "i",
+        "Alleles": ["A", "T"],
+        "ReverseCompNeeded": "Yes",
+        "Coord": 41
+    },
+    "rs279844": {
+        "Type": "i",
+        "Alleles": ["A", "T"],
+        "ReverseCompNeeded": "No",
+        "Coord": 46
+    },
+    "rs6811238": {
+        "Type": "i",
+        "Alleles": ["G", "T"],
+        "ReverseCompNeeded": "No",
+        "Coord": 47
+    },
+    "rs1979255": {
+        "Type": "i",
+        "Alleles": ["G", "C"],
+        "ReverseCompNeeded": "Yes",
+        "Coord": 42
+    },
+    "rs717302": {
+        "Type": "i",
+        "Alleles": ["G", "A"],
+        "ReverseCompNeeded": "No",
+        "Coord": 36
+    },
+    "rs159606": {
+        "Type": "i",
+        "Alleles": ["G", "A"],
+        "ReverseCompNeeded": "No",
+        "Coord": 28
+    },
+    "rs13182883": {
+        "Type": "i",
+        "Alleles": ["G", "A"],
+        "ReverseCompNeeded": "No",
+        "Coord": 63
+    },
+    "rs251934": {
+        "Type": "i",
+        "Alleles": ["A", "G"],
+        "ReverseCompNeeded": "Yes",
+        "Coord": 38
+    },
+    "rs338882": {
+        "Type": "i",
+        "Alleles": ["A", "G"],
+        "ReverseCompNeeded": "Yes",
+        "Coord": 106
+    },
+    "rs13218440": {
+        "Type": "i",
+        "Alleles": ["G", "A"],
+        "ReverseCompNeeded": "No",
+        "Coord": 6
+    },
+    "rs1336071": {
+        "Type": "i",
+        "Alleles": ["C", "T"],
+        "ReverseCompNeeded": "Yes",
+        "Coord": 46
+    },
+    "rs214955": {
+        "Type": "i",
+        "Alleles": ["C", "T"],
+        "ReverseCompNeeded": "Yes",
+        "Coord": 52
+    },
+    "rs727811": {
+        "Type": "i",
+        "Alleles": ["G", "T"],
+        "ReverseCompNeeded": "Yes",
+        "Coord": 54
+    },
+    "rs6955448": {
+        "Type": "i",
+        "Alleles": ["C", "T"],
+        "ReverseCompNeeded": "No",
+        "Coord": 56
+    },
+    "rs917118": {
+        "Type": "i",
+        "Alleles": ["C", "T"],
+        "ReverseCompNeeded": "No",
+        "Coord": 30
+    },
+    "rs321198": {
+        "Type": "i",
+        "Alleles": ["C", "T"],
+        "ReverseCompNeeded": "No",
+        "Coord": 98
+    },
+    "rs737681": {
+        "Type": "i",
+        "Alleles": ["C", "T"],
+        "ReverseCompNeeded": "No",
+        "Coord": 51
+    },
+    "rs763869": {
+        "Type": "i",
+        "Alleles": ["G", "A"],
+        "ReverseCompNeeded": "Yes",
+        "Coord": 11
+    },
+    "rs10092491": {
+        "Type": "i",
+        "Alleles": ["C", "T"],
+        "ReverseCompNeeded": "No",
+        "Coord": 9
+    },
+    "rs2056277": {
+        "Type": "i",
+        "Alleles": ["C", "T"],
+        "ReverseCompNeeded": "No",
+        "Coord": 52
+    },
+    "rs4606077": {
+        "Type": "i",
+        "Alleles": ["C", "T"],
+        "ReverseCompNeeded": "No",
+        "Coord": 22
+    },
+    "rs1015250": {
+        "Type": "i",
+        "Alleles": ["C", "G"],
+        "ReverseCompNeeded": "No",
+        "Coord": 48
+    },
+    "rs7041158": {
+        "Type": "i",
+        "Alleles": ["C", "T"],
+        "ReverseCompNeeded": "No",
+        "Coord": 10
+    },
+    "rs1463729": {
+        "Type": "i",
+        "Alleles": ["C", "T"],
+        "ReverseCompNeeded": "Yes",
+        "Coord": 31
+    },
+    "rs1360288": {
+        "Type": "i",
+        "Alleles": ["C", "T"],
+        "ReverseCompNeeded": "No",
+        "Coord": 49
+    },
+    "rs10776839": {
+        "Type": "i",
+        "Alleles": ["G", "T"],
+        "ReverseCompNeeded": "No",
+        "Coord": 17
+    },
+    "rs826472": {
+        "Type": "i",
+        "Alleles": ["C", "T"],
+        "ReverseCompNeeded": "No",
+        "Coord": 95
+    },
+    "rs735155": {
+        "Type": "i",
+        "Alleles": ["C", "T"],
+        "ReverseCompNeeded": "Yes",
+        "Coord": 25
+    },
+    "rs3780962": {
+        "Type": "i",
+        "Alleles": ["A", "G"],
+        "ReverseCompNeeded": "Yes",
+        "Coord": 34
+    },
+    "rs740598": {
+        "Type": "i",
+        "Alleles": ["A", "G"],
+        "ReverseCompNeeded": "No",
+        "Coord": 33
+    },
+    "rs964681": {
+        "Type": "i",
+        "Alleles": ["T", "C"],
+        "ReverseCompNeeded": "No",
+        "Coord": 4
+    },
+    "rs1498553": {
+        "Type": "i",
+        "Alleles": ["C", "T"],
+        "ReverseCompNeeded": "No",
+        "Coord": 22
+    },
+    "rs901398": {
+        "Type": "i",
+        "Alleles": ["C", "T"],
+        "ReverseCompNeeded": "No",
+        "Coord": 25
+    },
+    "rs10488710": {
+        "Type": "i",
+        "Alleles": ["G", "C"],
+        "ReverseCompNeeded": "Yes",
+        "Coord": 15
+    },
+    "rs2076848": {
+        "Type": "i",
+        "Alleles": ["T", "A"],
+        "ReverseCompNeeded": "Yes",
+        "Coord": 24
+    },
+    "rs2107612": {
+        "Type": "i",
+        "Alleles": ["G", "A"],
+        "ReverseCompNeeded": "No",
+        "Coord": 34
+    },
+    "rs2269355": {
+        "Type": "i",
+        "Alleles": ["G", "C"],
+        "ReverseCompNeeded": "No",
+        "Coord": 13
+    },
+    "rs2920816": {
+        "Type": "i",
+        "Alleles": ["G", "A"],
+        "ReverseCompNeeded": "Yes",
+        "Coord": 51
+    },
+    "rs2111980": {
+        "Type": "i",
+        "Alleles": ["T", "C"],
+        "ReverseCompNeeded": "Yes",
+        "Coord": 46
+    },
+    "rs10773760": {
+        "Type": "i",
+        "Alleles": ["A", "G"],
+        "ReverseCompNeeded": "No",
+        "Coord": 51
+    },
+    "rs1335873": {
+        "Type": "i",
+        "Alleles": ["A", "T"],
+        "ReverseCompNeeded": "Yes",
+        "Coord": 34
+    },
+    "rs1886510": {
+        "Type": "i",
+        "Alleles": ["G", "A"],
+        "ReverseCompNeeded": "Yes",
+        "Coord": 30
+    },
+    "rs1058083": {
+        "Type": "i",
+        "Alleles": ["A", "G"],
+        "ReverseCompNeeded": "No",
+        "Coord": 16
+    },
+    "rs354439": {
+        "Type": "i",
+        "Alleles": ["T", "A"],
+        "ReverseCompNeeded": "Yes",
+        "Coord": 66
+    },
+    "rs1454361": {
+        "Type": "i",
+        "Alleles": ["T", "A"],
+        "ReverseCompNeeded": "No",
+        "Coord": 46
+    },
+    "rs722290": {
+        "Type": "i",
+        "Alleles": ["C", "G"],
+        "ReverseCompNeeded": "Yes",
+        "Coord": 12
+    },
+    "rs873196": {
+        "Type": "i",
+        "Alleles": ["C", "T"],
+        "ReverseCompNeeded": "No",
+        "Coord": 5
+    },
+    "rs4530059": {
+        "Type": "i",
+        "Alleles": ["G", "A"],
+        "ReverseCompNeeded": "No",
+        "Coord": 28
+    },
+    "rs1821380": {
+        "Type": "i",
+        "Alleles": ["G", "C"],
+        "ReverseCompNeeded": "Yes",
+        "Coord": 37
+    },
+    "rs8037429": {
+        "Type": "i",
+        "Alleles": ["C", "T"],
+        "ReverseCompNeeded": "No",
+        "Coord": 6
+    },
+    "rs1528460": {
+        "Type": "i",
+        "Alleles": ["C", "T"],
+        "ReverseCompNeeded": "No",
+        "Coord": 16
+    },
+    "rs729172": {
+        "Type": "i",
+        "Alleles": ["G", "T"],
+        "ReverseCompNeeded": "Yes",
+        "Coord": 15
+    },
+    "rs2342747": {
+        "Type": "i",
+        "Alleles": ["G", "A"],
+        "ReverseCompNeeded": "No",
+        "Coord": 29
+    },
+    "rs430046": {
+        "Type": "i",
+        "Alleles": ["C", "T"],
+        "ReverseCompNeeded": "No",
+        "Coord": 47
+    },
+    "rs1382387": {
+        "Type": "i",
+        "Alleles": ["C", "A"],
+        "ReverseCompNeeded": "Yes",
+        "Coord": 20
+    },
+    "rs9905977": {
+        "Type": "i",
+        "Alleles": ["A", "G"],
+        "ReverseCompNeeded": "No",
+        "Coord": 41
+    },
+    "rs740910": {
+        "Type": "i",
+        "Alleles": ["A", "G"],
+        "ReverseCompNeeded": "No",
+        "Coord": 43
+    },
+    "rs938283": {
+        "Type": "i",
+        "Alleles": ["T", "C"],
+        "ReverseCompNeeded": "No",
+        "Coord": 42
+    },
+    "rs8078417": {
+        "Type": "i",
+        "Alleles": ["C", "T"],
+        "ReverseCompNeeded": "No",
+        "Coord": 67
+    },
+    "rs1493232": {
+        "Type": "i",
+        "Alleles": ["C", "A"],
+        "ReverseCompNeeded": "No",
+        "Coord": 16
+    },
+    "rs9951171": {
+        "Type": "i",
+        "Alleles": ["G", "A"],
+        "ReverseCompNeeded": "No",
+        "Coord": 66
+    },
+    "rs1736442": {
+        "Type": "i",
+        "Alleles": ["T", "C"],
+        "ReverseCompNeeded": "Yes",
+        "Coord": 59
+    },
+    "rs1024116": {
+        "Type": "i",
+        "Alleles": ["C", "T"],
+        "ReverseCompNeeded": "Yes",
+        "Coord": 45
+    },
+    "rs719366": {
+        "Type": "i",
+        "Alleles": ["A", "G"],
+        "ReverseCompNeeded": "Yes",
+        "Coord": 31
+    },
+    "rs576261": {
+        "Type": "i",
+        "Alleles": ["A", "C"],
+        "ReverseCompNeeded": "No",
+        "Coord": 7
+    },
+    "rs1031825": {
+        "Type": "i",
+        "Alleles": ["A", "C"],
+        "ReverseCompNeeded": "No",
+        "Coord": 43
+    },
+    "rs445251": {
+        "Type": "i",
+        "Alleles": ["G", "C"],
+        "ReverseCompNeeded": "No",
+        "Coord": 43
+    },
+    "rs1005533": {
+        "Type": "i",
+        "Alleles": ["G", "A"],
+        "ReverseCompNeeded": "No",
+        "Coord": 24
+    },
+    "rs1523537": {
+        "Type": "i",
+        "Alleles": ["T", "C"],
+        "ReverseCompNeeded": "No",
+        "Coord": 60
+    },
+    "rs722098": {
+        "Type": "i",
+        "Alleles": ["A", "G"],
+        "ReverseCompNeeded": "No",
+        "Coord": 12
+    },
+    "rs2830795": {
+        "Type": "i",
+        "Alleles": ["A", "G"],
+        "ReverseCompNeeded": "No",
+        "Coord": 49
+    },
+    "rs2831700": {
+        "Type": "i",
+        "Alleles": ["A", "G"],
+        "ReverseCompNeeded": "No",
+        "Coord": 25
+    },
+    "rs914165": {
+        "Type": "i",
+        "Alleles": ["A", "G"],
+        "ReverseCompNeeded": "No",
+        "Coord": 41
+    },
+    "rs221956": {
+        "Type": "i",
+        "Alleles": ["T", "C"],
+        "ReverseCompNeeded": "No",
+        "Coord": 42
+    },
+    "rs733164": {
+        "Type": "i",
+        "Alleles": ["G", "A"],
+        "ReverseCompNeeded": "No",
+        "Coord": 53
+    },
+    "rs987640": {
+        "Type": "i",
+        "Alleles": ["T", "A"],
+        "ReverseCompNeeded": "No",
+        "Coord": 36
+    },
+    "rs2040411": {
+        "Type": "i",
+        "Alleles": ["G", "A"],
+        "ReverseCompNeeded": "No",
+        "Coord": 6
+    },
+    "rs1028528": {
+        "Type": "i",
+        "Alleles": ["G", "A"],
+        "ReverseCompNeeded": "No",
+        "Coord": 13
+    },
+    "rs28777": {
+        "Type": "p",
+        "Alleles": ["C", "A"],
+        "ReverseCompNeeded": "No",
+        "Coord": 19
+    },
+    "rs12203592": {
+        "Type": "p",
+        "Alleles": ["C", "T"],
+        "ReverseCompNeeded": "No",
+        "Coord": 25
+    },
+    "rs4959270": {
+        "Type": "p",
+        "Alleles": ["C", "A"],
+        "ReverseCompNeeded": "No",
+        "Coord": 73
+    },
+    "rs683": {
+        "Type": "p",
+        "Alleles": ["C", "A"],
+        "ReverseCompNeeded": "No",
+        "Coord": 30
+    },
+    "rs1042602": {
+        "Type": "p",
+        "Alleles": ["C", "A"],
+        "ReverseCompNeeded": "No",
+        "Coord": 12
+    },
+    "rs1393350": {
+        "Type": "p",
+        "Alleles": ["G", "A"],
+        "ReverseCompNeeded": "No",
+        "Coord": 48
+    },
+    "rs12821256": {
+        "Type": "p",
+        "Alleles": ["T", "C"],
+        "ReverseCompNeeded": "No",
+        "Coord": 34
+    },
+    "rs12896399": {
+        "Type": "p",
+        "Alleles": ["G", "T"],
+        "ReverseCompNeeded": "No",
+        "Coord": 8
+    },
+    "rs2402130": {
+        "Type": "p",
+        "Alleles": ["G", "A"],
+        "ReverseCompNeeded": "No",
+        "Coord": 8
+    },
+    "rs1800407": {
+        "Type": "p",
+        "Alleles": ["C", "T"],
+        "ReverseCompNeeded": "Yes",
+        "Coord": 50
+    },
+    "rs312262906_N29insA": {
+        "Type": "p",
+        "Alleles": ["C", "insA"],
+        "ReverseCompNeeded": "No",
+        "Coord": 45
+    },
+    "rs1805005": {
+        "Type": "p",
+        "Alleles": ["G", "T"],
+        "ReverseCompNeeded": "No",
+        "Coord": 48
+    },
+    "rs1805006": {
+        "Type": "p",
+        "Alleles": ["C", "A"],
+        "ReverseCompNeeded": "No",
+        "Coord": 122
+    },
+    "rs2228479": {
+        "Type": "p",
+        "Alleles": ["G", "A"],
+        "ReverseCompNeeded": "No",
+        "Coord": 144
+    },
+    "rs11547464": {
+        "Type": "p",
+        "Alleles": ["G", "A"],
+        "ReverseCompNeeded": "No",
+        "Coord": 25
+    },
+    "rs1805007": {
+        "Type": "p",
+        "Alleles": ["C", "T"],
+        "ReverseCompNeeded": "No",
+        "Coord": 51
+    },
+    "rs201326893_Y152OCH": {
+        "Type": "p",
+        "Alleles": ["C", "A"],
+        "ReverseCompNeeded": "No",
+        "Coord": 56
+    },
+    "rs1110400": {
+        "Type": "p",
+        "Alleles": ["T", "C"],
+        "ReverseCompNeeded": "No",
+        "Coord": 64
+    },
+    "rs1805008": {
+        "Type": "p",
+        "Alleles": ["C", "T"],
+        "ReverseCompNeeded": "No",
+        "Coord": 78
+    },
+    "rs885479": {
+        "Type": "p",
+        "Alleles": ["G", "A"],
+        "ReverseCompNeeded": "No",
+        "Coord": 88
+    },
+    "rs1805009": {
+        "Type": "p",
+        "Alleles": ["G", "C"],
+        "ReverseCompNeeded": "No",
+        "Coord": 40
+    },
+    "rs2378249": {
+        "Type": "p",
+        "Alleles": ["G", "A"],
+        "ReverseCompNeeded": "No",
+        "Coord": 40
+    },
+    "rs16891982": {
+        "Type": "p/a",
+        "Alleles": ["C", "G"],
+        "ReverseCompNeeded": "No",
+        "Coord": 47
+    },
+    "rs12913832": {
+        "Type": "p/a",
+        "Alleles": ["A", "G"],
+        "ReverseCompNeeded": "No",
+        "Coord": 69
+    },
+    "rs3737576": {
+        "Type": "a",
+        "Alleles": ["T", "C"],
+        "ReverseCompNeeded": "Yes",
+        "Coord": 17
+    },
+    "rs7554936": {
+        "Type": "a",
+        "Alleles": ["C", "T"],
+        "ReverseCompNeeded": "No",
+        "Coord": 52
+    },
+    "rs2814778": {
+        "Type": "a",
+        "Alleles": ["T", "C"],
+        "ReverseCompNeeded": "Yes",
+        "Coord": 13
+    },
+    "rs798443": {
+        "Type": "a",
+        "Alleles": ["G", "A"],
+        "ReverseCompNeeded": "No",
+        "Coord": 29
+    },
+    "rs1876482": {
+        "Type": "a",
+        "Alleles": ["G", "A"],
+        "ReverseCompNeeded": "Yes",
+        "Coord": 20
+    },
+    "rs1834619": {
+        "Type": "a",
+        "Alleles": ["G", "A"],
+        "ReverseCompNeeded": "No",
+        "Coord": 8
+    },
+    "rs3827760": {
+        "Type": "a",
+        "Alleles": ["A", "G"],
+        "ReverseCompNeeded": "Yes",
+        "Coord": 35
+    },
+    "rs260690": {
+        "Type": "a",
+        "Alleles": ["C", "A"],
+        "ReverseCompNeeded": "No",
+        "Coord": 33
+    },
+    "rs6754311": {
+        "Type": "a",
+        "Alleles": ["C", "T"],
+        "ReverseCompNeeded": "No",
+        "Coord": 38
+    },
+    "rs10497191": {
+        "Type": "a",
+        "Alleles": ["T", "C"],
+        "ReverseCompNeeded": "No",
+        "Coord": 43
+    },
+    "rs1919550": {
+        "Type": "a",
+        "Alleles": ["A", "T"],
+        "ReverseCompNeeded": "No",
+        "Coord": 41
+    },
+    "rs12498138": {
+        "Type": "a",
+        "Alleles": ["G", "A"],
+        "ReverseCompNeeded": "No",
+        "Coord": 19
+    },
+    "rs4833103": {
+        "Type": "a",
+        "Alleles": ["C", "A"],
+        "ReverseCompNeeded": "No",
+        "Coord": 14
+    },
+    "rs1229984": {
+        "Type": "a",
+        "Alleles": ["C", "T"],
+        "ReverseCompNeeded": "Yes",
+        "Coord": 10
+    },
+    "rs3811801": {
+        "Type": "a",
+        "Alleles": ["G", "A"],
+        "ReverseCompNeeded": "Yes",
+        "Coord": 36
+    },
+    "rs7657799": {
+        "Type": "a",
+        "Alleles": ["G", "T"],
+        "ReverseCompNeeded": "No",
+        "Coord": 7
+    },
+    "rs870347": {
+        "Type": "a",
+        "Alleles": ["A", "C"],
+        "ReverseCompNeeded": "Yes",
+        "Coord": 18
+    },
+    "rs7722456": {
+        "Type": "a",
+        "Alleles": ["C", "T"],
+        "ReverseCompNeeded": "No",
+        "Coord": 63
+    },
+    "rs192655": {
+        "Type": "a",
+        "Alleles": ["G", "A"],
+        "ReverseCompNeeded": "No",
+        "Coord": 18
+    },
+    "rs3823159": {
+        "Type": "a",
+        "Alleles": ["G", "A"],
+        "ReverseCompNeeded": "No",
+        "Coord": 4
+    },
+    "rs917115": {
+        "Type": "a",
+        "Alleles": ["T", "C"],
+        "ReverseCompNeeded": "No",
+        "Coord": 16
+    },
+    "rs1462906": {
+        "Type": "a",
+        "Alleles": ["T", "C"],
+        "ReverseCompNeeded": "No",
+        "Coord": 22
+    },
+    "rs6990312": {
+        "Type": "a",
+        "Alleles": ["T", "G"],
+        "ReverseCompNeeded": "No",
+        "Coord": 25
+    },
+    "rs2196051": {
+        "Type": "a",
+        "Alleles": ["G", "A"],
+        "ReverseCompNeeded": "Yes",
+        "Coord": 60
+    },
+    "rs1871534": {
+        "Type": "a",
+        "Alleles": ["C", "G"],
+        "ReverseCompNeeded": "Yes",
+        "Coord": 9
+    },
+    "rs3814134": {
+        "Type": "a",
+        "Alleles": ["G", "A"],
+        "ReverseCompNeeded": "Yes",
+        "Coord": 5
+    },
+    "rs4918664": {
+        "Type": "a",
+        "Alleles": ["A", "G"],
+        "ReverseCompNeeded": "No",
+        "Coord": 80
+    },
+    "rs174570": {
+        "Type": "a",
+        "Alleles": ["C", "T"],
+        "ReverseCompNeeded": "No",
+        "Coord": 13
+    },
+    "rs1079597": {
+        "Type": "a",
+        "Alleles": ["C", "T"],
+        "ReverseCompNeeded": "Yes",
+        "Coord": 34
+    },
+    "rs2238151": {
+        "Type": "a",
+        "Alleles": ["C", "T"],
+        "ReverseCompNeeded": "No",
+        "Coord": 55
+    },
+    "rs671": {
+        "Type": "a",
+        "Alleles": ["G", "A"],
+        "ReverseCompNeeded": "No",
+        "Coord": 86
+    },
+    "rs7997709": {
+        "Type": "a",
+        "Alleles": ["C", "T"],
+        "ReverseCompNeeded": "No",
+        "Coord": 19
+    },
+    "rs1572018": {
+        "Type": "a",
+        "Alleles": ["T", "C"],
+        "ReverseCompNeeded": "Yes",
+        "Coord": 33
+    },
+    "rs2166624": {
+        "Type": "a",
+        "Alleles": ["G", "A"],
+        "ReverseCompNeeded": "No",
+        "Coord": 11
+    },
+    "rs7326934": {
+        "Type": "a",
+        "Alleles": ["G", "C"],
+        "ReverseCompNeeded": "No",
+        "Coord": 10
+    },
+    "rs9522149": {
+        "Type": "a",
+        "Alleles": ["T", "C"],
+        "ReverseCompNeeded": "No",
+        "Coord": 21
+    },
+    "rs200354": {
+        "Type": "a",
+        "Alleles": ["G", "T"],
+        "ReverseCompNeeded": "No",
+        "Coord": 53
+    },
+    "rs1800414": {
+        "Type": "a",
+        "Alleles": ["T", "C"],
+        "ReverseCompNeeded": "Yes",
+        "Coord": 43
+    },
+    "rs12439433": {
+        "Type": "a",
+        "Alleles": ["A", "G"],
+        "ReverseCompNeeded": "No",
+        "Coord": 29
+    },
+    "rs735480": {
+        "Type": "a",
+        "Alleles": ["C", "T"],
+        "ReverseCompNeeded": "No",
+        "Coord": 26
+    },
+    "rs1426654": {
+        "Type": "a",
+        "Alleles": ["A", "G"],
+        "ReverseCompNeeded": "No",
+        "Coord": 5
+    },
+    "rs459920": {
+        "Type": "a",
+        "Alleles": ["T", "C"],
+        "ReverseCompNeeded": "No",
+        "Coord": 6
+    },
+    "rs4411548": {
+        "Type": "a",
+        "Alleles": ["C", "T"],
+        "ReverseCompNeeded": "Yes",
+        "Coord": 70
+    },
+    "rs2593595": {
+        "Type": "a",
+        "Alleles": ["G", "A"],
+        "ReverseCompNeeded": "Yes",
+        "Coord": 10
+    },
+    "rs17642714": {
+        "Type": "a",
+        "Alleles": ["A", "T"],
+        "ReverseCompNeeded": "No",
+        "Coord": 51
+    },
+    "rs4471745": {
+        "Type": "a",
+        "Alleles": ["G", "A"],
+        "ReverseCompNeeded": "No",
+        "Coord": 12
+    },
+    "rs11652805": {
+        "Type": "a",
+        "Alleles": ["C", "T"],
+        "ReverseCompNeeded": "No",
+        "Coord": 18
+    },
+    "rs2042762": {
+        "Type": "a",
+        "Alleles": ["T", "C"],
+        "ReverseCompNeeded": "Yes",
+        "Coord": 33
+    },
+    "rs7226659": {
+        "Type": "a",
+        "Alleles": ["G", "T"],
+        "ReverseCompNeeded": "No",
+        "Coord": 70
+    },
+    "rs3916235": {
+        "Type": "a",
+        "Alleles": ["T", "C"],
+        "ReverseCompNeeded": "Yes",
+        "Coord": 14
+    },
+    "rs4891825": {
+        "Type": "a",
+        "Alleles": ["G", "A"],
+        "ReverseCompNeeded": "No",
+        "Coord": 23
+    },
+    "rs7251928": {
+        "Type": "a",
+        "Alleles": ["C", "A"],
+        "ReverseCompNeeded": "No",
+        "Coord": 29
+    },
+    "rs310644": {
+        "Type": "a",
+        "Alleles": ["C", "T"],
+        "ReverseCompNeeded": "Yes",
+        "Coord": 6
+    },
+    "rs2024566": {
+        "Type": "a",
+        "Alleles": ["A", "G"],
+        "ReverseCompNeeded": "No",
+        "Coord": 6
+    }
+}
