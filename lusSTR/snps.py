@@ -214,10 +214,10 @@ def strait_razor_concat(indir, snp_type_arg):
                 continue
             if row is not None:
                 snps = snps.append(row)
-        snps.columns = [
-            'SampleID', 'Project', 'Analysis', 'SNP', 'Sequence', 'Reads',
-            'Forward_Strand_Allele', 'UAS_Allele', 'Type', 'Potential_Issues'
-        ]
+    snps.columns = [
+        'SampleID', 'Project', 'Analysis', 'SNP', 'Sequence', 'Reads',
+        'Forward_Strand_Allele', 'UAS_Allele', 'Type', 'Potential_Issues'
+    ]
     return snps
 
 
@@ -260,40 +260,43 @@ def collect_snp_info(infile, snpid, j, type, name, analysis):
     seq = infile.iloc[j, 2]
     expected_alleles = metadata['Alleles']
     snp_loc = metadata['Coord']
-    snp_call = seq[snp_loc]
-    if snpid == 'rs312262906_N29insA' and snp_call == 'A':
-        snp_call = 'insA'
-    if metadata['ReverseCompNeeded'] == 'Yes':
-        snp_call_uas = complement_base(snp_call)
-    else:
-        snp_call_uas = snp_call
-    if snpid == 'rs2402130':
-        differ_length = len(seq) - 73
-    else:
-        differ_length = int(infile.iloc[j, 6])
-    if snp_call not in expected_alleles and differ_length != 0:
-        if snpid == 'rs1821380':
-            snp_call, allele_flag = snp_call_exception(seq, differ_length, metadata, snp_call)
+    if len(seq) > snp_loc:
+        snp_call = seq[snp_loc]
+        if snpid == 'rs312262906_N29insA' and snp_call == 'A':
+            snp_call = 'insA'
+        if metadata['ReverseCompNeeded'] == 'Yes':
             snp_call_uas = complement_base(snp_call)
         else:
-            allele_flag = (
-                'Allele call does not match expected allele! Check for indels '
-                '(does not match expected sequence length)'
-            )
-    elif snp_call not in expected_alleles:
-        allele_flag = 'Allele call does not match expected allele!'
-    elif differ_length != 0:
-        allele_flag = 'Check for indels (does not match expected sequence length)'
-    else:
-        allele_flag = ''
-    if (
-        (type == 'p' and (snp_type == 'p' or snp_type == 'a' or snp_type == 'p/a')) or
-        (type == 'i' and snp_type == 'i') or (type == 'all')
-    ):
-        row_tmp = [
-            name, analysis, analysis, snpid, seq, infile.iloc[j, 7], snp_call, snp_call_uas,
-            snp_type_dict[snp_type], allele_flag
-        ]
+            snp_call_uas = snp_call
+        if snpid == 'rs2402130':
+            differ_length = len(seq) - 73
+        else:
+            differ_length = int(infile.iloc[j, 6])
+        if snp_call not in expected_alleles and differ_length != 0:
+            if snpid == 'rs1821380':
+                snp_call, allele_flag = snp_call_exception(seq, differ_length, metadata, snp_call)
+                snp_call_uas = complement_base(snp_call)
+            else:
+                allele_flag = (
+                    'Allele call does not match expected allele! Check for indels '
+                    '(does not match expected sequence length)'
+                )
+        elif snp_call not in expected_alleles:
+            allele_flag = 'Allele call does not match expected allele!'
+        elif differ_length != 0:
+            allele_flag = 'Check for indels (does not match expected sequence length)'
+        else:
+            allele_flag = ''
+        if (
+            (type == 'p' and (snp_type == 'p' or snp_type == 'a' or snp_type == 'p/a')) or
+            (type == 'i' and snp_type == 'i') or (type == 'all')
+        ):
+            row_tmp = [
+                name, analysis, analysis, snpid, seq, infile.iloc[j, 7], snp_call, snp_call_uas,
+                snp_type_dict[snp_type], allele_flag
+            ]
+        else:
+            row_tmp = None
     else:
         row_tmp = None
     return row_tmp
