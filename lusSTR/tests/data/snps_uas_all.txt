@@ -109,8 +109,8 @@ Positive Control	Project1	Analysis1	rs993934	1074	G	C	Identity
 Positive Control	Project1	Analysis1	rs12997453	136	A	A	Identity	
 Positive Control	Project1	Analysis1	rs907100	69	C	C	Identity	
 Positive Control	Project1	Analysis1	rs907100	56	G	G	Identity	
-Positive Control	Project1	Analysis1	rs1357617	25	A	A	Identity	
-Positive Control	Project1	Analysis1	rs1357617	35	T	T	Identity	
+Positive Control	Project1	Analysis1	rs1357617	25	T	A	Identity	
+Positive Control	Project1	Analysis1	rs1357617	35	A	T	Identity	
 Positive Control	Project1	Analysis1	rs4364205	1561	G	G	Identity	
 Positive Control	Project1	Analysis1	rs2399332	191	T	A	Identity	
 Positive Control	Project1	Analysis1	rs2399332	210	G	C	Identity	
@@ -178,8 +178,8 @@ Positive Control	Project1	Analysis1	rs1886510	102	A	T	Identity
 Positive Control	Project1	Analysis1	rs1058083	258	A	A	Identity	
 Positive Control	Project1	Analysis1	rs1058083	359	G	G	Identity	
 Positive Control	Project1	Analysis1	rs354439	110	A	T	Identity	
-Positive Control	Project1	Analysis1	rs1454361	596	A	A	Identity	
-Positive Control	Project1	Analysis1	rs1454361	633	T	T	Identity	
+Positive Control	Project1	Analysis1	rs1454361	596	T	A	Identity	
+Positive Control	Project1	Analysis1	rs1454361	633	A	T	Identity	
 Positive Control	Project1	Analysis1	rs722290	418	C	G	Identity	
 Positive Control	Project1	Analysis1	rs873196	247	C	C	Identity	
 Positive Control	Project1	Analysis1	rs873196	192	T	T	Identity	
@@ -206,8 +206,8 @@ Positive Control	Project1	Analysis1	rs719366	159	A	T	Identity
 Positive Control	Project1	Analysis1	rs576261	167	A	A	Identity	
 Positive Control	Project1	Analysis1	rs576261	199	C	C	Identity	
 Positive Control	Project1	Analysis1	rs1031825	55	C	C	Identity	
-Positive Control	Project1	Analysis1	rs445251	161	C	C	Identity	
-Positive Control	Project1	Analysis1	rs445251	136	G	G	Identity	
+Positive Control	Project1	Analysis1	rs445251	161	G	C	Identity	
+Positive Control	Project1	Analysis1	rs445251	136	C	G	Identity	
 Positive Control	Project1	Analysis1	rs1005533	586	A	A	Identity	
 Positive Control	Project1	Analysis1	rs1523537	372	C	C	Identity	
 Positive Control	Project1	Analysis1	rs722098	265	A	A	Identity	

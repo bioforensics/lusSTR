@@ -64,8 +64,8 @@ SampleID	Project	Analysis	SNP	Reads	Forward_Strand_Allele	UAS_Allele	Type	Issues
 2800M_STRaitRazor	snps	snps	rs1336071	382	C	G	Identity	
 2800M_STRaitRazor	snps	snps	rs1355366	63	C	G	Identity	
 2800M_STRaitRazor	snps	snps	rs1355366	55	T	A	Identity	
-2800M_STRaitRazor	snps	snps	rs1357617	34	A	A	Identity	
-2800M_STRaitRazor	snps	snps	rs1357617	35	T	T	Identity	
+2800M_STRaitRazor	snps	snps	rs1357617	34	A	T	Identity	
+2800M_STRaitRazor	snps	snps	rs1357617	35	T	A	Identity	
 2800M_STRaitRazor	snps	snps	rs1360288	1	A	A	Identity	Allele call does not match expected allele!
 2800M_STRaitRazor	snps	snps	rs1360288	307	C	C	Identity	
 2800M_STRaitRazor	snps	snps	rs1382387	838	A	T	Identity	
@@ -73,9 +73,9 @@ SampleID	Project	Analysis	SNP	Reads	Forward_Strand_Allele	UAS_Allele	Type	Issues
 2800M_STRaitRazor	snps	snps	rs1393350	253	G	G	Phenotype	
 2800M_STRaitRazor	snps	snps	rs1413212	91	C	G	Identity	
 2800M_STRaitRazor	snps	snps	rs1426654	212	A	A	Ancestry	
-2800M_STRaitRazor	snps	snps	rs1454361	472	A	A	Identity	
-2800M_STRaitRazor	snps	snps	rs1454361	1	C	C	Identity	Allele call does not match expected allele!
-2800M_STRaitRazor	snps	snps	rs1454361	576	T	T	Identity	
+2800M_STRaitRazor	snps	snps	rs1454361	472	A	T	Identity	
+2800M_STRaitRazor	snps	snps	rs1454361	1	C	G	Identity	Allele call does not match expected allele!
+2800M_STRaitRazor	snps	snps	rs1454361	576	T	A	Identity	
 2800M_STRaitRazor	snps	snps	rs1462906	95	C	C	Ancestry	
 2800M_STRaitRazor	snps	snps	rs1463729	184	C	G	Identity	
 2800M_STRaitRazor	snps	snps	rs1463729	259	T	A	Identity	
@@ -207,8 +207,8 @@ SampleID	Project	Analysis	SNP	Reads	Forward_Strand_Allele	UAS_Allele	Type	Issues
 2800M_STRaitRazor	snps	snps	rs4364205	5	T	T	Identity	
 2800M_STRaitRazor	snps	snps	rs4411548	961	C	G	Ancestry	
 2800M_STRaitRazor	snps	snps	rs4411548	5	G	C	Ancestry	Allele call does not match expected allele!
-2800M_STRaitRazor	snps	snps	rs445251	187	C	C	Identity	
-2800M_STRaitRazor	snps	snps	rs445251	107	G	G	Identity	
+2800M_STRaitRazor	snps	snps	rs445251	187	C	G	Identity	
+2800M_STRaitRazor	snps	snps	rs445251	107	G	C	Identity	
 2800M_STRaitRazor	snps	snps	rs4471745	1	A	A	Ancestry	
 2800M_STRaitRazor	snps	snps	rs4471745	345	G	G	Ancestry	
 2800M_STRaitRazor	snps	snps	rs4471745	3	T	T	Ancestry	Allele call does not match expected allele!
