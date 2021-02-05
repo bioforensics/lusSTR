@@ -159,7 +159,10 @@ def strait_razor_format(infile, snp_type_arg):
     is one of two expected alleles for the SNP (and flags the allele if not).
     '''
     results = strait_razor_concat(infile, snp_type_arg)
-    results_combine = results.groupby(
+    results_sort = results.sort_values(
+        by=['SampleID', 'Project', 'Analysis', 'SNP', 'Reads'], ascending=False
+    )
+    results_combine = results_sort.groupby(
         [
             'SNP', 'Forward_Strand_Allele', 'UAS_Allele', 'Type', 'SampleID', 'Project',
             'Analysis'
@@ -176,7 +179,10 @@ def strait_razor_format(infile, snp_type_arg):
         metadata = snp_marker_data[snpid]
         if results_combine.iloc[j, 5] not in metadata['Alleles']:
             results_combine.iloc[j, 8] = 'Allele call does not match expected allele!'
-    return results, results_combine
+    results_combine_sort = results_combine.sort_values(
+        by=['SampleID', 'Project', 'Analysis', 'SNP', 'Reads'], ascending=False
+    )
+    return results_sort, results_combine_sort
 
 
 def strait_razor_concat(indir, snp_type_arg):
