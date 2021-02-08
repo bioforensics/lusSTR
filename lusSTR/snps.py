@@ -87,7 +87,10 @@ def uas_format(infile, snp_type_arg):
         'SampleID', 'Project', 'Analysis', 'SNP', 'Reads', 'Forward_Strand_Allele', 'UAS_Allele',
         'Type', 'Issues'
     ])
-    return data_final
+    data_final_sort = data_final.sort_values(
+        by=['SampleID', 'Project', 'Analysis', 'SNP', 'Reads'], ascending=False
+    )
+    return data_final_sort
 
 
 def uas_load(indir, type='i'):
