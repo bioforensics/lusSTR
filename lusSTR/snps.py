@@ -11,6 +11,7 @@ import glob
 import json
 import lusSTR
 import pandas as pd
+import openpyxl
 import os
 from pkg_resources import resource_filename
 
@@ -54,65 +55,6 @@ def complement_base(base):
     return comp_base
 
 
-def uas_load(indir, type='i'):
-    '''
-    This function lists input .xlsx files within the specified directory and performs a check to
-    ensure the correct file is processed (must contain either "Phenotype" or "Sample Details").
-    This also compiles the SNP data for each file within the directory.
-    '''
-    snp_final_output = pd.DataFrame()
-    files = glob.glob(os.path.join(indir, '[!~]*.xlsx'))
-    for filename in sorted(files):
-        if 'Phenotype' in filename or 'Sample Details' in filename:
-            snps = uas_types(filename, type)
-            if snps is not None:
-                snp_final_output = snp_final_output.append(snps)
-        else:
-            continue
-    return snp_final_output
-
-
-def parse_snp_table_from_sheet(infile, sheet, snp_type_arg):
-    '''
-    This function formats the SNP data from the original file and filters the SNPs based on the
-    indicated SNP type.
-    '''
-    table = pd.read_excel(io=infile, sheet_name=sheet)
-    offset = table[table.iloc[:, 0] == "Coverage Information"].index.tolist()[0]
-    data = table.iloc[offset + 2:]
-    data.columns = table.iloc[offset + 1]
-    data = data[['Locus', 'Reads', 'Allele Name']]
-    final_df = pd.DataFrame()
-    if snp_type_arg == 'all':
-        final_df = data
-    elif snp_type_arg == 'i':
-        filtered_dict = {k: v for k, v in snp_marker_data.items() if 'i' in v['Type']}
-        filtered_data = data[data['Locus'].isin(filtered_dict)].reset_index(drop=True)
-        final_df = final_df.append(filtered_data)
-    else:
-        filtered_dict = {k: v for k, v in snp_marker_data.items() if 'i' not in v['Type']}
-        filtered_data = data[data['Locus'].isin(filtered_dict)].reset_index(drop=True)
-        final_df = final_df.append(filtered_data)
-    final_df['SampleID'] = table.iloc[1, 1]
-    final_df['Project'] = table.iloc[2, 1]
-    final_df['Analysis'] = table.iloc[3, 1]
-    return final_df
-
-
-def uas_types(infile, snp_type_arg):
-    '''
-    This function determines which tab within the specified file is required to extract the SNP
-    data from based on the name of the file.
-    '''
-    if 'Sample Details' in infile and (snp_type_arg == 'all' or snp_type_arg == 'i'):
-        snp_data = parse_snp_table_from_sheet(infile, 'iSNPs', snp_type_arg)
-    elif 'Phenotype' in infile and (snp_type_arg == 'all' or snp_type_arg == 'p'):
-        snp_data = parse_snp_table_from_sheet(infile, 'SNP Data', snp_type_arg)
-    else:
-        snp_data = None
-    return snp_data
-
-
 def uas_format(infile, snp_type_arg):
     '''
     This function begins with the compiled data from all files within the specified directory.
@@ -123,7 +65,6 @@ def uas_format(infile, snp_type_arg):
     data = uas_load(infile, snp_type_arg)
     data_filt = data.loc[data['Reads'] != 0].reset_index(drop=True)
     data_df = []
-    print(len(data_filt))
     for j, row in data_filt.iterrows():
         snpid = data_filt.iloc[j, 0]
         metadata = snp_marker_data[snpid]
@@ -146,106 +87,105 @@ def uas_format(infile, snp_type_arg):
         'SampleID', 'Project', 'Analysis', 'SNP', 'Reads', 'Forward_Strand_Allele', 'UAS_Allele',
         'Type', 'Issues'
     ])
-    return data_final
+    data_final_sort = data_final.sort_values(
+        by=['SampleID', 'Project', 'Analysis', 'SNP', 'Reads'], ascending=False
+    )
+    return data_final_sort
 
 
-def compile_row_of_snp_data(infile, snp, table_loc, type, name, analysis):
+def uas_load(indir, type='i'):
     '''
-    This function is necessary to account for the two sets of SNPs reported from the same
-    sequence amplicon. Sequences labeled as mh16-MC1RB and mh16-MC1RC contain 3 and 6 SNPs,
-    respectively. This function reports out each SNP from the sequence amplicon as individual
-    rows and calls another function to compile data on each SNP.
+    This function lists input .xlsx files within the specified directory and performs a check to
+    ensure the correct file is processed (must contain either "Phenotype" or "Sample Details").
+    This also compiles the SNP data for each file within the directory.
     '''
-    snp_df = []
-    if 'mh16' in snp:
-        locus_data = snps_within_loci[snp]
-        for k in range(0, len(locus_data['SNPs'])):
-            snp_id = locus_data['SNPs'][k]
-            row_tmp = collect_snp_info(infile, snp_id, table_loc, type, name, analysis)
-            if row_tmp is not None:
-                snp_df.append(row_tmp)
-    else:
-        row_tmp = collect_snp_info(infile, snp, table_loc, type, name, analysis)
-        if row_tmp is not None:
-            snp_df.append(row_tmp)
-    final_snp_df = pd.DataFrame(snp_df)
-    return final_snp_df
-
-
-def snp_call_exception(seq, expected_size, metadata, base):
-    '''
-    This function accounts for insertions and deletions in sequences to identify the correct base
-     for the SNP. If the identified allele is still not one of the expected alleles, the sequence
-     will be flagged appropriately.
-    '''
-    new_size = len(seq) + expected_size
-    new_base_call = seq[new_size]
-    if new_base_call in metadata['Alleles']:
-        flag = (
-            'Sequence length different than expected (check for indels); allele position adjusted'
-        )
-        return new_base_call, flag
-    else:
-        flag = (
-            'Allele call does not match expected allele! Check for indels '
-            '(does not match expected sequence length)'
-        )
-        return base, flag
-
-
-def collect_snp_info(infile, snpid, j, type, name, analysis):
-    '''
-    This function compiles allele calls, reads, reverse complements allele call if necessary to
-    match how the UAS reports the allele, and any flags associated with the allele call. The flags
-    indicate potential issues, including an unexpected allele call (not one of two expected
-    alleles for the SNP) or unexpected length of the sequence amplicon which could result in an
-    incorrect allele call. This function also determines if the SNP should be included in the
-    final table based on the specified SNP type from the CLI.
-    '''
-    if snpid == 'N29insA':
-        snpid = 'rs312262906_N29insA'
-    metadata = snp_marker_data[snpid]
-    snp_type = metadata['Type']
-    seq = infile.iloc[j, 2]
-    expected_alleles = metadata['Alleles']
-    snp_loc = metadata['Coord']
-    snp_call = seq[snp_loc]
-    if snpid == 'rs312262906_N29insA' and snp_call == 'A':
-        snp_call = 'insA'
-    if metadata['ReverseCompNeeded'] == 'Yes':
-        snp_call_uas = complement_base(snp_call)
-    else:
-        snp_call_uas = snp_call
-    if snpid == 'rs2402130':
-        differ_length = len(seq) - 73
-    else:
-        differ_length = int(infile.iloc[j, 6])
-    if snp_call not in expected_alleles and differ_length != 0:
-        if snpid == 'rs1821380':
-            snp_call, allele_flag = snp_call_exception(seq, differ_length, metadata, snp_call)
-            snp_call_uas = complement_base(snp_call)
+    snp_final_output = pd.DataFrame()
+    files = glob.glob(os.path.join(indir, '[!~]*.xlsx'))
+    for filename in sorted(files):
+        if 'Phenotype' in filename or 'Sample Details' in filename:
+            snps = uas_types(filename, type)
+            if snps is not None:
+                snp_final_output = snp_final_output.append(snps)
         else:
-            allele_flag = (
-                'Allele call does not match expected allele! Check for indels '
-                '(does not match expected sequence length)'
-            )
-    elif snp_call not in expected_alleles:
-        allele_flag = 'Allele call does not match expected allele!'
-    elif differ_length != 0:
-        allele_flag = 'Check for indels (does not match expected sequence length)'
+            continue
+    return snp_final_output
+
+
+def uas_types(infile, snp_type_arg):
+    '''
+    This function determines which tab within the specified file is required to extract the SNP
+    data from based on the name of the file.
+    '''
+    if 'Sample Details' in infile and (snp_type_arg == 'all' or snp_type_arg == 'i'):
+        snp_data = parse_snp_table_from_sheet(infile, 'iSNPs', snp_type_arg)
+    elif 'Phenotype' in infile and (snp_type_arg == 'all' or snp_type_arg == 'p'):
+        snp_data = parse_snp_table_from_sheet(infile, 'SNP Data', snp_type_arg)
     else:
-        allele_flag = ''
-    if (
-        (type == 'p' and (snp_type == 'p' or snp_type == 'a' or snp_type == 'p/a')) or
-        (type == 'i' and snp_type == 'i') or (type == 'all')
-    ):
-        row_tmp = [
-            name, analysis, analysis, snpid, seq, infile.iloc[j, 7], snp_call, snp_call_uas,
-            snp_type_dict[snp_type], allele_flag
-        ]
+        snp_data = None
+    return snp_data
+
+
+def parse_snp_table_from_sheet(infile, sheet, snp_type_arg):
+    '''
+    This function formats the SNP data from the original file and filters the SNPs based on the
+    indicated SNP type.
+    '''
+    file = openpyxl.load_workbook(infile)
+    file_sheet = file[sheet]
+    table = pd.DataFrame(file_sheet.values)
+    offset = table[table.iloc[:, 0] == "Coverage Information"].index.tolist()[0]
+    data = table.iloc[offset + 2:]
+    data.columns = table.iloc[offset + 1]
+    data = data[['Locus', 'Reads', 'Allele Name']]
+    final_df = pd.DataFrame()
+    if snp_type_arg == 'all':
+        final_df = data
+    elif snp_type_arg == 'i':
+        filtered_dict = {k: v for k, v in snp_marker_data.items() if 'i' in v['Type']}
+        filtered_data = data[data['Locus'].isin(filtered_dict)].reset_index(drop=True)
+        final_df = final_df.append(filtered_data)
     else:
-        row_tmp = None
-    return row_tmp
+        filtered_dict = {k: v for k, v in snp_marker_data.items() if 'i' not in v['Type']}
+        filtered_data = data[data['Locus'].isin(filtered_dict)].reset_index(drop=True)
+        final_df = final_df.append(filtered_data)
+    final_df['SampleID'] = table.iloc[2, 1]
+    final_df['Project'] = table.iloc[3, 1]
+    final_df['Analysis'] = table.iloc[4, 1]
+    return final_df
+
+
+def strait_razor_format(infile, snp_type_arg):
+    '''
+    This function formats STRait Razor input data for two separate reports. The full output
+    includes all reads, the SNP allele calls and any results flags. In the main report, the reads
+    are summed for identical allele calls per SNP. This function also checks that the allele call
+    is one of two expected alleles for the SNP (and flags the allele if not).
+    '''
+    results = strait_razor_concat(infile, snp_type_arg)
+    results_sort = results.sort_values(
+        by=['SampleID', 'Project', 'Analysis', 'SNP', 'Reads'], ascending=False
+    )
+    results_combine = results_sort.groupby(
+        [
+            'SNP', 'Forward_Strand_Allele', 'UAS_Allele', 'Type', 'SampleID', 'Project',
+            'Analysis'
+        ],
+        as_index=False
+    )['Reads'].sum()
+    results_combine = results_combine[[
+        'SampleID', 'Project', 'Analysis', 'SNP', 'Reads', 'Forward_Strand_Allele',
+        'UAS_Allele', 'Type'
+    ]]
+    results_combine['Issues'] = ''
+    for j, row in results_combine.iterrows():
+        snpid = results_combine.iloc[j, 3]
+        metadata = snp_marker_data[snpid]
+        if results_combine.iloc[j, 5] not in metadata['Alleles']:
+            results_combine.iloc[j, 8] = 'Allele call does not match expected allele!'
+    results_combine_sort = results_combine.sort_values(
+        by=['SampleID', 'Project', 'Analysis', 'SNP', 'Reads'], ascending=False
+    )
+    return results_sort, results_combine_sort
 
 
 def strait_razor_concat(indir, snp_type_arg):
@@ -283,39 +223,113 @@ def strait_razor_concat(indir, snp_type_arg):
                 continue
             if row is not None:
                 snps = snps.append(row)
-        snps.columns = [
-            'SampleID', 'Project', 'Analysis', 'SNP', 'Sequence', 'Reads',
-            'Forward_Strand_Allele', 'UAS_Allele', 'Type', 'Potential_Issues'
-        ]
+    snps.columns = [
+        'SampleID', 'Project', 'Analysis', 'SNP', 'Sequence', 'Reads',
+        'Forward_Strand_Allele', 'UAS_Allele', 'Type', 'Potential_Issues'
+    ]
     return snps
 
 
-def strait_razor_format(infile, snp_type_arg):
+def compile_row_of_snp_data(infile, snp, table_loc, type, name, analysis):
     '''
-    This function formats STRait Razor input data for two separate reports. The full output
-    includes all reads, the SNP allele calls and any results flags. In the main report, the reads
-    are summed for identical allele calls per SNP. This function also checks that the allele call
-    is one of two expected alleles for the SNP (and flags the allele if not).
+    This function is necessary to account for the two sets of SNPs reported from the same
+    sequence amplicon. Sequences labeled as mh16-MC1RB and mh16-MC1RC contain 3 and 6 SNPs,
+    respectively. This function reports out each SNP from the sequence amplicon as individual
+    rows and calls another function to compile data on each SNP.
     '''
-    results = strait_razor_concat(infile, snp_type_arg)
-    results_combine = results.groupby(
-        [
-            'SNP', 'Forward_Strand_Allele', 'UAS_Allele', 'Type', 'SampleID', 'Project',
-            'Analysis'
-        ],
-        as_index=False
-    )['Reads'].sum()
-    results_combine = results_combine[[
-        'SampleID', 'Project', 'Analysis', 'SNP', 'Reads', 'Forward_Strand_Allele',
-        'UAS_Allele', 'Type'
-    ]]
-    results_combine['Issues'] = ''
-    for j, row in results_combine.iterrows():
-        snpid = results_combine.iloc[j, 3]
-        metadata = snp_marker_data[snpid]
-        if results_combine.iloc[j, 5] not in metadata['Alleles']:
-            results_combine.iloc[j, 8] = 'Allele call does not match expected allele!'
-    return results, results_combine
+    snp_df = []
+    if 'mh16' in snp:
+        locus_data = snps_within_loci[snp]
+        for k in range(0, len(locus_data['SNPs'])):
+            snp_id = locus_data['SNPs'][k]
+            row_tmp = collect_snp_info(infile, snp_id, table_loc, type, name, analysis)
+            if row_tmp is not None:
+                snp_df.append(row_tmp)
+    else:
+        row_tmp = collect_snp_info(infile, snp, table_loc, type, name, analysis)
+        if row_tmp is not None:
+            snp_df.append(row_tmp)
+    final_snp_df = pd.DataFrame(snp_df)
+    return final_snp_df
+
+
+def collect_snp_info(infile, snpid, j, type, name, analysis):
+    '''
+    This function compiles allele calls, reads, reverse complements allele call if necessary to
+    match how the UAS reports the allele, and any flags associated with the allele call. The flags
+    indicate potential issues, including an unexpected allele call (not one of two expected
+    alleles for the SNP) or unexpected length of the sequence amplicon which could result in an
+    incorrect allele call. This function also determines if the SNP should be included in the
+    final table based on the specified SNP type from the CLI.
+    '''
+    if snpid == 'N29insA':
+        snpid = 'rs312262906_N29insA'
+    metadata = snp_marker_data[snpid]
+    snp_type = metadata['Type']
+    seq = infile.iloc[j, 2]
+    expected_alleles = metadata['Alleles']
+    snp_loc = metadata['Coord']
+    if len(seq) > snp_loc:
+        snp_call = seq[snp_loc]
+        if snpid == 'rs312262906_N29insA' and snp_call == 'A':
+            snp_call = 'insA'
+        if metadata['ReverseCompNeeded'] == 'Yes':
+            snp_call_uas = complement_base(snp_call)
+        else:
+            snp_call_uas = snp_call
+        if snpid == 'rs2402130':
+            differ_length = len(seq) - 73
+        else:
+            differ_length = int(infile.iloc[j, 6])
+        if snp_call not in expected_alleles and differ_length != 0:
+            if snpid == 'rs1821380':
+                snp_call, allele_flag = snp_call_exception(seq, differ_length, metadata, snp_call)
+                snp_call_uas = complement_base(snp_call)
+            else:
+                allele_flag = (
+                    'Allele call does not match expected allele! Check for indels '
+                    '(does not match expected sequence length)'
+                )
+        elif snp_call not in expected_alleles:
+            allele_flag = 'Allele call does not match expected allele!'
+        elif differ_length != 0:
+            allele_flag = 'Check for indels (does not match expected sequence length)'
+        else:
+            allele_flag = ''
+        if (
+            (type == 'p' and (snp_type == 'p' or snp_type == 'a' or snp_type == 'p/a')) or
+            (type == 'i' and snp_type == 'i') or (type == 'all')
+        ):
+            row_tmp = [
+                name, analysis, analysis, snpid, seq, infile.iloc[j, 7], snp_call, snp_call_uas,
+                snp_type_dict[snp_type], allele_flag
+            ]
+        else:
+            row_tmp = None
+    else:
+        row_tmp = None
+    return row_tmp
+
+
+def snp_call_exception(seq, expected_size, metadata, base):
+    '''
+    This function accounts for insertions and deletions in sequences to identify the correct base
+    coordinate for the SNP. If the identified allele is still not one of the expected alleles, the
+    sequence will be flagged appropriately.
+    '''
+    new_size = len(seq) + expected_size
+    new_base_call = seq[new_size]
+    if new_base_call in metadata['Alleles']:
+        flag = (
+            'Sequence length different than expected (check for indels); allele position adjusted'
+        )
+        return new_base_call, flag
+    else:
+        flag = (
+            'Allele call does not match expected allele! Check for indels '
+            '(does not match expected sequence length)'
+        )
+        return base, flag
 
 
 def main(args):

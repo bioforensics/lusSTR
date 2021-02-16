@@ -16,7 +16,7 @@ from tempfile import NamedTemporaryFile
 
 
 def test_format():
-    UAStestfile = data_file('UAS_Sample_Details_Report_test.xlsx')
+    UAStestfile = data_file('snps/Positive Control Sample Details Report 2315.xlsx')
     formatoutput = data_file('testformat.csv')
     with NamedTemporaryFile(suffix='.csv') as outfile:
         arglist = ['format', UAStestfile, '-o', outfile.name, '--uas']
@@ -26,7 +26,7 @@ def test_format():
 
 
 def test_format_stdout(capsys):
-    UAStestfile = data_file('UAS_Sample_Details_Report_test.xlsx')
+    UAStestfile = data_file('snps/Positive Control Sample Details Report 2315.xlsx')
     formatoutput = data_file('testformat.csv')
     arglist = ['format', UAStestfile, '--uas']
     args = lusSTR.cli.get_parser().parse_args(arglist)
@@ -49,7 +49,7 @@ def test_format_straitrazor():
 
 
 def test_format_sexloci_uas():
-    UAStestfile = data_file('UAS_Sample_Details_Report_test.xlsx')
+    UAStestfile = data_file('snps/Positive Control Sample Details Report 2315.xlsx')
     formatoutput = data_file('testformat_uas_sexloci.csv')
     with NamedTemporaryFile(suffix='.csv') as outfile:
         arglist = ['format', UAStestfile, '-o', outfile.name, '--uas', '--include-sex']

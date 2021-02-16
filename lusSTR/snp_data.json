@@ -68,7 +68,7 @@
     "rs1357617": {
         "Type": "i",
         "Alleles": ["A", "T"],
-        "ReverseCompNeeded": "No",
+        "ReverseCompNeeded": "Yes",
         "Coord": 60
     },
     "rs4364205": {
@@ -362,7 +362,7 @@
     "rs1454361": {
         "Type": "i",
         "Alleles": ["T", "A"],
-        "ReverseCompNeeded": "No",
+        "ReverseCompNeeded": "Yes",
         "Coord": 46
     },
     "rs722290": {
@@ -494,7 +494,7 @@
     "rs445251": {
         "Type": "i",
         "Alleles": ["G", "C"],
-        "ReverseCompNeeded": "No",
+        "ReverseCompNeeded": "Yes",
         "Coord": 43
     },
     "rs1005533": {
