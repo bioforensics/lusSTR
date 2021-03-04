@@ -104,15 +104,15 @@ def format_table(input, uas=False, kit='forenseq'):
 
     columns = [
         'SampleID', 'Project', 'Analysis', 'Locus', 'UAS_Output_Sequence',
-        'Forward_Strand_Sequence', 'Traditional_STR_Allele', 'Forward_Strand_Bracketed_form',
-        'UAS_Output_Bracketed_Form', 'LUS', 'LUS_Plus', 'Reads'
+        'Forward_Strand_Sequence', 'RU_Allele', 'Forward_Strand_Bracketed_Notation',
+        'UAS_Output_Bracketed_Notation', 'LUS', 'LUS_Plus', 'Reads'
     ]
     final_output = pd.DataFrame(list_of_lists, columns=columns)
     if not uas:
         flanks_columns = [
-            'SampleID', 'Project', 'Analysis', 'Locus', 'Reads', 'Length_Allele',
-            'Full_Sequence', '5_Flank_Anno', 'UAS_Region_Anno', '3_Flank_Anno',
-            'Potential_Issues'
+            'SampleID', 'Project', 'Analysis', 'Locus', 'Reads', 'RU_Allele',
+            'Full_Sequence', '5_Flank_Bracketed_Notation', 'UAS_Region_Bracketed_Notation',
+            '3_Flank_Bracketed_Notation', 'Potential_Issues'
         ]
         final_flank_output = pd.DataFrame(flanks_list, columns=flanks_columns)
     else:
