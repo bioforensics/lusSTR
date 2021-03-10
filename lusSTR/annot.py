@@ -130,19 +130,61 @@ def main(args):
         sex_final_table, sex_flank_table, sex_columns = format_table(
             f'{input_name}_sexloci.csv', args.uas, args.kit
         )
-        sex_final_table.to_csv(f'{output_name}_sexloci.txt', sep='\t', index=False)
         if not args.uas:
-            sex_flank_table.to_csv(f'{output_name}_sexloci_flanks_anno.txt', sep='\t', index=False)
+            sex_flank_sort = sex_flank_table.sort_values(
+                by=['SampleID', 'Project', 'Analysis', 'Locus', 'Reads', 'RU_Allele'],
+                ascending=False
+            )
+            sex_flank_sort.to_csv(f'{output_name}_sexloci_flanks_anno.txt', sep='\t', index=False)
+            if args.combine:
+                sex_final_table = (
+                    sex_final_table.groupby(columns[:-1], as_index=False)['Reads'].sum()
+                )
+                sex_table_sort = sex_final_table.sort_values(
+                    by=['SampleID', 'Project', 'Analysis', 'Locus', 'Reads', 'RU_Allele'],
+                    ascending=False
+                )
+                sex_table_sort.to_csv(f'{output_name}_sexloci.txt', sep='\t', index=False)
+            else:
+                sex_final_sort = sex_final_table.sort_values(
+                    by=['SampleID', 'Project', 'Analysis', 'Locus', 'Reads', 'RU_Allele'],
+                    ascending=False
+                )
+                sex_final_sort.to_csv(
+                    f'{output_name}_sexloci_no_combined_reads.txt', index=False
+                )
+        else:
+            sex_final_sort = sex_final_table.sort_values(
+                by=['SampleID', 'Project', 'Analysis', 'Locus', 'Reads', 'RU_Allele'],
+                ascending=False
+            )
+            sex_final_sort.to_csv(f'{output_name}_sexloci.txt', sep='\t', index=False)
     if not args.uas:
-        autosomal_flank_table.to_csv(f'{output_name}_flanks_anno.txt', sep='\t', index=False)
+        auto_flank_sort = autosomal_flank_table.sort_values(
+                by=['SampleID', 'Project', 'Analysis', 'Locus', 'Reads', 'RU_Allele'],
+                ascending=False
+            )
+        auto_flank_sort.to_csv(f'{output_name}_flanks_anno.txt', sep='\t', index=False)
         if args.combine:
             autosomal_final_table = (
                 autosomal_final_table.groupby(columns[:-1], as_index=False)['Reads'].sum()
             )
-            autosomal_final_table.to_csv(args.out, sep='\t', index=False)
+            auto_final_sort = autosomal_final_table.sort_values(
+                by=['SampleID', 'Project', 'Analysis', 'Locus', 'Reads', 'RU_Allele'],
+                ascending=False
+            )
+            auto_final_sort.to_csv(args.out, sep='\t', index=False)
         else:
-            autosomal_final_table.to_csv(
+            auto_final_sort = autosomal_final_table.sort_values(
+                by=['SampleID', 'Project', 'Analysis', 'Locus', 'Reads', 'RU_Allele'],
+                ascending=False
+            )
+            auto_final_sort.to_csv(
                 f'{output_name}_no_combined_reads.txt', sep='\t', index=False
             )
     else:
-        autosomal_final_table.to_csv(args.out, sep='\t', index=False)
+        auto_final_sort = autosomal_final_table.sort_values(
+            by=['SampleID', 'Project', 'Analysis', 'Locus', 'Reads', 'RU_Allele'],
+            ascending=False
+        )
+        auto_final_sort.to_csv(args.out, sep='\t', index=False)
