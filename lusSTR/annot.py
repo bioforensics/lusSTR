@@ -69,6 +69,8 @@ def format_table(input, uas=False, kit='forenseq'):
             locus = 'PENTA E'
         if locus == 'DYS385A-B' or locus == 'DYS385':
             locus = 'DYS385A-B'
+        if locus == 'AMELOGENIN':
+            continue
         metadata = str_marker_data[locus]
         if kit == 'forenseq':
             remove_5p = metadata['Foren_5']
