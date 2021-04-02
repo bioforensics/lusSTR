@@ -107,6 +107,8 @@ The ```annotate``` command produces a tab-delineated table with the following co
 
 If the ```--include-sex``` flag is included, a second table with the above columns for the sex chromosome loci will be outputted as well.
 
+**NOTE** on including the sex chromosome STR loci: in the ```annotate``` step, lusSTR requires two files for input: (1) the properly formatted file of autosomal STR loci produced from the ```format``` command (or a file with the appropriate format) with a label such as ```lusSTRinput.csv```, and (2) the properly formatted file of X- and Y-STR loci produced from the ```format``` command with the ```--include-sex``` flag (or a file with the appropriate format) labeled as ```lusSTRinput_sexloci.csv```. The file containing the X- and Y-STR loci *must* have the identical file name to the file containing the autosomal STRs but with ```_sexloci.csv``` (see above for precise examples). These two files are automatically created (and named appropriately) when using the ```--include-sex``` flag with the ```format``` command.
+
 For the ```annotate``` command, the following must be specified:
 *  Input filename
 *  Output filename
