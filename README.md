@@ -71,15 +71,18 @@ The above command will output two tables which are used in the ```annotate``` co
 
 If using lusSTR version 0.4 or above, STRait Razor data **must** be produced using the STRait Razor config file released in January 2021 (ForenSeqv1.25.config and PowerSeqv2.1.config). These config files are available here: https://github.com/Ahhgust/STRaitRazor/tree/103ef68746f010add8f21266fa8bf8fb9f4a076e/.
 
-If using the output from STRait Razor, the files **must** be labeled as ```SampleID.txt``` (example: ```Sample0001.txt```) and **must** be compiled in a separate folder (labeled with the project ID). The user must specify the folder name for the ```format``` command as well as an output filename (all sample files will be compiled into one file):
+If using the output from STRait Razor, the files **must** be labeled as ```SampleID.txt``` (example: ```Sample0001.txt```) and can either be specified as a single file or as a folder of multiple STRait Razor output files (folder labeled with the project ID). The user must specify the file or folder name for the ```format``` command as well as an output filename (all sample files will be compiled into one file):
 ```
 lusstr format <input> -o <output>
 ```
 
-Example:
+Examples:
 
 ```
 lusstr format STRaitRazorOutputFolder/ -o STRaitRazor_test_file.csv
+```
+```
+lusstr format A001.txt -o A001.csv
 ```
 
 Again, sex loci can be included using the ```--include-sex``` flag.
