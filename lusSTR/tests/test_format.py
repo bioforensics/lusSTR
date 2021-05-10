@@ -10,6 +10,7 @@
 import filecmp
 import lusSTR
 from lusSTR.tests import data_file
+import pytest
 import os
 from shutil import copytree
 from tempfile import NamedTemporaryFile
@@ -38,10 +39,14 @@ def test_format_stdout(capsys):
     assert obs_out == exp_out
 
 
-def test_format_straitrazor():
+@pytest.mark.parametrize('input, testoutput', [
+    ('STRait_Razor_test_output', 'STRait_Razor_test_output.csv'),
+    ('STRait_Razor_test_output/A001.txt', 'STRaitRazor_output_test_A001.csv')
+])
+def test_format_straitrazor(input, testoutput):
     with NamedTemporaryFile() as outfile:
-        inputdb = data_file('STRait_Razor_test_output')
-        testformat = data_file('STRait_Razor_test_output.csv')
+        inputdb = data_file(input)
+        testformat = data_file(testoutput)
         arglist = ['format', inputdb, '-o', outfile.name]
         args = lusSTR.cli.get_parser().parse_args(arglist)
         lusSTR.format.main(args)

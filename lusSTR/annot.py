@@ -48,7 +48,7 @@ def format_table(input, uas=False, kit='forenseq'):
     '''
     Function to format final output table and the flanking report (if necessary).
     '''
-    data = pd.read_csv(input)
+    data = pd.read_csv(input, keep_default_na=False)
     data.iloc[:, 3] = data.iloc[:, 3].astype(str)
     list_of_lists = []
     flanks_list = []
