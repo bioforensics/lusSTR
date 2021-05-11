@@ -1,8 +1,8 @@
 # lusSTR
 
-lusSTR is a tool written in Python to convert NGS sequence data of forensic STR loci to different annotation types for ease in downstream analyses.
+lusSTR is a tool written in Python to convert NGS sequence data of forensic STR loci to different sequence representations and allele designations for ease in downstream analyses.
 
-This Python package has been written for use with either: (1) the 27 autosomal STR loci, 24 Y-chromosome STR loci and 7 X-chromosome STR loci from the Verogen ForenSeq panel, or (2) the 22 autosomal STR loci and 22 Y-chromosome loci from the Promega PowerSeq panel. The package accomodates either the Sample Details Report from the ForenSeq Universal Analysis Software (UAS) or STRait Razor output. If STRait Razor output is provided, sequences are filtered to the UAS sequence region for annotation.
+This Python package has been written for use with either: (1) the 27 autosomal STR loci, 24 Y-chromosome STR loci and 7 X-chromosome STR loci from the Verogen ForenSeq panel, or (2) the 22 autosomal STR loci and 22 Y-chromosome loci from the Promega PowerSeq panel. The package accomodates either the Sample Details Report from the ForenSeq Universal Analysis Software (UAS) or STRait Razor output. If STRait Razor output is provided, sequences are filtered to the UAS sequence region for translation.
 
 lusSTR also processes SNP data from the Verogen ForenSeq panel. ForenSeq consists of 94 identity SNPs, 22 phenotype (hair/eye color) SNPs, 54 ancestry SNPs and 2 phenotype and ancestry SNPs. Identity SNP data is provided in the UAS Sample Details Report; phenotype and ancestry SNP data is provided in the UAS Phenotype Report. All SNP calls are also reported in the STRait Razor output.
 
@@ -71,15 +71,18 @@ The above command will output two tables which are used in the ```annotate``` co
 
 If using lusSTR version 0.4 or above, STRait Razor data **must** be produced using the STRait Razor config file released in January 2021 (ForenSeqv1.25.config and PowerSeqv2.1.config). These config files are available here: https://github.com/Ahhgust/STRaitRazor/tree/103ef68746f010add8f21266fa8bf8fb9f4a076e/.
 
-If using the output from STRait Razor, the files **must** be labeled as ```SampleID.txt``` (example: ```Sample0001.txt```) and **must** be compiled in a separate folder (labeled with the project ID). The user must specify the folder name for the ```format``` command as well as an output filename (all sample files will be compiled into one file):
+If using the output from STRait Razor, the files **must** be labeled as ```SampleID.txt``` (example: ```Sample0001.txt```) and can either be specified as a single file or as a folder of multiple STRait Razor output files (folder labeled with the project ID). The user must specify the file or folder name for the ```format``` command as well as an output filename (all sample files will be compiled into one file):
 ```
 lusstr format <input> -o <output>
 ```
 
-Example:
+Examples:
 
 ```
 lusstr format STRaitRazorOutputFolder/ -o STRaitRazor_test_file.csv
+```
+```
+lusstr format A001.txt -o A001.csv
 ```
 
 Again, sex loci can be included using the ```--include-sex``` flag.
@@ -89,7 +92,7 @@ lusstr format STRaitRazorOutputFolder/ -o STRaitRazor_test_file.csv --include-se
 With this, two tables will be produced: ```STRaitRazor_test_file.csv``` and ```STRaitRazor_test_file_sex_loci.csv```.
 
 
-### Annotation of STR loci sequences
+### Translation of STR loci sequences
 
 The ```annotate``` command produces a tab-delineated table with the following columns:
 *  Sample ID
@@ -98,14 +101,16 @@ The ```annotate``` command produces a tab-delineated table with the following co
 *  Locus
 *  UAS Output sequence: can be forward or reverse strand
 *  Forward strand sequence: will be same as UAS Output sequence for those loci reported on forward strand
-*  Traditional STR allele: common repeat unit based annotation
-*  Forward Strand Bracketed annotation: Bracketed annotation for forward strand sequence
-*  UAS Output Bracketed annotation: Bracketed annotation for the reported UAS sequence output (will be same for those loci which report the forward strand)
+*  RU allele: common length-based repeat unit (RU) allele designation
+*  Forward Strand Bracketed notation: Bracketed notation for forward strand sequence
+*  UAS Output Bracketed notation: Bracketed annotation for the reported UAS sequence output (will be same for those loci which report the forward strand)
 *  LUS: Longest uninterrupted stretch
-*  LUS+: annotation combining multiple annotations including traditional STR allele designation, LUS, secondary motif (if applicable) and tertiary motif (if applicable)
+*  LUS+: Notation combining multiple allele designations including RU, LUS, secondary motif (if applicable) and tertiary motif (if applicable)
 *  Reads: number of reads observed with the specified sequence
 
 If the ```--include-sex``` flag is included, a second table with the above columns for the sex chromosome loci will be outputted as well.
+
+**NOTE** on including the sex chromosome STR loci: in the ```annotate``` step, lusSTR requires two files for input: (1) the properly formatted file of autosomal STR loci produced from the ```format``` command (or a file with the appropriate format) with a label such as ```lusSTRinput.csv```, and (2) the properly formatted file of X- and Y-STR loci produced from the ```format``` command with the ```--include-sex``` flag (or a file with the appropriate format) labeled as ```lusSTRinput_sexloci.csv```. The file containing the X- and Y-STR loci *must* have the identical file name to the file containing the autosomal STRs but with ```_sexloci.csv``` (see above for precise examples). These two files are automatically created (and named appropriately) when using the ```--include-sex``` flag with the ```format``` command.
 
 For the ```annotate``` command, the following must be specified:
 *  Input filename
@@ -124,7 +129,7 @@ lusstr annotate UAS_test_file.csv -o UAS_final_table.txt --kit forenseq --uas
 ```
 
 If no ```--uas``` flag is provided, several additional processes occur with the ```annotate``` command:
-*  The full sequences are filtered to the UAS region before the annotation step. The number of bases to remove is determined based on the specified kit.
+*  The full sequences are filtered to the UAS region before the translation step. The number of bases to remove is determined based on the specified kit.
 *  Once the sequences are filtered to the UAS region, any duplicated sequences are removed and their reads are summed in with the remaining sequence ```Reads``` column. NOTE: This step can be skipped with the ```--nocombine``` flag.
   
 Further, a second table (labeled as ```*_flanks_anno.txt```) containing information related to the flanking sequences surrounding the UAS sequence region is also produced with the following columns:
@@ -135,9 +140,9 @@ Further, a second table (labeled as ```*_flanks_anno.txt```) containing informat
 *  Reads: number of reads observed for the specified sequence
 *  Length-based Allele
 *  Full Sequence
-*  5' Flanking Sequence Annotation
-*  UAS Region Sequence Annotation (same as column ```UAS Output Bracketed annotation``` in the main table)
-*  3' Flanking Sequence Annotation
+*  5' Flanking Sequence Bracketed Notation
+*  UAS Region Sequence Bracketed Notation (same as column ```UAS Output Bracketed Notation``` in the main table)
+*  3' Flanking Sequence Bracketed Notation
 *  Potential Issues (such as: Possible indel or partial sequence)
 
 The ```Potential Issues``` column in this report is to draw attention to potential problem sequences (due to perhaps an indel or partial sequence) and requires the attention of the user to further evaluate the sequence for it's authenticity.
@@ -152,7 +157,7 @@ If the ```--include-sex``` flag is included, as below:
 ```
 lusstr annotate STRaitRazor_test_file.csv -o STRaitRazor_powerseq_final.txt --kit powerseq --include-sex
 ```
- Two additional tables will be produced: (1) ```STRaitRazor_powerseq_final_sexloci.txt``` and (2) ```STRaitRazor_powerseq_final_sexloci_flanks_anno.txt``` for annotation of the sex chromosome loci and their flanking regions.
+ Two additional tables will be produced: (1) ```STRaitRazor_powerseq_final_sexloci.txt``` and (2) ```STRaitRazor_powerseq_final_sexloci_flanks_anno.txt``` for translation of the sex chromosome loci and their flanking regions.
 
  ## SNP Data Processing
 

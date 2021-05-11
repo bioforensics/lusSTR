@@ -63,7 +63,7 @@ def uas_format(infile, sexloci=False):
     return auto_strs, sex_strs
 
 
-def strait_razor_concat(indir, sexloci=False):
+def strait_razor_concat(inpath, sexloci=False):
     '''Format a directory of STRait Razor output files for use with `lusSTR annotate`.'''
     locus_list = [
         'CSF1PO', 'D10S1248', 'D12S391', 'D13S317', 'D16S539', 'D17S1301', 'D18S51', 'D19S433',
@@ -80,31 +80,45 @@ def strait_razor_concat(indir, sexloci=False):
     ]
     auto_strs = pd.DataFrame()
     sex_strs = pd.DataFrame() if sexloci is True else None
-    analysisID = os.path.basename(indir.rstrip(os.sep))
-    files = glob.glob(os.path.join(indir, '*.txt'))
-    for filename in sorted(files):
-        name = filename.replace('.txt', '').split(os.sep)[-1]
-        table = pd.read_csv(
-            filename, sep='\t', header=None,
-            names=['Locus_allele', 'Length', 'Sequence', 'Forward_Reads', 'Reverse_Reads']
-        )
-        try:
-            table[['Locus', 'Allele']] = table.Locus_allele.str.split(":", expand=True)
-        except ValueError:
-            print(
-                f'Error found with {filename}. Will bypass and continue. Please check file'
-                f' and rerun the command, if necessary.'
-            )
-            continue
-        table['Total_Reads'] = table['Forward_Reads'] + table['Reverse_Reads']
-        table['SampleID'] = name
-        table['Project'] = analysisID
-        table['Analysis'] = analysisID
-        table = table[['Locus', 'Total_Reads', 'Sequence', 'SampleID', 'Project', 'Analysis']]
+    if os.path.isdir(inpath):
+        analysisID = os.path.basename(inpath.rstrip(os.sep))
+        files = glob.glob(os.path.join(inpath, '*.txt'))
+        for filename in sorted(files):
+            try:
+                table = strait_razor_table(filename, analysisID, sexloci)
+            except ValueError:
+                print(
+                    f'Error found with {filename}. Will bypass and continue. Please check file'
+                    f' and rerun the command, if necessary.'
+                )
+                continue
+            auto_strs = auto_strs.append(table[table.Locus.isin(locus_list)])
+            if sexloci is True:
+                sex_strs = sex_strs.append(table[table.Locus.isin(sex_locus_list)])
+    else:
+        table = strait_razor_table(inpath, 'NA', sexloci)
         auto_strs = auto_strs.append(table[table.Locus.isin(locus_list)])
         if sexloci is True:
             sex_strs = sex_strs.append(table[table.Locus.isin(sex_locus_list)])
     return auto_strs, sex_strs
+
+
+def strait_razor_table(filename, analysisID, sexloci=False):
+    name = filename.replace('.txt', '').split(os.sep)[-1]
+    table = pd.read_csv(
+        filename, sep='\t', header=None,
+        names=['Locus_allele', 'Length', 'Sequence', 'Forward_Reads', 'Reverse_Reads']
+    )
+    try:
+        table[['Locus', 'Allele']] = table.Locus_allele.str.split(":", expand=True)
+    except ValueError:
+        table = []
+    table['Total_Reads'] = table['Forward_Reads'] + table['Reverse_Reads']
+    table['SampleID'] = name
+    table['Project'] = analysisID
+    table['Analysis'] = analysisID
+    table = table[['Locus', 'Total_Reads', 'Sequence', 'SampleID', 'Project', 'Analysis']]
+    return table
 
 
 def main(args):

@@ -40,18 +40,30 @@ def test_annotate_uas():
         assert filecmp.cmp(testanno, outfile.name) is True
 
 
-def test_annotate_full_nocombine():
+@pytest.mark.parametrize('infile, len_sum, len_uncom, xy_len_sum, xy_len_uncom, kit', [
+    ('testformat_sr.csv', 897, 913, 9701, 16108, 'forenseq'),
+    ('powerseq.csv', 353, 441, 256, 303, 'powerseq')
+])
+def test_annotate_full_nocombine(infile, len_sum, len_uncom, xy_len_sum, xy_len_uncom, kit):
+    inputfile = data_file(infile)
     with NamedTemporaryFile() as outfile:
-        inputfile = data_file('2800M_formatted_full.csv')
-        testfullanno = data_file('2800M_full_anno_no_combined_reads.txt')
-        arglist = [
-            'annotate', inputfile, '-o', outfile.name, '--kit', 'forenseq', '--nocombine'
+        arglist_nocomb = [
+            'annotate', inputfile, '-o', outfile.name, '--kit', kit, '--nocombine', '--include-sex'
         ]
-        args = lusSTR.cli.get_parser().parse_args(arglist)
-        lusSTR.annot.main(args)
+        args_nocomb = lusSTR.cli.get_parser().parse_args(arglist_nocomb)
+        lusSTR.annot.main(args_nocomb)
         outfile_name = os.path.splitext(outfile.name)[0]
-        outfile_name_output = f'{outfile_name}_no_combined_reads.txt'
-        assert filecmp.cmp(testfullanno, outfile_name_output) is True
+        with open(f'{outfile_name}_no_combined_reads.txt', 'r') as fh:
+            assert len(fh.readlines()) == len_uncom
+        with open(f'{outfile_name}_sexloci_no_combined_reads.txt', 'r') as fh:
+            assert len(fh.readlines()) == xy_len_uncom
+        arglist_comb = ['annotate', inputfile, '-o', outfile.name, '--kit', kit, '--include-sex']
+        args_comb = lusSTR.cli.get_parser().parse_args(arglist_comb)
+        lusSTR.annot.main(args_comb)
+        with open(outfile.name, 'r') as fh:
+            assert len(fh.readlines()) == len_sum
+        with open(f'{outfile_name}_sexloci.txt', 'r') as fh:
+            assert len(fh.readlines()) == xy_len_sum
 
 
 def test_flank_anno():

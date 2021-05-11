@@ -20,12 +20,13 @@ def format_subparser(subparsers):
     )
     cli.add_argument(
         'input',
-        help='Input is either a single file (UAS Sample Details Report, in .xlsx format) or a '
-        'directory of STRait Razor output files. If input is the UAS Sample Details Report '
-        '(in .xlsx format), use of the --uas flag is required. If STRait Razor output is '
-        'used, the name of the provided directory will be used as the Analysis ID in the '
-        'final annotation table. Output files within the directory should be named as such: '
-        'SampleID_STRaitRazor.txt (e.g. A001_STRaitRazor.txt).'
+        help='Input is either a UAS Sample Details Report (in .xlsx format) or a STRait Razor '
+        'output file (.txt format). Both single files and directories containing multiple UAS or '
+        'STRait Razor files are accepted. If input is the UAS Sample Details Report, use of the '
+        '--uas flag is required. If a directory of STRait Razor files is provided, the name of '
+        'the directory will be used as the Project and Analysis IDs in the final annotation '
+        'table. If a single file is provided, the Project and Analysis IDs will be NA. '
+        'STRaitRazor files should be named as the Sample ID, e.g. A001.txt, A002.txt, etc.'
     )
     cli.add_argument(
         '--uas', action='store_true',

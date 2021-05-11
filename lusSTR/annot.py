@@ -48,7 +48,7 @@ def format_table(input, uas=False, kit='forenseq'):
     '''
     Function to format final output table and the flanking report (if necessary).
     '''
-    data = pd.read_csv(input)
+    data = pd.read_csv(input, keep_default_na=False)
     data.iloc[:, 3] = data.iloc[:, 3].astype(str)
     list_of_lists = []
     flanks_list = []
@@ -69,6 +69,8 @@ def format_table(input, uas=False, kit='forenseq'):
             locus = 'PENTA E'
         if locus == 'DYS385A-B' or locus == 'DYS385':
             locus = 'DYS385A-B'
+        if locus == 'AMELOGENIN':
+            continue
         metadata = str_marker_data[locus]
         if kit == 'forenseq':
             remove_5p = metadata['Foren_5']
@@ -104,20 +106,40 @@ def format_table(input, uas=False, kit='forenseq'):
 
     columns = [
         'SampleID', 'Project', 'Analysis', 'Locus', 'UAS_Output_Sequence',
-        'Forward_Strand_Sequence', 'Traditional_STR_Allele', 'Forward_Strand_Bracketed_form',
-        'UAS_Output_Bracketed_Form', 'LUS', 'LUS_Plus', 'Reads'
+        'Forward_Strand_Sequence', 'RU_Allele', 'Forward_Strand_Bracketed_Notation',
+        'UAS_Output_Bracketed_Notation', 'LUS', 'LUS_Plus', 'Reads'
     ]
-    final_output = pd.DataFrame(list_of_lists, columns=columns)
+    if not list_of_lists:
+        final_output = pd.DataFrame(list_of_lists, columns=columns)
+    else:
+        final_output = sort_table(pd.DataFrame(list_of_lists, columns=columns))
     if not uas:
         flanks_columns = [
-            'SampleID', 'Project', 'Analysis', 'Locus', 'Reads', 'Length_Allele',
-            'Full_Sequence', '5_Flank_Anno', 'UAS_Region_Anno', '3_Flank_Anno',
-            'Potential_Issues'
+            'SampleID', 'Project', 'Analysis', 'Locus', 'Reads', 'RU_Allele',
+            'Full_Sequence', '5_Flank_Bracketed_Notation', 'UAS_Region_Bracketed_Notation',
+            '3_Flank_Bracketed_Notation', 'Potential_Issues'
         ]
-        final_flank_output = pd.DataFrame(flanks_list, columns=flanks_columns)
+        if not flanks_list:
+            final_flank_output = pd.DataFrame(flanks_list, columns=flanks_columns)
+        else:
+            final_flank_output = sort_table(pd.DataFrame(flanks_list, columns=flanks_columns))
     else:
         final_flank_output = ''
     return final_output, final_flank_output, columns
+
+
+def combine_reads(table, columns):
+    comb_table = table.groupby(columns[:-1], as_index=False)['Reads'].sum()
+    sorted = sort_table(comb_table)
+    return sorted
+
+
+def sort_table(table):
+    sorted_table = table.sort_values(
+                by=['SampleID', 'Project', 'Analysis', 'Locus', 'Reads', 'RU_Allele'],
+                ascending=False
+            )
+    return sorted_table
 
 
 def main(args):
@@ -127,18 +149,28 @@ def main(args):
         args.input, args.uas, args.kit
     )
     if args.sex:
-        sex_final_table, sex_flank_table, sex_columns = format_table(
+        sex_final_table, sex_flank_table, columns = format_table(
             f'{input_name}_sexloci.csv', args.uas, args.kit
         )
-        sex_final_table.to_csv(f'{output_name}_sexloci.txt', sep='\t', index=False)
         if not args.uas:
-            sex_flank_table.to_csv(f'{output_name}_sexloci_flanks_anno.txt', sep='\t', index=False)
+            sex_flank_table.to_csv(
+                f'{output_name}_sexloci_flanks_anno.txt', sep='\t', index=False
+            )
+            if args.combine:
+                if not sex_final_table.empty:
+                    sex_final_table = combine_reads(sex_final_table, columns)
+                sex_final_table.to_csv(f'{output_name}_sexloci.txt', sep='\t', index=False)
+            else:
+                sex_final_table.to_csv(
+                    f'{output_name}_sexloci_no_combined_reads.txt', index=False
+                )
+        else:
+            sex_final_table.to_csv(f'{output_name}_sexloci.txt', sep='\t', index=False)
     if not args.uas:
         autosomal_flank_table.to_csv(f'{output_name}_flanks_anno.txt', sep='\t', index=False)
         if args.combine:
-            autosomal_final_table = (
-                autosomal_final_table.groupby(columns[:-1], as_index=False)['Reads'].sum()
-            )
+            if not autosomal_final_table.empty:
+                autosomal_final_table = combine_reads(autosomal_final_table, columns)
             autosomal_final_table.to_csv(args.out, sep='\t', index=False)
         else:
             autosomal_final_table.to_csv(
