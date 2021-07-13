@@ -142,7 +142,20 @@ def sort_table(table):
     return sorted_table
 
 
+def indiv_files(table, input_dir, ext):
+    output_dir = f'Separated_lusstr_Files/{input_dir}'
+    try:
+        os.mkdir(output_dir)
+    except FileExistsError:
+        pass
+    for samp in table['SampleID'].unique():
+        new_df = table[table['SampleID'] == samp]
+        new_df.to_csv(f'{output_dir}/{samp}{ext}', sep='\t', index=False)
+
+
 def main(args):
+    if args.separate and os.path.exists('Separated_lusstr_Files') is False:
+        os.mkdir('Separated_lusstr_Files')
     output_name = os.path.splitext(args.out)[0]
     input_name = os.path.splitext(args.input)[0]
     autosomal_final_table, autosomal_flank_table, columns = format_table(
@@ -159,22 +172,36 @@ def main(args):
             if args.combine:
                 if not sex_final_table.empty:
                     sex_final_table = combine_reads(sex_final_table, columns)
-                sex_final_table.to_csv(f'{output_name}_sexloci.txt', sep='\t', index=False)
+                if args.separate:
+                    indiv_files(sex_final_table, input_name, '_sexloci.txt')
+                else:
+                    sex_final_table.to_csv(f'{output_name}_sexloci.txt', sep='\t', index=False)
             else:
+                if args.separate:
+                    indiv_files(sex_final_table, input_name, '_sexloci_no_combined_reads.txt')
                 sex_final_table.to_csv(
                     f'{output_name}_sexloci_no_combined_reads.txt', index=False
                 )
         else:
-            sex_final_table.to_csv(f'{output_name}_sexloci.txt', sep='\t', index=False)
+            if args.separate:
+                indiv_files(sex_final_table, input_name, '_sexloci.txt')
+            else:
+                sex_final_table.to_csv(f'{output_name}_sexloci.txt', sep='\t', index=False)
     if not args.uas:
         autosomal_flank_table.to_csv(f'{output_name}_flanks_anno.txt', sep='\t', index=False)
         if args.combine:
             if not autosomal_final_table.empty:
                 autosomal_final_table = combine_reads(autosomal_final_table, columns)
-            autosomal_final_table.to_csv(args.out, sep='\t', index=False)
+                if args.separate:
+                    indiv_files(autosomal_final_table, input_name, '.txt')
+                else:
+                    autosomal_final_table.to_csv(args.out, sep='\t', index=False)
         else:
             autosomal_final_table.to_csv(
                 f'{output_name}_no_combined_reads.txt', sep='\t', index=False
             )
     else:
-        autosomal_final_table.to_csv(args.out, sep='\t', index=False)
+        if args.separate:
+            indiv_files(autosomal_final_table, input_name, '.txt')
+        else:
+            autosomal_final_table.to_csv(args.out, sep='\t', index=False)

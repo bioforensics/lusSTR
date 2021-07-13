@@ -42,7 +42,9 @@ def annot_subparser(subparsers):
     cli = subparsers.add_parser('annotate')
     cli.add_argument(
         '-o', '--out', metavar='FILE',
-        help='file to which output will be written; default is terminal (stdout)'
+        help='file to which output will be written; default is terminal (stdout). If the '
+        '--separate flag is used, this will be the name of the directory which the individual '
+        'files are written to.'
     )
     cli.add_argument(
         'input', help='sample(s) in CSV format; first four columns must be Locus, NumReads, '
@@ -66,6 +68,10 @@ def annot_subparser(subparsers):
         '--include-sex', dest='sex', action='store_true',
         help='Use if including the X and Y STR markers. Separate reports for these markers '
         'will be created.'
+    )
+    cli.add_argument(
+        '--separate', action='store_true',
+        help='This flag will result in the creation of individual output files per sample.'
     )
 
 
@@ -92,6 +98,10 @@ def snps_subparser(subparsers):
     cli.add_argument(
         '--uas', action='store_true',
         help='Use if sequences have been run through the ForenSeq UAS.'
+    )
+    cli.add_argument(
+        '--separate', action='store_true',
+        help='This flag will result in the creation of individual output files per sample.'
     )
 
 
