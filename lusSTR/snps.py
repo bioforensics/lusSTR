@@ -62,8 +62,7 @@ def uas_format(infile, snp_type_arg):
     complemented to be reported on the forward strand; and checks that the called allele is one of
     two expected alleles for the SNP (and flags any SNP call which is unexpected).
     '''
-    data = uas_load(infile, snp_type_arg)
-    data_filt = data.loc[data['Reads'] != 0].reset_index(drop=True)
+    data_filt = uas_load(infile, snp_type_arg).reset_index(drop=True)
     data_df = []
     for j, row in data_filt.iterrows():
         snpid = data_filt.iloc[j, 0]
@@ -136,7 +135,7 @@ def parse_snp_table_from_sheet(infile, sheet, snp_type_arg):
     file = openpyxl.load_workbook(infile)
     file_sheet = file[sheet]
     table = pd.DataFrame(file_sheet.values)
-    offset = table[table.iloc[:, 0] == "Coverage Information"].index.tolist()[0]
+    offset = table[table.iloc[:, 0] == 'Coverage Information'].index.tolist()[0]
     data = table.iloc[offset + 2:]
     data.columns = table.iloc[offset + 1]
     data = data[['Locus', 'Reads', 'Allele Name', 'Typed Allele?']]
@@ -351,9 +350,7 @@ def main(args):
     output_name = os.path.splitext(args.out)[0]
     if args.uas:
         results = uas_format(args.input, args.type)
-        print(results.head())
         if args.separate:
-            print('here')
             indiv_files(results, output_name, '.txt')
         else:
             results.to_csv(args.out, index=False, sep='\t')
