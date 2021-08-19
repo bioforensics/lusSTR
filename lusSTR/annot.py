@@ -179,8 +179,6 @@ def main(args):
             else:
                 if args.separate:
                     indiv_files(sex_final_table, input_name, '_sexloci_no_combined_reads.txt')
-                sex_final_table.to_csv(f'{output_name}_sexloci.txt', sep='\t', index=False)
-            else:
                 sex_final_table.to_csv(
                     f'{output_name}_sexloci_no_combined_reads.txt', index=False
                 )
@@ -189,7 +187,6 @@ def main(args):
                 indiv_files(sex_final_table, input_name, '_sexloci.txt')
             else:
                 sex_final_table.to_csv(f'{output_name}_sexloci.txt', sep='\t', index=False)
-            sex_final_table.to_csv(f'{output_name}_sexloci.txt', sep='\t', index=False)
     if not args.uas:
         autosomal_flank_table.to_csv(f'{output_name}_flanks_anno.txt', sep='\t', index=False)
         if args.combine:
@@ -199,7 +196,6 @@ def main(args):
                     indiv_files(autosomal_final_table, input_name, '.txt')
                 else:
                     autosomal_final_table.to_csv(args.out, sep='\t', index=False)
-            autosomal_final_table.to_csv(args.out, sep='\t', index=False)
         else:
             autosomal_final_table.to_csv(
                 f'{output_name}_no_combined_reads.txt', sep='\t', index=False
