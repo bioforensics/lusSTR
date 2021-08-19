@@ -97,7 +97,7 @@ def test_FGA_short_seq():
         args = lusSTR.cli.get_parser().parse_args(arglist)
         lusSTR.annot.main(args)
         with open(outfile.name, 'r') as fh:
-            assert len(fh.readlines()) == 1
+            assert len(fh.readlines()) == 0
 
 
 @pytest.mark.parametrize('locus, sequence, uas, kit, output', [
