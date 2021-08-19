@@ -174,3 +174,21 @@ def test_annotate_sr_sexloci(inputfile, testoutput, flank_output, kit):
         assert filecmp.cmp(testanno, outfile_name_output) is True
         flank_outfile = f'{outfile_name}_sexloci_flanks_anno.txt'
         assert filecmp.cmp(flankanno, flank_outfile) is True
+
+
+@pytest.mark.parametrize('flag', 'sex', [
+    ('', ''),
+    ('--include-sex', '_sexloci')
+])
+def separate_output(tmp_path, flag, sex):
+    inputfile = data_file('UAS_bulk_test.csv')
+    outputfile = str(tmp_path / 'UAS_bulk_test.txt')
+    arglist = ['annotate', inputfile, '-o', outputfile, '--separate', flag]
+    args = lusSTR.cli.get_parser().parse_args(arglist)
+    lusSTR.annot.main(args)
+    assert os.file.exists(
+        f'{tmp_path}/Separated_lusstr_Files/UAS_bulk_test/Positive_Control{sex}.txt'
+    )
+    assert os.file.exists(
+        f'{tmp_path}/Separated_lusstr_Files/UAS_bulk_test/Positive_Control2{sex}.txt'
+    )
