@@ -62,8 +62,7 @@ def uas_format(infile, snp_type_arg):
     complemented to be reported on the forward strand; and checks that the called allele is one of
     two expected alleles for the SNP (and flags any SNP call which is unexpected).
     '''
-    data = uas_load(infile, snp_type_arg)
-    data_filt = data.loc[data['Reads'] != 0].reset_index(drop=True)
+    data_filt = uas_load(infile, snp_type_arg).reset_index(drop=True)
     data_df = []
     for j, row in data_filt.iterrows():
         snpid = data_filt.iloc[j, 0]
@@ -74,13 +73,16 @@ def uas_format(infile, snp_type_arg):
             forward_strand_allele = complement_base(uas_allele)
         else:
             forward_strand_allele = uas_allele
-        if forward_strand_allele in metadata['Alleles']:
+        if data_filt.loc[j, 'Typed Allele?'] == 'No':
+            flag = 'Contains untyped allele'
+        elif forward_strand_allele in metadata['Alleles']:
             flag = ''
         else:
             flag = 'Allele call does not match expected allele!'
         row_tmp = [
-            data_filt.iloc[j, 3], data_filt.iloc[j, 4], data_filt.iloc[j, 5], snpid,
-            data_filt.iloc[j, 1], forward_strand_allele, uas_allele, snp_type_dict[type], flag
+            data_filt.loc[j, 'SampleID'], data_filt.loc[j, 'Project'],
+            data_filt.loc[j, 'Analysis'], snpid, data_filt.loc[j, 'Reads'], forward_strand_allele,
+            uas_allele, snp_type_dict[type], flag
         ]
         data_df.append(row_tmp)
     data_final = pd.DataFrame(data_df, columns=[
@@ -133,10 +135,10 @@ def parse_snp_table_from_sheet(infile, sheet, snp_type_arg):
     file = openpyxl.load_workbook(infile)
     file_sheet = file[sheet]
     table = pd.DataFrame(file_sheet.values)
-    offset = table[table.iloc[:, 0] == "Coverage Information"].index.tolist()[0]
+    offset = table[table.iloc[:, 0] == 'Coverage Information'].index.tolist()[0]
     data = table.iloc[offset + 2:]
     data.columns = table.iloc[offset + 1]
-    data = data[['Locus', 'Reads', 'Allele Name']]
+    data = data[['Locus', 'Reads', 'Allele Name', 'Typed Allele?']]
     final_df = pd.DataFrame()
     if snp_type_arg == 'all':
         final_df = data
@@ -332,12 +334,26 @@ def snp_call_exception(seq, expected_size, metadata, base):
         return base, flag
 
 
+def indiv_files(table, input_dir, ext):
+    output_dir = f'Separated_lusstr_Files/{input_dir}'
+    os.makedirs(output_dir, exist_ok=True)
+    for samp in table['SampleID'].unique():
+        new_df = table[table['SampleID'] == samp]
+        new_df.to_csv(f'{output_dir}/{samp}{ext}', sep='\t', index=False)
+
+
 def main(args):
+    output_name = os.path.splitext(args.out)[0]
     if args.uas:
         results = uas_format(args.input, args.type)
-        results.to_csv(args.out, index=False, sep='\t')
+        if args.separate:
+            indiv_files(results, output_name, '.txt')
+        else:
+            results.to_csv(args.out, index=False, sep='\t')
     else:
         results, results_combined = strait_razor_format(args.input, args.type)
-        output_name = os.path.splitext(args.out)[0]
-        results_combined.to_csv(args.out, index=False, sep='\t')
+        if args.separate:
+            indiv_files(results_combined, output_name, '.txt')
+        else:
+            results_combined.to_csv(args.out, index=False, sep='\t')
         results.to_csv(f'{output_name}_full_output.txt', index=False, sep='\t')

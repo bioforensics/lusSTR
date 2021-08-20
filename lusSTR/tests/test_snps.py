@@ -28,8 +28,8 @@ def test_uas_all(tmp_path):
 
 
 @pytest.mark.parametrize('type, lines', [
-    ('i', 132),
-    ('p', 95)
+    ('i', 189),
+    ('p', 157)
 ])
 def test_uas_type(type, lines, tmp_path):
     inputdb = data_file('snps')
