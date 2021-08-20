@@ -336,11 +336,7 @@ def snp_call_exception(seq, expected_size, metadata, base):
 
 def indiv_files(table, input_dir, ext):
     output_dir = f'Separated_lusstr_Files/{input_dir}'
-    print(output_dir)
-    try:
-        os.mkdir(output_dir)
-    except FileExistsError:
-        pass
+    os.makedirs(output_dir, exist_ok=True)
     for samp in table['SampleID'].unique():
         new_df = table[table['SampleID'] == samp]
         new_df.to_csv(f'{output_dir}/{samp}{ext}', sep='\t', index=False)
