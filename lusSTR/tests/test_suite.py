@@ -68,7 +68,7 @@ def test_annotate_full_nocombine(infile, len_sum, len_uncom, xy_len_sum, xy_len_
 
 def test_flank_anno():
     with NamedTemporaryFile(suffix='.txt') as outfile:
-        inputfile = data_file('Flanks_testing_file.csv')
+        inputfile = data_file('test_flank.csv')
         testflanks = data_file('testflanks_flanks_anno.txt')
         arglist = ['annotate', inputfile, '-o', outfile.name, '--kit', 'forenseq']
         args = lusSTR.cli.get_parser().parse_args(arglist)

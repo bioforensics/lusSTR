@@ -145,6 +145,12 @@ def test_D21_lus_sec():
         (
             'D13S317', 'TATCTATCTATCTATCTATCTATCTATCTATCAATCAATCATCTATCTATCTTTCTGTCTGTC',
             '[TATC]8 [AATC]2 [ATCT]3 TTCT GTCT GTC', '8', '3', '1'
+        ),
+        (
+            'D13S317', 'TATCTATCTATCTATCTATCTATCTATCTATCTATCTATCAATCAATCATCTATCTATCTTTCTGTCTGT'
+            'CTTTTTGGGCTGCCTATATCTATCTATCTATCTATCTATCTATCAATCAATCATCTATCTATCTTTCTGTCTGTC',
+            '[TATC]10 [AATC]2 [ATCT]3 TTCT [GTCT]2 TTTT GGGC TGCC TA [TATC]7 [AATC]2 [ATCT]3 TTCT'
+            ' GTCT GTC', '10', '3', '2'
         )
     ])
 def test_annotation_and_lus(locus, sequence, forward_bracket, lus, sec, tert):

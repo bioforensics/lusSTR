@@ -327,11 +327,11 @@ class STRMarker_D13S317(STRMarker):
         if len(self.uas_sequence) < 110:
             bracketed_form = collapse_repeats_by_length(self.uas_sequence, 4)
         else:
-            for m in re.finditer('GGGC', self.uas_sequence):
+            for m in re.finditer('GGGCTGCCTA', self.uas_sequence):
                 break_point = m.end()
             bracketed_form = (
                 f'{collapse_repeats_by_length(self.uas_sequence[:break_point], 4)} '
-                f'{sequence_to_bracketed_form(self.uas_sequence[break_point:], 4, self.repeats)}'
+                f'{collapse_repeats_by_length(self.uas_sequence[break_point:], 4)}'
             )
         return bracketed_form
 
@@ -715,58 +715,55 @@ class STRMarker_FGA(STRMarker):
         else:
             final = list()
             prev = 0
-            if len(sequence) % 4 == 0:
-                final_string = collapse_repeats_by_length(sequence, 4)
-            else:
-                for m in re.finditer('GGAA', sequence):
-                    if prev == 0 or m.start() == prev:
-                        prev = m.end()
-                    else:
-                        break
-                first_string = sequence[:prev]
-                second_string = sequence[prev:]
-                prev = 0
-                for m in re.finditer('AAAA', second_string):
-                    prev = m.start()
-                    break
-                if second_string[prev:(prev+6)] == 'AAAAAA':
-                    third_string = second_string[:prev+2]
-                    fourth_string = second_string[prev+2:]
-                elif prev == 0:
-                    third_string = second_string[:-6]
-                    fourth_string = second_string[-6:]
+            for m in re.finditer('GGAA', sequence):
+                if prev == 0 or m.start() == prev:
+                    prev = m.end()
                 else:
-                    third_string = second_string[:prev]
-                    fourth_string = second_string[prev:]
-                final.append(collapse_repeats_by_length(first_string, 4))
-                final.append(sequence_to_bracketed_form(third_string, 4, self.repeats))
-                count = 0
-                tmp = list()
-                for element in re.split('GAAA', fourth_string):
-                    parts = element.split(',')
-                    for i in parts:
-                        if i == '':
-                            count += 1
+                    break
+            first_string = sequence[:prev]
+            second_string = sequence[prev:]
+            prev = 0
+            for m in re.finditer('AAAA', second_string):
+                prev = m.start()
+                break
+            if second_string[prev:(prev+6)] == 'AAAAAA':
+                third_string = second_string[:prev+2]
+                fourth_string = second_string[prev+2:]
+            elif prev == 0:
+                third_string = second_string[:-6]
+                fourth_string = second_string[-6:]
+            else:
+                third_string = second_string[:prev]
+                fourth_string = second_string[prev:]
+            final.append(collapse_repeats_by_length(first_string, 4))
+            final.append(sequence_to_bracketed_form(third_string, 4, self.repeats))
+            count = 0
+            tmp = list()
+            for element in re.split('GAAA', fourth_string):
+                parts = element.split(',')
+                for i in parts:
+                    if i == '':
+                        count += 1
+                    else:
+                        if count == 1:
+                            tmp.append('GAAA')
+                        elif count >= 2:
+                            tmp.append('[GAAA]' + str(count))
+                        count = 1
+                        if i == 'AAAAAA':
+                            tmp.append('AA AAAA')
+                        elif len(i) > 4:
+                            for x in split_by_n(i, 4, False):
+                                tmp.append(x)
                         else:
-                            if count == 1:
-                                tmp.append('GAAA')
-                            elif count >= 2:
-                                tmp.append('[GAAA]' + str(count))
-                            count = 1
-                            if i == 'AAAAAA':
-                                tmp.append('AA AAAA')
-                            elif len(i) > 4:
-                                for x in split_by_n(i, 4, False):
-                                    tmp.append(x)
-                            else:
-                                tmp.append(i)
-                if parts[-1] == '' and count > 2:
-                    tmp.append('[GAAA]' + str(count-1))
-                elif parts[-1] == '' and count <= 2:
-                    tmp.append('GAAA')
-                last_string_final = ' '.join(tmp)
-                final.append(last_string_final)
-                final_string = ' '.join(final)
+                            tmp.append(i)
+            if parts[-1] == '' and count > 2:
+                tmp.append('[GAAA]' + str(count-1))
+            elif parts[-1] == '' and count <= 2:
+                tmp.append('GAAA')
+            last_string_final = ' '.join(tmp)
+            final.append(last_string_final)
+            final_string = ' '.join(final)
             return re.sub(r' +', ' ', final_string)
 
 
@@ -870,7 +867,7 @@ class STRMarker_D21S11(STRMarker):
             second_string_final = re.sub(' ', '', second_string)
             if len(second_string_final) % 4 == 0:
                 split_second_string = collapse_repeats_by_length(second_string_final, 4)
-                final_string = f'{first_string} {second_string}'
+                final_string = f'{first_string} {split_second_string}'
             elif len(second_string_final) == 6:
                 third_string = second_string_final[-6:-4]
                 fourth_string = second_string_final[-4:]
