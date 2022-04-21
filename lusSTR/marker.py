@@ -953,6 +953,8 @@ class STRMarker_TH01(STRMarker):
                 final_string.append(group1)
                 for x in split_by_n(unit[3:], n=4, rev=False):
                     final_string.append(x)
+            elif '[' not in unit and len(unit) > 4:
+                final_string.append(collapse_repeats_by_length(unit, 4))
             else:
                 final_string.append(unit)
         final_form = ' '.join(final_string)
