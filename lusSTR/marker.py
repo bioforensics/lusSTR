@@ -912,8 +912,8 @@ class STRMarker_D21S11(STRMarker):
                         repeats = repeat_copy_number(i, repeat)
                         lus_sec.append(repeats)
         if lus_allele is None:
-            if len(lus_sec) == 2:
-                lus_allele = lus_sec[1]
+            if len(lus_sec) >= 2:
+                lus_allele = lus_sec[-1]
                 sec_allele = lus_sec[0]
             elif len(lus_sec) > 2:
                 lus_allele = lus_sec[-1]
