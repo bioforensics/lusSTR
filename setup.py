@@ -21,7 +21,7 @@ setup(
         'lusSTR': [
              'lusSTR/str_markers.json', 'lusSTR/snp_data.json', 'lusSTR/tests/data/*', 
              'lusSTR/tests/data/STRait_Razor_test_output/*', 'lusSTR/tests/data/UAS_bulk_input/*',
-             'lusSTR/tests/data/snps/*, 'lusSTR/filters.json'
+             'lusSTR/tests/data/snps/*', 'lusSTR/filters.json'
          ]
     },
     include_package_data=True,
