@@ -48,7 +48,7 @@ def process_strs(dict_loc, allele_des):
     return final_df
 
 
-def EFM_output(df, separate=True, outfile):
+def EFM_output(df, outfile, separate=False):
     infile = df[df.allele_type != 'noise']
     infile_sort = infile.sort_values(by=['SampleID', 'Locus', 'RU_Allele'], ascending=True)
     infile_sort['merged'] = (
