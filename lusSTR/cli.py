@@ -9,7 +9,7 @@
 
 import argparse
 import lusSTR
-from . import format, annot, snps
+from . import format, annot, snps, filter
 
 
 def format_subparser(subparsers):
@@ -105,16 +105,53 @@ def snps_subparser(subparsers):
     )
 
 
+def filter_subparser(subparsers):
+    cli = subparsers.add_parser('filter')
+    cli.add_argument(
+        'input',
+        help='Input is a single lusSTR output file (.txt format)'
+    )
+    cli.add_argument(
+        '--allele', choices=['ru', 'lusplus'], default='lusplus',
+        help='Specify the allele type, either "ru" or "lusplus". Default is "lusplus".'
+    )
+    cli.add_argument(
+        '--separate', action='store_true',
+        help='Used to create separate final output files for each Sample. If not used, a single '
+        'file containing all samples will be created.'
+    )
+    cli.add_argument(
+        '--info', action='store_true',
+        help='Use to create a text document containing additional information on filtered '
+        'sequences and stutter.'
+    )
+    cli.add_argument(
+        '--output-type', dest='output', choices=['efm', 'strmix'], default='efm',
+        help='Choose the file format of the output file, either "efm" or "strmix". '
+        'Default is efm.'
+    )
+    cli.add_argument(
+        '--no-filters', dest='nofilters', action='store_true',
+        help='Used to skip all filtering steps. All input alleles will be included in the output.'
+    )
+    cli.add_argument(
+        '--out', '-o', help='Nmae of output file containing all samples. If separate files are '
+        'created, the sample ID will be used as the filename. Output files are in CSV format.'
+    )
+
+
 mains = {
     'format': lusSTR.format.main,
     'annotate': lusSTR.annot.main,
     'snps': lusSTR.snps.main,
+    'filter': lusSTR.filter.main
 }
 
 subparser_funcs = {
     'format': format_subparser,
     'annotate': annot_subparser,
     'snps': snps_subparser,
+    'filter': filter_subparser
 }
 
 

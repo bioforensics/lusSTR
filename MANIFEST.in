@@ -1,5 +1,6 @@
 include versioneer.py
 include lusSTR/_version.py
+include lusSTR/filters.json
 include lusSTR/str_markers.json
 include lusSTR/snp_data.json
 include lusSTR/tests/data/*
