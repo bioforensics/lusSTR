@@ -12,11 +12,20 @@ import json
 from re import L
 import numpy as np
 import pandas as pd
+import sys
 from pathlib import Path
 from pkg_resources import resource_filename
 
 import lusSTR
 from lusSTR.filter_settings import filters
+
+
+strs = [
+    'CSF1PO', 'D10S1248', 'D12S391', 'D13S317', 'D16S539', 'D17S1301', 'D18S51', 'D19S433',
+    'D1S1656', 'D20S482', 'D21S11', 'D22S1045', 'D2S1338', 'D2S441', 'D3S1358', 'D4S2408',
+    'D5S818', 'D6S1043', 'D7S820', 'D8S1179', 'D9S1122', 'FGA', 'PENTA D', 'PENTA E', 'TH01',
+    'TPOX', 'VWA'
+]
 
 
 def get_filter_metadata_file():
@@ -79,11 +88,11 @@ def EFM_output(df, outfile, separate=False):
     df_complete = pd.DataFrame()
     for id in ids_list:
         df_sub = final_df2[final_df2['SampleName'] == id]
-        for str in strs:
-            if str in df_sub['Marker'].values:
+        for strloc in strs:
+            if strloc in df_sub['Marker'].values:
                 continue
             else:
-                new_row = pd.DataFrame({'SampleName': [id], 'Marker': [str]})
+                new_row = pd.DataFrame({'SampleName': [id], 'Marker': [strloc]})
                 df_sub = df_sub.append(new_row)
         df_order = df_sub.sort_values(by=['Marker'])
         if separate:
@@ -118,17 +127,20 @@ def main(args):
     full_df = pd.read_csv(args.input, sep='\t')
     output_type = args.output.lower()
     allele_des = args.allele.lower()
+    if args.out is None:
+        args.out = sys.stdout
     if output_type != 'efm' and output_type != 'strmix':
         raise ValueError('Incorrect output type specified. Please use EFM or STRmix only!')
     if args.nofilters:
         if output_type == 'strmix':
             STRmix_output(full_df)
         else:
-            EFM_output(full_df, args.separate, args.out)
+            full_df['allele_type'] = 'real_allele'
+            EFM_output(full_df, args.out, args.separate)
     else:
         dict_loc = {k: v for k, v in full_df.groupby(['SampleID', 'Locus'])}
         final_df = process_strs(dict_loc, args.allele)
         if output_type == 'efm':
-            EFM_output(final_df, args.separate, args.out)
+            EFM_output(final_df, args.out, args.separate)
         else:
             STRmix_output(final_df)

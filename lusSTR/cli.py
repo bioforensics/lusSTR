@@ -135,7 +135,8 @@ def filter_subparser(subparsers):
         help='Used to skip all filtering steps. All input alleles will be included in the output.'
     )
     cli.add_argument(
-        '--out', '-o', help='Nmae of output file containing all samples. If separate files are '
+        '--out', '-o', metavar='FILE',
+        help='Name of output file containing all samples. If separate files are '
         'created, the sample ID will be used as the filename. Output files are in CSV format.'
     )
 
