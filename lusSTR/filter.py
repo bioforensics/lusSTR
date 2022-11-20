@@ -127,7 +127,6 @@ def STRmix_output(df):
 def main(args):
     full_df = pd.read_csv(args.input, sep='\t')
     output_type = args.output.lower()
-    allele_des = args.allele.lower()
     if args.out is None:
         args.out = sys.stdout
     if output_type != 'efm' and output_type != 'strmix':

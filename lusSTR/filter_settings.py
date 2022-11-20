@@ -22,15 +22,7 @@ with open(get_filter_metadata_file(), 'r') as fh:
     filter_marker_data = json.load(fh)
 
 
-strs = [
-    'CSF1PO', 'D10S1248', 'D12S391', 'D13S317', 'D16S539', 'D17S1301', 'D18S51', 'D19S433',
-    'D1S1656', 'D20S482', 'D21S11', 'D22S1045', 'D2S1338', 'D2S441', 'D3S1358', 'D4S2408',
-    'D5S818', 'D6S1043', 'D7S820', 'D8S1179', 'D9S1122', 'FGA', 'PENTA D', 'PENTA E', 'TH01',
-    'TPOX', 'VWA'
-]
-
-
-def filters(data_order, metadata, total_reads, allele_des):
+def filters(data_order, metadata, total_reads):
     if len(data_order) == 1:
         if thresholds('Detection', metadata, total_reads, data_order['Reads'][0])[1] is False:
             data_order = pd.DataFrame()
@@ -230,7 +222,7 @@ def allele_type_ru(ref, ru, all_type, metadata, al_reads, ref_reads, al1_ref_rea
             ref_reads = check_2stutter(data, 'ru', ru)[1]
             stutter_thresh_reads = stutter_thresh * ref_reads
             all_type, stut_perc = minus2_stutter(
-                all_type, stutter_thresh_reads, forward_thresh, stutter_thresh_reads, ref_reads,
+                all_type, stutter_thresh_reads, forward_thresh, stutter_thresh_reads,
                 al1_ref_reads, al_reads
             )
     elif ref - ru == -1:  # +1 stutter
