@@ -11,6 +11,7 @@ import argparse
 import json
 from re import L
 import numpy as np
+import os
 import pandas as pd
 import sys
 from pathlib import Path
@@ -57,7 +58,7 @@ def process_strs(dict_loc, allele_des):
     return final_df
 
 
-def EFM_output(df, outfile, separate=False):
+def EFM_output(df, outfile, separate=False, info=False):
     infile = df[df.allele_type != 'noise']
     infile_sort = infile.sort_values(by=['SampleID', 'Locus', 'RU_Allele'], ascending=True)
     infile_sort['merged'] = (
@@ -136,11 +137,17 @@ def main(args):
             STRmix_output(full_df)
         else:
             full_df['allele_type'] = 'real_allele'
-            EFM_output(full_df, args.out, args.separate)
+            EFM_output(full_df, args.out, args.separate, args.info)
     else:
         dict_loc = {k: v for k, v in full_df.groupby(['SampleID', 'Locus'])}
         final_df = process_strs(dict_loc, args.allele)
+        if args.info:
+            try:
+                name = args.out.replace('.csv', '').split(os.sep)[-1]
+            except ValueError:
+                print('No outfile provided. Please specify --out to create info file.')
+            final_df.to_csv(f'{name}_sequence_info.csv', index=False)
         if output_type == 'efm':
-            EFM_output(final_df, args.out, args.separate)
+            EFM_output(final_df, args.out, args.separate, args.info)
         else:
             STRmix_output(final_df)
