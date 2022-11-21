@@ -31,3 +31,78 @@ def test_thresholds(filter, locus, total_reads, allele_reads, final_reads, pass_
     )
     assert test_total_reads == final_reads
     assert test_passfilt == pass_filt
+
+
+@pytest.mark.parametrize('perc, perc_stut, reads, forward_threshold', [
+    (0, 0.18, 100, 4),
+    (0.15, 0.21, 100, 15)
+])
+def test_forward_stutter_threshold(perc, perc_stut, reads, forward_threshold):
+    test_forward_thresh = lusSTR.filter_settings.forward_stut_thresh(perc, perc_stut, reads)
+    assert test_forward_thresh == forward_threshold
+
+
+@pytest.mark.parametrize(
+    'all_type, stutter_thresh, forward_thresh, stutter_thresh_reads, ref_reads, al1_ref_reads,'
+    'al_reads, called_allele_type, stut_perc', [
+        (None, 0.18, 0, 18, 100, None, 15, '-1_stutter', 0.15),
+        (None, 0.18, 0, 18, 100, None, 20, 'real_allele', None),
+        ('+1_stutter', 0.18, 0, 18, 100, 200, 20, '-1_stutter/+1_stutter', None),
+        ('+1_stutter', 0.18, 0, 18, 100, 200, 30, 'real_allele', None),
+        ('-2_stutter', 0.18, 0, 18, 100, 100, 30, '-1_stutter/-2_stutter', None),
+        ('-2_stutter', 0.18, 0, 18, 100, 100, 40, 'real_allele', None)
+    ]
+)
+def test_minus1stutter(
+    all_type, stutter_thresh, forward_thresh, stutter_thresh_reads, ref_reads,
+    al1_ref_reads, al_reads, called_allele_type, stut_perc
+):
+    test_stutter_type, test_stut_perc = lusSTR.filter_settings.minus1_stutter(
+        all_type, stutter_thresh, forward_thresh, stutter_thresh_reads, ref_reads, al1_ref_reads,
+        al_reads)
+    assert test_stutter_type == called_allele_type
+    assert test_stut_perc == stut_perc
+
+
+@pytest.mark.parametrize(
+    'all_type, stutter_thresh, forward_thresh, stutter_thresh_reads, al1_ref_reads,'
+    'ref_reads, al_reads, called_allele_type, stut_perc', [
+        (None, 0.18, 0, 18, None, 100, 15, '-2_stutter', 0.15),
+        (None, 0.18, 0, 18, None, 100, 20, 'real_allele', None),
+        ('+1_stutter', 0.18, 0, 18, 100, 200, 20, '+1_stutter/-2_stutter', None),
+        ('+1_stutter', 0.18, 0, 18, 100, 200, 30, 'real_allele', None),
+        ('-1_stutter', 0.18, 0, 18, 100, 100, 30, '-1_stutter/-2_stutter', None),
+        ('-1_stutter', 0.18, 0, 18, 100, 100, 40, 'real_allele', None)
+    ]
+)
+def test_minus2stutter(
+    all_type, stutter_thresh, forward_thresh, stutter_thresh_reads, ref_reads,
+    al1_ref_reads, al_reads, called_allele_type, stut_perc
+):
+    test_stutter_type, test_stut_perc = lusSTR.filter_settings.minus2_stutter(
+        all_type, stutter_thresh, forward_thresh, stutter_thresh_reads, ref_reads, al1_ref_reads,
+        al_reads)
+    assert test_stutter_type == called_allele_type
+    assert test_stut_perc == stut_perc
+
+
+@pytest.mark.parametrize(
+    'all_type, stutter_thresh, forward_thresh, ref_reads, al1_ref_reads,'
+    'al_reads, called_allele_type, stut_perc', [
+        (None, 0.18, 0, 100, None, 3, '+1_stutter', 0.03),
+        (None, 0.18, 0, 100, None, 20, 'real_allele', None),
+        ('-1_stutter', 0.18, 0, 100, 200, 3, '-1_stutter/+1_stutter', None),
+        ('-1_stutter', 0.18, 0, 100, 200, 50, 'real_allele', None),
+        ('-2_stutter', 0.18, 0, 100, 100, 3, '+1_stutter/-2_stutter', None),
+        ('-2_stutter', 0.18, 0, 100, 100, 40, 'real_allele', None)
+    ]
+)
+def test_plus1stutter(
+    all_type, stutter_thresh, forward_thresh, ref_reads, al1_ref_reads,
+    al_reads, called_allele_type, stut_perc
+):
+    test_stutter_type, test_stut_perc = lusSTR.filter_settings.plus1_stutter(
+        all_type, stutter_thresh, forward_thresh, ref_reads, al1_ref_reads,
+        al_reads)
+    assert test_stutter_type == called_allele_type
+    assert test_stut_perc == stut_perc

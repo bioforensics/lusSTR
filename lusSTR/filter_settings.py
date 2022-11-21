@@ -154,7 +154,7 @@ def minus1_stutter(
 
 
 def minus2_stutter(
-    all_type, stutter_thresh, forward_thresh, stutter_thresh_reads,
+    all_type, stutter_thresh, forward_thresh, stutter_thresh_reads, ref_reads,
     al1_ref_reads, al_reads
 ):
     stut_perc = None
@@ -176,7 +176,7 @@ def minus2_stutter(
         )
     elif al_reads <= stutter_thresh_reads:
         all_type = '-2_stutter'
-        stut_perc = al_reads / al1_ref_reads
+        stut_perc = al_reads / ref_reads
     else:
         all_type = 'real_allele'
     return all_type, stut_perc
@@ -224,7 +224,7 @@ def allele_type_ru(ref, ru, all_type, metadata, al_reads, ref_reads, al1_ref_rea
             stutter_thresh_reads = stutter_thresh * ref_reads
             all_type, stut_perc = minus2_stutter(
                 all_type, stutter_thresh_reads, forward_thresh, stutter_thresh_reads,
-                al1_ref_reads, al_reads
+                ref_reads, al1_ref_reads, al_reads
             )
     elif ref - ru == -1:  # +1 stutter
         all_type, stut_perc = plus1_stutter(
