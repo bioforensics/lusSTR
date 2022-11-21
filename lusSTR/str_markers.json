@@ -202,7 +202,7 @@
             "TCTA",
             "TCTG"
         ],
-        "NumBasesToSeparate": 6,
+        "NumBasesToSeparate": 4,
         "ReverseCompNeeded": "No",
         "LUS": "TCTA",
         "Sec": "TCTA",
