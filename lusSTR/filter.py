@@ -126,13 +126,12 @@ def STRmix_output(df):
 
 def main(args):
     full_df = pd.read_csv(args.input, sep='\t')
-    output_type = args.output.lower()
     if args.out is None:
         args.out = sys.stdout
-    if output_type != 'efm' and output_type != 'strmix':
+    if args.output != 'efm' and args.output != 'strmix':
         raise ValueError('Incorrect output type specified. Please use EFM or STRmix only!')
     if args.nofilters:
-        if output_type == 'strmix':
+        if args.output == 'strmix':
             STRmix_output(full_df)
         else:
             full_df['allele_type'] = 'real_allele'
@@ -146,7 +145,7 @@ def main(args):
                 final_df.to_csv(f'{name}_sequence_info.csv', index=False)
             else:
                 raise ValueError('No outfile provided. Please specify --out to create info file.')
-        if output_type == 'efm':
+        if args.output == 'efm':
             EFM_output(final_df, args.out, args.separate)
         else:
             STRmix_output(final_df)

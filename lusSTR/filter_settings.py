@@ -22,7 +22,8 @@ with open(get_filter_metadata_file(), 'r') as fh:
     filter_marker_data = json.load(fh)
 
 
-def filters(data_order, metadata, total_reads):
+def filters(data_order, locus, total_reads):
+    metadata = filter_marker_data[locus]
     if len(data_order) == 1:
         if thresholds('Detection', metadata, total_reads, data_order['Reads'][0])[1] is False:
             data_order = pd.DataFrame()
@@ -35,7 +36,7 @@ def filters(data_order, metadata, total_reads):
             al_reads = data_order.loc[i, 'Reads']
             if thresholds('Detection', metadata, total_reads, al_reads)[1] is False:
                 data_order = data_order.drop(data_order.index[i])
-                total_reads = total_reads - al_reads
+                total_reads = thresholds('Detection', metadata, total_reads, al_reads)[0]
         data_order = data_order.reset_index(drop=True)
         for i in range(len(data_order)):  # check for alleles below AT threshold
             ref_allele_reads = data_order.loc[i, 'Reads']
@@ -119,7 +120,7 @@ def thresholds(filter, metadata, total_reads, al_reads):
             f'Check filters.json file and re-run.'
         )
     if al_reads < thresh:
-        if filter == 'dynamic':
+        if filter == 'Detection':
             total_reads = total_reads - al_reads
         return total_reads, False
     else:
