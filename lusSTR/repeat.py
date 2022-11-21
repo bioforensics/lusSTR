@@ -98,8 +98,7 @@ def sequence_to_bracketed_form(sequence, n, repeats):
     blocks = list()
     for unit in collapsed.split(' '):
         if len(unit) > n and '[' not in unit:
-            for x in split_by_n(unit, n, False):
-                blocks.append(x)
+            blocks.append(collapse_repeats_by_length(unit, n))
         else:
             blocks.append(unit)
     result = ' '.join(blocks)

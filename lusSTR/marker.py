@@ -912,13 +912,15 @@ class STRMarker_D21S11(STRMarker):
                         repeats = repeat_copy_number(i, repeat)
                         lus_sec.append(repeats)
         if lus_allele is None:
-            if len(lus_sec) >= 2:
+            if len(lus_sec) == 2:
+                lus_allele = lus_sec[1]
+                sec_allele = lus_sec[0]
+            elif len(lus_sec) > 2:
                 lus_allele = lus_sec[-1]
                 sec_allele = lus_sec[0]
             else:
                 lus_allele = 0
                 sec_allele = lus_sec[0]
-
         finalcount = 0
         for m in re.finditer(self.data['Tert'], self.annotation):
             count = self.annotation[m.end()+1:m.end()+3]
@@ -948,11 +950,13 @@ class STRMarker_TH01(STRMarker):
         strings = collapse_all_repeats(self.uas_sequence, self.repeats)
         final_string = list()
         for unit in strings.split(' '):
-            if '[' not in unit and len(unit) > 3 and (len(unit) % 4 != 0) and unit[:3] == 'ATG':
+            if '[' not in unit and len(unit) > 3 and len(unit) % 4 != 0 and unit[:3] == 'ATG':
                 group1 = unit[:3]
                 final_string.append(group1)
                 for x in split_by_n(unit[3:], n=4, rev=False):
                     final_string.append(x)
+            elif '[' not in unit and len(unit) > 4:
+                final_string.append(collapse_repeats_by_length(unit, 4))
             else:
                 final_string.append(unit)
         final_form = ' '.join(final_string)

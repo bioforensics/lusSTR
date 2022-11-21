@@ -63,6 +63,9 @@ def format_table(input, uas=False, kit='forenseq'):
         except IndexError:
             project = 'NA'
             analysis = 'NA'
+        except TypeError:
+            project = data.iloc[i, 4]
+            analysis = data.iloc[i, 5]
         if locus == 'PENTAD' or locus == 'PENTA_D':
             locus = 'PENTA D'
         if locus == 'PENTAE' or locus == 'PENTA_E':
