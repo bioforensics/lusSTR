@@ -7,11 +7,13 @@
 # and is licensed under the BSD license: see LICENSE.txt.
 # -----------------------------------------------------------------------------
 
+import filecmp
 import json
 import lusSTR
 from lusSTR.filter_settings import get_filter_metadata_file
 from lusSTR.tests import data_file
 import pytest
+from tempfile import NamedTemporaryFile
 
 
 with open(get_filter_metadata_file(), 'r') as fh:
@@ -106,3 +108,26 @@ def test_plus1stutter(
         al_reads)
     assert test_stutter_type == called_allele_type
     assert test_stut_perc == stut_perc
+
+
+def test_EFMoutput_format(tmp_path):
+    input_file = data_file('test_filtering.txt')
+    exp_out = data_file('test_filtering_EFMoutput.csv')
+    obs_out = str(tmp_path / 'test_output.csv')
+    arglist = ['filter', '-o', obs_out, '--output-type', 'efm', input_file]
+    args = lusSTR.cli.get_parser().parse_args(arglist)
+    lusSTR.filter.main(args)
+    assert filecmp.cmp(exp_out, obs_out) is True
+
+
+def test_STRmixoutput_format(tmp_path):
+    input_file = data_file('test_filtering.txt')
+    exp_out = data_file('STRmix_Files/Sample1.csv')
+    obs_out = str(tmp_path / 'STRmix_Files/Sample1.csv')
+    arglist = [
+        'filter', '-o', str(tmp_path / 'STRmix_Files'), '--output-type',
+        'strmix', input_file
+    ]
+    args = lusSTR.cli.get_parser().parse_args(arglist)
+    lusSTR.filter.main(args)
+    assert filecmp.cmp(exp_out, obs_out) is True

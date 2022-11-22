@@ -226,9 +226,11 @@ def allele_type_ru(ref, ru, all_type, metadata, al_reads, ref_reads, al1_ref_rea
                 all_type, stutter_thresh_reads, forward_thresh, stutter_thresh_reads,
                 ref_reads, al1_ref_reads, al_reads
             )
+        else:
+            all_type = 'noise'
     elif ref - ru == -1:  # +1 stutter
         all_type, stut_perc = plus1_stutter(
-            all_type, stutter_thresh_reads, forward_thresh, ref_reads,
+            all_type, stutter_thresh, forward_thresh, ref_reads,
             al1_ref_reads, al_reads
         )
     elif pd.isnull(all_type):

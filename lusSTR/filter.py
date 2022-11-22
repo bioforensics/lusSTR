@@ -9,16 +9,15 @@
 
 import argparse
 import json
-from re import L
+import lusSTR
+from lusSTR.filter_settings import filters
 import numpy as np
 import os
 import pandas as pd
-import sys
 from pathlib import Path
 from pkg_resources import resource_filename
-
-import lusSTR
-from lusSTR.filter_settings import filters
+from re import L
+import sys
 
 
 strs = [
@@ -37,28 +36,30 @@ with open(get_filter_metadata_file(), 'r') as fh:
     filter_marker_data = json.load(fh)
 
 
-def process_strs(dict_loc, allele_des):
+def process_strs(dict_loc):
     final_df = pd.DataFrame()
     for key, value in dict_loc.items():
         data = dict_loc[key].reset_index(drop=True)
-        if allele_des == 'ru':
-            data_combine = data.groupby(
-                ['SampleID', 'Locus', 'RU_Allele'], as_index=False
-            )['Reads'].sum()
-            data_order = data_combine.sort_values(by=['RU_Allele'], ascending=False)
+        # if allele_des == 'ru':
+        data_combine = data.groupby(
+            ['SampleID', 'Locus', 'RU_Allele'], as_index=False
+        )['Reads'].sum()
+        data_order = data_combine.sort_values(by=['RU_Allele'], ascending=False)
         total_reads = data_order['Reads'].sum()
-        metadata = filter_marker_data[key[1]]
+        locus = key[1]
         data_order = data_order.reindex(columns=[
             *data_order.columns.tolist(),
             'allele_type', 'stuttering_allele1', 'stuttering_allele2', 'allele1_ref_reads',
             'allele2_ref_reads', 'perc_noise', 'perc_stutter'
         ], fill_value=None)
-        filtered_df = filters(data_order, metadata, total_reads, allele_des)
+        filtered_df = filters(data_order, locus, total_reads)
         final_df = final_df.append(filtered_df)
     return final_df
 
 
 def EFM_output(df, outfile, separate=False):
+    if outfile is None:
+        outfile = sys.stdout
     infile = df[df.allele_type != 'noise']
     infile_sort = infile.sort_values(by=['SampleID', 'Locus', 'RU_Allele'], ascending=True)
     infile_sort['merged'] = (
@@ -105,7 +106,7 @@ def EFM_output(df, outfile, separate=False):
             df_complete.to_csv(outfile, index=False)
 
 
-def STRmix_output(df):
+def STRmix_output(df, outdir):
     data_combine = df.groupby(['SampleID', 'Locus', 'RU_Allele'], as_index=False)['Reads'].sum()
     dict_loc = {k: v for k, v in data_combine.groupby(['SampleID', 'Locus'])}
     final_df = pd.DataFrame()
@@ -118,27 +119,27 @@ def STRmix_output(df):
         final_df = final_df.append(data)
     final_df = final_df.rename({'RU_Allele': 'CE Allele'})
     id_list = final_df['SampleID'].unique()
-    Path('STRmix_Files').mkdir(exist_ok=True)
+    if outdir is None:
+        outdir = 'STRmix_Files'
+    Path(outdir).mkdir(exist_ok=True)
     for id in id_list:
         df_sub = final_df[final_df['SampleID'] == id]
-        df_sub.iloc[:, 1:].to_csv(f'STRmix_Files/{id}.csv', index=False)
+        df_sub.iloc[:, 1:].to_csv(f'{outdir}/{id}.csv', index=False)
 
 
 def main(args):
     full_df = pd.read_csv(args.input, sep='\t')
-    if args.out is None:
-        args.out = sys.stdout
     if args.output != 'efm' and args.output != 'strmix':
         raise ValueError('Incorrect output type specified. Please use EFM or STRmix only!')
     if args.nofilters:
         if args.output == 'strmix':
-            STRmix_output(full_df)
+            STRmix_output(full_df, args.out)
         else:
             full_df['allele_type'] = 'real_allele'
             EFM_output(full_df, args.out, args.separate)
     else:
         dict_loc = {k: v for k, v in full_df.groupby(['SampleID', 'Locus'])}
-        final_df = process_strs(dict_loc, args.allele)
+        final_df = process_strs(dict_loc)
         if args.info:
             if args.out != sys.stdout:
                 name = args.out.replace('.csv', '').split(os.sep)[-1]
@@ -148,4 +149,4 @@ def main(args):
         if args.output == 'efm':
             EFM_output(final_df, args.out, args.separate)
         else:
-            STRmix_output(final_df)
+            STRmix_output(final_df, args.out)
