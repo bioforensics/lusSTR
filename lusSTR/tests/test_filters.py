@@ -135,3 +135,16 @@ def test_STRmixoutput_format(tmp_path):
     lusSTR.filter.main(args)
     assert filecmp.cmp(exp_out, obs_out) is True
     assert filecmp.cmp(exp_info_out, obs_info_out) is True
+
+
+def test_stdout(capsys):
+    input_file = data_file('test_filtering.txt')
+    output = data_file('test_filtering_EFMoutput.csv')
+    arglist = ['filter', '--output-type', 'efm', input_file]
+    args = lusSTR.cli.get_parser().parse_args(arglist)
+    lusSTR.filter.main(args)
+    with open(output, 'r') as fh:
+        exp_out = fh.read().strip()
+    terminal = capsys.readouterr()
+    obs_out = terminal.out.strip()
+    assert obs_out == exp_out
