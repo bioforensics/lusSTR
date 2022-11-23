@@ -113,21 +113,25 @@ def test_plus1stutter(
 def test_EFMoutput_format(tmp_path):
     input_file = data_file('test_filtering.txt')
     exp_out = data_file('test_filtering_EFMoutput.csv')
+    exp_info_out = data_file('test_filtering_EFMoutput_sequence_info.csv')
     obs_out = str(tmp_path / 'test_output.csv')
-    arglist = ['filter', '-o', obs_out, '--output-type', 'efm', input_file]
+    obs_info_out = str(tmp_path / 'test_output_sequence_info.csv')
+    arglist = ['filter', '-o', obs_out, '--output-type', 'efm', '--info', input_file]
     args = lusSTR.cli.get_parser().parse_args(arglist)
     lusSTR.filter.main(args)
     assert filecmp.cmp(exp_out, obs_out) is True
+    assert filecmp.cmp(exp_info_out, obs_info_out) is True
 
 
 def test_STRmixoutput_format(tmp_path):
     input_file = data_file('test_filtering.txt')
     exp_out = data_file('STRmix_Files/Sample1.csv')
+    exp_info_out = data_file('STRmix_Files/STRmix_Files_sequence_info.csv')
+    obs_outdir = str(tmp_path / 'STRmix_Files')
     obs_out = str(tmp_path / 'STRmix_Files/Sample1.csv')
-    arglist = [
-        'filter', '-o', str(tmp_path / 'STRmix_Files'), '--output-type',
-        'strmix', input_file
-    ]
+    obs_info_out = f'{obs_outdir}/STRmix_Files_sequence_info.csv'
+    arglist = ['filter', '-o', obs_outdir, '--output-type', 'strmix', '--info', input_file]
     args = lusSTR.cli.get_parser().parse_args(arglist)
     lusSTR.filter.main(args)
     assert filecmp.cmp(exp_out, obs_out) is True
+    assert filecmp.cmp(exp_info_out, obs_info_out) is True

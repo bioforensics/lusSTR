@@ -16,7 +16,7 @@ import os
 import pandas as pd
 from pathlib import Path
 from pkg_resources import resource_filename
-from re import L
+import re
 import sys
 
 
@@ -140,13 +140,20 @@ def main(args):
     else:
         dict_loc = {k: v for k, v in full_df.groupby(['SampleID', 'Locus'])}
         final_df = process_strs(dict_loc)
-        if args.info:
-            if args.out != sys.stdout:
-                name = args.out.replace('.csv', '').split(os.sep)[-1]
-                final_df.to_csv(f'{name}_sequence_info.csv', index=False)
-            else:
-                raise ValueError('No outfile provided. Please specify --out to create info file.')
         if args.output == 'efm':
             EFM_output(final_df, args.out, args.separate)
         else:
             STRmix_output(final_df, args.out)
+        if args.info:
+            if args.out != sys.stdout:
+                if args.output == 'efm':
+                    name = args.out.replace('.csv', '')
+                    final_df.to_csv(f'{name}_sequence_info.csv', index=False)
+                else:
+                    if args.out is None:
+                        outdir = 'STRmix_Files'
+                    else:
+                        outdir = args.out
+                    final_df.to_csv(f'{outdir}/STRmix_Files_sequence_info.csv', index=False)
+            else:
+                raise ValueError('No outfile provided. Please specify --out to create info file.')
