@@ -112,10 +112,6 @@ def filter_subparser(subparsers):
         help='Input is a single lusSTR output file (.txt format)'
     )
     cli.add_argument(
-        '--allele', choices=['ru', 'lusplus'], default='lusplus',
-        help='Specify the allele type, either "ru" or "lusplus". Default is "lusplus".'
-    )
-    cli.add_argument(
         '--separate', action='store_true',
         help='Used to create separate final output files for each Sample. If not used, a single '
         'file containing all samples will be created.'
@@ -136,8 +132,9 @@ def filter_subparser(subparsers):
     )
     cli.add_argument(
         '--out', '-o', metavar='FILE',
-        help='Name of output file containing all samples. If separate files are '
-        'created, the sample ID will be used as the filename. Output files are in CSV format.'
+        help='Name of output file containing all samples for EFM or name/path of directory for '
+        'STRmix. If separate files are specified for EFM, the sample ID will be used as the '
+        'filename. Output files are in CSV format.'
     )
 
 

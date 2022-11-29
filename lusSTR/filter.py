@@ -117,7 +117,8 @@ def STRmix_output(df, outdir):
         intercept = metadata['Intercept']
         data['Size'] = data['RU_Allele']*intercept + slope
         final_df = final_df.append(data)
-    final_df = final_df.rename({'RU_Allele': 'CE Allele'})
+    final_df.rename(
+        {'RU_Allele': 'Allele', 'Reads': 'Height', 'Locus': 'Marker'}, axis=1, inplace=True)
     id_list = final_df['SampleID'].unique()
     if outdir is None:
         outdir = 'STRmix_Files'
