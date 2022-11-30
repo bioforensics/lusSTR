@@ -111,9 +111,9 @@ def test_plus1stutter(
 
 
 def test_EFMoutput_format(tmp_path):
-    input_file = data_file('test_filtering.txt')
-    exp_out = data_file('test_filtering_EFMoutput.csv')
-    exp_info_out = data_file('test_filtering_EFMoutput_sequence_info.csv')
+    input_file = data_file('test_stutter.txt')
+    exp_out = data_file('RU_stutter_test/test_filtering_EFMoutput.csv')
+    exp_info_out = data_file('RU_stutter_test/test_filtering_EFMoutput_sequence_info.csv')
     obs_out = str(tmp_path / 'test_output.csv')
     obs_info_out = str(tmp_path / 'test_output_sequence_info.csv')
     arglist = ['filter', '-o', obs_out, '--output-type', 'efm', '--info', input_file]
@@ -124,9 +124,9 @@ def test_EFMoutput_format(tmp_path):
 
 
 def test_STRmixoutput_format(tmp_path):
-    input_file = data_file('test_filtering.txt')
-    exp_out = data_file('STRmix_Files/Sample1.csv')
-    exp_info_out = data_file('STRmix_Files/STRmix_Files_sequence_info.csv')
+    input_file = data_file('test_stutter.txt')
+    exp_out = data_file('RU_stutter_test/Sample1.csv')
+    exp_info_out = data_file('RU_stutter_test/STRmix_Files_sequence_info.csv')
     obs_outdir = str(tmp_path / 'STRmix_Files')
     obs_out = str(tmp_path / 'STRmix_Files/Sample1.csv')
     obs_info_out = f'{obs_outdir}/STRmix_Files_sequence_info.csv'
@@ -138,8 +138,8 @@ def test_STRmixoutput_format(tmp_path):
 
 
 def test_stdout(capsys):
-    input_file = data_file('test_filtering.txt')
-    output = data_file('test_filtering_EFMoutput.csv')
+    input_file = data_file('test_stutter.txt')
+    output = data_file('RU_stutter_test/test_filtering_EFMoutput.csv')
     arglist = ['filter', '--output-type', 'efm', input_file]
     args = lusSTR.cli.get_parser().parse_args(arglist)
     lusSTR.filter.main(args)
