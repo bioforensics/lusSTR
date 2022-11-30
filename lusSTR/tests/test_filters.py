@@ -154,7 +154,7 @@ def test_info_file(tmp_path):
     input_file = data_file('test_stutter.txt')
     exp_out = data_file('RU_stutter_test/STRmix_Files_sequence_info.csv')
     obs_outdir = str(tmp_path / 'RU_stutter_test')
-    obs_out = str(tmp_path / 'RU_stutter_test/STRMix_Files_sequence_info.csv')
+    obs_out = str(tmp_path / 'RU_stutter_test/STRmix_Files_sequence_info.csv')
     arglist = ['filter', '-o', obs_outdir, '--output-type', 'strmix', '--info', input_file]
     args = lusSTR.cli.get_parser().parse_args(arglist)
     lusSTR.filter.main(args)
