@@ -28,7 +28,7 @@ def filters(data_order, locus, total_reads):
         if thresholds('Detection', metadata, total_reads, data_order['Reads'][0])[1] is False:
             data_order = pd.DataFrame()
         elif thresholds('Analytical', metadata, total_reads, data_order['Reads'][0])[1] is False:
-            data_order[['allele_type', 'perc_noise']] = ['noise', 1]
+            data_order[['allele_type', 'perc_noise']] = ['noise', 1.0]
         elif thresholds('Analytical', metadata, total_reads, data_order['Reads'][0])[1] is True:
             data_order['allele_type'] = 'real_allele'
     else:
