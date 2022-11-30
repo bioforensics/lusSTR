@@ -119,8 +119,13 @@ def test_EFMoutput_format(tmp_path):
     arglist = ['filter', '-o', obs_out, '--output-type', 'efm', '--info', input_file]
     args = lusSTR.cli.get_parser().parse_args(arglist)
     lusSTR.filter.main(args)
+    with open(obs_info_out, 'r') as fh:
+        obs_out_lines = fh.read().strip()
+    with open(exp_info_out, 'r') as fh:
+        exp_out_lines = fh.read().strip()
+    assert obs_out_lines == exp_out_lines
     assert filecmp.cmp(exp_out, obs_out) is True
-    assert filecmp.cmp(exp_info_out, obs_info_out) is True
+    # assert filecmp.cmp(exp_info_out, obs_info_out) is True
 
 
 def test_STRmixoutput_format(tmp_path):
@@ -133,8 +138,13 @@ def test_STRmixoutput_format(tmp_path):
     arglist = ['filter', '-o', obs_outdir, '--output-type', 'strmix', '--info', input_file]
     args = lusSTR.cli.get_parser().parse_args(arglist)
     lusSTR.filter.main(args)
+    with open(obs_info_out, 'r') as fh:
+        obs_out_lines = fh.read().strip()
+    with open(exp_info_out, 'r') as fh:
+        exp_out_lines = fh.read().strip()
+    assert obs_out_lines == exp_out_lines
     assert filecmp.cmp(exp_out, obs_out) is True
-    assert filecmp.cmp(exp_info_out, obs_info_out) is True
+    # assert filecmp.cmp(exp_info_out, obs_info_out) is True
 
 
 def test_stdout(capsys):
