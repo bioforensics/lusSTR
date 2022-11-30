@@ -176,7 +176,7 @@ def minus2_stutter(
         )
     elif al_reads <= stutter_thresh_reads:
         all_type = '-2_stutter'
-        stut_perc = al_reads / ref_reads
+        stut_perc = round(al_reads / ref_reads, 3)
     else:
         all_type = 'real_allele'
     return all_type, stut_perc
