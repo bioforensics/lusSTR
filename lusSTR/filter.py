@@ -10,7 +10,7 @@
 import argparse
 import json
 import lusSTR
-from lusSTR.filter_settings import filters
+from lusSTR.filter_settings import allele_counts, allele_imbalance_check, filters
 import numpy as np
 import os
 import pandas as pd
@@ -38,13 +38,16 @@ with open(get_filter_metadata_file(), 'r') as fh:
 
 def process_strs(dict_loc):
     final_df = pd.DataFrame()
+    flags_df = pd.DataFrame()
     for key, value in dict_loc.items():
         data = dict_loc[key].reset_index(drop=True)
         # if allele_des == 'ru':
         data_combine = data.groupby(
             ['SampleID', 'Locus', 'RU_Allele'], as_index=False
         )['Reads'].sum()
-        data_order = data_combine.sort_values(by=['RU_Allele'], ascending=False)
+        data_order = data_combine.sort_values(
+            by=['RU_Allele'], ascending=False
+        ).reset_index(drop=True)
         total_reads = data_order['Reads'].sum()
         locus = key[1]
         data_order = data_order.reindex(columns=[
@@ -54,7 +57,9 @@ def process_strs(dict_loc):
         ], fill_value=None)
         filtered_df = filters(data_order, locus, total_reads)
         final_df = final_df.append(filtered_df)
-    return final_df
+        flags_df = flags_df.append(allele_counts(filtered_df))
+        flags_df = flags_df.append(allele_imbalance_check(filtered_df))
+    return final_df, flags_df
 
 
 def EFM_output(df, outfile, separate=False):
@@ -140,7 +145,7 @@ def main(args):
             EFM_output(full_df, args.out, args.separate)
     else:
         dict_loc = {k: v for k, v in full_df.groupby(['SampleID', 'Locus'])}
-        final_df = process_strs(dict_loc)
+        final_df, flags_df = process_strs(dict_loc)
         if args.output == 'efm':
             EFM_output(final_df, args.out, args.separate)
         else:
@@ -150,11 +155,15 @@ def main(args):
                 if args.output == 'efm':
                     name = args.out.replace('.csv', '')
                     final_df.to_csv(f'{name}_sequence_info.csv', index=False)
+                    if not flags_df.empty:
+                        flags_df.to_csv(f'{name}_Flagged_Loci.csv', index=False)
                 else:
                     if args.out is None:
                         outdir = 'STRmix_Files'
                     else:
                         outdir = args.out
                     final_df.to_csv(f'{outdir}/STRmix_Files_sequence_info.csv', index=False)
+                    if not flags_df.empty:
+                        flags_df.to_csv(f'{outdir}/Flagged_Loci.csv', index=False)
             else:
                 raise ValueError('No outfile provided. Please specify --out to create info file.')

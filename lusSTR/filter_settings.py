@@ -213,12 +213,12 @@ def allele_type_ru(ref, ru, all_type, metadata, al_reads, ref_reads, al1_ref_rea
     forward_thresh = metadata['StutterForwardThresholdDynamicPercent']
     stutter_thresh_reads = np.ceil(stutter_thresh * ref_reads)
     stut_perc = None
-    if ref - ru == 1:  # -1 stutter
+    if ref - ru == 1 and ref_reads > al_reads:  # -1 stutter
         all_type, stut_perc = minus1_stutter(
             all_type, stutter_thresh, forward_thresh, stutter_thresh_reads, ref_reads,
             al1_ref_reads, al_reads
         )
-    elif ref - ru == 2:  # -2 stutter
+    elif ref - ru == 2 and ref_reads > al_reads:  # -2 stutter
         if check_2stutter(data, 'ru', ru)[0] is True:
             ref_reads = check_2stutter(data, 'ru', ru)[1]
             stutter_thresh_reads = stutter_thresh * ref_reads
@@ -228,7 +228,7 @@ def allele_type_ru(ref, ru, all_type, metadata, al_reads, ref_reads, al1_ref_rea
             )
         else:
             all_type = 'noise'
-    elif ref - ru == -1:  # +1 stutter
+    elif ref - ru == -1 and ref_reads > al_reads:  # +1 stutter
         all_type, stut_perc = plus1_stutter(
             all_type, stutter_thresh, forward_thresh, ref_reads,
             al1_ref_reads, al_reads
@@ -264,3 +264,34 @@ def check_2stutter(data, allele_des, allele):
                     is_true, reads = True, data.loc[k, 'Reads']
                     break
     return is_true, reads
+
+
+def allele_counts(df):
+    new_df = pd.DataFrame(columns=['SampleID', 'Locus', 'Flags'])
+    try:
+        if df.allele_type.value_counts()['real_allele'] > 2:
+            new_df.loc[len(new_df.index)] = [
+                df.loc[1, 'SampleID'], df.loc[1, 'Locus'], '>2Alleles'
+            ]
+    except (KeyError, AttributeError):
+        pass
+    return new_df
+
+
+def allele_imbalance_check(df):
+    new_df = pd.DataFrame(columns=['SampleID', 'Locus', 'Flags'])
+    try:
+        locus = df.loc[0, 'Locus']
+        metadata = filter_marker_data[locus]
+        het_perc = metadata['MinimumHeterozygousBalanceThresholdDynamicPercent']
+        if df.allele_type.value_counts()['real_allele'] >= 2:
+            real_df = df[df['allele_type'] == 'real_allele'].reset_index(drop=True)
+            max_reads = real_df['Reads'].max()
+            min_reads = real_df['Reads'].min()
+            if min_reads / max_reads < het_perc:
+                new_df.loc[len(new_df.index)] = [
+                    real_df.loc[0, 'SampleID'], locus, 'IntraLocusImbalance'
+                    ]
+    except (KeyError, AttributeError):
+        pass
+    return new_df

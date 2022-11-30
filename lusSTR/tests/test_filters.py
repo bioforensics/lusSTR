@@ -74,7 +74,7 @@ def test_minus1stutter(
         ('+1_stutter', 0.18, 0, 18, 100, 200, 20, '+1_stutter/-2_stutter', None),
         ('+1_stutter', 0.18, 0, 18, 100, 200, 30, 'real_allele', None),
         ('-1_stutter', 0.18, 0, 18, 100, 100, 30, '-1_stutter/-2_stutter', None),
-        ('-1_stutter', 0.18, 0, 18, 100, 100, 40, 'real_allele', None)
+        ('-1_stutter', 0.18, 0, 18, 100, 100, 40, 'real_allele', None),
     ]
 )
 def test_minus2stutter(
@@ -148,3 +148,25 @@ def test_stdout(capsys):
     terminal = capsys.readouterr()
     obs_out = terminal.out.strip()
     assert obs_out == exp_out
+
+
+def test_info_file(tmp_path):
+    input_file = data_file('test_stutter.txt')
+    exp_out = data_file('RU_stutter_test/STRmix_Files_sequence_info.csv')
+    obs_outdir = str(tmp_path / 'RU_stutter_test')
+    obs_out = str(tmp_path / 'RU_stutter_test/STRMix_Files_sequence_info.csv')
+    arglist = ['filter', '-o', obs_outdir, '--output-type', 'strmix', '--info', input_file]
+    args = lusSTR.cli.get_parser().parse_args(arglist)
+    lusSTR.filter.main(args)
+    assert filecmp.cmp(exp_out, obs_out) is True
+
+
+def test_flags(tmp_path):
+    input_file = data_file('test_stutter.txt')
+    exp_out = data_file('RU_stutter_test/Flagged_Loci.csv')
+    obs_outdir = str(tmp_path / 'RU_stutter_test')
+    obs_out = str(tmp_path / 'RU_stutter_test/Flagged_Loci.csv')
+    arglist = ['filter', '-o', obs_outdir, '--output-type', 'strmix', '--info', input_file]
+    args = lusSTR.cli.get_parser().parse_args(arglist)
+    lusSTR.filter.main(args)
+    assert filecmp.cmp(exp_out, obs_out) is True
