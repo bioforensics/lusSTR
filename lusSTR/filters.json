@@ -213,7 +213,7 @@
         "StutterThresholdDynamicPercent": 0.40,
         "StutterForwardThresholdDynamicPercent": 0,
         "Slope": 169,
-        "Intercept": 4
+        "Intercept": 3
     },
     "D2S1338": {
         "MinimumNumberReadsForDynamicThresholds": 650,
@@ -411,7 +411,7 @@
         "StutterThresholdDynamicPercent": 0.16,
         "StutterForwardThresholdDynamicPercent": 0,
         "Slope": 203,
-        "Intercept": 4
+        "Intercept": 5
     },
     "PENTA E": {
         "MinimumNumberReadsForDynamicThresholds": 650,
@@ -429,7 +429,7 @@
         "StutterThresholdDynamicPercent": 0.18,
         "StutterForwardThresholdDynamicPercent": 0,
         "Slope": 316,
-        "Intercept": 4
+        "Intercept": 5
     },
     "TH01": {
         "MinimumNumberReadsForDynamicThresholds": 650,
