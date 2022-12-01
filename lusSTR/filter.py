@@ -62,10 +62,13 @@ def process_strs(dict_loc):
     return final_df, flags_df
 
 
-def EFM_output(df, outfile, separate=False):
+def EFM_output(df, outfile, profile, separate=False):
     if outfile is None:
         outfile = sys.stdout
-    infile = df[df.allele_type != 'noise']
+    if profile == 'reference':
+        infile = df[df.allele_type == 'real_allele']
+    else:
+        infile = df[df.allele_type != 'noise']
     infile_sort = infile.sort_values(by=['SampleID', 'Locus', 'RU_Allele'], ascending=True)
     infile_sort['merged'] = (
         infile_sort['RU_Allele'].astype(str)+', '+infile_sort['Reads'].astype(str)
@@ -105,14 +108,26 @@ def EFM_output(df, outfile, separate=False):
         if separate:
             Path('Separated_EFM_Files').mkdir(exist_ok=True)
             df_order = df_order.dropna(axis=1, how='all', inplace=False)
-            df_order.to_csv(f'Separated_EFM_Files/{id}.csv', index=False)
+            if profile == 'evidence':
+                df_order.to_csv(f'Separated_EFM_Files/{id}.csv', index=False)
+            else:
+                df_order.iloc[:, :4].to_csv(f'Separated_EFM_Files/{id}.csv', index=False)
         else:
             df_complete = df_complete.append(df_order)
-            df_complete.to_csv(outfile, index=False)
+            if profile == 'evidence':
+                df_complete.to_csv(outfile, index=False)
+            else:
+                df_complete.iloc[:, :4].to_csv(outfile, index=False)
 
 
-def STRmix_output(df, outdir):
-    data_combine = df.groupby(['SampleID', 'Locus', 'RU_Allele'], as_index=False)['Reads'].sum()
+def STRmix_output(df, outdir, profile):
+    if profile == 'reference':
+        infile = df[df.allele_type == 'real_allele']
+    else:
+        infile = df
+    data_combine = infile.groupby(
+        ['SampleID', 'Locus', 'RU_Allele'], as_index=False
+    )['Reads'].sum()
     dict_loc = {k: v for k, v in data_combine.groupby(['SampleID', 'Locus'])}
     final_df = pd.DataFrame()
     for key, value in dict_loc.items():
@@ -130,7 +145,10 @@ def STRmix_output(df, outdir):
     Path(outdir).mkdir(exist_ok=True)
     for id in id_list:
         df_sub = final_df[final_df['SampleID'] == id]
-        df_sub.iloc[:, 1:].to_csv(f'{outdir}/{id}.csv', index=False)
+        if profile == 'evidence':
+            df_sub.iloc[:, 1:].to_csv(f'{outdir}/{id}.csv', index=False)
+        else:
+            df_sub.iloc[:, 1:3].to_csv(f'{outdir}/{id}.csv', index=False)
 
 
 def main(args):
@@ -139,17 +157,17 @@ def main(args):
         raise ValueError('Incorrect output type specified. Please use EFM or STRmix only!')
     if args.nofilters:
         if args.output == 'strmix':
-            STRmix_output(full_df, args.out)
+            STRmix_output(full_df, args.out, args.profile)
         else:
             full_df['allele_type'] = 'real_allele'
-            EFM_output(full_df, args.out, args.separate)
+            EFM_output(full_df, args.out, args.profile, args.separate)
     else:
         dict_loc = {k: v for k, v in full_df.groupby(['SampleID', 'Locus'])}
         final_df, flags_df = process_strs(dict_loc)
         if args.output == 'efm':
-            EFM_output(final_df, args.out, args.separate)
+            EFM_output(final_df, args.out, args.profile, args.separate)
         else:
-            STRmix_output(final_df, args.out)
+            STRmix_output(final_df, args.out, args.profile)
         if args.info:
             if args.out != sys.stdout:
                 if args.output == 'efm':

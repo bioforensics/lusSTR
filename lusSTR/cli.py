@@ -136,6 +136,10 @@ def filter_subparser(subparsers):
         'STRmix. If separate files are specified for EFM, the sample ID will be used as the '
         'filename. Output files are in CSV format.'
     )
+    cli.add_argument(
+        '--profile-type', dest='profile', choices=['evidence', 'reference'], default='evidence',
+        help='Choose the type of profile, either evidence or reference. Default is evidence.'
+    )
 
 
 mains = {
