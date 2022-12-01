@@ -159,3 +159,30 @@ def test_flags(tmp_path):
     args = lusSTR.cli.get_parser().parse_args(arglist)
     lusSTR.filter.main(args)
     assert filecmp.cmp(exp_out, obs_out) is True
+
+
+def test_efm_reference(tmp_path):
+    input_file = data_file('test_references.txt')
+    exp_out = data_file('RU_stutter_test/EFM_test_reference.csv')
+    obs_out = str(tmp_path / 'test_output.csv')
+    obs_efm_out = str(tmp_path / 'test_output_reference.csv')
+    arglist = [
+        'filter', '-o', obs_out, '--output-type', 'efm',
+        '--profile-type', 'reference', input_file
+    ]
+    args = lusSTR.cli.get_parser().parse_args(arglist)
+    lusSTR.filter.main(args)
+    assert filecmp.cmp(exp_out, obs_efm_out) is True
+
+
+def test_strmix_reference(tmp_path):
+    input_file = data_file('test_references.txt')
+    exp_out = data_file('RU_stutter_test/Positive_Control_reference.csv')
+    obs_out = str(tmp_path / 'Positive_Control_reference.csv')
+    arglist = [
+        'filter', '-o', str(tmp_path), '--output-type', 'strmix',
+        '--profile-type', 'reference', input_file
+    ]
+    args = lusSTR.cli.get_parser().parse_args(arglist)
+    lusSTR.filter.main(args)
+    assert filecmp.cmp(exp_out, obs_out) is True

@@ -117,7 +117,11 @@ def EFM_output(df, outfile, profile, separate=False):
             if profile == 'evidence':
                 df_complete.to_csv(outfile, index=False)
             else:
-                df_complete.iloc[:, :4].to_csv(outfile, index=False)
+                for i in range(len(df_complete)):
+                    if pd.isna(df_complete.loc[i, 'Allele2']):
+                        df_complete.loc[i, 'Allele2'] = df_complete.loc[i, 'Allele1']
+                name = outfile.replace('.csv', '')
+                df_complete.iloc[:, :4].to_csv(f'{name}_reference.csv', index=False)
 
 
 def STRmix_output(df, outdir, profile):
@@ -148,7 +152,7 @@ def STRmix_output(df, outdir, profile):
         if profile == 'evidence':
             df_sub.iloc[:, 1:].to_csv(f'{outdir}/{id}.csv', index=False)
         else:
-            df_sub.iloc[:, 1:3].to_csv(f'{outdir}/{id}.csv', index=False)
+            df_sub.iloc[:, 1:3].to_csv(f'{outdir}/{id}_reference.csv', index=False)
 
 
 def main(args):

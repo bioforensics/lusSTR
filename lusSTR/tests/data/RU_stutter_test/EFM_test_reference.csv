@@ -1,0 +1,28 @@
+SampleName,Marker,Allele1,Allele2
+Positive_Control,CSF1PO,12.0,12.0
+Positive_Control,D10S1248,13.0,15.0
+Positive_Control,D12S391,18.0,23.0
+Positive_Control,D13S317,9.0,11.0
+Positive_Control,D16S539,9.0,13.0
+Positive_Control,D17S1301,11.0,12.0
+Positive_Control,D18S51,16.0,18.0
+Positive_Control,D19S433,13.0,14.0
+Positive_Control,D1S1656,12.0,13.0
+Positive_Control,D20S482,14.0,15.0
+Positive_Control,D21S11,29.0,31.2
+Positive_Control,D22S1045,16.0,16.0
+Positive_Control,D2S1338,22.0,25.0
+Positive_Control,D2S441,10.0,14.0
+Positive_Control,D3S1358,17.0,18.0
+Positive_Control,D4S2408,9.0,9.0
+Positive_Control,D5S818,12.0,12.0
+Positive_Control,D6S1043,12.0,20.0
+Positive_Control,D7S820,8.0,11.0
+Positive_Control,D8S1179,14.0,15.0
+Positive_Control,D9S1122,12.0,12.0
+Positive_Control,FGA,20.0,23.0
+Positive_Control,PENTA D,12.0,13.0
+Positive_Control,PENTA E,7.0,14.0
+Positive_Control,TH01,6.0,9.3
+Positive_Control,TPOX,11.0,11.0
+Positive_Control,VWA,16.0,19.0
