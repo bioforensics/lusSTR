@@ -213,7 +213,7 @@ The ```filter``` command provides the opportunity to filter sequences using thre
 * Detection threshold (both static and dynamic)
 * Analytical threshold (both static and dynamic)
 
-Custom static and dynamic thresholds for each locus are stored in the ```filters.json``` file. Modifying this file will change the thresholds.
+Custom static and dynamic thresholds for each locus are stored in the ```filters.json``` file. This file should be updated to utilize validated thresholds for individual labs.
 
 In addition, stutter alleles can be identified using the ```--info``` flag. This creates a separate file containing information about each allele, including an allele classification (```real allele```, ```stutter``` or ```noise```). Stutter alleles are classified as either ```-1 stutter```, ```-2 stutter```, or ```+1 stutter```. For these stutter alleles, the stuttering allele is reported along with the percent stutter (# of reads for that allele/# of reads for stuttering allele). In instances where a stutter allele could be multiple different types of stutter, all potential designations will be reported as such: ```-1 stutter/-2 stutter```, ```-1 stutter/+1 stutter```, or ```-2 stutter/+1 stutter```. No percent stutter is calculated for these alleles. If a sequence is identified as noise, the percent noise is calculated (# of reads for that sequence/total locus reads).
 
