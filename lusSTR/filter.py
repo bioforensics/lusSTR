@@ -128,7 +128,7 @@ def STRmix_output(df, outdir, profile):
     if profile == 'reference':
         infile = df[df.allele_type == 'real_allele']
     else:
-        infile = df
+        infile = df[df.allele_type != 'noise']
     data_combine = infile.groupby(
         ['SampleID', 'Locus', 'RU_Allele'], as_index=False
     )['Reads'].sum()
