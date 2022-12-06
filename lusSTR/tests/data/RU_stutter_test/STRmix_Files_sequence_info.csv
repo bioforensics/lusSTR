@@ -13,7 +13,7 @@ Sample1,FGA,23,1436,real_allele,,,,,,
 Sample1,FGA,22,262,-1_stutter,23.0,,1436.0,,,0.182
 Sample1,FGA,21,48,noise,,,,,0.013,
 Sample1,FGA,20,1750,real_allele,,,,,,
-Sample1,FGA,18,181,noise,,,,,0.049,
+Sample1,FGA,18,181,real_allele,,,,,,
 Sample1,FGA,17,15,noise,,,,,0.004,
 Sample1,PENTA D,15,50,real_allele,,,,,,
 Sample1,PENTA D,13,1000,real_allele,,,,,,

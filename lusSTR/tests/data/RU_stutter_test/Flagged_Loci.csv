@@ -1,3 +1,5 @@
 SampleID,Locus,Flags
 Sample1,D4S2408,>2Alleles
+Sample1,FGA,>2Alleles
+Sample1,FGA,IntraLocusImbalance
 Sample1,PENTA D,IntraLocusImbalance
