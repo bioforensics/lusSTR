@@ -125,10 +125,11 @@ def EFM_output(df, outfile, profile, separate=False):
 
 
 def STRmix_output(df, outdir, profile):
+    df_filt = df[df['Locus'] != 'Amelogenin'].reset_index(drop=True)
     if profile == 'reference':
-        infile = df[df.allele_type == 'real_allele']
+        infile = df_filt[df_filt.allele_type == 'real_allele']
     else:
-        infile = df[df.allele_type != 'noise']
+        infile = df_filt[df_filt.allele_type != 'noise']
     data_combine = infile.groupby(
         ['SampleID', 'Locus', 'RU_Allele'], as_index=False
     )['Reads'].sum()
@@ -142,7 +143,11 @@ def STRmix_output(df, outdir, profile):
         data['Size'] = data['RU_Allele']*intercept + slope
         final_df = final_df.append(data)
     final_df.rename(
-        {'RU_Allele': 'Allele', 'Reads': 'Height', 'Locus': 'Marker'}, axis=1, inplace=True)
+        {'RU_Allele': 'Allele', 'Reads': 'Height', 'Locus': 'Marker'}, axis=1, inplace=True
+    )
+    final_df.replace(
+        {'Marker': {'VWA': 'vWA', 'PENTA D': 'PentaD', 'PENTA E': 'PentaE'}}, inplace=True
+    )
     id_list = final_df['SampleID'].unique()
     if outdir is None:
         outdir = 'STRmix_Files'
@@ -160,10 +165,10 @@ def main(args):
     if args.output != 'efm' and args.output != 'strmix':
         raise ValueError('Incorrect output type specified. Please use EFM or STRmix only!')
     if args.nofilters:
+        full_df['allele_type'] = 'real_allele'
         if args.output == 'strmix':
             STRmix_output(full_df, args.out, args.profile)
         else:
-            full_df['allele_type'] = 'real_allele'
             EFM_output(full_df, args.out, args.profile, args.separate)
     else:
         dict_loc = {k: v for k, v in full_df.groupby(['SampleID', 'Locus'])}
