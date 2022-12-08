@@ -148,6 +148,9 @@ def STRmix_output(df, outdir, profile, datatype):
             intercept = metadata['Intercept']
             data['Size'] = data['RU_Allele']*intercept + slope
             final_df = final_df.append(data)
+        final_df.replace(
+            {'Locus': {'VWA': 'vWA', 'PENTA D': 'PentaD', 'PENTA E': 'PentaE'}}, inplace=True
+        )
         final_df.rename(
             {'RU_Allele': 'Allele', 'Reads': 'Height', 'Locus': 'Marker'}, axis=1, inplace=True
         )
@@ -158,9 +161,9 @@ def STRmix_output(df, outdir, profile, datatype):
         final_df.rename(
             {'RU_Allele': 'CE Allele', 'UAS_Output_Sequence': 'Allele Seq'}, axis=1, inplace=True
         )
-    final_df.replace(
-            {'Locus': {'VWA': 'vWA', 'PENTA D': 'PentaD', 'PENTA E': 'PentaE'}}, inplace=True
-        )
+        final_df.replace(
+                {'Locus': {'VWA': 'vWA', 'PENTA D': 'PentaD', 'PENTA E': 'PentaE'}}, inplace=True
+            )
     id_list = final_df['SampleID'].unique()
     if outdir is None:
         outdir = 'STRmix_Files'
