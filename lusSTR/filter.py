@@ -36,18 +36,23 @@ with open(get_filter_metadata_file(), 'r') as fh:
     filter_marker_data = json.load(fh)
 
 
-def process_strs(dict_loc):
+def process_strs(dict_loc, datatype):
     final_df = pd.DataFrame()
     flags_df = pd.DataFrame()
     for key, value in dict_loc.items():
         data = dict_loc[key].reset_index(drop=True)
-        # if allele_des == 'ru':
-        data_combine = data.groupby(
-            ['SampleID', 'Locus', 'RU_Allele'], as_index=False
-        )['Reads'].sum()
-        data_order = data_combine.sort_values(
-            by=['RU_Allele'], ascending=False
-        ).reset_index(drop=True)
+        if datatype == 'ce':
+            data_combine = data.groupby(
+                ['SampleID', 'Locus', 'RU_Allele'], as_index=False
+            )['Reads'].sum()
+            data_order = data_combine.sort_values(
+                by=['RU_Allele'], ascending=False
+            ).reset_index(drop=True)
+        else:
+            data_combine = data[['SampleID', 'Locus', 'UAS_Output_Sequence', 'RU_Allele', 'Reads']]
+            data_order = data_combine.sort_values(
+                by=['RU_Allele'], ascending=True
+            ).reset_index(drop=True)
         total_reads = data_order['Reads'].sum()
         locus = key[1]
         data_order = data_order.reindex(columns=[
@@ -55,7 +60,7 @@ def process_strs(dict_loc):
             'allele_type', 'stuttering_allele1', 'stuttering_allele2', 'allele1_ref_reads',
             'allele2_ref_reads', 'perc_noise', 'perc_stutter'
         ], fill_value=None)
-        filtered_df = filters(data_order, locus, total_reads)
+        filtered_df = filters(data_order, locus, total_reads, datatype)
         final_df = final_df.append(filtered_df)
         flags_df = flags_df.append(allele_counts(filtered_df))
         flags_df = flags_df.append(allele_imbalance_check(filtered_df))
@@ -124,30 +129,38 @@ def EFM_output(df, outfile, profile, separate=False):
                 df_complete.iloc[:, :4].to_csv(f'{name}_reference.csv', index=False)
 
 
-def STRmix_output(df, outdir, profile):
+def STRmix_output(df, outdir, profile, datatype):
     df_filt = df[df['Locus'] != 'Amelogenin'].reset_index(drop=True)
     if profile == 'reference':
         infile = df_filt[df_filt.allele_type == 'real_allele']
     else:
         infile = df_filt[df_filt.allele_type != 'noise']
-    data_combine = infile.groupby(
-        ['SampleID', 'Locus', 'RU_Allele'], as_index=False
-    )['Reads'].sum()
-    dict_loc = {k: v for k, v in data_combine.groupby(['SampleID', 'Locus'])}
-    final_df = pd.DataFrame()
-    for key, value in dict_loc.items():
-        data = dict_loc[key].reset_index(drop=True)
-        metadata = filter_marker_data[key[1]]
-        slope = metadata['Slope']
-        intercept = metadata['Intercept']
-        data['Size'] = data['RU_Allele']*intercept + slope
-        final_df = final_df.append(data)
-    final_df.rename(
-        {'RU_Allele': 'Allele', 'Reads': 'Height', 'Locus': 'Marker'}, axis=1, inplace=True
-    )
+    if datatype == 'ce':
+        data_combine = infile.groupby(
+            ['SampleID', 'Locus', 'RU_Allele'], as_index=False
+        )['Reads'].sum()
+        dict_loc = {k: v for k, v in data_combine.groupby(['SampleID', 'Locus'])}
+        final_df = pd.DataFrame()
+        for key, value in dict_loc.items():
+            data = dict_loc[key].reset_index(drop=True)
+            metadata = filter_marker_data[key[1]]
+            slope = metadata['Slope']
+            intercept = metadata['Intercept']
+            data['Size'] = data['RU_Allele']*intercept + slope
+            final_df = final_df.append(data)
+        final_df.rename(
+            {'RU_Allele': 'Allele', 'Reads': 'Height', 'Locus': 'Marker'}, axis=1, inplace=True
+        )
+    else:
+        final_df = infile[[
+            'SampleID', 'Locus', 'RU_Allele', 'UAS_Output_Sequence', 'Reads'
+        ]].copy()
+        final_df.rename(
+            {'RU_Allele': 'CE Allele', 'UAS_Output_Sequence': 'Allele Seq'}, axis=1, inplace=True
+        )
     final_df.replace(
-        {'Marker': {'VWA': 'vWA', 'PENTA D': 'PentaD', 'PENTA E': 'PentaE'}}, inplace=True
-    )
+            {'Locus': {'VWA': 'vWA', 'PENTA D': 'PentaD', 'PENTA E': 'PentaE'}}, inplace=True
+        )
     id_list = final_df['SampleID'].unique()
     if outdir is None:
         outdir = 'STRmix_Files'
@@ -162,35 +175,35 @@ def STRmix_output(df, outdir, profile):
 
 def main(args):
     full_df = pd.read_csv(args.input, sep='\t')
-    if args.output != 'efm' and args.output != 'strmix':
-        raise ValueError('Incorrect output type specified. Please use EFM or STRmix only!')
+    if args.out is None:
+        outpath = sys.stdout
+    else:
+        outpath = args.out
     if args.nofilters:
         full_df['allele_type'] = 'real_allele'
-        if args.output == 'strmix':
-            STRmix_output(full_df, args.out, args.profile)
+        if args.output == 'efm':
+            EFM_output(full_df, outpath, args.profile, args.separate)
         else:
-            EFM_output(full_df, args.out, args.profile, args.separate)
+            STRmix_output(full_df, outpath, args.profile, args.data)
     else:
         dict_loc = {k: v for k, v in full_df.groupby(['SampleID', 'Locus'])}
-        final_df, flags_df = process_strs(dict_loc)
+        final_df, flags_df = process_strs(dict_loc, args.data)
         if args.output == 'efm':
-            EFM_output(final_df, args.out, args.profile, args.separate)
+            EFM_output(final_df, outpath, args.profile, args.separate)
         else:
-            STRmix_output(final_df, args.out, args.profile)
+            STRmix_output(final_df, outpath, args.profile, args.data)
         if args.info:
-            if args.out != sys.stdout:
+            if outpath != sys.stdout:
                 if args.output == 'efm':
                     name = args.out.replace('.csv', '')
                     final_df.to_csv(f'{name}_sequence_info.csv', index=False)
                     if not flags_df.empty:
                         flags_df.to_csv(f'{name}_Flagged_Loci.csv', index=False)
                 else:
-                    if args.out is None:
-                        outdir = 'STRmix_Files'
-                    else:
-                        outdir = args.out
-                    final_df.to_csv(f'{outdir}/STRmix_Files_sequence_info.csv', index=False)
+                    if outpath == sys.stdout:
+                        outpath = 'STRmix_Files'
+                    final_df.to_csv(f'{outpath}/STRmix_Files_sequence_info.csv', index=False)
                     if not flags_df.empty:
-                        flags_df.to_csv(f'{outdir}/Flagged_Loci.csv', index=False)
+                        flags_df.to_csv(f'{outpath}/Flagged_Loci.csv', index=False)
             else:
                 raise ValueError('No outfile provided. Please specify --out to create info file.')

@@ -140,6 +140,10 @@ def filter_subparser(subparsers):
         '--profile-type', dest='profile', choices=['evidence', 'reference'], default='evidence',
         help='Choose the type of profile, either evidence or reference. Default is evidence.'
     )
+    cli.add_argument(
+        '--data-type', dest='data', choices=['ngs', 'ce'], default='ce',
+        help='Choose the type of data, either ngs or ce. Default is ce.'
+    )
 
 
 mains = {
