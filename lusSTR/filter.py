@@ -168,7 +168,7 @@ def STRmix_output(df, outdir, profile, datatype):
     for id in id_list:
         df_sub = final_df[final_df['SampleID'] == id]
         if profile == 'evidence':
-            df_sub.iloc[:, 1:].to_csv(f'{outdir}/{id}.csv', index=False)
+            df_sub.iloc[:, 1:].to_csv(f'{outdir}/{id}_{datatype}.csv', index=False)
         else:
             df_sub.iloc[:, 1:3].to_csv(f'{outdir}/{id}_reference.csv', index=False)
 

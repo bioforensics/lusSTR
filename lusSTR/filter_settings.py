@@ -307,11 +307,13 @@ def same_size_filter(df, metadata):
         ).reset_index(drop=True)
         if len(df_filt) > 1:
             high_reads = df_filt.loc[0, 'Reads']
+            final_df = final_df.append(df_filt.loc[0, :])
             for i in range(1, len(df_filt)):
                 size_thresh = metadata['SameSizeThresholdDynamicPercent']
                 size_thresh_reads = high_reads * size_thresh
-                if df_filt.loc[i, 'Reads'] < size_thresh_reads:
-                    df_filt = df_filt.drop(df_filt.index[i])
-        final_df = final_df.append(df_filt)
+                if df_filt.loc[i, 'Reads'] >= size_thresh_reads:
+                    final_df = final_df.append(df_filt.loc[i, :])
+        else:
+            final_df = final_df.append(df_filt)
     final_df = final_df.reset_index(drop=True)
     return final_df
