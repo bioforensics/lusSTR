@@ -123,14 +123,20 @@ def test_EFMoutput_format(tmp_path):
     assert filecmp.cmp(exp_info_out, obs_info_out) is True
 
 
-def test_STRmixoutput_format(tmp_path):
+@pytest.mark.parametrize('outputdir, datatype', [
+    ('RU_stutter_test/', 'ce'),
+    ('NGS_stutter_test/', 'ngs')
+])
+def test_STRmixoutput_format(outputdir, datatype, tmp_path):
     input_file = data_file('test_stutter.txt')
-    exp_out = data_file('RU_stutter_test/Sample1.csv')
-    exp_info_out = data_file('RU_stutter_test/STRmix_Files_sequence_info.csv')
+    exp_out = data_file(f'{outputdir}Sample1_{datatype}.csv')
+    exp_info_out = data_file(f'{outputdir}STRmix_Files_sequence_info.csv')
     obs_outdir = str(tmp_path / 'STRmix_Files')
-    obs_out = str(tmp_path / 'STRmix_Files/Sample1.csv')
+    obs_out = str(tmp_path / f'STRmix_Files/Sample1_{datatype}.csv')
     obs_info_out = f'{obs_outdir}/STRmix_Files_sequence_info.csv'
-    arglist = ['filter', '-o', obs_outdir, '--output-type', 'strmix', '--info', input_file]
+    arglist = [
+        'filter', '-o', obs_outdir, '--output-type', 'strmix', '--info', input_file,
+        '--data-type', datatype]
     args = lusSTR.cli.get_parser().parse_args(arglist)
     lusSTR.filter.main(args)
     assert filecmp.cmp(exp_out, obs_out) is True
