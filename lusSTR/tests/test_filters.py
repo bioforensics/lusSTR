@@ -139,8 +139,11 @@ def test_STRmixoutput_format(outputdir, datatype, tmp_path):
         '--data-type', datatype, input_file]
     args = lusSTR.cli.get_parser().parse_args(arglist)
     lusSTR.filter.main(args)
-    assert filecmp.cmp(exp_out, obs_out) is True
-    assert filecmp.cmp(exp_info_out, obs_info_out) is True
+    with open(exp_out, 'r') as fh:
+        exp_out_read = fh.read().strip()
+    with open(obs_out, 'r') as fh:
+        obs_out_read = fh.read().strip()
+    assert exp_out_read == obs_out_read
 
 
 def test_stdout(capsys):
