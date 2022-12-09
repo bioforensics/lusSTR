@@ -135,8 +135,8 @@ def test_STRmixoutput_format(outputdir, datatype, tmp_path):
     obs_out = str(tmp_path / f'STRmix_Files/Sample1_{datatype}.csv')
     obs_info_out = f'{obs_outdir}/STRmix_Files_sequence_info.csv'
     arglist = [
-        'filter', '-o', obs_outdir, '--output-type', 'strmix', '--info', input_file,
-        '--data-type', datatype]
+        'filter', '-o', obs_outdir, '--output-type', 'strmix', '--info',
+        '--data-type', datatype, input_file]
     args = lusSTR.cli.get_parser().parse_args(arglist)
     lusSTR.filter.main(args)
     assert filecmp.cmp(exp_out, obs_out) is True
