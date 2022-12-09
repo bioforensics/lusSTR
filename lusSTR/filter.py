@@ -152,7 +152,7 @@ def STRmix_output(df, outdir, profile, datatype):
             {'Locus': {'VWA': 'vWA', 'PENTA D': 'PentaD', 'PENTA E': 'PentaE'}}, inplace=True
         )
         final_df.rename(
-            {'RU_Allele': 'Allele', 'Reads': 'Height', 'Locus': 'Marker'}, axis=1, inplace=True
+            {'RU_Allele': 'Allele', 'Reads': 'Height'}, axis=1, inplace=True
         )
     else:
         final_df = infile[[
