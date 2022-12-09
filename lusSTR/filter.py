@@ -165,7 +165,7 @@ def STRmix_output(df, outdir, profile, datatype):
         final_df.replace(
                 {'Locus': {'VWA': 'vWA', 'PENTA D': 'PentaD', 'PENTA E': 'PentaE'}}, inplace=True
             )
-    print(final_df.dtypes)
+        final_df['CE Allele'] = final_df['CE Allele'].astype('float64')
     id_list = final_df['SampleID'].unique()
     if outdir is None:
         outdir = 'STRmix_Files'
