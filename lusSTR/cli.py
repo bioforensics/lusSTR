@@ -143,6 +143,7 @@ def filter_subparser(subparsers):
     cli.add_argument(
         '--data-type', dest='data', choices=['ngs', 'ce'], default='ce',
         help='Choose the type of data, either ngs or ce. Default is ce.'
+        '**This is only applicable to STRmix evidence data.**'
     )
 
 
