@@ -64,6 +64,7 @@ def process_strs(dict_loc, datatype):
         final_df = final_df.append(filtered_df)
         flags_df = flags_df.append(allele_counts(filtered_df))
         flags_df = flags_df.append(allele_imbalance_check(filtered_df))
+    final_df = final_df.astype({'RU_Allele': 'float64', 'Reads': 'int'})
     return final_df, flags_df
 
 
@@ -165,9 +166,6 @@ def STRmix_output(df, outdir, profile, datatype):
         final_df.replace(
                 {'Locus': {'VWA': 'vWA', 'PENTA D': 'PentaD', 'PENTA E': 'PentaE'}}, inplace=True
             )
-        final_df[['CE Allele', 'Reads']] = final_df[[
-            'CE Allele', 'Reads'
-        ]].astype('float64', 'int')
     id_list = final_df['SampleID'].unique()
     if outdir is None:
         outdir = 'STRmix_Files'
