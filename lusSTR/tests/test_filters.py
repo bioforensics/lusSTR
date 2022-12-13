@@ -184,7 +184,7 @@ def test_efm_reference(tmp_path):
 def test_strmix_reference(tmp_path):
     input_file = data_file('test_references.txt')
     exp_out = data_file('RU_stutter_test/Positive_Control_reference.csv')
-    obs_out = str(tmp_path / 'Positive_Control_reference.csv')
+    obs_out = str(tmp_path / 'Positive_Control_reference_ce.csv')
     arglist = [
         'filter', '-o', str(tmp_path), '--output-type', 'strmix',
         '--profile-type', 'reference', input_file

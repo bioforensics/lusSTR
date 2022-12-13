@@ -152,10 +152,6 @@ def STRmix_output(df, outdir, profile, datatype):
         final_df.rename(
             {'RU_Allele': 'Allele', 'Reads': 'Height'}, axis=1, inplace=True
         )
-        final_df.replace(
-            {'Locus': {'VWA': 'vWA', 'PENTA D': 'PentaD', 'PENTA E': 'PentaE'}}, inplace=True
-        )
-        final_df['Allele'] = final_df['Allele'].astype('float64')
     else:
         final_df = infile[[
             'SampleID', 'Locus', 'RU_Allele', 'UAS_Output_Sequence', 'Reads'
@@ -163,19 +159,42 @@ def STRmix_output(df, outdir, profile, datatype):
         final_df.rename(
             {'RU_Allele': 'CE Allele', 'UAS_Output_Sequence': 'Allele Seq'}, axis=1, inplace=True
         )
-        final_df.replace(
-                {'Locus': {'VWA': 'vWA', 'PENTA D': 'PentaD', 'PENTA E': 'PentaE'}}, inplace=True
-            )
+    final_df.replace(
+            {'Locus': {'VWA': 'vWA', 'PENTA D': 'PentaD', 'PENTA E': 'PentaE'}}, inplace=True
+        )
     id_list = final_df['SampleID'].unique()
     if outdir is None:
         outdir = 'STRmix_Files'
     Path(outdir).mkdir(exist_ok=True)
     for id in id_list:
-        df_sub = final_df[final_df['SampleID'] == id]
+        df_sub = final_df[final_df['SampleID'] == id].reset_index(drop=True)
         if profile == 'evidence':
             df_sub.iloc[:, 1:].to_csv(f'{outdir}/{id}_{datatype}.csv', index=False)
         else:
-            df_sub.iloc[:, 1:3].to_csv(f'{outdir}/{id}_reference.csv', index=False)
+            ref_df = reference_table(df_sub.iloc[:, 1:3])
+            ref_df.to_csv(f'{outdir}/{id}_reference_{datatype}.csv', index=False)
+
+
+def reference_table(data):
+    new_rows = []
+    for i, row in data.iterrows():
+        locus = data.loc[i, 'Locus']
+        try:
+            next_col = data.loc[i+1, 'Locus']
+        except KeyError:
+            next_col = None
+        try:
+            prev_col = data.loc[i-1, 'Locus']
+        except KeyError:
+            prev_col = None
+        if locus == next_col or locus == prev_col:
+            continue
+        else:
+            new_rows.append(list(row))
+    new_df = pd.DataFrame(new_rows, columns=['Locus', 'Allele'])
+    concat_df = pd.concat([data, new_df]).reset_index(drop=True)
+    sort_df = concat_df.sort_values(by=['Locus', 'Allele'])
+    return sort_df
 
 
 def main(args):
