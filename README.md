@@ -207,17 +207,20 @@ lusstr snps STRait_Razor_output/ -o strait_razor_p.txt --type p
 
 ## Filtering RU alleles and Creation of Files for Use in ProbGen Software
 
-**Currently, lusSTR is only set up to filter and identify stutter based on RU alleles for autosomal loci; future work will expand into the use of the LUS+ allele as well as for sex chromosome loci and SNPs.*
+**Currently, lusSTR is only set up to filter and identify stutter based on RU alleles for autosomal loci; future work will expand into the use of the LUS+ allele/sequence string as well as for sex chromosome loci and SNPs.*
 
 The ```filter``` command provides the opportunity to filter sequences using thresholds such as:
 * Detection threshold (both static and dynamic)
 * Analytical threshold (both static and dynamic)
+* Same size threshold (dynamic)
 
 Custom static and dynamic thresholds for each locus are stored in the ```filters.json``` file. This file should be updated to utilize validated thresholds for individual labs.
 
 In addition, stutter alleles can be identified using the ```--info``` flag. This creates a separate file containing information about each allele, including an allele classification (```real allele```, ```stutter``` or ```noise```). Stutter alleles are classified as either ```-1 stutter```, ```-2 stutter```, or ```+1 stutter```. For these stutter alleles, the stuttering allele is reported along with the percent stutter (# of reads for that allele/# of reads for stuttering allele). In instances where a stutter allele could be multiple different types of stutter, all potential designations will be reported as such: ```-1 stutter/-2 stutter```, ```-1 stutter/+1 stutter```, or ```-2 stutter/+1 stutter```. No percent stutter is calculated for these alleles. If a sequence is identified as noise, the percent noise is calculated (# of reads for that sequence/total locus reads).
 
 Each locus is checked for containing greater than 2 alleles (indicating a potential mixture) and for intralocus imbalance. If either are identified, a separate file (```Flagged_Loci.csv```) is created, containing the SampleID, Locus and either ```>2Alleles``` or ```IntraLocusImbalance```.
+
+When using STRmix data, the data type can be specified using the ```--data-type``` flag as either ```ce``` or ```ngs``` (default is ```ce```). If ```ngs``` is specified, the same size filter is applied but the stutter filter is not (the stutter filter is currently a work in progress for NGS data!). Further, the columns and column names in the output file differ based on the data type.
 
 Finally, output files are created for direct use in EuroForMix (EFM) or STRmix. If EFM is specified, a single file is created containing all samples in the input file (however, separate output files for each sample can be created with the ```--separate``` flag). If STRmix is specified, a directory containing files for each individual sample is created. The ```--profile-type``` flag allows for the creation of either a ```reference``` or ```evidence``` profile. Both EuroForMix and STRmix require different formatting depending on the type of sample. 
 
@@ -229,6 +232,7 @@ The ```filter``` command requires the input of a ```.txt``` file produced by the
 The ```-o/--out``` flag specifies the name of the output file (for EFM) or output directory (for STRmix)
 ```--output-type``` specifies the type of output file created, either ```efm``` or ```strmix```. ```efm``` is the default.
 ```--profile-type``` specifies the sample type, either ```evidence``` or ```reference```. ```evidence``` is the default.
+```--data-type``` specifies the type of data used, either ```ce``` or ```ngs```. ```ce``` is the default. Only applicable to STRmix data.
 ```--info``` creates the allele information file, containing allele designations (e.g. stutter, noise or real allele) as well as stutter/noise percentages.
 The ```--no-filters``` flag will not apply any filters and therefore all alleles present in the input file will be in the created output file(s).
 The ```--separate``` flag will indicate to separate samples into individual output files for EFM. STRmix creates separate files by default.
@@ -241,6 +245,10 @@ lusstr filter experiment01.txt -o experiment01_efm.csv --output-type efm --info
 
 ```
 lusstr filter experiment01.txt -o STRmix_files/ --output-type strmix --profile-type reference --info
+```
+
+```
+lusstr filter experiment01.txt -o STRmix_files/ --output-type strmix --data-type ngs --info
 ```
 
 ----
