@@ -298,6 +298,28 @@ def allele_imbalance_check(df):
     return new_df
 
 
+def check_D7(df):
+    new_df = pd.DataFrame(columns=['SampleID', 'Locus', 'Flags'])
+    for i in range(len(df)):
+        al = df.loc[i, 'RU_Allele']
+        try:
+            if str(al).split('.')[1] == '1':
+                new_df.loc[len(new_df.index)] = [
+                    df.loc[0, 'SampleID'], df.loc[0, 'Locus'], 'Microvariant'
+                ]
+        except IndexError:
+            continue
+    return new_df
+
+
+def flags(df):
+    new_df = pd.DataFrame(columns=['SampleID', 'Locus', 'Flags'])
+    new_df = new_df.append(allele_counts(df))
+    new_df = new_df.append(allele_imbalance_check(df))
+    new_df = new_df.append(check_D7(df))
+    return new_df
+
+
 def same_size_filter(df, metadata):
     final_df = pd.DataFrame()
     al_list = df['RU_Allele'].unique()
