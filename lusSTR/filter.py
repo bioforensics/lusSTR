@@ -8,9 +8,10 @@
 # -----------------------------------------------------------------------------
 
 import argparse
+from collections import defaultdict
 import json
 import lusSTR
-from lusSTR.filter_settings import allele_counts, allele_imbalance_check, filters
+from lusSTR.filter_settings import filters, flags
 import numpy as np
 import os
 import pandas as pd
@@ -62,72 +63,100 @@ def process_strs(dict_loc, datatype):
         ], fill_value=None)
         filtered_df = filters(data_order, locus, total_reads, datatype)
         final_df = final_df.append(filtered_df)
-        flags_df = flags_df.append(allele_counts(filtered_df))
-        flags_df = flags_df.append(allele_imbalance_check(filtered_df))
+        flags_df = flags_df.append(flags(filtered_df))
     final_df = final_df.astype({'RU_Allele': 'float64', 'Reads': 'int'})
     return final_df, flags_df
 
 
-def EFM_output(df, outfile, profile, separate=False):
+def EFM_output(profile, outfile, profile_type, separate=False):
+    if profile_type not in ("evidence", "reference"):
+        raise ValueError(f"unknown profile type '{profile_type}'")
     if outfile is None:
         outfile = sys.stdout
-    if profile == 'reference':
-        infile = df[df.allele_type == 'real_allele']
+    if profile_type == "reference":
+        profile = profile[profile.allele_type == "real_allele"]
     else:
-        infile = df[df.allele_type != 'noise']
-    infile_sort = infile.sort_values(by=['SampleID', 'Locus', 'RU_Allele'], ascending=True)
-    infile_sort['merged'] = (
-        infile_sort['RU_Allele'].astype(str)+', '+infile_sort['Reads'].astype(str)
-    )
-    alleles_typed_col = infile_sort.groupby(
-        ['SampleID', 'Locus']
-    ).agg({'merged': ','.join}).reset_index()
-    alleles_typed_final = alleles_typed_col['merged'].str.split(',', expand=True)
-    new_df = pd.DataFrame()
-    al_num = 0
-    for name, values in alleles_typed_final.iteritems():
-        if int(name) % 2:
-            new_df[name] = values
+        profile = profile[profile.allele_type != "noise"]
+    efm_profile = populate_efm_profile(profile)
+    if separate:
+        write_sample_specific_efm_profiles(efm_profile, profile_type)
+    else:
+        write_aggregate_efm_profile(efm_profile, profile_type, outfile)
+
+
+def populate_efm_profile(profile):
+    profile = profile.sort_values(by=["SampleID", "Locus", "RU_Allele"])
+    allele_heights = defaultdict(lambda: defaultdict(dict))
+    for i, row in profile.iterrows():
+        allele_heights[row.SampleID][row.Locus][float(row.RU_Allele)] = int(row.Reads)
+    max_num_alleles = determine_max_num_alleles(allele_heights)
+    reformatted_profile = list()
+    for sampleid, loci in allele_heights.items():
+        for locusid, alleles in loci.items():
+            allele_list, height_list = list(), list()
+            for allele, height in alleles.items():
+                allele_list.append(allele)
+                height_list.append(height)
+            while len(allele_list) < max_num_alleles:
+                allele_list.append(None)
+                height_list.append(None)
+            entry = [sampleid, locusid] + allele_list + height_list
+            reformatted_profile.append(entry)
+    for sampleid in allele_heights:
+        for locusid in strs:
+            if locusid not in allele_heights[sampleid]:
+                entry = [sampleid, locusid] + ([None] * max_num_alleles * 2)
+                reformatted_profile.append(entry)
+    allele_columns = [f"Allele{n + 1}" for n in range(max_num_alleles)]
+    height_columns = [f"Height{n + 1}" for n in range(max_num_alleles)]
+    column_names = ["SampleName", "Marker"] + allele_columns + height_columns
+    efm_profile = pd.DataFrame(reformatted_profile, columns=column_names)
+    for col in height_columns:
+        efm_profile[col] = efm_profile[col].astype('Int64')
+    efm_profile = efm_profile.sort_values(by=["SampleName", "Marker"])
+    return efm_profile
+
+
+def write_sample_specific_efm_profiles(efm_profile, profile_type, outdir="Separated_EFM_Files"):
+    Path(outdir).mkdir(exist_ok=True)
+    for sample in efm_profile.SampleName:
+        sample_profile = efm_profile[efm_profile.SampleName == sample]
+        sample_profile.dropna(axis=1, how='all', inplace=True)
+        if profile_type == 'evidence':
+            sample_profile.to_csv(f'Separated_EFM_Files/{sample}.csv', index=False)
         else:
-            new_df.insert(al_num, name, values)
-            al_num += 1
-    col_len = int(len(new_df.columns)/2)
-    for k in range(col_len):
-        all_num = k+1
-        read_num = k+col_len
-        new_df.rename(columns={new_df.columns[k]: f'Allele{all_num}'}, inplace=True)
-        new_df.rename(columns={new_df.columns[read_num]: f'Height{all_num}'}, inplace=True)
-    sampl_snp_ids = alleles_typed_col.loc[:, ['SampleID', 'Locus']]
-    final_df2 = pd.concat([sampl_snp_ids, new_df], axis=1).reset_index(drop=True)
-    final_df2 = final_df2.rename({'SampleID': 'SampleName', 'Locus': 'Marker'}, axis=1)
-    ids_list = final_df2['SampleName'].unique()
-    df_complete = pd.DataFrame()
-    for id in ids_list:
-        df_sub = final_df2[final_df2['SampleName'] == id]
-        for strloc in strs:
-            if strloc in df_sub['Marker'].values:
-                continue
-            else:
-                new_row = pd.DataFrame({'SampleName': [id], 'Marker': [strloc]})
-                df_sub = df_sub.append(new_row)
-        df_order = df_sub.sort_values(by=['Marker'])
-        if separate:
-            Path('Separated_EFM_Files').mkdir(exist_ok=True)
-            df_order = df_order.dropna(axis=1, how='all', inplace=False)
-            if profile == 'evidence':
-                df_order.to_csv(f'Separated_EFM_Files/{id}.csv', index=False)
-            else:
-                df_order.iloc[:, :4].to_csv(f'Separated_EFM_Files/{id}.csv', index=False)
-        else:
-            df_complete = df_complete.append(df_order)
-            if profile == 'evidence':
-                df_complete.to_csv(outfile, index=False)
-            else:
-                for i in range(len(df_complete)):
-                    if pd.isna(df_complete.loc[i, 'Allele2']):
-                        df_complete.loc[i, 'Allele2'] = df_complete.loc[i, 'Allele1']
-                name = outfile.replace('.csv', '')
-                df_complete.iloc[:, :4].to_csv(f'{name}_reference.csv', index=False)
+            num_alleles = (len(sample_profile.columns) - 2) / 2
+            if num_alleles > 2:
+                message = (
+                    f"reference profile {sample} has at least one locus with {num_alleles} "
+                    "alleles; stubbornly refusing to proceed with more than two alleles for "
+                    "a reference profile"
+                )
+                raise ValueError(message)
+            for i in range(len(sample_profile)):
+                if pd.isna(sample_profile.loc[i, 'Allele2']):
+                    sample_profile.loc[i, 'Allele2'] = sample_profile.loc[i, 'Allele1']
+            sample_profile.iloc[:, :4].to_csv(f'Separated_EFM_Files/{id}.csv', index=False)
+
+
+def write_aggregate_efm_profile(efm_profile, profile_type, outfile):
+    if profile_type == "evidence":
+        efm_profile.to_csv(outfile, index=False)
+    else:
+        for i in range(len(efm_profile)):
+            if pd.isna(efm_profile.loc[i, 'Allele2']):
+                efm_profile.loc[i, 'Allele2'] = efm_profile.loc[i, 'Allele1']
+        prefix = outfile.replace('.csv', '')
+        efm_profile.iloc[:, :4].to_csv(f'{prefix}_reference.csv', index=False)
+
+
+def determine_max_num_alleles(allele_heights):
+    max_num_alleles = 0
+    for sampleid, loci in allele_heights.items():
+        for locusid, alleles in loci.items():
+            if len(alleles) > max_num_alleles:
+                max_num_alleles = len(alleles)
+    return max_num_alleles
 
 
 def STRmix_output(df, outdir, profile, datatype):
