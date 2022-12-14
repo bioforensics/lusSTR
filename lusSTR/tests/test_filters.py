@@ -192,3 +192,15 @@ def test_strmix_reference(tmp_path):
     args = lusSTR.cli.get_parser().parse_args(arglist)
     lusSTR.filter.main(args)
     assert filecmp.cmp(exp_out, obs_out) is True
+
+
+def test_D7(tmp_path):
+    input_file = data_file('test_D7.txt')
+    exp_out = data_file('D7_microvariant_flagged.csv')
+    obs_out = str(tmp_path / 'Flagged_Loci.csv')
+    arglist = [
+        'filter', '-o', str(tmp_path), '--output-type', 'strmix', '--info', input_file
+    ]
+    args = lusSTR.cli.get_parser().parse_args(arglist)
+    lusSTR.filter.main(args)
+    assert filecmp.cmp(exp_out, obs_out)
