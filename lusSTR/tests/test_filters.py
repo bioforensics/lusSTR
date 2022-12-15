@@ -133,7 +133,7 @@ def test_STRmixoutput_format(outputdir, datatype, tmp_path):
     exp_info_out = data_file(f'{outputdir}STRmix_Files_sequence_info.csv')
     obs_outdir = str(tmp_path / 'STRmix_Files')
     obs_out = str(tmp_path / f'STRmix_Files/Sample1_{datatype}.csv')
-    obs_info_out = str(tmp_path / f'STRmix_Files/STRmix_Files_sequence_info.csv')
+    obs_info_out = str(tmp_path / f'STRmix_Files/sequence_info.csv')
     arglist = [
         'filter', '-o', obs_outdir, '--output-type', 'strmix', '--info',
         '--data-type', datatype, input_file]

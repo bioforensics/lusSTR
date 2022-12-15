@@ -50,7 +50,9 @@ def process_strs(dict_loc, datatype):
                 by=['RU_Allele'], ascending=False
             ).reset_index(drop=True)
         else:
-            data_combine = data[['SampleID', 'Locus', 'UAS_Output_Sequence', 'RU_Allele', 'Reads']]
+            data_combine = data[[
+                'SampleID', 'Locus', 'UAS_Output_Sequence', 'RU_Allele', 'Reads'
+            ]]
             data_order = data_combine.sort_values(
                 by=['RU_Allele'], ascending=True
             ).reset_index(drop=True)
@@ -69,10 +71,6 @@ def process_strs(dict_loc, datatype):
 
 
 def EFM_output(profile, outfile, profile_type, separate=False):
-    if profile_type not in ("evidence", "reference"):
-        raise ValueError(f"unknown profile type '{profile_type}'")
-    if outfile is None:
-        outfile = sys.stdout
     if profile_type == "reference":
         profile = profile[profile.allele_type == "real_allele"]
     else:
@@ -159,9 +157,9 @@ def determine_max_num_alleles(allele_heights):
     return max_num_alleles
 
 
-def STRmix_output(df, outdir, profile, datatype):
+def STRmix_output(df, outdir, profile_type, datatype):
     df_filt = df[df['Locus'] != 'Amelogenin'].reset_index(drop=True)
-    if profile == 'reference':
+    if profile_type == 'reference':
         infile = df_filt[df_filt.allele_type == 'real_allele']
     else:
         infile = df_filt[df_filt.allele_type != 'noise']
@@ -197,7 +195,7 @@ def STRmix_output(df, outdir, profile, datatype):
     Path(outdir).mkdir(exist_ok=True)
     for id in id_list:
         df_sub = final_df[final_df['SampleID'] == id].reset_index(drop=True)
-        if profile == 'evidence':
+        if profile_type == 'evidence':
             df_sub.iloc[:, 1:].to_csv(f'{outdir}/{id}_{datatype}.csv', index=False)
         else:
             ref_df = reference_table(df_sub.iloc[:, 1:3])
@@ -228,6 +226,15 @@ def reference_table(data):
 
 def main(args):
     full_df = pd.read_csv(args.input, sep='\t')
+    profile_type = args.profile
+    if profile_type not in ("evidence", "reference"):
+        raise ValueError(f"unknown profile type '{profile_type}'")
+    data_type = args.data
+    if data_type not in ("ce", "ngs"):
+        raise ValueError(f"unknown data type '{data_type}'")
+    output_type = args.output
+    if output_type not in ("efm", "strmix"):
+        raise ValueError(f"unknown output type '{output_type}'")
     if args.out is None:
         outpath = sys.stdout
     else:
@@ -235,28 +242,24 @@ def main(args):
     if args.nofilters:
         full_df['allele_type'] = 'real_allele'
         if args.output == 'efm':
-            EFM_output(full_df, outpath, args.profile, args.separate)
+            EFM_output(full_df, outpath, profile_type, args.separate)
         else:
-            STRmix_output(full_df, outpath, args.profile, args.data)
+            STRmix_output(full_df, outpath, profile_type, data_type)
     else:
         dict_loc = {k: v for k, v in full_df.groupby(['SampleID', 'Locus'])}
         final_df, flags_df = process_strs(dict_loc, args.data)
-        if args.output == 'efm':
-            EFM_output(final_df, outpath, args.profile, args.separate)
+        if output_type == 'efm':
+            EFM_output(final_df, outpath, profile_type, args.separate)
         else:
-            STRmix_output(final_df, outpath, args.profile, args.data)
+            STRmix_output(final_df, outpath, profile_type, data_type)
         if args.info:
             if outpath != sys.stdout:
-                if args.output == 'efm':
-                    name = args.out.replace('.csv', '')
-                    final_df.to_csv(f'{name}_sequence_info.csv', index=False)
-                    if not flags_df.empty:
-                        flags_df.to_csv(f'{name}_Flagged_Loci.csv', index=False)
+                if output_type == 'efm':
+                    outputname = outpath.replace('.csv', '_')
                 else:
-                    if outpath == sys.stdout:
-                        outpath = 'STRmix_Files'
-                    final_df.to_csv(f'{outpath}/STRmix_Files_sequence_info.csv', index=False)
-                    if not flags_df.empty:
-                        flags_df.to_csv(f'{outpath}/Flagged_Loci.csv', index=False)
+                    outputname = f'{outpath}/'
+                final_df.to_csv(f'{outputname}sequence_info.csv', index=False)
+                if not flags_df.empty:
+                    flags_df.to_csv(f'{outputname}Flagged_Loci.csv', index=False)
             else:
                 raise ValueError('No outfile provided. Please specify --out to create info file.')
