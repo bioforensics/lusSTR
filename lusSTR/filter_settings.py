@@ -216,12 +216,13 @@ def allele_type_ru(ref, ru, all_type, metadata, al_reads, ref_reads, al1_ref_rea
     forward_thresh = metadata['StutterForwardThresholdDynamicPercent']
     stutter_thresh_reads = np.ceil(stutter_thresh * ref_reads)
     stut_perc = None
-    if ref - ru == 1 and ref_reads > al_reads:  # -1 stutter
+    allele_diff = round(ref - ru, 1)
+    if allele_diff == 1 and ref_reads > al_reads:  # -1 stutter
         all_type, stut_perc = minus1_stutter(
             all_type, stutter_thresh, forward_thresh, stutter_thresh_reads, ref_reads,
             al1_ref_reads, al_reads
         )
-    elif ref - ru == 2 and ref_reads > al_reads:  # -2 stutter
+    elif allele_diff == 2 and ref_reads > al_reads:  # -2 stutter
         if check_2stutter(data, 'ru', ru)[0] is True:
             ref_reads = check_2stutter(data, 'ru', ru)[1]
             stutter_thresh_reads = stutter_thresh * ref_reads
@@ -229,7 +230,7 @@ def allele_type_ru(ref, ru, all_type, metadata, al_reads, ref_reads, al1_ref_rea
                 all_type, stutter_thresh_reads, forward_thresh, stutter_thresh_reads,
                 ref_reads, al1_ref_reads, al_reads
             )
-    elif ref - ru == -1 and ref_reads > al_reads:  # +1 stutter
+    elif allele_diff == -1 and ref_reads > al_reads:  # +1 stutter
         all_type, stut_perc = plus1_stutter(
             all_type, stutter_thresh, forward_thresh, ref_reads,
             al1_ref_reads, al_reads
