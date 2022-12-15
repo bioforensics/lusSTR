@@ -156,6 +156,19 @@ def test_stdout(capsys):
     assert obs_out == exp_out
 
 
+def test_nofilters(tmp_path):
+    input_file = data_file('test_stutter.txt')
+    exp_out = data_file('NGS_stutter_test/Sample1_nofilter.csv')
+    obs_out = str(tmp_path / 'Sample1_ngs.csv')
+    arglist = [
+        'filter', '-o', str(tmp_path), '--output-type', 'strmix', '--no-filters',
+        '--data-type', 'ngs', input_file
+        ]
+    args = lusSTR.cli.get_parser().parse_args(arglist)
+    lusSTR.filter.main(args)
+    assert filecmp.cmp(exp_out, obs_out) is True
+
+
 def test_flags(tmp_path):
     input_file = data_file('test_stutter.txt')
     exp_out = data_file('RU_stutter_test/Flagged_Loci.csv')
