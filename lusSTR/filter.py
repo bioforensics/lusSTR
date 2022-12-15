@@ -157,49 +157,53 @@ def determine_max_num_alleles(allele_heights):
     return max_num_alleles
 
 
-def STRmix_output(df, outdir, profile_type, datatype):
-    df_filt = df[df['Locus'] != 'Amelogenin'].reset_index(drop=True)
+def STRmix_output(profile, outdir, profile_type, data_type):
     if profile_type == 'reference':
-        infile = df_filt[df_filt.allele_type == 'real_allele']
+        infile = profile[profile.allele_type == 'real_allele']
     else:
-        infile = df_filt[df_filt.allele_type != 'noise']
-    if datatype == 'ce':
-        data_combine = infile.groupby(
-            ['SampleID', 'Locus', 'RU_Allele'], as_index=False
-        )['Reads'].sum()
-        dict_loc = {k: v for k, v in data_combine.groupby(['SampleID', 'Locus'])}
-        final_df = pd.DataFrame()
-        for key, value in dict_loc.items():
-            data = dict_loc[key].reset_index(drop=True)
-            metadata = filter_marker_data[key[1]]
-            slope = metadata['Slope']
-            intercept = metadata['Intercept']
-            data['Size'] = data['RU_Allele']*intercept + slope
-            final_df = final_df.append(data)
-        final_df.rename(
-            {'RU_Allele': 'Allele', 'Reads': 'Height'}, axis=1, inplace=True
-        )
+        infile = profile[profile.allele_type != 'noise']
+    if data_type == 'ce':
+        final_df = strmix_ce_processing(infile)
     else:
-        final_df = infile[[
-            'SampleID', 'Locus', 'RU_Allele', 'UAS_Output_Sequence', 'Reads'
-        ]].copy()
+        final_df = infile.loc[
+            :, ['SampleID', 'Locus', 'RU_Allele', 'UAS_Output_Sequence', 'Reads']
+        ]
         final_df.rename(
             {'RU_Allele': 'CE Allele', 'UAS_Output_Sequence': 'Allele Seq'}, axis=1, inplace=True
         )
     final_df.replace(
             {'Locus': {'VWA': 'vWA', 'PENTA D': 'PentaD', 'PENTA E': 'PentaE'}}, inplace=True
         )
-    id_list = final_df['SampleID'].unique()
     if outdir is None:
         outdir = 'STRmix_Files'
     Path(outdir).mkdir(exist_ok=True)
+    id_list = final_df['SampleID'].unique()
     for id in id_list:
         df_sub = final_df[final_df['SampleID'] == id].reset_index(drop=True)
         if profile_type == 'evidence':
-            df_sub.iloc[:, 1:].to_csv(f'{outdir}/{id}_{datatype}.csv', index=False)
+            df_sub.iloc[:, 1:].to_csv(f'{outdir}/{id}_{data_type}.csv', index=False)
         else:
             ref_df = reference_table(df_sub.iloc[:, 1:3])
-            ref_df.to_csv(f'{outdir}/{id}_reference_{datatype}.csv', index=False)
+            ref_df.to_csv(f'{outdir}/{id}_reference_{data_type}.csv', index=False)
+
+
+def strmix_ce_processing(profile):
+    data_combine = profile.groupby(
+        ['SampleID', 'Locus', 'RU_Allele'], as_index=False
+    )['Reads'].sum()
+    dict_loc = {k: v for k, v in data_combine.groupby(['SampleID', 'Locus'])}
+    locus_df = pd.DataFrame()
+    for key, value in dict_loc.items():
+        data = dict_loc[key].reset_index(drop=True)
+        metadata = filter_marker_data[key[1]]
+        slope = metadata['Slope']
+        intercept = metadata['Intercept']
+        data['Size'] = data['RU_Allele'] * intercept + slope
+        locus_df = locus_df.append(data)
+    locus_df.rename(
+        {'RU_Allele': 'Allele', 'Reads': 'Height'}, axis=1, inplace=True
+    )
+    return locus_df
 
 
 def reference_table(data):
@@ -214,7 +218,14 @@ def reference_table(data):
             prev_col = data.loc[i-1, 'Locus']
         except KeyError:
             prev_col = None
-        if locus == next_col or locus == prev_col:
+        if next_col == prev_col:
+            message = (
+                f"reference profile has at least one locus with > 2 alleles; "
+                "stubbornly refusing to proceed with more than two alleles for "
+                "a reference profile"
+            )
+            raise ValueError(message)
+        elif locus == next_col or locus == prev_col:
             continue
         else:
             new_rows.append(list(row))
