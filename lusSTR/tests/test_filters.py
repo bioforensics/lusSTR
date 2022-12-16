@@ -217,3 +217,15 @@ def test_D7(tmp_path):
     args = lusSTR.cli.get_parser().parse_args(arglist)
     lusSTR.filter.main(args)
     assert filecmp.cmp(exp_out, obs_out)
+
+
+def test_ngs_reference_error(capsys):
+    input_file = data_file('test_stutter.txt')
+    arglist = [
+        'filter', '--output-type', 'strmix', '--data-type', 'ngs', '--profile-type',
+        'reference', input_file
+    ]
+    args = lusSTR.cli.get_parser().parse_args(arglist)
+    exp_error = 'Cannot create reference file from ngs data. Abort!'
+    with pytest.raises(ValueError, match=exp_error) as fnfe:
+        fullpath = lusSTR.filter.main(args)
