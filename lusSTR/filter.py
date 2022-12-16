@@ -174,7 +174,7 @@ def STRmix_output(df, outdir, profile_type, datatype):
             metadata = filter_marker_data[key[1]]
             slope = metadata['Slope']
             intercept = metadata['Intercept']
-            data['Size'] = data['RU_Allele']*intercept + slope
+            data['Size'] = data['RU_Allele']*slope + intercept
             final_df = final_df.append(data)
         final_df.rename(
             {'RU_Allele': 'Allele', 'Reads': 'Height'}, axis=1, inplace=True
@@ -225,7 +225,6 @@ def reference_table(data):
 
 
 def main(args):
-    full_df = pd.read_csv(args.input, sep='\t')
     profile_type = args.profile
     if profile_type not in ("evidence", "reference"):
         raise ValueError(f"unknown profile type '{profile_type}'")
@@ -237,6 +236,7 @@ def main(args):
         raise ValueError(f"unknown output type '{output_type}'")
     if profile_type == "reference" and data_type == "ngs":
         raise ValueError("Cannot create reference file from ngs data. Abort!")
+    full_df = pd.read_csv(args.input, sep='\t')
     if args.out is None:
         outpath = sys.stdout
     else:

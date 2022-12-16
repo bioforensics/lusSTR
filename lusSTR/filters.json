@@ -14,8 +14,8 @@
         "SameSizeThresholdDynamicPercent": 0.20,
         "StutterThresholdDynamicPercent": 0.18,
         "StutterForwardThresholdDynamicPercent": 0,
-        "Slope": 70,
-        "Intercept": 4
+        "Intercept": 70,
+        "Slope": 4
     },
     "D10S1248": {
         "MinimumNumberReadsForDynamicThresholds": 650,
@@ -32,8 +32,8 @@
         "SameSizeThresholdDynamicPercent": 0.20,
         "StutterThresholdDynamicPercent": 0.40,
         "StutterForwardThresholdDynamicPercent": 0,
-        "Slope": 96,
-        "Intercept": 4
+        "Intercept": 96,
+        "Slope": 4
     },
     "D12S391": {
         "MinimumNumberReadsForDynamicThresholds": 650,
@@ -50,8 +50,8 @@
         "SameSizeThresholdDynamicPercent": 0.20,
         "StutterThresholdDynamicPercent": 0.40,
         "StutterForwardThresholdDynamicPercent": 0,
-        "Slope": 178,
-        "Intercept": 4
+        "Intercept": 178,
+        "Slope": 4
     },
     "D13S317": {
         "MinimumNumberReadsForDynamicThresholds": 650,
@@ -68,8 +68,8 @@
         "SameSizeThresholdDynamicPercent": 0.20,
         "StutterThresholdDynamicPercent": 0.21,
         "StutterForwardThresholdDynamicPercent": 0,
-        "Slope": 118,
-        "Intercept": 4
+        "Intercept": 118,
+        "Slope": 4
     },
     "D16S539": {
         "MinimumNumberReadsForDynamicThresholds": 650,
@@ -86,8 +86,8 @@
         "SameSizeThresholdDynamicPercent": 0.20,
         "StutterThresholdDynamicPercent": 0.40,
         "StutterForwardThresholdDynamicPercent": 0,
-        "Slope": 116,
-        "Intercept": 4
+        "Intercept": 116,
+        "Slope": 4
     },
     "D17S1301": {
         "MinimumNumberReadsForDynamicThresholds": 650,
@@ -104,8 +104,8 @@
         "SameSizeThresholdDynamicPercent": 0.20,
         "StutterThresholdDynamicPercent": 0.32,
         "StutterForwardThresholdDynamicPercent": 0,
-        "Slope": 94,
-        "Intercept": 4
+        "Intercept": 94,
+        "Slope": 4
     },
     "D18S51": {
         "MinimumNumberReadsForDynamicThresholds": 650,
@@ -122,8 +122,8 @@
         "SameSizeThresholdDynamicPercent": 0.20,
         "StutterThresholdDynamicPercent": 0.34,
         "StutterForwardThresholdDynamicPercent": 0,
-        "Slope": 113,
-        "Intercept": 4
+        "Intercept": 113,
+        "Slope": 4
     },
     "D19S433": {
         "MinimumNumberReadsForDynamicThresholds": 650,
@@ -140,8 +140,8 @@
         "SameSizeThresholdDynamicPercent": 0.20,
         "StutterThresholdDynamicPercent": 0.21,
         "StutterForwardThresholdDynamicPercent": 0.15,
-        "Slope": 132,
-        "Intercept": 4
+        "Intercept": 132,
+        "Slope": 4
     },
     "D1S1656": {
         "MinimumNumberReadsForDynamicThresholds": 650,
@@ -158,8 +158,8 @@
         "SameSizeThresholdDynamicPercent": 0.20,
         "StutterThresholdDynamicPercent": 0.33,
         "StutterForwardThresholdDynamicPercent": 0,
-        "Slope": 105,
-        "Intercept": 4
+        "Intercept": 105,
+        "Slope": 4
     },
     "D20S482": {
         "MinimumNumberReadsForDynamicThresholds": 650,
@@ -176,8 +176,8 @@
         "SameSizeThresholdDynamicPercent": 0.20,
         "StutterThresholdDynamicPercent": 0.24,
         "StutterForwardThresholdDynamicPercent": 0,
-        "Slope": 90,
-        "Intercept": 4
+        "Intercept": 90,
+        "Slope": 4
     },
     "D21S11": {
         "MinimumNumberReadsForDynamicThresholds": 650,
@@ -194,8 +194,8 @@
         "SameSizeThresholdDynamicPercent": 0.20,
         "StutterThresholdDynamicPercent": 0.20,
         "StutterForwardThresholdDynamicPercent": 0,
-        "Slope": 111,
-        "Intercept": 4
+        "Intercept": 111,
+        "Slope": 4
     },
     "D22S1045": {
         "MinimumNumberReadsForDynamicThresholds": 650,
@@ -212,8 +212,8 @@
         "SameSizeThresholdDynamicPercent": 0.20,
         "StutterThresholdDynamicPercent": 0.40,
         "StutterForwardThresholdDynamicPercent": 0,
-        "Slope": 169,
-        "Intercept": 3
+        "Intercept": 169,
+        "Slope": 3
     },
     "D2S1338": {
         "MinimumNumberReadsForDynamicThresholds": 650,
@@ -230,8 +230,8 @@
         "SameSizeThresholdDynamicPercent": 0.20,
         "StutterThresholdDynamicPercent": 0.29,
         "StutterForwardThresholdDynamicPercent": 0,
-        "Slope": 71,
-        "Intercept": 4
+        "Intercept": 71,
+        "Slope": 4
     },
     "D2S441": {
         "MinimumNumberReadsForDynamicThresholds": 650,
@@ -248,8 +248,8 @@
         "SameSizeThresholdDynamicPercent": 0.20,
         "StutterThresholdDynamicPercent": 0.16,
         "StutterForwardThresholdDynamicPercent": 0,
-        "Slope": 112,
-        "Intercept": 4
+        "Intercept": 112,
+        "Slope": 4
     },
     "D3S1358": {
         "MinimumNumberReadsForDynamicThresholds": 650,
@@ -266,8 +266,8 @@
         "SameSizeThresholdDynamicPercent": 0.20,
         "StutterThresholdDynamicPercent": 0.39,
         "StutterForwardThresholdDynamicPercent": 0,
-        "Slope": 106,
-        "Intercept": 4
+        "Intercept": 106,
+        "Slope": 4
     },
     "D4S2408": {
         "MinimumNumberReadsForDynamicThresholds": 650,
@@ -284,8 +284,8 @@
         "SameSizeThresholdDynamicPercent": 0.20,
         "StutterThresholdDynamicPercent": 0.16,
         "StutterForwardThresholdDynamicPercent": 0.03,
-        "Slope": 67,
-        "Intercept": 4
+        "Intercept": 67,
+        "Slope": 4
     },
     "D5S818": {
         "MinimumNumberReadsForDynamicThresholds": 650,
@@ -302,8 +302,8 @@
         "SameSizeThresholdDynamicPercent": 0.20,
         "StutterThresholdDynamicPercent": 0.21,
         "StutterForwardThresholdDynamicPercent": 0,
-        "Slope": 78,
-        "Intercept": 4
+        "Intercept": 78,
+        "Slope": 4
     },
     "D6S1043": {
         "MinimumNumberReadsForDynamicThresholds": 650,
@@ -320,8 +320,8 @@
         "SameSizeThresholdDynamicPercent": 0.20,
         "StutterThresholdDynamicPercent": 0.40,
         "StutterForwardThresholdDynamicPercent": 0,
-        "Slope": 127,
-        "Intercept": 4
+        "Intercept": 127,
+        "Slope": 4
     },
     "D7S820": {
         "MinimumNumberReadsForDynamicThresholds": 650,
@@ -338,8 +338,8 @@
         "SameSizeThresholdDynamicPercent": 0.20,
         "StutterThresholdDynamicPercent": 0.20,
         "StutterForwardThresholdDynamicPercent": 0,
-        "Slope": 116,
-        "Intercept": 4
+        "Intercept": 116,
+        "Slope": 4
     },
     "D8S1179": {
         "MinimumNumberReadsForDynamicThresholds": 650,
@@ -356,8 +356,8 @@
         "SameSizeThresholdDynamicPercent": 0.20,
         "StutterThresholdDynamicPercent": 0.40,
         "StutterForwardThresholdDynamicPercent": 0,
-        "Slope": 58,
-        "Intercept": 4
+        "Intercept": 58,
+        "Slope": 4
     },
     "D9S1122": {
         "MinimumNumberReadsForDynamicThresholds": 650,
@@ -374,8 +374,8 @@
         "SameSizeThresholdDynamicPercent": 0.20,
         "StutterThresholdDynamicPercent": 0.21,
         "StutterForwardThresholdDynamicPercent": 0,
-        "Slope": 73,
-        "Intercept": 4
+        "Intercept": 73,
+        "Slope": 4
     },
     "FGA": {
         "MinimumNumberReadsForDynamicThresholds": 650,
@@ -392,8 +392,8 @@
         "SameSizeThresholdDynamicPercent": 0.20,
         "StutterThresholdDynamicPercent": 0.33,
         "StutterForwardThresholdDynamicPercent": 0,
-        "Slope": 100,
-        "Intercept": 4
+        "Intercept": 100,
+        "Slope": 4
     },
     "PENTA D": {
         "MinimumNumberReadsForDynamicThresholds": 650,
@@ -410,8 +410,8 @@
         "SameSizeThresholdDynamicPercent": 0.20,
         "StutterThresholdDynamicPercent": 0.16,
         "StutterForwardThresholdDynamicPercent": 0,
-        "Slope": 203,
-        "Intercept": 5
+        "Intercept": 203,
+        "Slope": 5
     },
     "PENTA E": {
         "MinimumNumberReadsForDynamicThresholds": 650,
@@ -428,8 +428,8 @@
         "SameSizeThresholdDynamicPercent": 0.20,
         "StutterThresholdDynamicPercent": 0.18,
         "StutterForwardThresholdDynamicPercent": 0,
-        "Slope": 316,
-        "Intercept": 5
+        "Intercept": 316,
+        "Slope": 5
     },
     "TH01": {
         "MinimumNumberReadsForDynamicThresholds": 650,
@@ -446,8 +446,8 @@
         "SameSizeThresholdDynamicPercent": 0.20,
         "StutterThresholdDynamicPercent": 0.31,
         "StutterForwardThresholdDynamicPercent": 0,
-        "Slope": 84,
-        "Intercept": 4
+        "Intercept": 84,
+        "Slope": 4
     },
     "TPOX": {
         "MinimumNumberReadsForDynamicThresholds": 650,
@@ -464,8 +464,8 @@
         "SameSizeThresholdDynamicPercent": 0.20,
         "StutterThresholdDynamicPercent": 0.18,
         "StutterForwardThresholdDynamicPercent": 0,
-        "Slope": 45,
-        "Intercept": 4
+        "Intercept": 45,
+        "Slope": 4
     },
     "VWA": {
         "MinimumNumberReadsForDynamicThresholds": 650,
@@ -482,7 +482,7 @@
         "SameSizeThresholdDynamicPercent": 0.20,
         "StutterThresholdDynamicPercent": 0.40,
         "StutterForwardThresholdDynamicPercent": 0.22,
-        "Slope": 75,
-        "Intercept": 4
+        "Intercept": 75,
+        "Slope": 4
     }
 }
