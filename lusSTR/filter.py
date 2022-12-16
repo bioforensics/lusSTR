@@ -235,6 +235,8 @@ def main(args):
     output_type = args.output
     if output_type not in ("efm", "strmix"):
         raise ValueError(f"unknown output type '{output_type}'")
+    if profile_type == "reference" and data_type == "ngs":
+        raise ValueError("Cannot create reference file from ngs data. Abort!")
     if args.out is None:
         outpath = sys.stdout
     else:
