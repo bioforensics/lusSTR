@@ -198,7 +198,7 @@ def strmix_ce_processing(profile):
         metadata = filter_marker_data[key[1]]
         slope = metadata['Slope']
         intercept = metadata['Intercept']
-        data['Size'] = data['RU_Allele'] * intercept + slope
+        data['Size'] = data['RU_Allele'] * slope + intercept
         locus_df = locus_df.append(data)
     locus_df.rename(
         {'RU_Allele': 'Allele', 'Reads': 'Height'}, axis=1, inplace=True
@@ -236,7 +236,6 @@ def reference_table(data):
 
 
 def main(args):
-    full_df = pd.read_csv(args.input, sep='\t')
     profile_type = args.profile
     if profile_type not in ("evidence", "reference"):
         raise ValueError(f"unknown profile type '{profile_type}'")
@@ -246,6 +245,9 @@ def main(args):
     output_type = args.output
     if output_type not in ("efm", "strmix"):
         raise ValueError(f"unknown output type '{output_type}'")
+    if profile_type == "reference" and data_type == "ngs":
+        raise ValueError("Cannot create reference file from ngs data. Abort!")
+    full_df = pd.read_csv(args.input, sep='\t')
     if args.out is None:
         outpath = sys.stdout
     else:
