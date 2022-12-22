@@ -159,32 +159,30 @@ def determine_max_num_alleles(allele_heights):
 
 def STRmix_output(profile, outdir, profile_type, data_type):
     if profile_type == 'reference':
-        infile = profile[profile.allele_type == 'real_allele']
+        filtered_df = profile[profile.allele_type == 'real_allele']
     else:
-        infile = profile[profile.allele_type != 'noise']
+        filtered_df = profile[profile.allele_type != 'noise']
     if data_type == 'ce':
-        final_df = strmix_ce_processing(infile)
+        strmix_profile = strmix_ce_processing(filtered_df)
     else:
-        final_df = infile.loc[
+        strmix_profile = filtered_df.loc[
             :, ['SampleID', 'Locus', 'RU_Allele', 'UAS_Output_Sequence', 'Reads']
         ]
-        final_df.rename(
+        strmix_profile.rename(
             {'RU_Allele': 'CE Allele', 'UAS_Output_Sequence': 'Allele Seq'}, axis=1, inplace=True
         )
-    final_df.replace(
+    strmix_profile.replace(
             {'Locus': {'VWA': 'vWA', 'PENTA D': 'PentaD', 'PENTA E': 'PentaE'}}, inplace=True
         )
-    if outdir is None:
-        outdir = 'STRmix_Files'
     Path(outdir).mkdir(exist_ok=True)
-    id_list = final_df['SampleID'].unique()
+    id_list = strmix_profile['SampleID'].unique()
     for id in id_list:
-        df_sub = final_df[final_df['SampleID'] == id].reset_index(drop=True)
+        sample_df = strmix_profile[strmix_profile['SampleID'] == id].reset_index(drop=True)
         if profile_type == 'evidence':
-            df_sub.iloc[:, 1:].to_csv(f'{outdir}/{id}_{data_type}.csv', index=False)
+            sample_df.iloc[:, 1:].to_csv(f'{outdir}/{id}_{data_type}.csv', index=False)
         else:
-            ref_df = reference_table(df_sub.iloc[:, 1:3])
-            ref_df.to_csv(f'{outdir}/{id}_reference_{data_type}.csv', index=False)
+            reference_df = reference_table(sample_df.iloc[:, 1:3])
+            reference_df.to_csv(f'{outdir}/{id}_reference_{data_type}.csv', index=False)
 
 
 def strmix_ce_processing(profile):
@@ -206,16 +204,16 @@ def strmix_ce_processing(profile):
     return locus_df
 
 
-def reference_table(data):
+def reference_table(sample_data):
     new_rows = []
-    for i, row in data.iterrows():
-        locus = data.loc[i, 'Locus']
+    for i, row in sample_data.iterrows():
+        locus = sample_data.loc[i, 'Locus']
         try:
-            next_col = data.loc[i+1, 'Locus']
+            next_col = sample_data.loc[i+1, 'Locus']
         except KeyError:
             next_col = None
         try:
-            prev_col = data.loc[i-1, 'Locus']
+            prev_col = sample_data.loc[i-1, 'Locus']
         except KeyError:
             prev_col = None
         if next_col == prev_col:
@@ -229,8 +227,8 @@ def reference_table(data):
             continue
         else:
             new_rows.append(list(row))
-    new_df = pd.DataFrame(new_rows, columns=['Locus', 'Allele'])
-    concat_df = pd.concat([data, new_df]).reset_index(drop=True)
+    final_reference = pd.DataFrame(new_rows, columns=['Locus', 'Allele'])
+    concat_df = pd.concat([sample_data, final_reference]).reset_index(drop=True)
     sort_df = concat_df.sort_values(by=['Locus', 'Allele'])
     return sort_df
 
@@ -260,7 +258,7 @@ def main(args):
             STRmix_output(full_df, outpath, profile_type, data_type)
     else:
         dict_loc = {k: v for k, v in full_df.groupby(['SampleID', 'Locus'])}
-        final_df, flags_df = process_strs(dict_loc, args.data)
+        final_df, flags_df = process_strs(dict_loc, data_type)
         if output_type == 'efm':
             EFM_output(final_df, outpath, profile_type, args.separate)
         else:

@@ -304,7 +304,8 @@ def check_D7(df):
     for i in range(len(df)):
         al = df.loc[i, 'RU_Allele']
         try:
-            if str(al).split('.')[1] == '1':
+            if str(al).split('.')[1] == '1' and df.loc[i, 'allele_type'] != 'noise':
+                print('D7 microvariants detected! Check flagged file for details.')
                 new_df.loc[len(new_df.index)] = [
                     df.loc[0, 'SampleID'], df.loc[0, 'Locus'], 'Microvariant'
                 ]
