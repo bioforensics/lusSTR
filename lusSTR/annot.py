@@ -1,11 +1,14 @@
-#!/usr/bin/env python
+# -------------------------------------------------------------------------------------------------
+# Copyright (c) 2020, DHS.
 #
-# -----------------------------------------------------------------------------
-# Copyright (c) 2020, Battelle National Biodefense Institute.
+# This file is part of lusSTR (http://github.com/bioforensics/lusSTR) and is licensed under
+# the BSD license: see LICENSE.txt.
 #
-# This file is part of lusSTR (http://github.com/bioforensics/lusSTR)
-# and is licensed under the BSD license: see LICENSE.txt.
-# -----------------------------------------------------------------------------
+# This software was prepared for the Department of Homeland Security (DHS) by the Battelle National
+# Biodefense Institute, LLC (BNBI) as part of contract HSHQDC-15-C-00064 to manage and operate the
+# National Biodefense Analysis and Countermeasures Center (NBACC), a Federally Funded Research and
+# Development Center.
+# -------------------------------------------------------------------------------------------------
 
 import csv
 import json
@@ -21,17 +24,17 @@ from pkg_resources import resource_filename
 
 
 def get_str_metadata_file():
-    return resource_filename('lusSTR', 'str_markers.json')
+    return resource_filename("lusSTR", "str_markers.json")
 
 
-with open(get_str_metadata_file(), 'r') as fh:
+with open(get_str_metadata_file(), "r") as fh:
     str_marker_data = json.load(fh)
 
 
 def split_sequence_into_two_strings(sequence, repeat_for_split):
-    '''
+    """
     Function to split a sequence into two separate strings at a specified repeat unit.
-    '''
+    """
     last = 0
     prev = 0
     for m in re.finditer(repeat_for_split, sequence):
@@ -44,10 +47,10 @@ def split_sequence_into_two_strings(sequence, repeat_for_split):
     return first_string, second_string
 
 
-def format_table(input, uas=False, kit='forenseq'):
-    '''
+def format_table(input, uas=False, kit="forenseq"):
+    """
     Function to format final output table and the flanking report (if necessary).
-    '''
+    """
     data = pd.read_csv(input, keep_default_na=False)
     data.iloc[:, 3] = data.iloc[:, 3].astype(str)
     list_of_lists = []
@@ -61,37 +64,55 @@ def format_table(input, uas=False, kit='forenseq'):
             project = re.sub(" ", "_", data.iloc[i, 4])
             analysis = re.sub(" ", "_", data.iloc[i, 5])
         except IndexError:
-            project = 'NA'
-            analysis = 'NA'
+            project = "NA"
+            analysis = "NA"
         except TypeError:
             project = data.iloc[i, 4]
             analysis = data.iloc[i, 5]
-        if locus == 'PENTAD' or locus == 'PENTA_D':
-            locus = 'PENTA D'
-        if locus == 'PENTAE' or locus == 'PENTA_E':
-            locus = 'PENTA E'
-        if locus == 'DYS385A-B' or locus == 'DYS385':
-            locus = 'DYS385A-B'
-        if locus == 'AMELOGENIN':
+        if locus == "PENTAD" or locus == "PENTA_D":
+            locus = "PENTA D"
+        if locus == "PENTAE" or locus == "PENTA_E":
+            locus = "PENTA E"
+        if locus == "DYS385A-B" or locus == "DYS385":
+            locus = "DYS385A-B"
+        if locus == "AMELOGENIN":
             continue
         metadata = str_marker_data[locus]
-        if kit == 'forenseq':
-            remove_5p = metadata['Foren_5']
-            remove_3p = metadata['Foren_3']
+        if kit == "forenseq":
+            remove_5p = metadata["Foren_5"]
+            remove_3p = metadata["Foren_3"]
         else:
-            remove_5p = metadata['Power_5']
-            remove_3p = metadata['Power_3']
+            remove_5p = metadata["Power_5"]
+            remove_3p = metadata["Power_3"]
         if len(sequence) <= (remove_5p + remove_3p) and not uas:
             flank_summary = [
-                sampleid, project, analysis, locus, reads, 'NA', sequence, 'NA', 'NA', 'NA',
-                'Partial sequence'
+                sampleid,
+                project,
+                analysis,
+                locus,
+                reads,
+                "NA",
+                sequence,
+                "NA",
+                "NA",
+                "NA",
+                "Partial sequence",
             ]
             flanks_list.append(flank_summary)
             continue
-        elif 'N' in sequence:
+        elif "N" in sequence:
             flank_summary = [
-                sampleid, project, analysis, locus, reads, 'NA', sequence, 'NA', 'NA', 'NA',
-                'Sequence contains Ns'
+                sampleid,
+                project,
+                analysis,
+                locus,
+                reads,
+                "NA",
+                sequence,
+                "NA",
+                "NA",
+                "NA",
+                "Sequence contains Ns",
             ]
             flanks_list.append(flank_summary)
             continue
@@ -102,15 +123,33 @@ def format_table(input, uas=False, kit='forenseq'):
 
         if not uas:
             flank_summary = [
-                sampleid, project, analysis, locus, reads, marker.canonical, marker.sequence,
-                marker.flank_5p, marker.annotation, marker.flank_3p, marker.indel_flag
+                sampleid,
+                project,
+                analysis,
+                locus,
+                reads,
+                marker.canonical,
+                marker.sequence,
+                marker.flank_5p,
+                marker.annotation,
+                marker.flank_3p,
+                marker.indel_flag,
             ]
             flanks_list.append(flank_summary)
 
     columns = [
-        'SampleID', 'Project', 'Analysis', 'Locus', 'UAS_Output_Sequence',
-        'Forward_Strand_Sequence', 'RU_Allele', 'Forward_Strand_Bracketed_Notation',
-        'UAS_Output_Bracketed_Notation', 'LUS', 'LUS_Plus', 'Reads'
+        "SampleID",
+        "Project",
+        "Analysis",
+        "Locus",
+        "UAS_Output_Sequence",
+        "Forward_Strand_Sequence",
+        "RU_Allele",
+        "Forward_Strand_Bracketed_Notation",
+        "UAS_Output_Bracketed_Notation",
+        "LUS",
+        "LUS_Plus",
+        "Reads",
     ]
     if not list_of_lists:
         final_output = pd.DataFrame(list_of_lists, columns=columns)
@@ -118,47 +157,54 @@ def format_table(input, uas=False, kit='forenseq'):
         final_output = sort_table(pd.DataFrame(list_of_lists, columns=columns))
     if not uas:
         flanks_columns = [
-            'SampleID', 'Project', 'Analysis', 'Locus', 'Reads', 'RU_Allele',
-            'Full_Sequence', '5_Flank_Bracketed_Notation', 'UAS_Region_Bracketed_Notation',
-            '3_Flank_Bracketed_Notation', 'Potential_Issues'
+            "SampleID",
+            "Project",
+            "Analysis",
+            "Locus",
+            "Reads",
+            "RU_Allele",
+            "Full_Sequence",
+            "5_Flank_Bracketed_Notation",
+            "UAS_Region_Bracketed_Notation",
+            "3_Flank_Bracketed_Notation",
+            "Potential_Issues",
         ]
         if not flanks_list:
             final_flank_output = pd.DataFrame(flanks_list, columns=flanks_columns)
         else:
             final_flank_output = sort_table(pd.DataFrame(flanks_list, columns=flanks_columns))
     else:
-        final_flank_output = ''
+        final_flank_output = ""
     return final_output, final_flank_output, columns
 
 
 def combine_reads(table, columns):
-    comb_table = table.groupby(columns[:-1], as_index=False)['Reads'].sum()
+    comb_table = table.groupby(columns[:-1], as_index=False)["Reads"].sum()
     sorted = sort_table(comb_table)
     return sorted
 
 
 def sort_table(table):
     sorted_table = table.sort_values(
-                by=['SampleID', 'Project', 'Analysis', 'Locus', 'Reads', 'RU_Allele'],
-                ascending=False
-            )
+        by=["SampleID", "Project", "Analysis", "Locus", "Reads", "RU_Allele"], ascending=False
+    )
     return sorted_table
 
 
 def indiv_files(table, input_dir, ext):
-    output_dir = f'Separated_lusstr_Files/{input_dir}'
+    output_dir = f"Separated_lusstr_Files/{input_dir}"
     try:
         os.mkdir(output_dir)
     except FileExistsError:
         pass
-    for samp in table['SampleID'].unique():
-        new_df = table[table['SampleID'] == samp]
-        new_df.to_csv(f'{output_dir}/{samp}{ext}', sep='\t', index=False)
+    for samp in table["SampleID"].unique():
+        new_df = table[table["SampleID"] == samp]
+        new_df.to_csv(f"{output_dir}/{samp}{ext}", sep="\t", index=False)
 
 
 def main(args):
-    if args.separate and os.path.exists('Separated_lusstr_Files') is False:
-        os.mkdir('Separated_lusstr_Files')
+    if args.separate and os.path.exists("Separated_lusstr_Files") is False:
+        os.mkdir("Separated_lusstr_Files")
     output_name = os.path.splitext(args.out)[0]
     input_name = os.path.splitext(args.input)[0]
     autosomal_final_table, autosomal_flank_table, columns = format_table(
@@ -166,45 +212,41 @@ def main(args):
     )
     if args.sex:
         sex_final_table, sex_flank_table, columns = format_table(
-            f'{input_name}_sexloci.csv', args.uas, args.kit
+            f"{input_name}_sexloci.csv", args.uas, args.kit
         )
         if not args.uas:
-            sex_flank_table.to_csv(
-                f'{output_name}_sexloci_flanks_anno.txt', sep='\t', index=False
-            )
+            sex_flank_table.to_csv(f"{output_name}_sexloci_flanks_anno.txt", sep="\t", index=False)
             if args.combine:
                 if not sex_final_table.empty:
                     sex_final_table = combine_reads(sex_final_table, columns)
                 if args.separate:
-                    indiv_files(sex_final_table, input_name, '_sexloci.txt')
+                    indiv_files(sex_final_table, input_name, "_sexloci.txt")
                 else:
-                    sex_final_table.to_csv(f'{output_name}_sexloci.txt', sep='\t', index=False)
+                    sex_final_table.to_csv(f"{output_name}_sexloci.txt", sep="\t", index=False)
             else:
                 if args.separate:
-                    indiv_files(sex_final_table, input_name, '_sexloci_no_combined_reads.txt')
-                sex_final_table.to_csv(
-                    f'{output_name}_sexloci_no_combined_reads.txt', index=False
-                )
+                    indiv_files(sex_final_table, input_name, "_sexloci_no_combined_reads.txt")
+                sex_final_table.to_csv(f"{output_name}_sexloci_no_combined_reads.txt", index=False)
         else:
             if args.separate:
-                indiv_files(sex_final_table, input_name, '_sexloci.txt')
+                indiv_files(sex_final_table, input_name, "_sexloci.txt")
             else:
-                sex_final_table.to_csv(f'{output_name}_sexloci.txt', sep='\t', index=False)
+                sex_final_table.to_csv(f"{output_name}_sexloci.txt", sep="\t", index=False)
     if not args.uas:
-        autosomal_flank_table.to_csv(f'{output_name}_flanks_anno.txt', sep='\t', index=False)
+        autosomal_flank_table.to_csv(f"{output_name}_flanks_anno.txt", sep="\t", index=False)
         if args.combine:
             if not autosomal_final_table.empty:
                 autosomal_final_table = combine_reads(autosomal_final_table, columns)
                 if args.separate:
-                    indiv_files(autosomal_final_table, input_name, '.txt')
+                    indiv_files(autosomal_final_table, input_name, ".txt")
                 else:
-                    autosomal_final_table.to_csv(args.out, sep='\t', index=False)
+                    autosomal_final_table.to_csv(args.out, sep="\t", index=False)
         else:
             autosomal_final_table.to_csv(
-                f'{output_name}_no_combined_reads.txt', sep='\t', index=False
+                f"{output_name}_no_combined_reads.txt", sep="\t", index=False
             )
     else:
         if args.separate:
-            indiv_files(autosomal_final_table, input_name, '.txt')
+            indiv_files(autosomal_final_table, input_name, ".txt")
         else:
-            autosomal_final_table.to_csv(args.out, sep='\t', index=False)
+            autosomal_final_table.to_csv(args.out, sep="\t", index=False)

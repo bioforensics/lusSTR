@@ -8,13 +8,17 @@ help: Makefile
 test:
 	pytest --cov=lusSTR --doctest-modules lusSTR/annot.py lusSTR/tests/test_*.py
 
-## style:     check code style against PEP8
+## style:     check code style
 style:
-	pycodestyle --max-line-length=99 lusSTR/*.py lusSTR/tests/test_*.py
+	black --line-length=99 --check *.py lusSTR/*.py lusSTR/tests/test_*.py
+
+## format:    auto-reformat code with Black
+format:
+	black --line-length=99 *.py lusSTR/*.py lusSTR/tests/test_*.py
 
 ## devenv:    configure a development environment
 devenv:
-	conda install pycodestyle pytest pytest-cov
+	conda install black==22.6 pytest pytest-cov
 	pip install -e .
 	echo 'make style' > .git/hooks/pre-commit
 	chmod 755 .git/hooks/pre-commit
