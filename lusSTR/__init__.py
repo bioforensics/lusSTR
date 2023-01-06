@@ -11,6 +11,8 @@ from lusSTR import annot
 from lusSTR import marker
 from lusSTR import repeat
 from lusSTR import format
+from lusSTR import snps
+from lusSTR import filter
 from lusSTR import cli
 from ._version import get_versions
 __version__ = get_versions()['version']

@@ -1,8 +1,12 @@
 include versioneer.py
 include lusSTR/_version.py
+include lusSTR/filters.json
 include lusSTR/str_markers.json
 include lusSTR/snp_data.json
+include lusSTR/filters.json
 include lusSTR/tests/data/*
 include lusSTR/tests/data/STRait_Razor_test_output/*
 include lusSTR/tests/data/UAS_bulk_input/*
 include lusSTR/tests/data/snps/*
+include lusSTR/tests/data/RU_stutter_test/*
+include lusSTR/tests/data/NGS_stutter_test/*

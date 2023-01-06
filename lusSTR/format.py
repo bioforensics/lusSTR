@@ -26,7 +26,7 @@ def uas_load(inpath, sexloci=False):
     if os.path.isdir(inpath):
         auto_strs = pd.DataFrame()
         sex_strs = pd.DataFrame() if sexloci is True else None
-        files = glob.glob(os.path.join(inpath, '*.xlsx'))
+        files = glob.glob(os.path.join(inpath, '[!~]*.xlsx'))
         for filename in sorted(files):
             if 'Sample Details' not in filename:
                 continue
@@ -84,7 +84,7 @@ def strait_razor_concat(inpath, sexloci=False):
     sex_strs = pd.DataFrame() if sexloci is True else None
     if os.path.isdir(inpath):
         analysisID = os.path.basename(inpath.rstrip(os.sep))
-        files = glob.glob(os.path.join(inpath, '*.txt'))
+        files = glob.glob(os.path.join(inpath, '[!~]*.txt'))
         for filename in sorted(files):
             try:
                 table = strait_razor_table(filename, analysisID, sexloci)
