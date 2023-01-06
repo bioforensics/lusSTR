@@ -22,80 +22,47 @@ with open(get_filter_metadata_file(), 'r') as fh:
     filter_marker_data = json.load(fh)
 
 
-def filters(data_order, locus, total_reads, datatype):
+def filters(locus_allele_info, locus, total_reads, datatype):
     metadata = filter_marker_data[locus]
-    if len(data_order) == 1:
-        if thresholds('Detection', metadata, total_reads, data_order['Reads'][0])[1] is False:
-            data_order = pd.DataFrame()
-        elif thresholds('Analytical', metadata, total_reads, data_order['Reads'][0])[1] is False:
-            data_order[['allele_type', 'perc_noise']] = ['noise', 1.0]
-        elif thresholds('Analytical', metadata, total_reads, data_order['Reads'][0])[1] is True:
-            data_order['allele_type'] = 'real_allele'
+    if len(locus_allele_info) == 1:
+        locus_allele_info = single_allele_thresholds(metadata, total_reads, locus_allele_info)
     else:
-        for i in range(len(data_order)):  # check for alleles below detection threshold
-            al_reads = data_order.loc[i, 'Reads']
-            if thresholds('Detection', metadata, total_reads, al_reads)[1] is False:
-                data_order = data_order.drop(data_order.index[i])
-                total_reads = thresholds('Detection', metadata, total_reads, al_reads)[0]
-        data_order = data_order.reset_index(drop=True)
-        for i in range(len(data_order)):  # check for alleles below AT threshold
-            ref_allele_reads = data_order.loc[i, 'Reads']
-            if thresholds('Analytical', metadata, total_reads, ref_allele_reads)[1] is False:
-                data_order.loc[i, ['allele_type', 'perc_noise']] = [
-                    'noise', round(ref_allele_reads/total_reads, 3)
-                ]
-            else:
-                data_order.loc[i, 'allele_type'] = 'real_allele'
+        locus_allele_info, al_reads, total_reads = multiple_allele_thresholds(
+            metadata, total_reads, locus_allele_info
+        )
         if datatype == 'ce':
-            for i in range(len(data_order)):  # check for stutter alleles
-                if data_order.loc[i, 'allele_type'] != 'real_allele':
-                    continue
-                else:
-                    ref_allele_reads = data_order.loc[i, 'Reads']
-                    for j in range(len(data_order)):
-                        if j == i:
-                            continue
-                        init_type_all = data_order.loc[j, 'allele_type']
-                        if init_type_all == 'noise':
-                            continue
-                        al_reads = data_order.loc[j, 'Reads']
-                        ref_allele = float(data_order.loc[i, 'RU_Allele'])
-                        question_allele = float(data_order.loc[j, 'RU_Allele'])
-                        data_order.loc[j, ['allele_type', 'perc_stutter']] = allele_type_ru(
-                            ref_allele, question_allele, init_type_all, metadata, al_reads,
-                            ref_allele_reads, data_order.loc[j, 'allele1_ref_reads'], data_order
-                        )
-                        if 'stutter' in data_order.loc[j, 'allele_type']:
-                            if (
-                                '/' in data_order.loc[j, 'allele_type'] and
-                                pd.isnull(data_order.loc[j, 'stuttering_allele2'])
-                            ):
-                                data_order.loc[j, ['stuttering_allele2', 'allele2_ref_reads']] = [
-                                    ref_allele, ref_allele_reads
-                                ]
-                            elif pd.isnull(data_order.loc[j, 'stuttering_allele1']):
-                                data_order.loc[j, ['stuttering_allele1', 'allele1_ref_reads']] = [
-                                    ref_allele, ref_allele_reads
-                                ]
-                for j in range(len(data_order)):
-                    type_all = data_order.loc[j, 'allele_type']
-                    if 'stutter' in type_all:
-                        if '/' not in type_all:
-                            if pd.isnull(data_order.loc[j, 'perc_stutter']):
-                                data_order.loc[j, 'perc_stutter'] = round(
-                                    data_order.loc[j, 'Reads'] /
-                                    data_order.loc[j, 'allele1_ref_reads'], 3
-                                )
-                        else:
-                            data_order.loc[j, 'perc_stutter'] = ''
-                        data_order.loc[j, 'perc_noise'] = ''
-                    elif 'noise' in data_order.loc[j, 'allele_type']:
-                        data_order.loc[j, 'perc_noise'] = round(
-                                data_order.loc[j, 'Reads']/total_reads, 3
-                            )
+            locus_allele_info = ce_filtering(locus_allele_info, total_reads, metadata)
         else:
-            data_order = same_size_filter(data_order, metadata)
-    return data_order
+            locus_allele_info = same_size_filter(locus_allele_info, metadata)
+    return locus_allele_info
+
+
+def single_allele_thresholds(metadata, total_reads, single_all_df):
+    if thresholds('Detection', metadata, total_reads, single_all_df['Reads'][0])[1] is False:
+        single_all_df = pd.DataFrame()
+    elif thresholds('Analytical', metadata, total_reads, single_all_df['Reads'][0])[1] is False:
+        single_all_df[['allele_type', 'perc_noise']] = ['noise', 1.0]
+    elif thresholds('Analytical', metadata, total_reads, single_all_df['Reads'][0])[1] is True:
+        single_all_df['allele_type'] = 'real_allele'
+    return single_all_df
+
+
+def multiple_allele_thresholds(metadata, total_reads, locus_allele_info):
+    for i in range(len(locus_allele_info)):  # check for alleles below detection threshold
+        al_reads = locus_allele_info.loc[i, 'Reads']
+        if thresholds('Detection', metadata, total_reads, al_reads)[1] is False:
+            locus_allele_info = locus_allele_info.drop(locus_allele_info.index[i])
+            total_reads = thresholds('Detection', metadata, total_reads, al_reads)[0]
+    locus_allele_info = locus_allele_info.reset_index(drop=True)
+    for i in range(len(locus_allele_info)):  # check for alleles below AT threshold
+        ref_allele_reads = locus_allele_info.loc[i, 'Reads']
+        if thresholds('Analytical', metadata, total_reads, ref_allele_reads)[1] is False:
+            locus_allele_info.loc[i, ['allele_type', 'perc_noise']] = [
+                'noise', round(ref_allele_reads/total_reads, 3)
+            ]
+        else:
+            locus_allele_info.loc[i, 'allele_type'] = 'real_allele'
+    return locus_allele_info, al_reads, total_reads
 
 
 def thresholds(filter, metadata, total_reads, al_reads):
@@ -128,6 +95,64 @@ def thresholds(filter, metadata, total_reads, al_reads):
         return total_reads, False
     else:
         return total_reads, True
+
+
+def ce_filtering(locus_allele_info, total_reads, metadata):
+    for i in range(len(locus_allele_info)):  # check for stutter alleles
+        if locus_allele_info.loc[i, 'allele_type'] != 'real_allele':
+            continue
+        else:
+            ref_allele_reads = locus_allele_info.loc[i, 'Reads']
+            for j in range(len(locus_allele_info)):
+                if j == i:
+                    continue
+                init_type_all = locus_allele_info.loc[j, 'allele_type']
+                if init_type_all == 'noise':
+                    continue
+                locus_allele_info = ce_allele_ident(
+                    locus_allele_info, init_type_all, metadata, ref_allele_reads, i, j
+                )
+        for j in range(len(locus_allele_info)):
+            type_all = locus_allele_info.loc[j, 'allele_type']
+            if 'stutter' in type_all:
+                if '/' not in type_all:
+                    if pd.isnull(locus_allele_info.loc[j, 'perc_stutter']):
+                        locus_allele_info.loc[j, 'perc_stutter'] = round(
+                            locus_allele_info.loc[j, 'Reads'] /
+                            locus_allele_info.loc[j, 'allele1_ref_reads'], 3
+                        )
+                else:
+                    locus_allele_info.loc[j, 'perc_stutter'] = ''
+                locus_allele_info.loc[j, 'perc_noise'] = ''
+            elif 'noise' in locus_allele_info.loc[j, 'allele_type']:
+                locus_allele_info.loc[j, 'perc_noise'] = round(
+                        locus_allele_info.loc[j, 'Reads']/total_reads, 3
+                    )
+    return locus_allele_info
+
+
+def ce_allele_ident(locus_allele_info, init_type_all, metadata, ref_allele_reads, i, j):
+    al_reads = locus_allele_info.loc[j, 'Reads']
+    ref_allele = float(locus_allele_info.loc[i, 'RU_Allele'])
+    question_allele = float(locus_allele_info.loc[j, 'RU_Allele'])
+    locus_allele_info.loc[j, ['allele_type', 'perc_stutter']] = allele_type_ru(
+        ref_allele, question_allele, init_type_all, metadata, al_reads,
+        ref_allele_reads, locus_allele_info.loc[j, 'allele1_ref_reads'],
+        locus_allele_info
+    )
+    if 'stutter' in locus_allele_info.loc[j, 'allele_type']:
+        if (
+            '/' in locus_allele_info.loc[j, 'allele_type'] and
+            pd.isnull(locus_allele_info.loc[j, 'stuttering_allele2'])
+        ):
+            locus_allele_info.loc[j, ['stuttering_allele2', 'allele2_ref_reads']] = [
+                ref_allele, ref_allele_reads
+            ]
+        elif pd.isnull(locus_allele_info.loc[j, 'stuttering_allele1']):
+            locus_allele_info.loc[j, ['stuttering_allele1', 'allele1_ref_reads']] = [
+                ref_allele, ref_allele_reads
+            ]
+    return locus_allele_info
 
 
 def minus1_stutter(
@@ -211,7 +236,7 @@ def plus1_stutter(all_type, stutter_thresh, forward_thresh, ref_reads, al1_ref_r
     return all_type, stut_perc
 
 
-def allele_type_ru(ref, ru, all_type, metadata, al_reads, ref_reads, al1_ref_reads, data):
+def allele_type_ru(ref, ru, all_type, metadata, al_reads, ref_reads, al1_ref_reads, all_type_df):
     stutter_thresh = metadata['StutterThresholdDynamicPercent']
     forward_thresh = metadata['StutterForwardThresholdDynamicPercent']
     stutter_thresh_reads = np.ceil(stutter_thresh * ref_reads)
@@ -223,8 +248,8 @@ def allele_type_ru(ref, ru, all_type, metadata, al_reads, ref_reads, al1_ref_rea
             al1_ref_reads, al_reads
         )
     elif allele_diff == 2 and ref_reads > al_reads:  # -2 stutter
-        if check_2stutter(data, 'ru', ru)[0] is True:
-            ref_reads = check_2stutter(data, 'ru', ru)[1]
+        if check_2stutter(all_type_df, 'ru', ru)[0] is True:
+            ref_reads = check_2stutter(all_type_df, 'ru', ru)[1]
             stutter_thresh_reads = stutter_thresh * ref_reads
             all_type, stut_perc = minus2_stutter(
                 all_type, stutter_thresh_reads, forward_thresh, stutter_thresh_reads,
@@ -256,70 +281,70 @@ def forward_stut_thresh(perc, perc_stut, reads):
     return forward_thresh
 
 
-def check_2stutter(data, allele_des, allele):
+def check_2stutter(stutter_df, allele_des, allele):
     is_true, reads = False, None
-    if '-1_stutter' in data.loc[:, 'allele_type'].values:
+    if '-1_stutter' in stutter_df.loc[:, 'allele_type'].values:
         if allele_des == 'ru':
-            for k, row in data.iterrows():
-                ru_test = data.loc[k, 'RU_Allele']
-                if ru_test - allele == 1 and data.loc[k, 'allele_type'] == '-1_stutter':
-                    is_true, reads = True, data.loc[k, 'Reads']
+            for k, row in stutter_df.iterrows():
+                ru_test = stutter_df.loc[k, 'RU_Allele']
+                if ru_test - allele == 1 and stutter_df.loc[k, 'allele_type'] == '-1_stutter':
+                    is_true, reads = True, stutter_df.loc[k, 'Reads']
                     break
     return is_true, reads
 
 
-def allele_counts(df):
-    new_df = pd.DataFrame(columns=['SampleID', 'Locus', 'Flags'])
+def allele_counts(allele_df):
+    mix_df = pd.DataFrame(columns=['SampleID', 'Locus', 'Flags'])
     try:
-        if df.allele_type.value_counts()['real_allele'] > 2:
-            new_df.loc[len(new_df.index)] = [
-                df.loc[1, 'SampleID'], df.loc[1, 'Locus'], '>2Alleles'
+        if allele_df.allele_type.value_counts()['real_allele'] > 2:
+            mix_df.loc[len(mix_df.index)] = [
+                allele_df.loc[1, 'SampleID'], allele_df.loc[1, 'Locus'], '>2Alleles'
             ]
     except (KeyError, AttributeError):
         pass
-    return new_df
+    return mix_df
 
 
-def allele_imbalance_check(df):
-    new_df = pd.DataFrame(columns=['SampleID', 'Locus', 'Flags'])
+def allele_imbalance_check(allele_df):
+    imbalance_df = pd.DataFrame(columns=['SampleID', 'Locus', 'Flags'])
     try:
-        locus = df.loc[0, 'Locus']
+        locus = allele_df.loc[0, 'Locus']
         metadata = filter_marker_data[locus]
         het_perc = metadata['MinimumHeterozygousBalanceThresholdDynamicPercent']
-        if df.allele_type.value_counts()['real_allele'] >= 2:
-            real_df = df[df['allele_type'] == 'real_allele'].reset_index(drop=True)
+        if allele_df.allele_type.value_counts()['real_allele'] >= 2:
+            real_df = allele_df[allele_df['allele_type'] == 'real_allele'].reset_index(drop=True)
             max_reads = real_df['Reads'].max()
             min_reads = real_df['Reads'].min()
             if min_reads / max_reads < het_perc:
-                new_df.loc[len(new_df.index)] = [
+                imbalance_df.loc[len(imbalance_df.index)] = [
                     real_df.loc[0, 'SampleID'], locus, 'IntraLocusImbalance'
                     ]
     except (KeyError, AttributeError):
         pass
-    return new_df
+    return imbalance_df
 
 
-def check_D7(df):
-    new_df = pd.DataFrame(columns=['SampleID', 'Locus', 'Flags'])
-    for i in range(len(df)):
-        al = df.loc[i, 'RU_Allele']
+def check_D7(allele_df):
+    D7_df = pd.DataFrame(columns=['SampleID', 'Locus', 'Flags'])
+    for i in range(len(allele_df)):
+        al = allele_df.loc[i, 'RU_Allele']
         try:
-            if str(al).split('.')[1] == '1' and df.loc[i, 'allele_type'] != 'noise':
+            if str(al).split('.')[1] == '1' and allele_df.loc[i, 'allele_type'] != 'noise':
                 print('D7 microvariants detected! Check flagged file for details.')
-                new_df.loc[len(new_df.index)] = [
-                    df.loc[0, 'SampleID'], df.loc[0, 'Locus'], 'Microvariant'
+                D7_df.loc[len(D7_df.index)] = [
+                    allele_df.loc[0, 'SampleID'], allele_df.loc[0, 'Locus'], 'Microvariant'
                 ]
         except IndexError:
             continue
-    return new_df
+    return D7_df
 
 
-def flags(df):
-    new_df = pd.DataFrame(columns=['SampleID', 'Locus', 'Flags'])
-    new_df = new_df.append(allele_counts(df))
-    new_df = new_df.append(allele_imbalance_check(df))
-    new_df = new_df.append(check_D7(df))
-    return new_df
+def flags(allele_df):
+    flags_df = pd.DataFrame(columns=['SampleID', 'Locus', 'Flags'])
+    flags_df = flags_df.append(allele_counts(allele_df))
+    flags_df = flags_df.append(allele_imbalance_check(allele_df))
+    flags_df = flags_df.append(check_D7(allele_df))
+    return flags_df
 
 
 def same_size_filter(df, metadata):
