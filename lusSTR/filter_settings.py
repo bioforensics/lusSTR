@@ -8,7 +8,6 @@
 # -----------------------------------------------------------------------------
 
 import json
-import lusSTR
 import numpy as np
 import pandas as pd
 from pkg_resources import resource_filename
@@ -22,57 +21,57 @@ with open(get_filter_metadata_file(), 'r') as fh:
     filter_marker_data = json.load(fh)
 
 
-def filters(locus_allele_info, locus, total_reads, datatype):
+def filters(locus_allele_info, locus, locus_reads, datatype):
     metadata = filter_marker_data[locus]
     if len(locus_allele_info) == 1:
-        locus_allele_info = single_allele_thresholds(metadata, total_reads, locus_allele_info)
+        locus_allele_info = single_allele_thresholds(metadata, locus_reads, locus_allele_info)
     else:
-        locus_allele_info, al_reads, total_reads = multiple_allele_thresholds(
-            metadata, total_reads, locus_allele_info
+        locus_allele_info, locus_reads = multiple_allele_thresholds(
+            metadata, locus_reads, locus_allele_info
         )
         if datatype == 'ce':
-            locus_allele_info = ce_filtering(locus_allele_info, total_reads, metadata)
+            locus_allele_info = ce_filtering(locus_allele_info, locus_reads, metadata)
         else:
             locus_allele_info = same_size_filter(locus_allele_info, metadata)
     return locus_allele_info
 
 
-def single_allele_thresholds(metadata, total_reads, single_all_df):
-    if thresholds('Detection', metadata, total_reads, single_all_df['Reads'][0])[1] is False:
+def single_allele_thresholds(metadata, locus_reads, single_all_df):
+    if thresholds('Detection', metadata, locus_reads, single_all_df['Reads'][0])[1] is False:
         single_all_df = pd.DataFrame()
-    elif thresholds('Analytical', metadata, total_reads, single_all_df['Reads'][0])[1] is False:
+    elif thresholds('Analytical', metadata, locus_reads, single_all_df['Reads'][0])[1] is False:
         single_all_df[['allele_type', 'perc_noise']] = ['noise', 1.0]
-    elif thresholds('Analytical', metadata, total_reads, single_all_df['Reads'][0])[1] is True:
+    elif thresholds('Analytical', metadata, locus_reads, single_all_df['Reads'][0])[1] is True:
         single_all_df['allele_type'] = 'real_allele'
     return single_all_df
 
 
-def multiple_allele_thresholds(metadata, total_reads, locus_allele_info):
+def multiple_allele_thresholds(metadata, locus_reads, locus_allele_info):
     for i in range(len(locus_allele_info)):  # check for alleles below detection threshold
-        al_reads = locus_allele_info.loc[i, 'Reads']
-        if thresholds('Detection', metadata, total_reads, al_reads)[1] is False:
+        quest_al_reads = locus_allele_info.loc[i, 'Reads']
+        if thresholds('Detection', metadata, locus_reads, quest_al_reads)[1] is False:
             locus_allele_info = locus_allele_info.drop(locus_allele_info.index[i])
-            total_reads = thresholds('Detection', metadata, total_reads, al_reads)[0]
+            locus_reads = thresholds('Detection', metadata, locus_reads, quest_al_reads)[0]
     locus_allele_info = locus_allele_info.reset_index(drop=True)
     for i in range(len(locus_allele_info)):  # check for alleles below AT threshold
-        ref_allele_reads = locus_allele_info.loc[i, 'Reads']
-        if thresholds('Analytical', metadata, total_reads, ref_allele_reads)[1] is False:
+        quest_allele_reads = locus_allele_info.loc[i, 'Reads']
+        if thresholds('Analytical', metadata, locus_reads, quest_allele_reads)[1] is False:
             locus_allele_info.loc[i, ['allele_type', 'perc_noise']] = [
-                'noise', round(ref_allele_reads/total_reads, 3)
+                'noise', round(quest_allele_reads/locus_reads, 3)
             ]
         else:
             locus_allele_info.loc[i, 'allele_type'] = 'real_allele'
-    return locus_allele_info, al_reads, total_reads
+    return locus_allele_info, locus_reads
 
 
-def thresholds(filter, metadata, total_reads, al_reads):
+def thresholds(filter, metadata, locus_reads, quest_al_reads):
     use = metadata[f'{filter}ThresholdUse']
     count = metadata[f'{filter}ThresholdStaticCount']
     perc = metadata[f'{filter}ThresholdDynamicPercent']
-    thresh_perc = round(perc * total_reads, 1)
+    thresh_perc = round(perc * locus_reads, 1)
     if (
         use.lower() == 'dynamic' and
-        total_reads < metadata['MinimumNumberReadsForDynamicThresholds']
+        locus_reads < metadata['MinimumNumberReadsForDynamicThresholds']
     ):
         use = 'static'
     if use.lower() == 'both':
@@ -89,15 +88,15 @@ def thresholds(filter, metadata, total_reads, al_reads):
             f'Specified {filter} Threshold Use Not Acceptable!'
             f'Check filters.json file and re-run.'
         )
-    if al_reads < thresh:
+    if quest_al_reads < thresh:
         if filter == 'Detection':
-            total_reads = total_reads - al_reads
-        return total_reads, False
+            locus_reads = locus_reads - quest_al_reads
+        return locus_reads, False
     else:
-        return total_reads, True
+        return locus_reads, True
 
 
-def ce_filtering(locus_allele_info, total_reads, metadata):
+def ce_filtering(locus_allele_info, locus_reads, metadata):
     for i in range(len(locus_allele_info)):  # check for stutter alleles
         if locus_allele_info.loc[i, 'allele_type'] != 'real_allele':
             continue
@@ -126,17 +125,17 @@ def ce_filtering(locus_allele_info, total_reads, metadata):
                 locus_allele_info.loc[j, 'perc_noise'] = ''
             elif 'noise' in locus_allele_info.loc[j, 'allele_type']:
                 locus_allele_info.loc[j, 'perc_noise'] = round(
-                        locus_allele_info.loc[j, 'Reads']/total_reads, 3
+                        locus_allele_info.loc[j, 'Reads']/locus_reads, 3
                     )
     return locus_allele_info
 
 
 def ce_allele_ident(locus_allele_info, init_type_all, metadata, ref_allele_reads, i, j):
-    al_reads = locus_allele_info.loc[j, 'Reads']
+    quest_al_reads = locus_allele_info.loc[j, 'Reads']
     ref_allele = float(locus_allele_info.loc[i, 'RU_Allele'])
     question_allele = float(locus_allele_info.loc[j, 'RU_Allele'])
     locus_allele_info.loc[j, ['allele_type', 'perc_stutter']] = allele_type_ru(
-        ref_allele, question_allele, init_type_all, metadata, al_reads,
+        ref_allele, question_allele, init_type_all, metadata, quest_al_reads,
         ref_allele_reads, locus_allele_info.loc[j, 'allele1_ref_reads'],
         locus_allele_info
     )
@@ -157,7 +156,7 @@ def ce_allele_ident(locus_allele_info, init_type_all, metadata, ref_allele_reads
 
 def minus1_stutter(
     all_type, stutter_thresh, forward_thresh, stutter_thresh_reads,
-    ref_reads, al1_ref_reads, al_reads
+    ref_reads, al1_ref_reads, quest_al_reads
 ):
     stut_perc = None
     if all_type == '+1_stutter':
@@ -166,16 +165,16 @@ def minus1_stutter(
             forward_stut_thresh(forward_thresh, stutter_thresh, al1_ref_reads)
         )
         all_type = output_allele_call(
-            al_reads, all_thresh, '-1_stutter/+1_stutter'
+            quest_al_reads, all_thresh, '-1_stutter/+1_stutter'
         )
     elif all_type == '-2_stutter':
         all_thresh = stutter_thresh_reads + np.ceil(stutter_thresh * al1_ref_reads)
         all_type = output_allele_call(
-            al_reads, all_thresh, '-1_stutter/-2_stutter'
+            quest_al_reads, all_thresh, '-1_stutter/-2_stutter'
         )
-    elif al_reads <= stutter_thresh_reads:
+    elif quest_al_reads <= stutter_thresh_reads:
         all_type = '-1_stutter'
-        stut_perc = round(al_reads/ref_reads, 3)
+        stut_perc = round(quest_al_reads/ref_reads, 3)
     else:
         all_type = 'real_allele'
     return all_type, stut_perc
@@ -183,7 +182,7 @@ def minus1_stutter(
 
 def minus2_stutter(
     all_type, stutter_thresh, forward_thresh, stutter_thresh_reads, ref_reads,
-    al1_ref_reads, al_reads
+    al1_ref_reads, quest_al_reads
 ):
     stut_perc = None
     if all_type == '-1_stutter':
@@ -192,7 +191,7 @@ def minus2_stutter(
             np.ceil(stutter_thresh * al1_ref_reads)
         )
         all_type = output_allele_call(
-            al_reads, all_thresh, '-1_stutter/-2_stutter'
+            quest_al_reads, all_thresh, '-1_stutter/-2_stutter'
         )
     elif all_type == '+1_stutter':
         all_thresh = (
@@ -200,17 +199,19 @@ def minus2_stutter(
             forward_stut_thresh(forward_thresh, stutter_thresh, al1_ref_reads)
         )
         all_type = output_allele_call(
-            al_reads, all_thresh, '+1_stutter/-2_stutter'
+            quest_al_reads, all_thresh, '+1_stutter/-2_stutter'
         )
-    elif al_reads <= stutter_thresh_reads:
+    elif quest_al_reads <= stutter_thresh_reads:
         all_type = '-2_stutter'
-        stut_perc = round(al_reads / ref_reads, 3)
+        stut_perc = round(quest_al_reads / ref_reads, 3)
     else:
         all_type = 'real_allele'
     return all_type, stut_perc
 
 
-def plus1_stutter(all_type, stutter_thresh, forward_thresh, ref_reads, al1_ref_reads, al_reads):
+def plus1_stutter(
+    all_type, stutter_thresh, forward_thresh, ref_reads, al1_ref_reads, quest_al_reads
+):
     stut_perc = None
     if all_type == '-1_stutter':
         all_thresh = (
@@ -218,7 +219,7 @@ def plus1_stutter(all_type, stutter_thresh, forward_thresh, ref_reads, al1_ref_r
             forward_stut_thresh(forward_thresh, stutter_thresh, ref_reads)
         )
         all_type = output_allele_call(
-            al_reads, all_thresh, '-1_stutter/+1_stutter'
+            quest_al_reads, all_thresh, '-1_stutter/+1_stutter'
         )
     elif all_type == '-2_stutter':
         all_thresh = (
@@ -226,47 +227,49 @@ def plus1_stutter(all_type, stutter_thresh, forward_thresh, ref_reads, al1_ref_r
             forward_stut_thresh(forward_thresh, stutter_thresh, ref_reads)
         )
         all_type = output_allele_call(
-            al_reads, all_thresh, '+1_stutter/-2_stutter'
+            quest_al_reads, all_thresh, '+1_stutter/-2_stutter'
         )
-    elif al_reads <= forward_stut_thresh(forward_thresh, stutter_thresh, ref_reads):
+    elif quest_al_reads <= forward_stut_thresh(forward_thresh, stutter_thresh, ref_reads):
         all_type = '+1_stutter'
-        stut_perc = round(al_reads/ref_reads, 3)
+        stut_perc = round(quest_al_reads/ref_reads, 3)
     else:
         all_type = 'real_allele'
     return all_type, stut_perc
 
 
-def allele_type_ru(ref, ru, all_type, metadata, al_reads, ref_reads, al1_ref_reads, all_type_df):
+def allele_type_ru(
+    ref, ru, all_type, metadata, quest_al_reads, ref_reads, al1_ref_reads, all_type_df
+):
     stutter_thresh = metadata['StutterThresholdDynamicPercent']
     forward_thresh = metadata['StutterForwardThresholdDynamicPercent']
     stutter_thresh_reads = np.ceil(stutter_thresh * ref_reads)
     stut_perc = None
     allele_diff = round(ref - ru, 1)
-    if allele_diff == 1 and ref_reads > al_reads:  # -1 stutter
+    if allele_diff == 1 and ref_reads > quest_al_reads:  # -1 stutter
         all_type, stut_perc = minus1_stutter(
             all_type, stutter_thresh, forward_thresh, stutter_thresh_reads, ref_reads,
-            al1_ref_reads, al_reads
+            al1_ref_reads, quest_al_reads
         )
-    elif allele_diff == 2 and ref_reads > al_reads:  # -2 stutter
+    elif allele_diff == 2 and ref_reads > quest_al_reads:  # -2 stutter
         if check_2stutter(all_type_df, 'ru', ru)[0] is True:
             ref_reads = check_2stutter(all_type_df, 'ru', ru)[1]
             stutter_thresh_reads = stutter_thresh * ref_reads
             all_type, stut_perc = minus2_stutter(
                 all_type, stutter_thresh_reads, forward_thresh, stutter_thresh_reads,
-                ref_reads, al1_ref_reads, al_reads
+                ref_reads, al1_ref_reads, quest_al_reads
             )
-    elif allele_diff == -1 and ref_reads > al_reads:  # +1 stutter
+    elif allele_diff == -1 and ref_reads > quest_al_reads:  # +1 stutter
         all_type, stut_perc = plus1_stutter(
             all_type, stutter_thresh, forward_thresh, ref_reads,
-            al1_ref_reads, al_reads
+            al1_ref_reads, quest_al_reads
         )
     elif pd.isnull(all_type):
         all_type = 'noise'
     return all_type, stut_perc
 
 
-def output_allele_call(al_reads, all_thresh, orig_type):
-    if al_reads <= all_thresh:
+def output_allele_call(quest_al_reads, all_thresh, orig_type):
+    if quest_al_reads <= all_thresh:
         all_type = orig_type
     else:
         all_type = 'real_allele'
