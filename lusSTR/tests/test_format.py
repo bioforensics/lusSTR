@@ -1,11 +1,14 @@
-#!/usr/bin/env python
+# -------------------------------------------------------------------------------------------------
+# Copyright (c) 2020, DHS.
 #
-# -----------------------------------------------------------------------------
-# Copyright (c) 2020, Battelle National Biodefense Institute.
+# This file is part of lusSTR (http://github.com/bioforensics/lusSTR) and is licensed under
+# the BSD license: see LICENSE.txt.
 #
-# This file is part of lusSTR (http://github.com/bioforensics/lusSTR)
-# and is licensed under the BSD license: see LICENSE.txt.
-# -----------------------------------------------------------------------------
+# This software was prepared for the Department of Homeland Security (DHS) by the Battelle National
+# Biodefense Institute, LLC (BNBI) as part of contract HSHQDC-15-C-00064 to manage and operate the
+# National Biodefense Analysis and Countermeasures Center (NBACC), a Federally Funded Research and
+# Development Center.
+# -------------------------------------------------------------------------------------------------
 
 import filecmp
 import lusSTR
@@ -17,87 +20,90 @@ from tempfile import NamedTemporaryFile
 
 
 def test_format():
-    UAStestfile = data_file('snps/Positive Control Sample Details Report 2315.xlsx')
-    formatoutput = data_file('testformat.csv')
-    with NamedTemporaryFile(suffix='.csv') as outfile:
-        arglist = ['format', UAStestfile, '-o', outfile.name, '--uas']
+    UAStestfile = data_file("snps/Positive Control Sample Details Report 2315.xlsx")
+    formatoutput = data_file("testformat.csv")
+    with NamedTemporaryFile(suffix=".csv") as outfile:
+        arglist = ["format", UAStestfile, "-o", outfile.name, "--uas"]
         args = lusSTR.cli.get_parser().parse_args(arglist)
         lusSTR.format.main(args)
         assert filecmp.cmp(formatoutput, outfile.name) is True
 
 
 def test_format_stdout(capsys):
-    UAStestfile = data_file('snps/Positive Control Sample Details Report 2315.xlsx')
-    formatoutput = data_file('testformat.csv')
-    arglist = ['format', UAStestfile, '--uas']
+    UAStestfile = data_file("snps/Positive Control Sample Details Report 2315.xlsx")
+    formatoutput = data_file("testformat.csv")
+    arglist = ["format", UAStestfile, "--uas"]
     args = lusSTR.cli.get_parser().parse_args(arglist)
     lusSTR.format.main(args)
-    with open(formatoutput, 'r') as fh:
+    with open(formatoutput, "r") as fh:
         exp_out = fh.read().strip()
     terminal = capsys.readouterr()
     obs_out = terminal.out.strip()
     assert obs_out == exp_out
 
 
-@pytest.mark.parametrize('input, testoutput', [
-    ('STRait_Razor_test_output', 'STRait_Razor_test_output.csv'),
-    ('STRait_Razor_test_output/A001.txt', 'STRaitRazor_output_test_A001.csv')
-])
+@pytest.mark.parametrize(
+    "input, testoutput",
+    [
+        ("STRait_Razor_test_output", "STRait_Razor_test_output.csv"),
+        ("STRait_Razor_test_output/A001.txt", "STRaitRazor_output_test_A001.csv"),
+    ],
+)
 def test_format_straitrazor(input, testoutput):
     with NamedTemporaryFile() as outfile:
         inputdb = data_file(input)
         testformat = data_file(testoutput)
-        arglist = ['format', inputdb, '-o', outfile.name]
+        arglist = ["format", inputdb, "-o", outfile.name]
         args = lusSTR.cli.get_parser().parse_args(arglist)
         lusSTR.format.main(args)
         assert filecmp.cmp(testformat, outfile.name) is True
 
 
 def test_format_sexloci_uas():
-    UAStestfile = data_file('snps/Positive Control Sample Details Report 2315.xlsx')
-    formatoutput = data_file('testformat_uas_sexloci.csv')
-    with NamedTemporaryFile(suffix='.csv') as outfile:
-        arglist = ['format', UAStestfile, '-o', outfile.name, '--uas', '--include-sex']
+    UAStestfile = data_file("snps/Positive Control Sample Details Report 2315.xlsx")
+    formatoutput = data_file("testformat_uas_sexloci.csv")
+    with NamedTemporaryFile(suffix=".csv") as outfile:
+        arglist = ["format", UAStestfile, "-o", outfile.name, "--uas", "--include-sex"]
         args = lusSTR.cli.get_parser().parse_args(arglist)
         lusSTR.format.main(args)
         outfile_name = os.path.splitext(outfile.name)[0]
-        outfile_name_output = f'{outfile_name}_sexloci.csv'
+        outfile_name_output = f"{outfile_name}_sexloci.csv"
         assert filecmp.cmp(formatoutput, outfile_name_output) is True
 
 
 def test_format_sex_loci_straitrazor(tmp_path):
-    inputdb = data_file('STRait_Razor_test_output')
-    exp_out = data_file('testformat_sr_sexloci.csv')
-    obs_out = str(tmp_path / 'sr.csv')
-    obs_out_sex = str(tmp_path / 'sr_sexloci.csv')
-    arglist = ['format', inputdb, '-o', obs_out, '--include-sex']
+    inputdb = data_file("STRait_Razor_test_output")
+    exp_out = data_file("testformat_sr_sexloci.csv")
+    obs_out = str(tmp_path / "sr.csv")
+    obs_out_sex = str(tmp_path / "sr_sexloci.csv")
+    arglist = ["format", inputdb, "-o", obs_out, "--include-sex"]
     args = lusSTR.cli.get_parser().parse_args(arglist)
     lusSTR.format.main(args)
     assert filecmp.cmp(exp_out, obs_out_sex) is True
 
 
 def test_uas_directory_autosomal_only(tmp_path):
-    inputdb = data_file('UAS_bulk_input')
-    copydb = str(tmp_path / 'UAS_bulk_input')
+    inputdb = data_file("UAS_bulk_input")
+    copydb = str(tmp_path / "UAS_bulk_input")
     copytree(inputdb, copydb)
-    bogusfile = os.path.join(copydb, 'bogusfile.txt')
-    with open(bogusfile, 'w') as fh:
+    bogusfile = os.path.join(copydb, "bogusfile.txt")
+    with open(bogusfile, "w") as fh:
         pass
-    exp_out_auto = data_file('UAS_bulk_test.csv')
-    obs_out_auto = str(tmp_path / 'format_output.csv')
-    arglist = ['format', '-o', obs_out_auto, '--uas', copydb]
+    exp_out_auto = data_file("UAS_bulk_test.csv")
+    obs_out_auto = str(tmp_path / "format_output.csv")
+    arglist = ["format", "-o", obs_out_auto, "--uas", copydb]
     args = lusSTR.cli.get_parser().parse_args(arglist)
     lusSTR.format.main(args)
     assert filecmp.cmp(exp_out_auto, obs_out_auto) is True
 
 
 def test_uas_directory_with_xy(tmp_path):
-    inputdb = data_file('UAS_bulk_input')
-    exp_out_auto = data_file('UAS_bulk_test.csv')
-    exp_out_sex = data_file('UAS_bulk_test_sexloci.csv')
-    obs_out_auto = str(tmp_path / 'format_output.csv')
-    obs_out_sex = str(tmp_path / 'format_output_sexloci.csv')
-    arglist = ['format', '-o', obs_out_auto, '--uas', '--include-sex', inputdb]
+    inputdb = data_file("UAS_bulk_input")
+    exp_out_auto = data_file("UAS_bulk_test.csv")
+    exp_out_sex = data_file("UAS_bulk_test_sexloci.csv")
+    obs_out_auto = str(tmp_path / "format_output.csv")
+    obs_out_sex = str(tmp_path / "format_output_sexloci.csv")
+    arglist = ["format", "-o", obs_out_auto, "--uas", "--include-sex", inputdb]
     args = lusSTR.cli.get_parser().parse_args(arglist)
     lusSTR.format.main(args)
     assert filecmp.cmp(exp_out_auto, obs_out_auto) is True

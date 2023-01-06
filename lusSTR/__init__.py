@@ -1,11 +1,14 @@
-#!/usr/bin/env python
+# -------------------------------------------------------------------------------------------------
+# Copyright (c) 2020, DHS.
 #
-# -----------------------------------------------------------------------------
-# Copyright (c) 2020, Battelle National Biodefense Institute.
+# This file is part of lusSTR (http://github.com/bioforensics/lusSTR) and is licensed under
+# the BSD license: see LICENSE.txt.
 #
-# This file is part of lusSTR (http://github.com/bioforensics/lusSTR)
-# and is licensed under the BSD license: see LICENSE.txt.
-# -----------------------------------------------------------------------------
+# This software was prepared for the Department of Homeland Security (DHS) by the Battelle National
+# Biodefense Institute, LLC (BNBI) as part of contract HSHQDC-15-C-00064 to manage and operate the
+# National Biodefense Analysis and Countermeasures Center (NBACC), a Federally Funded Research and
+# Development Center.
+# -------------------------------------------------------------------------------------------------
 
 from lusSTR import annot
 from lusSTR import marker
@@ -15,5 +18,6 @@ from lusSTR import snps
 from lusSTR import filter
 from lusSTR import cli
 from ._version import get_versions
-__version__ = get_versions()['version']
+
+__version__ = get_versions()["version"]
 del get_versions
