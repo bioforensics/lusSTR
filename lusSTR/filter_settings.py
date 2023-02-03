@@ -141,8 +141,12 @@ def ce_allele_ident(locus_allele_info, init_type_all, metadata, ref_allele_reads
     quest_al_reads = locus_allele_info.loc[j, "Reads"]
     ref_allele = float(locus_allele_info.loc[i, "RU_Allele"])
     question_allele = float(locus_allele_info.loc[j, "RU_Allele"])
-    ref_bracket = locus_allele_info.loc[i, "UAS_Output_Bracketed_Notation"]
-    question_bracket = locus_allele_info.loc[j, "UAS_Output_Bracketed_Notation"]
+    if datatype == "ngs":
+        ref_bracket = locus_allele_info.loc[i, "UAS_Output_Bracketed_Notation"]
+        question_bracket = locus_allele_info.loc[j, "UAS_Output_Bracketed_Notation"]
+    else:
+        ref_bracket = None
+        question_bracket = None
     locus_allele_info.loc[j, ["allele_type", "perc_stutter"]] = allele_type_ru(
         ref_allele,
         question_allele,
@@ -369,8 +373,6 @@ def bracketed_stutter_id(ref_bracket, quest_bracket, stutter_id):
     ref_repeats = create_repeat_dict(ref_bracket)
     quest_repeats = create_repeat_dict(quest_bracket)
     stutter = None
-    print(ref_repeats)
-    print(quest_repeats)
     if len(quest_repeats) == len(ref_repeats):
         diffcount = 0
         for key, value in ref_repeats.items():

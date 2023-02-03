@@ -86,7 +86,7 @@ def process_strs(dict_loc, datatype):
                     "Reads",
                 ]
             ]
-            data_order = data_combine.sort_values(by=["RU_Allele"], ascending=True).reset_index(
+            data_order = data_combine.sort_values(by=["RU_Allele"], ascending=False).reset_index(
                 drop=True
             )
         total_reads = data_order["Reads"].sum()
@@ -212,6 +212,7 @@ def STRmix_output(profile, outdir, profile_type, data_type):
         strmix_profile.rename(
             {"RU_Allele": "CE Allele", "UAS_Output_Sequence": "Allele Seq"}, axis=1, inplace=True
         )
+        strmix_profile = strmix_profile.sort_values(by=["SampleID", "Locus", "CE Allele"])
     strmix_profile.replace(
         {"Locus": {"VWA": "vWA", "PENTA D": "PentaD", "PENTA E": "PentaE"}}, inplace=True
     )
