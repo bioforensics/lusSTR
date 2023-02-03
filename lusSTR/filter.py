@@ -76,7 +76,16 @@ def process_strs(dict_loc, datatype):
                 drop=True
             )
         else:
-            data_combine = data[["SampleID", "Locus", "UAS_Output_Sequence", "RU_Allele", "Reads"]]
+            data_combine = data[
+                [
+                    "SampleID",
+                    "Locus",
+                    "UAS_Output_Sequence",
+                    "RU_Allele",
+                    "UAS_Output_Bracketed_Notation",
+                    "Reads",
+                ]
+            ]
             data_order = data_combine.sort_values(by=["RU_Allele"], ascending=True).reset_index(
                 drop=True
             )
