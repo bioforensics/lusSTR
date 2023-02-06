@@ -302,3 +302,19 @@ def test_ngs_reference_error(capsys):
     exp_error = "Cannot create reference file from ngs data. Abort!"
     with pytest.raises(ValueError, match=exp_error) as fnfe:
         fullpath = lusSTR.filter.main(args)
+
+
+@pytest.mark.parametrize(
+    "ref_bracket, quest_bracket, stutter, actual_call",
+    [
+        ("TCTA [TCTG]3 [TCTA]10 TCCA TCTA", "TCTA [TCTG]3 [TCTA]9 TCCA TCTA", -1, -1),
+        ("TCTA [TCTG]3 [TCTA]10 TCCA TCTA", "TCTA [TCTG]4 [TCTA]8 TCCA TCTA", -1, None),
+        ("[TAGA]4 TGA [TAGA]10 TAGG [TGTG]2 TG", "[TAGA]4 TGA [TAGA]11 TAGG [TGTG]2 TG", 1, 1),
+        ("[TAGA]4 TGA [TAGA]10 TAGG [TGTG]2 TG", "[TAGA]6 TGA [TAGA]9 TAGG [TGTG]2 TG", 1, None),
+        ("[TTTC]3 TTTT [CTTT]17 CTCC [TTCC]2", "[TTTC]3 TTTT [CTTT]15 CTCC [TTCC]2", -2, -2),
+        ("[TTTC]3 TTTT [CTTT]17 CTCC [TTCC]2", "[TTTC]4 TTTT [CTTT]14 CTCC [TTCC]2", -2, None),
+    ],
+)
+def test_ngs_stutter(ref_bracket, quest_bracket, stutter, actual_call):
+    test_stutter = lusSTR.filter_settings.bracketed_stutter_id(ref_bracket, quest_bracket, stutter)
+    assert test_stutter == actual_call
