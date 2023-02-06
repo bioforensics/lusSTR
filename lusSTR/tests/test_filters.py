@@ -54,7 +54,8 @@ def test_forward_stutter_threshold(perc, perc_stut, reads, forward_threshold):
     "al_reads, called_allele_type, stut_perc",
     [
         (None, 0.18, 0, 18, 100, None, 15, "-1_stutter", 0.15),
-        (None, 0.18, 0, 18, 100, None, 20, "real_allele", None),
+        ("real_allele", 0.18, 0, 18, 100, None, 20, "real_allele", None),
+        (None, 0.18, 0, 18, 100, None, 20, None, None),
         ("+1_stutter", 0.18, 0, 18, 100, 200, 20, "-1_stutter/+1_stutter", None),
         ("+1_stutter", 0.18, 0, 18, 100, 200, 30, "real_allele", None),
         ("-2_stutter", 0.18, 0, 18, 100, 100, 30, "-1_stutter/-2_stutter", None),
@@ -90,7 +91,8 @@ def test_minus1stutter(
     "ref_reads, al_reads, called_allele_type, stut_perc",
     [
         (None, 0.18, 0, 18, None, 100, 15, "-2_stutter", 0.15),
-        (None, 0.18, 0, 18, None, 100, 20, "real_allele", None),
+        ("real_allele", 0.18, 0, 18, None, 100, 20, "real_allele", None),
+        (None, 0.18, 0, 18, None, 100, 20, None, None),
         ("+1_stutter", 0.18, 0, 18, 100, 200, 20, "+1_stutter/-2_stutter", None),
         ("+1_stutter", 0.18, 0, 18, 100, 200, 30, "real_allele", None),
         ("-1_stutter", 0.18, 0, 18, 100, 100, 30, "-1_stutter/-2_stutter", None),
@@ -126,7 +128,8 @@ def test_minus2stutter(
     "al_reads, called_allele_type, stut_perc",
     [
         (None, 0.18, 0, 100, None, 3, "+1_stutter", 0.03),
-        (None, 0.18, 0, 100, None, 20, "real_allele", None),
+        ("real_allele", 0.18, 0, 100, None, 20, "real_allele", None),
+        (None, 0.18, 0, 100, None, 20, None, None),
         ("-1_stutter", 0.18, 0, 100, 200, 3, "-1_stutter/+1_stutter", None),
         ("-1_stutter", 0.18, 0, 100, 200, 50, "real_allele", None),
         ("-2_stutter", 0.18, 0, 100, 100, 3, "+1_stutter/-2_stutter", None),

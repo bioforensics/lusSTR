@@ -34,10 +34,9 @@ def filters(locus_allele_info, locus, locus_reads, datatype):
         locus_allele_info, locus_reads = multiple_allele_thresholds(
             metadata, locus_reads, locus_allele_info
         )
-        # if datatype == "ce":
         locus_allele_info = ce_filtering(locus_allele_info, locus_reads, metadata, datatype)
-        # else:
-        #    locus_allele_info = same_size_filter(locus_allele_info, metadata)
+        if datatype == "ngs":
+            locus_allele_info = same_size_filter(locus_allele_info, metadata)
     return locus_allele_info
 
 
@@ -114,7 +113,7 @@ def ce_filtering(locus_allele_info, locus_reads, metadata, datatype):
                 init_type_all = locus_allele_info.loc[j, "allele_type"]
                 if init_type_all == "noise":
                     continue
-                locus_allele_info = ce_allele_ident(
+                locus_allele_info = allele_ident(
                     locus_allele_info, init_type_all, metadata, ref_allele_reads, i, j, datatype
                 )
         for j in range(len(locus_allele_info)):
@@ -137,7 +136,7 @@ def ce_filtering(locus_allele_info, locus_reads, metadata, datatype):
     return locus_allele_info
 
 
-def ce_allele_ident(locus_allele_info, init_type_all, metadata, ref_allele_reads, i, j, datatype):
+def allele_ident(locus_allele_info, init_type_all, metadata, ref_allele_reads, i, j, datatype):
     quest_al_reads = locus_allele_info.loc[j, "Reads"]
     ref_allele = float(locus_allele_info.loc[i, "RU_Allele"])
     question_allele = float(locus_allele_info.loc[j, "RU_Allele"])
@@ -147,7 +146,7 @@ def ce_allele_ident(locus_allele_info, init_type_all, metadata, ref_allele_reads
     else:
         ref_bracket = None
         question_bracket = None
-    locus_allele_info.loc[j, ["allele_type", "perc_stutter"]] = allele_type_ru(
+    locus_allele_info.loc[j, ["allele_type", "perc_stutter"]] = allele_type(
         ref_allele,
         question_allele,
         init_type_all,
@@ -199,8 +198,6 @@ def minus1_stutter(
     elif quest_al_reads <= stutter_thresh_reads:
         all_type = "-1_stutter"
         stut_perc = round(quest_al_reads / ref_reads, 3)
-    else:
-        all_type = "real_allele"
     return all_type, stut_perc
 
 
@@ -225,8 +222,6 @@ def minus2_stutter(
     elif quest_al_reads <= stutter_thresh_reads:
         all_type = "-2_stutter"
         stut_perc = round(quest_al_reads / ref_reads, 3)
-    else:
-        all_type = "real_allele"
     return all_type, stut_perc
 
 
@@ -247,12 +242,10 @@ def plus1_stutter(
     elif quest_al_reads <= forward_stut_thresh(forward_thresh, stutter_thresh, ref_reads):
         all_type = "+1_stutter"
         stut_perc = round(quest_al_reads / ref_reads, 3)
-    else:
-        all_type = "real_allele"
     return all_type, stut_perc
 
 
-def allele_type_ru(
+def allele_type(
     ref,
     ru,
     all_type,
@@ -284,11 +277,12 @@ def allele_type_ru(
                 quest_al_reads,
             )
     elif allele_diff == 2 and ref_reads > quest_al_reads:  # -2 stutter
-        if check_2stutter(all_type_df, "ru", ru)[0] is True:
+        allele = ru if datatype == "ce" else question_bracket
+        if check_2stutter(all_type_df, datatype, allele)[0] is True:
             if (
                 datatype == "ngs" and bracketed_stutter_id(ref_bracket, question_bracket, -2) == -2
             ) or datatype == "ce":
-                ref_reads = check_2stutter(all_type_df, "ru", ru)[1]
+                ref_reads = check_2stutter(all_type_df, datatype, allele)[1]
                 stutter_thresh_reads = stutter_thresh * ref_reads
                 all_type, stut_perc = minus2_stutter(
                     all_type,
@@ -330,12 +324,17 @@ def forward_stut_thresh(perc, perc_stut, reads):
 def check_2stutter(stutter_df, allele_des, allele):
     is_true, reads = False, None
     if "-1_stutter" in stutter_df.loc[:, "allele_type"].values:
-        if allele_des == "ru":
+        if allele_des == "ce":
             for k, row in stutter_df.iterrows():
                 ru_test = stutter_df.loc[k, "RU_Allele"]
                 if ru_test - allele == 1 and stutter_df.loc[k, "allele_type"] == "-1_stutter":
                     is_true, reads = True, stutter_df.loc[k, "Reads"]
                     break
+        else:
+            for k, row in stutter_df.iterrows():
+                bracket_test = stutter_df.loc[k, "UAS_Output_Bracketed_Notation"]
+                if bracketed_stutter_id(bracket_test, allele, -1) == -1:
+                    is_true, reads = True, stutter_df.loc[k, "Reads"]
     return is_true, reads
 
 
