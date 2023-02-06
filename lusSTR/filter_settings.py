@@ -164,13 +164,15 @@ def ce_allele_ident(locus_allele_info, init_type_all, metadata, ref_allele_reads
         if "/" in locus_allele_info.loc[j, "allele_type"] and pd.isnull(
             locus_allele_info.loc[j, "stuttering_allele2"]
         ):
+            stut_allele2 = ref_allele if datatype == "ce" else ref_bracket
             locus_allele_info.loc[j, ["stuttering_allele2", "allele2_ref_reads"]] = [
-                ref_allele,
+                stut_allele2,
                 ref_allele_reads,
             ]
         elif pd.isnull(locus_allele_info.loc[j, "stuttering_allele1"]):
+            stut_allele1 = ref_allele if datatype == "ce" else ref_bracket
             locus_allele_info.loc[j, ["stuttering_allele1", "allele1_ref_reads"]] = [
-                ref_allele,
+                stut_allele1,
                 ref_allele_reads,
             ]
     return locus_allele_info
