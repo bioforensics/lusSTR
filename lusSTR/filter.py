@@ -223,7 +223,9 @@ def STRmix_output(profile, outdir, profile_type, data_type):
         if profile_type == "evidence":
             sample_df.iloc[:, 1:].to_csv(f"{outdir}/{id}_{data_type}.csv", index=False)
         else:
-            reference_df = reference_table(sample_df.iloc[:, 1:3])
+            # if data_type == "ce":
+            reference_df = reference_table(sample_df, data_type)
+            # else:
             reference_df.to_csv(f"{outdir}/{id}_reference_{data_type}.csv", index=False)
 
 
@@ -244,7 +246,7 @@ def strmix_ce_processing(profile):
     return locus_df
 
 
-def reference_table(sample_data):
+def reference_table(sample_data, datatype):
     new_rows = []
     for i, row in sample_data.iterrows():
         locus = sample_data.loc[i, "Locus"]
@@ -267,9 +269,22 @@ def reference_table(sample_data):
             continue
         else:
             new_rows.append(list(row))
-    final_reference = pd.DataFrame(new_rows, columns=["Locus", "Allele"])
-    concat_df = pd.concat([sample_data, final_reference]).reset_index(drop=True)
-    sort_df = concat_df.sort_values(by=["Locus", "Allele"])
+    if datatype == "ce":
+        ref_filtered = pd.DataFrame(
+            new_rows, columns=["SampleID", "Locus", "Allele", "Height", "Size"]
+        )
+        concat_df = pd.concat([sample_data.iloc[:, 1:3], ref_filtered.iloc[:, 1:3]]).reset_index(
+            drop=True
+        )
+        sort_df = concat_df.sort_values(by=["Locus", "Allele"])
+    else:
+        ref_filtered = pd.DataFrame(
+            new_rows, columns=["SampleID", "Locus", "CE Allele", "Allele Seq", "Reads"]
+        )
+        concat_df = pd.concat([sample_data.iloc[:, 1:4], ref_filtered.iloc[:, 1:4]]).reset_index(
+            drop=True
+        )
+        sort_df = concat_df.sort_values(by=["Locus", "CE Allele"])
     return sort_df
 
 
@@ -283,8 +298,8 @@ def main(args):
     output_type = args.output
     if output_type not in ("efm", "strmix"):
         raise ValueError(f"unknown output type '{output_type}'")
-    if profile_type == "reference" and data_type == "ngs":
-        raise ValueError("Cannot create reference file from ngs data. Abort!")
+    # if profile_type == "reference" and data_type == "ngs":
+    #    raise ValueError("Cannot create reference file from ngs data. Abort!")
     full_df = pd.read_csv(args.input, sep="\t")
     if args.out is None:
         outpath = sys.stdout

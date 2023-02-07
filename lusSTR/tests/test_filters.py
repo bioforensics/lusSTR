@@ -316,5 +316,5 @@ def test_ngs_reference_error(capsys):
     ],
 )
 def test_ngs_stutter(ref_bracket, quest_bracket, stutter, actual_call):
-    test_stutter = lusSTR.filter_settings.bracketed_stutter_id(ref_bracket, quest_bracket, stutter)
-    assert test_stutter == actual_call
+    test_stut = lusSTR.filter_settings.bracketed_stutter_id(ref_bracket, quest_bracket, stutter)
+    assert test_stut == actual_call
