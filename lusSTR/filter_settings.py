@@ -80,10 +80,7 @@ def thresholds(filter, metadata, locus_reads, quest_al_reads):
     ):
         use = "static"
     if use.lower() == "both":
-        if thresh_perc >= count:
-            thresh = thresh_perc
-        else:
-            thresh = count
+        thresh = thresh_perc if thresh_perc >= count else count
     elif use.lower() == "static":
         thresh = count
     elif use.lower() == "dynamic":
@@ -247,7 +244,7 @@ def plus1_stutter(
 
 def allele_type(
     ref,
-    ru,
+    ce,
     all_type,
     metadata,
     quest_al_reads,
@@ -262,7 +259,7 @@ def allele_type(
     forward_thresh = metadata["StutterForwardThresholdDynamicPercent"]
     stutter_thresh_reads = np.ceil(stutter_thresh * ref_reads)
     stut_perc = None
-    allele_diff = round(ref - ru, 1)
+    allele_diff = round(ref - ce, 1)
     if allele_diff == 1 and ref_reads > quest_al_reads:  # -1 stutter
         if (
             datatype == "ngs" and bracketed_stutter_id(ref_bracket, question_bracket, -1) == -1
@@ -277,7 +274,7 @@ def allele_type(
                 quest_al_reads,
             )
     elif allele_diff == 2 and ref_reads > quest_al_reads:  # -2 stutter
-        allele = ru if datatype == "ce" else question_bracket
+        allele = ce if datatype == "ce" else question_bracket
         if check_2stutter(all_type_df, datatype, allele)[0] is True:
             if (
                 datatype == "ngs" and bracketed_stutter_id(ref_bracket, question_bracket, -2) == -2
@@ -326,8 +323,8 @@ def check_2stutter(stutter_df, allele_des, allele):
     if "-1_stutter" in stutter_df.loc[:, "allele_type"].values:
         if allele_des == "ce":
             for k, row in stutter_df.iterrows():
-                ru_test = stutter_df.loc[k, "RU_Allele"]
-                if ru_test - allele == 1 and stutter_df.loc[k, "allele_type"] == "-1_stutter":
+                ce_test = stutter_df.loc[k, "RU_Allele"]
+                if ce_test - allele == 1 and stutter_df.loc[k, "allele_type"] == "-1_stutter":
                     is_true, reads = True, stutter_df.loc[k, "Reads"]
                     break
         else:
@@ -448,9 +445,9 @@ def flags(allele_df):
 def same_size_filter(df, metadata):
     final_df = pd.DataFrame()
     al_list = df["RU_Allele"].unique()
-    for ru_allele in al_list:
+    for ce_allele in al_list:
         df_filt = (
-            df[df["RU_Allele"] == ru_allele]
+            df[df["RU_Allele"] == ce_allele]
             .sort_values(by=["Reads"], ascending=False)
             .reset_index(drop=True)
         )

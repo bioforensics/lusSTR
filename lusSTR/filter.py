@@ -223,9 +223,7 @@ def STRmix_output(profile, outdir, profile_type, data_type):
         if profile_type == "evidence":
             sample_df.iloc[:, 1:].to_csv(f"{outdir}/{id}_{data_type}.csv", index=False)
         else:
-            # if data_type == "ce":
             reference_df = reference_table(sample_df, data_type)
-            # else:
             reference_df.to_csv(f"{outdir}/{id}_reference_{data_type}.csv", index=False)
 
 
@@ -269,6 +267,11 @@ def reference_table(sample_data, datatype):
             continue
         else:
             new_rows.append(list(row))
+        final_reference = format_ref_table(new_rows, sample_data, datatype)
+    return final_reference
+
+
+def format_ref_table(new_rows, sample_data, datatype):
     if datatype == "ce":
         ref_filtered = pd.DataFrame(
             new_rows, columns=["SampleID", "Locus", "Allele", "Height", "Size"]
@@ -298,8 +301,6 @@ def main(args):
     output_type = args.output
     if output_type not in ("efm", "strmix"):
         raise ValueError(f"unknown output type '{output_type}'")
-    # if profile_type == "reference" and data_type == "ngs":
-    #    raise ValueError("Cannot create reference file from ngs data. Abort!")
     full_df = pd.read_csv(args.input, sep="\t")
     if args.out is None:
         outpath = sys.stdout
