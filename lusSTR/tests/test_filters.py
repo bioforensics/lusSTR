@@ -257,10 +257,13 @@ def test_efm_reference(tmp_path):
     assert filecmp.cmp(exp_out, obs_efm_out) is True
 
 
-def test_strmix_reference(tmp_path):
+@pytest.mark.parametrize(
+    "outputdir, datatype", [("RU_stutter_test/", "ce"), ("NGS_stutter_test/", "ngs")]
+)
+def test_strmix_reference(outputdir, datatype, tmp_path):
     input_file = data_file("test_references.txt")
-    exp_out = data_file("RU_stutter_test/Positive_Control_reference.csv")
-    obs_out = str(tmp_path / "Positive_Control_reference_ce.csv")
+    exp_out = data_file(f"{outputdir}Positive_Control_reference_{datatype}.csv")
+    obs_out = str(tmp_path / f"Positive_Control_reference_{datatype}.csv")
     arglist = [
         "filter",
         "-o",
@@ -269,6 +272,8 @@ def test_strmix_reference(tmp_path):
         "strmix",
         "--profile-type",
         "reference",
+        "--data-type",
+        datatype,
         input_file,
     ]
     args = lusSTR.cli.get_parser().parse_args(arglist)
@@ -284,24 +289,6 @@ def test_D7(tmp_path):
     args = lusSTR.cli.get_parser().parse_args(arglist)
     lusSTR.filter.main(args)
     assert filecmp.cmp(exp_out, obs_out)
-
-
-def test_ngs_reference_error(capsys):
-    input_file = data_file("test_stutter.txt")
-    arglist = [
-        "filter",
-        "--output-type",
-        "strmix",
-        "--data-type",
-        "ngs",
-        "--profile-type",
-        "reference",
-        input_file,
-    ]
-    args = lusSTR.cli.get_parser().parse_args(arglist)
-    exp_error = "Cannot create reference file from ngs data. Abort!"
-    with pytest.raises(ValueError, match=exp_error) as fnfe:
-        fullpath = lusSTR.filter.main(args)
 
 
 @pytest.mark.parametrize(
