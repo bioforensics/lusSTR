@@ -135,8 +135,8 @@ def ce_filtering(locus_allele_info, locus_reads, metadata, datatype):
 
 def allele_ident(locus_allele_info, init_type_all, metadata, ref_allele_reads, i, j, datatype):
     quest_al_reads = locus_allele_info.loc[j, "Reads"]
-    ref_allele = float(locus_allele_info.loc[i, "RU_Allele"])
-    question_allele = float(locus_allele_info.loc[j, "RU_Allele"])
+    ref_allele = float(locus_allele_info.loc[i, "CE_Allele"])
+    question_allele = float(locus_allele_info.loc[j, "CE_Allele"])
     if datatype == "ngs":
         ref_bracket = locus_allele_info.loc[i, "UAS_Output_Bracketed_Notation"]
         question_bracket = locus_allele_info.loc[j, "UAS_Output_Bracketed_Notation"]
@@ -323,7 +323,7 @@ def check_2stutter(stutter_df, allele_des, allele):
     if "-1_stutter" in stutter_df.loc[:, "allele_type"].values:
         if allele_des == "ce":
             for k, row in stutter_df.iterrows():
-                ce_test = stutter_df.loc[k, "RU_Allele"]
+                ce_test = stutter_df.loc[k, "CE_Allele"]
                 if ce_test - allele == 1 and stutter_df.loc[k, "allele_type"] == "-1_stutter":
                     is_true, reads = True, stutter_df.loc[k, "Reads"]
                     break
@@ -420,7 +420,7 @@ def allele_imbalance_check(allele_df):
 def check_D7(allele_df):
     D7_df = pd.DataFrame(columns=["SampleID", "Locus", "Flags"])
     for i in range(len(allele_df)):
-        al = allele_df.loc[i, "RU_Allele"]
+        al = allele_df.loc[i, "CE_Allele"]
         try:
             if str(al).split(".")[1] == "1" and allele_df.loc[i, "allele_type"] != "noise":
                 print("D7 microvariants detected! Check flagged file for details.")
@@ -444,10 +444,10 @@ def flags(allele_df):
 
 def same_size_filter(df, metadata):
     final_df = pd.DataFrame()
-    al_list = df["RU_Allele"].unique()
+    al_list = df["CE_Allele"].unique()
     for ce_allele in al_list:
         df_filt = (
-            df[df["RU_Allele"] == ce_allele]
+            df[df["CE_Allele"] == ce_allele]
             .sort_values(by=["Reads"], ascending=False)
             .reset_index(drop=True)
         )

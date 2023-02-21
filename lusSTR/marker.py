@@ -304,9 +304,9 @@ class STRMarker:
         return [
             self.uas_sequence,
             self.forward_sequence,
-            canon,
-            self.annotation,
             self.annotation_uas,
+            self.annotation,
+            canon,
             lus_final_output,
             lus_plus,
         ]

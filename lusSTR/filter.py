@@ -69,10 +69,10 @@ def process_strs(dict_loc, datatype):
     for key, value in dict_loc.items():
         data = dict_loc[key].reset_index(drop=True)
         if datatype == "ce":
-            data_combine = data.groupby(["SampleID", "Locus", "RU_Allele"], as_index=False)[
+            data_combine = data.groupby(["SampleID", "Locus", "CE_Allele"], as_index=False)[
                 "Reads"
             ].sum()
-            data_order = data_combine.sort_values(by=["RU_Allele"], ascending=False).reset_index(
+            data_order = data_combine.sort_values(by=["CE_Allele"], ascending=False).reset_index(
                 drop=True
             )
         else:
@@ -81,12 +81,12 @@ def process_strs(dict_loc, datatype):
                     "SampleID",
                     "Locus",
                     "UAS_Output_Sequence",
-                    "RU_Allele",
+                    "CE_Allele",
                     "UAS_Output_Bracketed_Notation",
                     "Reads",
                 ]
             ]
-            data_order = data_combine.sort_values(by=["RU_Allele"], ascending=False).reset_index(
+            data_order = data_combine.sort_values(by=["CE_Allele"], ascending=False).reset_index(
                 drop=True
             )
         total_reads = data_order["Reads"].sum()
@@ -107,7 +107,7 @@ def process_strs(dict_loc, datatype):
         filtered_df = filters(data_order, locus, total_reads, datatype)
         final_df = final_df.append(filtered_df)
         flags_df = flags_df.append(flags(filtered_df))
-    final_df = final_df.astype({"RU_Allele": "float64", "Reads": "int"})
+    final_df = final_df.astype({"CE_Allele": "float64", "Reads": "int"})
     return final_df, flags_df
 
 
@@ -124,10 +124,10 @@ def EFM_output(profile, outfile, profile_type, separate=False):
 
 
 def populate_efm_profile(profile):
-    profile = profile.sort_values(by=["SampleID", "Locus", "RU_Allele"])
+    profile = profile.sort_values(by=["SampleID", "Locus", "CE_Allele"])
     allele_heights = defaultdict(lambda: defaultdict(dict))
     for i, row in profile.iterrows():
-        allele_heights[row.SampleID][row.Locus][float(row.RU_Allele)] = int(row.Reads)
+        allele_heights[row.SampleID][row.Locus][float(row.CE_Allele)] = int(row.Reads)
     max_num_alleles = determine_max_num_alleles(allele_heights)
     reformatted_profile = list()
     for sampleid, loci in allele_heights.items():
@@ -207,10 +207,10 @@ def STRmix_output(profile, outdir, profile_type, data_type):
         strmix_profile = strmix_ce_processing(filtered_df)
     else:
         strmix_profile = filtered_df.loc[
-            :, ["SampleID", "Locus", "RU_Allele", "UAS_Output_Sequence", "Reads"]
+            :, ["SampleID", "Locus", "CE_Allele", "UAS_Output_Sequence", "Reads"]
         ]
         strmix_profile.rename(
-            {"RU_Allele": "CE Allele", "UAS_Output_Sequence": "Allele Seq"}, axis=1, inplace=True
+            {"CE_Allele": "CE Allele", "UAS_Output_Sequence": "Allele Seq"}, axis=1, inplace=True
         )
         strmix_profile = strmix_profile.sort_values(by=["SampleID", "Locus", "CE Allele"])
     strmix_profile.replace(
@@ -228,7 +228,7 @@ def STRmix_output(profile, outdir, profile_type, data_type):
 
 
 def strmix_ce_processing(profile):
-    data_combine = profile.groupby(["SampleID", "Locus", "RU_Allele"], as_index=False)[
+    data_combine = profile.groupby(["SampleID", "Locus", "CE_Allele"], as_index=False)[
         "Reads"
     ].sum()
     dict_loc = {k: v for k, v in data_combine.groupby(["SampleID", "Locus"])}
@@ -238,9 +238,9 @@ def strmix_ce_processing(profile):
         metadata = filter_marker_data[key[1]]
         slope = metadata["Slope"]
         intercept = metadata["Intercept"]
-        data["Size"] = data["RU_Allele"] * slope + intercept
+        data["Size"] = data["CE_Allele"] * slope + intercept
         locus_df = locus_df.append(data)
-    locus_df.rename({"RU_Allele": "Allele", "Reads": "Height"}, axis=1, inplace=True)
+    locus_df.rename({"CE_Allele": "Allele", "Reads": "Height"}, axis=1, inplace=True)
     return locus_df
 
 
