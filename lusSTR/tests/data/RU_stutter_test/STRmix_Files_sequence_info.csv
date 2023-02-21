@@ -1,4 +1,4 @@
-SampleID,Locus,RU_Allele,Reads,allele_type,stuttering_allele1,stuttering_allele2,allele1_ref_reads,allele2_ref_reads,perc_noise,perc_stutter
+SampleID,Locus,CE_Allele,Reads,allele_type,stuttering_allele1,stuttering_allele2,allele1_ref_reads,allele2_ref_reads,perc_noise,perc_stutter
 Sample1,D4S2408,10.0,900,real_allele,,,,,,
 Sample1,D4S2408,9.0,1357,real_allele,,,,,,
 Sample1,D4S2408,8.0,1000,real_allele,,,,,,

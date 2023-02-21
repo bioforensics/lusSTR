@@ -1,4 +1,4 @@
-SampleID,Locus,UAS_Output_Sequence,RU_Allele,UAS_Output_Bracketed_Notation,Reads,allele_type,stuttering_allele1,stuttering_allele2,allele1_ref_reads,allele2_ref_reads,perc_noise,perc_stutter
+SampleID,Locus,UAS_Output_Sequence,CE_Allele,UAS_Output_Bracketed_Notation,Reads,allele_type,stuttering_allele1,stuttering_allele2,allele1_ref_reads,allele2_ref_reads,perc_noise,perc_stutter
 Sample1,D4S2408,ATCTATCTATCTATCTATCTATCTATCTATCTATCTATCT,10.0,[ATCT]10,900,real_allele,,,,,,
 Sample1,D4S2408,ATCTATCTATCTATCTATCTATCTATCTATCTATCT,9.0,[ATCT]9,1357,real_allele,,,,,,
 Sample1,D4S2408,ATCTATCTATCTATCTATCTATCTATCTATCT,8.0,[ATCT]8,1000,real_allele,,,,,,
