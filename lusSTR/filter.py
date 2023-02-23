@@ -115,7 +115,7 @@ def EFM_output(profile, outfile, profile_type, separate=False):
     if profile_type == "reference":
         profile = profile[profile.allele_type == "real_allele"]
     else:
-        profile = profile[profile.allele_type != "noise"]
+        profile = profile[profile.allele_type != "BelowAT"]
     efm_profile = populate_efm_profile(profile)
     if separate:
         write_sample_specific_efm_profiles(efm_profile, profile_type)
@@ -202,7 +202,7 @@ def STRmix_output(profile, outdir, profile_type, data_type):
     if profile_type == "reference":
         filtered_df = profile[profile.allele_type == "real_allele"]
     else:
-        filtered_df = profile[profile.allele_type != "noise"]
+        filtered_df = profile[profile.allele_type != "BelowAT"]
     if data_type == "ce":
         strmix_profile = strmix_ce_processing(filtered_df)
     else:

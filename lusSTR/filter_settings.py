@@ -44,7 +44,7 @@ def single_allele_thresholds(metadata, locus_reads, single_all_df):
     if thresholds("Detection", metadata, locus_reads, single_all_df["Reads"][0])[1] is False:
         single_all_df = pd.DataFrame()
     elif thresholds("Analytical", metadata, locus_reads, single_all_df["Reads"][0])[1] is False:
-        single_all_df[["allele_type", "perc_noise"]] = ["noise", 1.0]
+        single_all_df[["allele_type", "perc_noise"]] = ["BelowAT", 1.0]
     elif thresholds("Analytical", metadata, locus_reads, single_all_df["Reads"][0])[1] is True:
         single_all_df["allele_type"] = "real_allele"
     return single_all_df
@@ -61,7 +61,7 @@ def multiple_allele_thresholds(metadata, locus_reads, locus_allele_info):
         quest_allele_reads = locus_allele_info.loc[i, "Reads"]
         if thresholds("Analytical", metadata, locus_reads, quest_allele_reads)[1] is False:
             locus_allele_info.loc[i, ["allele_type", "perc_noise"]] = [
-                "noise",
+                "BelowAT",
                 round(quest_allele_reads / locus_reads, 3),
             ]
         else:
@@ -108,7 +108,7 @@ def ce_filtering(locus_allele_info, locus_reads, metadata, datatype):
                 if j == i:
                     continue
                 init_type_all = locus_allele_info.loc[j, "allele_type"]
-                if init_type_all == "noise":
+                if init_type_all == "BelowAT":
                     continue
                 locus_allele_info = allele_ident(
                     locus_allele_info, init_type_all, metadata, ref_allele_reads, i, j, datatype
@@ -126,7 +126,7 @@ def ce_filtering(locus_allele_info, locus_reads, metadata, datatype):
                 else:
                     locus_allele_info.loc[j, "perc_stutter"] = ""
                 locus_allele_info.loc[j, "perc_noise"] = ""
-            elif "noise" in locus_allele_info.loc[j, "allele_type"]:
+            elif "BelowAT" in locus_allele_info.loc[j, "allele_type"]:
                 locus_allele_info.loc[j, "perc_noise"] = round(
                     locus_allele_info.loc[j, "Reads"] / locus_reads, 3
                 )
@@ -298,7 +298,7 @@ def allele_type(
                 all_type, stutter_thresh, forward_thresh, ref_reads, al1_ref_reads, quest_al_reads
             )
     elif pd.isnull(all_type):
-        all_type = "noise"
+        all_type = "BelowAT"
     return all_type, stut_perc
 
 
@@ -422,7 +422,7 @@ def check_D7(allele_df):
     for i in range(len(allele_df)):
         al = allele_df.loc[i, "CE_Allele"]
         try:
-            if str(al).split(".")[1] == "1" and allele_df.loc[i, "allele_type"] != "noise":
+            if str(al).split(".")[1] == "1" and allele_df.loc[i, "allele_type"] != "BelowAT":
                 print("D7 microvariants detected! Check flagged file for details.")
                 D7_df.loc[len(D7_df.index)] = [
                     allele_df.loc[0, "SampleID"],
