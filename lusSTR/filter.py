@@ -95,8 +95,8 @@ def process_strs(dict_loc, datatype):
             columns=[
                 *data_order.columns.tolist(),
                 "allele_type",
-                "stuttering_allele1",
-                "stuttering_allele2",
+                "parent_allele1",
+                "parent_allele2",
                 "allele1_ref_reads",
                 "allele2_ref_reads",
                 "perc_noise",
