@@ -54,7 +54,8 @@ def test_forward_stutter_threshold(perc, perc_stut, reads, forward_threshold):
     "al_reads, called_allele_type, stut_perc",
     [
         (None, 0.18, 0, 18, 100, None, 15, "-1_stutter", 0.15),
-        (None, 0.18, 0, 18, 100, None, 20, "real_allele", None),
+        ("real_allele", 0.18, 0, 18, 100, None, 20, "real_allele", None),
+        (None, 0.18, 0, 18, 100, None, 20, None, None),
         ("+1_stutter", 0.18, 0, 18, 100, 200, 20, "-1_stutter/+1_stutter", None),
         ("+1_stutter", 0.18, 0, 18, 100, 200, 30, "real_allele", None),
         ("-2_stutter", 0.18, 0, 18, 100, 100, 30, "-1_stutter/-2_stutter", None),
@@ -90,7 +91,8 @@ def test_minus1stutter(
     "ref_reads, al_reads, called_allele_type, stut_perc",
     [
         (None, 0.18, 0, 18, None, 100, 15, "-2_stutter", 0.15),
-        (None, 0.18, 0, 18, None, 100, 20, "real_allele", None),
+        ("real_allele", 0.18, 0, 18, None, 100, 20, "real_allele", None),
+        (None, 0.18, 0, 18, None, 100, 20, None, None),
         ("+1_stutter", 0.18, 0, 18, 100, 200, 20, "+1_stutter/-2_stutter", None),
         ("+1_stutter", 0.18, 0, 18, 100, 200, 30, "real_allele", None),
         ("-1_stutter", 0.18, 0, 18, 100, 100, 30, "-1_stutter/-2_stutter", None),
@@ -126,7 +128,8 @@ def test_minus2stutter(
     "al_reads, called_allele_type, stut_perc",
     [
         (None, 0.18, 0, 100, None, 3, "+1_stutter", 0.03),
-        (None, 0.18, 0, 100, None, 20, "real_allele", None),
+        ("real_allele", 0.18, 0, 100, None, 20, "real_allele", None),
+        (None, 0.18, 0, 100, None, 20, None, None),
         ("-1_stutter", 0.18, 0, 100, 200, 3, "-1_stutter/+1_stutter", None),
         ("-1_stutter", 0.18, 0, 100, 200, 50, "real_allele", None),
         ("-2_stutter", 0.18, 0, 100, 100, 3, "+1_stutter/-2_stutter", None),
@@ -254,10 +257,13 @@ def test_efm_reference(tmp_path):
     assert filecmp.cmp(exp_out, obs_efm_out) is True
 
 
-def test_strmix_reference(tmp_path):
+@pytest.mark.parametrize(
+    "outputdir, datatype", [("RU_stutter_test/", "ce"), ("NGS_stutter_test/", "ngs")]
+)
+def test_strmix_reference(outputdir, datatype, tmp_path):
     input_file = data_file("test_references.txt")
-    exp_out = data_file("RU_stutter_test/Positive_Control_reference.csv")
-    obs_out = str(tmp_path / "Positive_Control_reference_ce.csv")
+    exp_out = data_file(f"{outputdir}Positive_Control_reference_{datatype}.csv")
+    obs_out = str(tmp_path / f"Positive_Control_reference_{datatype}.csv")
     arglist = [
         "filter",
         "-o",
@@ -266,6 +272,8 @@ def test_strmix_reference(tmp_path):
         "strmix",
         "--profile-type",
         "reference",
+        "--data-type",
+        datatype,
         input_file,
     ]
     args = lusSTR.cli.get_parser().parse_args(arglist)
@@ -283,19 +291,17 @@ def test_D7(tmp_path):
     assert filecmp.cmp(exp_out, obs_out)
 
 
-def test_ngs_reference_error(capsys):
-    input_file = data_file("test_stutter.txt")
-    arglist = [
-        "filter",
-        "--output-type",
-        "strmix",
-        "--data-type",
-        "ngs",
-        "--profile-type",
-        "reference",
-        input_file,
-    ]
-    args = lusSTR.cli.get_parser().parse_args(arglist)
-    exp_error = "Cannot create reference file from ngs data. Abort!"
-    with pytest.raises(ValueError, match=exp_error) as fnfe:
-        fullpath = lusSTR.filter.main(args)
+@pytest.mark.parametrize(
+    "ref_bracket, quest_bracket, stutter, actual_call",
+    [
+        ("TCTA [TCTG]3 [TCTA]10 TCCA TCTA", "TCTA [TCTG]3 [TCTA]9 TCCA TCTA", -1, -1),
+        ("TCTA [TCTG]3 [TCTA]10 TCCA TCTA", "TCTA [TCTG]4 [TCTA]8 TCCA TCTA", -1, None),
+        ("[TAGA]4 TGA [TAGA]10 TAGG [TGTG]2 TG", "[TAGA]4 TGA [TAGA]11 TAGG [TGTG]2 TG", 1, 1),
+        ("[TAGA]4 TGA [TAGA]10 TAGG [TGTG]2 TG", "[TAGA]6 TGA [TAGA]9 TAGG [TGTG]2 TG", 1, None),
+        ("[TTTC]3 TTTT [CTTT]17 CTCC [TTCC]2", "[TTTC]3 TTTT [CTTT]15 CTCC [TTCC]2", -2, -2),
+        ("[TTTC]3 TTTT [CTTT]17 CTCC [TTCC]2", "[TTTC]4 TTTT [CTTT]14 CTCC [TTCC]2", -2, None),
+    ],
+)
+def test_ngs_stutter(ref_bracket, quest_bracket, stutter, actual_call):
+    test_stut = lusSTR.filter_settings.bracketed_stutter_id(ref_bracket, quest_bracket, stutter)
+    assert test_stut == actual_call

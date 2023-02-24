@@ -144,9 +144,9 @@ def format_table(input, uas=False, kit="forenseq"):
         "Locus",
         "UAS_Output_Sequence",
         "Forward_Strand_Sequence",
-        "RU_Allele",
-        "Forward_Strand_Bracketed_Notation",
         "UAS_Output_Bracketed_Notation",
+        "Forward_Strand_Bracketed_Notation",
+        "CE_Allele",
         "LUS",
         "LUS_Plus",
         "Reads",
@@ -162,7 +162,7 @@ def format_table(input, uas=False, kit="forenseq"):
             "Analysis",
             "Locus",
             "Reads",
-            "RU_Allele",
+            "CE_Allele",
             "Full_Sequence",
             "5_Flank_Bracketed_Notation",
             "UAS_Region_Bracketed_Notation",
@@ -186,7 +186,7 @@ def combine_reads(table, columns):
 
 def sort_table(table):
     sorted_table = table.sort_values(
-        by=["SampleID", "Project", "Analysis", "Locus", "Reads", "RU_Allele"], ascending=False
+        by=["SampleID", "Project", "Analysis", "Locus", "Reads", "CE_Allele"], ascending=False
     )
     return sorted_table
 

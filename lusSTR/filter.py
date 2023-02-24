@@ -69,15 +69,24 @@ def process_strs(dict_loc, datatype):
     for key, value in dict_loc.items():
         data = dict_loc[key].reset_index(drop=True)
         if datatype == "ce":
-            data_combine = data.groupby(["SampleID", "Locus", "RU_Allele"], as_index=False)[
+            data_combine = data.groupby(["SampleID", "Locus", "CE_Allele"], as_index=False)[
                 "Reads"
             ].sum()
-            data_order = data_combine.sort_values(by=["RU_Allele"], ascending=False).reset_index(
+            data_order = data_combine.sort_values(by=["CE_Allele"], ascending=False).reset_index(
                 drop=True
             )
         else:
-            data_combine = data[["SampleID", "Locus", "UAS_Output_Sequence", "RU_Allele", "Reads"]]
-            data_order = data_combine.sort_values(by=["RU_Allele"], ascending=True).reset_index(
+            data_combine = data[
+                [
+                    "SampleID",
+                    "Locus",
+                    "UAS_Output_Sequence",
+                    "CE_Allele",
+                    "UAS_Output_Bracketed_Notation",
+                    "Reads",
+                ]
+            ]
+            data_order = data_combine.sort_values(by=["CE_Allele"], ascending=False).reset_index(
                 drop=True
             )
         total_reads = data_order["Reads"].sum()
@@ -86,8 +95,8 @@ def process_strs(dict_loc, datatype):
             columns=[
                 *data_order.columns.tolist(),
                 "allele_type",
-                "stuttering_allele1",
-                "stuttering_allele2",
+                "parent_allele1",
+                "parent_allele2",
                 "allele1_ref_reads",
                 "allele2_ref_reads",
                 "perc_noise",
@@ -98,7 +107,7 @@ def process_strs(dict_loc, datatype):
         filtered_df = filters(data_order, locus, total_reads, datatype)
         final_df = final_df.append(filtered_df)
         flags_df = flags_df.append(flags(filtered_df))
-    final_df = final_df.astype({"RU_Allele": "float64", "Reads": "int"})
+    final_df = final_df.astype({"CE_Allele": "float64", "Reads": "int"})
     return final_df, flags_df
 
 
@@ -106,7 +115,7 @@ def EFM_output(profile, outfile, profile_type, separate=False):
     if profile_type == "reference":
         profile = profile[profile.allele_type == "real_allele"]
     else:
-        profile = profile[profile.allele_type != "noise"]
+        profile = profile[profile.allele_type != "BelowAT"]
     efm_profile = populate_efm_profile(profile)
     if separate:
         write_sample_specific_efm_profiles(efm_profile, profile_type)
@@ -115,10 +124,10 @@ def EFM_output(profile, outfile, profile_type, separate=False):
 
 
 def populate_efm_profile(profile):
-    profile = profile.sort_values(by=["SampleID", "Locus", "RU_Allele"])
+    profile = profile.sort_values(by=["SampleID", "Locus", "CE_Allele"])
     allele_heights = defaultdict(lambda: defaultdict(dict))
     for i, row in profile.iterrows():
-        allele_heights[row.SampleID][row.Locus][float(row.RU_Allele)] = int(row.Reads)
+        allele_heights[row.SampleID][row.Locus][float(row.CE_Allele)] = int(row.Reads)
     max_num_alleles = determine_max_num_alleles(allele_heights)
     reformatted_profile = list()
     for sampleid, loci in allele_heights.items():
@@ -193,16 +202,17 @@ def STRmix_output(profile, outdir, profile_type, data_type):
     if profile_type == "reference":
         filtered_df = profile[profile.allele_type == "real_allele"]
     else:
-        filtered_df = profile[profile.allele_type != "noise"]
+        filtered_df = profile[profile.allele_type != "BelowAT"]
     if data_type == "ce":
         strmix_profile = strmix_ce_processing(filtered_df)
     else:
         strmix_profile = filtered_df.loc[
-            :, ["SampleID", "Locus", "RU_Allele", "UAS_Output_Sequence", "Reads"]
+            :, ["SampleID", "Locus", "CE_Allele", "UAS_Output_Sequence", "Reads"]
         ]
         strmix_profile.rename(
-            {"RU_Allele": "CE Allele", "UAS_Output_Sequence": "Allele Seq"}, axis=1, inplace=True
+            {"CE_Allele": "CE Allele", "UAS_Output_Sequence": "Allele Seq"}, axis=1, inplace=True
         )
+        strmix_profile = strmix_profile.sort_values(by=["SampleID", "Locus", "CE Allele"])
     strmix_profile.replace(
         {"Locus": {"VWA": "vWA", "PENTA D": "PentaD", "PENTA E": "PentaE"}}, inplace=True
     )
@@ -213,12 +223,12 @@ def STRmix_output(profile, outdir, profile_type, data_type):
         if profile_type == "evidence":
             sample_df.iloc[:, 1:].to_csv(f"{outdir}/{id}_{data_type}.csv", index=False)
         else:
-            reference_df = reference_table(sample_df.iloc[:, 1:3])
+            reference_df = reference_table(sample_df, data_type)
             reference_df.to_csv(f"{outdir}/{id}_reference_{data_type}.csv", index=False)
 
 
 def strmix_ce_processing(profile):
-    data_combine = profile.groupby(["SampleID", "Locus", "RU_Allele"], as_index=False)[
+    data_combine = profile.groupby(["SampleID", "Locus", "CE_Allele"], as_index=False)[
         "Reads"
     ].sum()
     dict_loc = {k: v for k, v in data_combine.groupby(["SampleID", "Locus"])}
@@ -228,13 +238,13 @@ def strmix_ce_processing(profile):
         metadata = filter_marker_data[key[1]]
         slope = metadata["Slope"]
         intercept = metadata["Intercept"]
-        data["Size"] = data["RU_Allele"] * slope + intercept
+        data["Size"] = data["CE_Allele"] * slope + intercept
         locus_df = locus_df.append(data)
-    locus_df.rename({"RU_Allele": "Allele", "Reads": "Height"}, axis=1, inplace=True)
+    locus_df.rename({"CE_Allele": "Allele", "Reads": "Height"}, axis=1, inplace=True)
     return locus_df
 
 
-def reference_table(sample_data):
+def reference_table(sample_data, datatype):
     new_rows = []
     for i, row in sample_data.iterrows():
         locus = sample_data.loc[i, "Locus"]
@@ -257,9 +267,27 @@ def reference_table(sample_data):
             continue
         else:
             new_rows.append(list(row))
-    final_reference = pd.DataFrame(new_rows, columns=["Locus", "Allele"])
-    concat_df = pd.concat([sample_data, final_reference]).reset_index(drop=True)
-    sort_df = concat_df.sort_values(by=["Locus", "Allele"])
+        final_reference = format_ref_table(new_rows, sample_data, datatype)
+    return final_reference
+
+
+def format_ref_table(new_rows, sample_data, datatype):
+    if datatype == "ce":
+        ref_filtered = pd.DataFrame(
+            new_rows, columns=["SampleID", "Locus", "Allele", "Height", "Size"]
+        )
+        concat_df = pd.concat([sample_data.iloc[:, 1:3], ref_filtered.iloc[:, 1:3]]).reset_index(
+            drop=True
+        )
+        sort_df = concat_df.sort_values(by=["Locus", "Allele"])
+    else:
+        ref_filtered = pd.DataFrame(
+            new_rows, columns=["SampleID", "Locus", "CE Allele", "Allele Seq", "Reads"]
+        )
+        concat_df = pd.concat([sample_data.iloc[:, 1:4], ref_filtered.iloc[:, 1:4]]).reset_index(
+            drop=True
+        )
+        sort_df = concat_df.sort_values(by=["Locus", "CE Allele"])
     return sort_df
 
 
@@ -273,8 +301,6 @@ def main(args):
     output_type = args.output
     if output_type not in ("efm", "strmix"):
         raise ValueError(f"unknown output type '{output_type}'")
-    if profile_type == "reference" and data_type == "ngs":
-        raise ValueError("Cannot create reference file from ngs data. Abort!")
     full_df = pd.read_csv(args.input, sep="\t")
     if args.out is None:
         outpath = sys.stdout

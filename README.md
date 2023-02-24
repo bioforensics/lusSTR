@@ -207,7 +207,6 @@ lusstr snps STRait_Razor_output/ -o strait_razor_p.txt --type p
 
 ## Filtering RU alleles and Creation of Files for Use in ProbGen Software
 
-**Currently, lusSTR is only set up to filter and identify stutter based on RU alleles for autosomal loci; future work will expand into the use of the LUS+ allele/sequence string as well as for sex chromosome loci and SNPs.*
 
 The ```filter``` command provides the opportunity to filter sequences using thresholds such as:
 * Detection threshold (both static and dynamic)
@@ -220,7 +219,7 @@ In addition, stutter alleles can be identified using the ```--info``` flag. This
 
 Each locus is checked for containing greater than 2 alleles (indicating a potential mixture) and for intralocus imbalance. If either are identified, a separate file (```Flagged_Loci.csv```) is created, containing the SampleID, Locus and either ```>2Alleles``` or ```IntraLocusImbalance```.
 
-When using STRmix data, the data type can be specified using the ```--data-type``` flag as either ```ce``` or ```ngs``` (default is ```ce```). If ```ngs``` is specified, the same size filter is applied but the stutter filter is not (the stutter filter is currently a work in progress for NGS data!). Further, the columns and column names in the output file differ based on the data type.
+When using STRmix data, the data type can be specified using the ```--data-type``` flag as either ```ce``` or ```ngs``` (default is ```ce```). If ```ngs``` is specified, the same size filter is applied following the stutter filter. Further, the columns and column names in the output file differ based on the data type.
 
 Finally, output files are created for direct use in EuroForMix (EFM) or STRmix. If EFM is specified, a single file is created containing all samples in the input file (however, separate output files for each sample can be created with the ```--separate``` flag). If STRmix is specified, a directory containing files for each individual sample is created. The ```--profile-type``` flag allows for the creation of either a ```reference``` or ```evidence``` profile. Both EuroForMix and STRmix require different formatting depending on the type of sample. 
 
@@ -228,7 +227,7 @@ Finally, output files are created for direct use in EuroForMix (EFM) or STRmix. 
 ```
 lusstr filter <input file> -o <output file/directory> --output-type <efm or strmix> --profile-type <evidence or reference> --info --no-filters --separate
 ```
-The ```filter``` command requires the input of a ```.txt``` file produced by the ```lusstr annot``` command.
+The ```filter``` command requires the input of a ```.txt``` file produced by the ```lusstr annotate``` command.
 The ```-o/--out``` flag specifies the name of the output file (for EFM) or output directory (for STRmix)
 ```--output-type``` specifies the type of output file created, either ```efm``` or ```strmix```. ```efm``` is the default.
 ```--profile-type``` specifies the sample type, either ```evidence``` or ```reference```. ```evidence``` is the default.
