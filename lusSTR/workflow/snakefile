@@ -24,10 +24,11 @@ def get_sample_IDs(input, uas):
             files = input
         files = [sub.replace(dir, "") for sub in files]
         ID_list = [sub.replace(file_ext, "") for sub in files]
-    return expand(
-        "{outdir}{samplename}_{prof_t}_{data_t}.csv", outdir=config["output_directory"],
-        samplename=ID_list, prof_t=config["profile_type"], data_t=config["data_type"]
-    )
+    return ID_list
+    #return expand(
+    #   "{outdir}{samplename}_{prof_t}_{data_t}.csv", outdir=config["output"],
+    #    samplename=ID_list, prof_t=config["profile_type"], data_t=config["data_type"]
+    #)
 
 
 def get_uas_ids(files):
@@ -55,7 +56,8 @@ rule all:
     input:
         expand("{name}.csv", name=config["output"]),
         expand("{name}.txt", name=config["output"]),
-        get_sample_IDs(config["samp_input"], config["uas"])
+        expand("{outdir}{samplename}_{prof_t}_{data_t}.csv", outdir=config["output"], samplename=get_sample_IDs(config["samp_input"], config["uas"]), prof_t=config["profile_type"], data_t=config["data_type"])
+        #get_sample_IDs(config["samp_input"], config["uas"])
 
 
 rule format:
@@ -89,9 +91,11 @@ rule filter:
     input:
         rules.annotate.output
     output:
-        "{samplename}_{prof_t}_{data_t}.csv"
+        #expand("{samplename}_{prof_t}_{data_t}.csv", samplename=
+        expand("{outdir}{samplename}_{prof_t}_{data_t}.csv", outdir=config["output"],
+        samplename=get_sample_IDs(config["samp_input"], config["uas"]), prof_t=config["profile_type"], data_t=config["data_type"])
     params:
-        output_dir=config["output_directory"],
+        output_dir=config["output"],
         output_type=config["output_type"],
         profile_type=config["profile_type"],
         data_type=config["data_type"],

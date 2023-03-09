@@ -2,24 +2,23 @@
 ---
 
 ## general settings
-uas: True
-sex: False
-output: "output_test"
+uas: True  ## True/False; if ran through UAS
+sex: False ## True/False; include sex-chromosome STRs
+output: "output_test/" ## output directory, must include "/" at the end. Example: "efm_output/"
 
 ##format settings
-samp_input: "/Users/rebecca.mitchell/Documents/Human/lusSTR/lusSTR/tests/data/UAS_bulk_input/"
-#samples: "Positive Control Sample Details Report 2316.xlsx"
+samp_input: "/Users/rebecca.mitchell/Documents/Human/lusSTR/lusSTR/tests/data/UAS_bulk_input/" ## input directory or sample
+#samp_input: "/Users/rebecca.mitchell/Documents/Human/lusSTR/lusSTR/tests/data/UAS_bulk_input/Positive Control Sample Details Report 2316.xlsx"
 
 ##annotate settings
-kit: "forenseq"
-nocombine: False
-separate: False
+kit: "forenseq" ## forenseq/powerseq
+nocombine: False ## True/False; do not combine identical sequences (if using STRait Razor data)
+separate: False ## True/False; create individual files for each sample
 
 ##filter settings
-output_directory: "output_test/"
-output_type: "strmix"
-profile_type: "evidence"
-data_type: "ce"
-info: True
-filter_sep: True
-nofilters: False
+output_type: "strmix" ## strmix/efm
+profile_type: "evidence" ## evidence/reference
+data_type: "ce" ## ce/ngs
+info: True ## True/False; create allele information file
+filter_sep: True ##True/False; for EFM only, if True will create individual files for samples; if False, will create one file with all samples
+nofilters: False ##True/False; skip all filtering steps
