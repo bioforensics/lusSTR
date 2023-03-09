@@ -1,0 +1,104 @@
+import glob
+import openpyxl
+import os
+import pandas as pd
+from pathlib import Path
+import re
+
+
+configfile: "config.yaml"
+
+
+def get_sample_IDs(input, uas):
+    file_ext = ".xlsx" if uas is True else ".txt"
+    if uas is True:
+        if os.path.isdir(input):
+            files = glob.glob(os.path.join(input, f"[!~]*{file_ext}"))
+        else:
+            files = input
+        ID_list = get_uas_ids(files)
+    else:
+        if os.path.isdir(input):
+            files = glob.glob(os.path.join(input, f"[!~]*{file_ext}"))
+        else:
+            files = input
+        files = [sub.replace(dir, "") for sub in files]
+        ID_list = [sub.replace(file_ext, "") for sub in files]
+    return expand(
+        "{outdir}{samplename}_{prof_t}_{data_t}.csv", outdir=config["output_directory"],
+        samplename=ID_list, prof_t=config["profile_type"], data_t=config["data_type"]
+    )
+
+
+def get_uas_ids(files):
+    samplelist = []
+    if isinstance(files, list):
+        for filename in sorted(files):
+            if "Sample Details" not in filename:
+                continue
+            sampleID = parse_sample_details(filename)
+            samplelist.append(sampleID)
+    else:
+        samplelist = parse_sample_details(files)
+    return samplelist
+
+
+def parse_sample_details(filename):
+    file = openpyxl.load_workbook(filename)
+    file_sheet = file["Autosomal STRs"]
+    table = pd.DataFrame(file_sheet.values)
+    sampleID = re.sub(" ", "_", table.iloc[2, 1])
+    return sampleID
+
+
+rule all:
+    input:
+        expand("{name}.csv", name=config["output"]),
+        expand("{name}.txt", name=config["output"]),
+        get_sample_IDs(config["samp_input"], config["uas"])
+
+
+rule format:
+    input:
+       expand("{input}", input=config["samp_input"])
+    output:
+        expand("{name}.csv", name=config["output"])
+    params:
+       uas="--uas" if config["uas"] is True else "",
+       sex="--include-sex" if config["sex"] is True else ""
+    shell:
+        "lusstr format '{input}' -o {output} {params.uas} {params.sex}"
+
+
+rule annotate:
+    input:
+        rules.format.output
+    output:
+        expand("{name}.txt", name=config["output"])
+    params:
+        uas="--uas" if config["uas"] is True else "",
+        sex="--include-sex" if config["sex"] is True else "",
+        combine="--nocombine" if config["nocombine"] is True else "",
+        separate="--separate" if config["separate"] is True else "",
+        kit=config["kit"]
+    shell:
+        "lusstr annotate {input} -o {output} --kit {params.kit} {params.uas} {params.sex} {params.combine} {params.separate}"
+
+
+rule filter:
+    input:
+        rules.annotate.output
+    output:
+        "{samplename}_{prof_t}_{data_t}.csv"
+    params:
+        output_dir=config["output_directory"],
+        output_type=config["output_type"],
+        profile_type=config["profile_type"],
+        data_type=config["data_type"],
+        info="--info" if config["info"] is True else "",
+        filter_sep="--separate" if config["filter_sep"] is True else "",
+        filters="--no-filters" if config["nofilters"] is True else ""
+    shell:
+        "lusstr filter {input} -o {params.output_dir} --output-type {params.output_type} --profile-type {params.profile_type} --data-type {params.data_type}"
+
+    

@@ -1,0 +1,25 @@
+%YAML 1.2
+---
+
+## general settings
+uas: True
+sex: False
+output: "output_test"
+
+##format settings
+samp_input: "/Users/rebecca.mitchell/Documents/Human/lusSTR/lusSTR/tests/data/UAS_bulk_input/"
+#samples: "Positive Control Sample Details Report 2316.xlsx"
+
+##annotate settings
+kit: "forenseq"
+nocombine: False
+separate: False
+
+##filter settings
+output_directory: "output_test/"
+output_type: "strmix"
+profile_type: "evidence"
+data_type: "ce"
+info: True
+filter_sep: True
+nofilters: False

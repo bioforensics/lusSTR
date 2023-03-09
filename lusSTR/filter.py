@@ -162,7 +162,7 @@ def write_sample_specific_efm_profiles(efm_profile, profile_type, outdir="Separa
         sample_profile = efm_profile[efm_profile.SampleName == sample]
         sample_profile.dropna(axis=1, how="all", inplace=True)
         if profile_type == "evidence":
-            sample_profile.to_csv(f"Separated_EFM_Files/{sample}.csv", index=False)
+            sample_profile.to_csv(f"Separated_EFM_Files/{sample}_evidence_ce.csv", index=False)
         else:
             num_alleles = (len(sample_profile.columns) - 2) / 2
             if num_alleles > 2:
@@ -175,7 +175,9 @@ def write_sample_specific_efm_profiles(efm_profile, profile_type, outdir="Separa
             for i in range(len(sample_profile)):
                 if pd.isna(sample_profile.loc[i, "Allele2"]):
                     sample_profile.loc[i, "Allele2"] = sample_profile.loc[i, "Allele1"]
-            sample_profile.iloc[:, :4].to_csv(f"Separated_EFM_Files/{id}.csv", index=False)
+            sample_profile.iloc[:, :4].to_csv(
+                f"Separated_EFM_Files/{id}_reference_ce.csv", index=False
+            )
 
 
 def write_aggregate_efm_profile(efm_profile, profile_type, outfile):
@@ -186,7 +188,7 @@ def write_aggregate_efm_profile(efm_profile, profile_type, outfile):
             if pd.isna(efm_profile.loc[i, "Allele2"]):
                 efm_profile.loc[i, "Allele2"] = efm_profile.loc[i, "Allele1"]
         prefix = outfile.replace(".csv", "")
-        efm_profile.iloc[:, :4].to_csv(f"{prefix}_reference.csv", index=False)
+        efm_profile.iloc[:, :4].to_csv(f"{prefix}_reference_ce.csv", index=False)
 
 
 def determine_max_num_alleles(allele_heights):
@@ -221,7 +223,7 @@ def STRmix_output(profile, outdir, profile_type, data_type):
     for id in id_list:
         sample_df = strmix_profile[strmix_profile["SampleID"] == id].reset_index(drop=True)
         if profile_type == "evidence":
-            sample_df.iloc[:, 1:].to_csv(f"{outdir}/{id}_{data_type}.csv", index=False)
+            sample_df.iloc[:, 1:].to_csv(f"{outdir}/{id}_evidence_{data_type}.csv", index=False)
         else:
             reference_df = reference_table(sample_df, data_type)
             reference_df.to_csv(f"{outdir}/{id}_reference_{data_type}.csv", index=False)
