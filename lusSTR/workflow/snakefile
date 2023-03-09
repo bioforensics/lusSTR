@@ -56,13 +56,16 @@ rule all:
     input:
         expand("{name}.csv", name=config["output"]),
         expand("{name}.txt", name=config["output"]),
-        expand("{outdir}{samplename}_{prof_t}_{data_t}.csv", outdir=config["output"], samplename=get_sample_IDs(config["samp_input"], config["uas"]), prof_t=config["profile_type"], data_t=config["data_type"])
-        #get_sample_IDs(config["samp_input"], config["uas"])
+        expand(
+            "{outdir}/{samplename}_{prof_t}_{data_t}.csv", outdir=config["output"],
+            samplename=get_sample_IDs(config["samp_input"], config["uas"]),
+            prof_t=config["profile_type"], data_t=config["data_type"]
+        )
 
 
 rule format:
     input:
-       expand("{input}", input=config["samp_input"])
+       expand("{samp_input}", samp_input=config["samp_input"])
     output:
         expand("{name}.csv", name=config["output"])
     params:
@@ -84,16 +87,19 @@ rule annotate:
         separate="--separate" if config["separate"] is True else "",
         kit=config["kit"]
     shell:
-        "lusstr annotate {input} -o {output} --kit {params.kit} {params.uas} {params.sex} {params.combine} {params.separate}"
+        "lusstr annotate {input} -o {output} --kit {params.kit} {params.uas} {params.sex} "
+        "{params.combine} {params.separate}"
 
 
 rule filter:
     input:
         rules.annotate.output
     output:
-        #expand("{samplename}_{prof_t}_{data_t}.csv", samplename=
-        expand("{outdir}{samplename}_{prof_t}_{data_t}.csv", outdir=config["output"],
-        samplename=get_sample_IDs(config["samp_input"], config["uas"]), prof_t=config["profile_type"], data_t=config["data_type"])
+        expand(
+            "{outdir}/{samplename}_{prof_t}_{data_t}.csv", outdir=config["output"],
+            samplename=get_sample_IDs(config["samp_input"], config["uas"]),
+            prof_t=config["profile_type"], data_t=config["data_type"]
+        )
     params:
         output_dir=config["output"],
         output_type=config["output_type"],
@@ -103,6 +109,7 @@ rule filter:
         filter_sep="--separate" if config["filter_sep"] is True else "",
         filters="--no-filters" if config["nofilters"] is True else ""
     shell:
-        "lusstr filter {input} -o {params.output_dir} --output-type {params.output_type} --profile-type {params.profile_type} --data-type {params.data_type}"
+        "lusstr filter {input} -o {params.output_dir} --output-type {params.output_type} "
+        "--profile-type {params.profile_type} --data-type {params.data_type}"
 
     

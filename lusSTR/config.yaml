@@ -4,7 +4,7 @@
 ## general settings
 uas: True  ## True/False; if ran through UAS
 sex: False ## True/False; include sex-chromosome STRs
-output: "output_test/" ## output directory, must include "/" at the end. Example: "efm_output/"
+output: "output_test" ## output file/directory name; Example: "test_030923"
 
 ##format settings
 samp_input: "/Users/rebecca.mitchell/Documents/Human/lusSTR/lusSTR/tests/data/UAS_bulk_input/" ## input directory or sample
