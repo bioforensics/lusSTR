@@ -18,7 +18,7 @@ filter_sep = config["filter_sep"]
 def get_sample_IDs(input, uas, output, software, separate):
     file_ext = ".xlsx" if uas is True else ".txt"
     if software == "efm" and separate is False:
-        return output
+        return os.path.basename(output)
     else:
         if uas is True:
             if os.path.isdir(input):

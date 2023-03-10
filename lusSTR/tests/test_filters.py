@@ -157,9 +157,10 @@ def test_EFMoutput_format(tmp_path):
     input_file = data_file("test_stutter.txt")
     exp_out = data_file("RU_stutter_test/test_filtering_EFMoutput.csv")
     exp_info_out = data_file("RU_stutter_test/test_filtering_EFMoutput_sequence_info.csv")
-    obs_out = str(tmp_path / "test_output.csv")
-    obs_info_out = str(tmp_path / "test_output_sequence_info.csv")
-    arglist = ["filter", "-o", obs_out, "--output-type", "efm", "--info", input_file]
+    output = str(tmp_path / "test_output")
+    obs_out = str(tmp_path / "test_output/test_output_evidence_ce.csv")
+    obs_info_out = str(tmp_path / "test_output/test_output_sequence_info.csv")
+    arglist = ["filter", "-o", output, "--output-type", "efm", "--info", input_file]
     args = lusSTR.cli.get_parser().parse_args(arglist)
     lusSTR.filter.main(args)
     assert filecmp.cmp(exp_out, obs_out) is True
@@ -174,8 +175,8 @@ def test_STRmixoutput_format(outputdir, datatype, tmp_path):
     exp_out = data_file(f"{outputdir}Sample1_{datatype}.csv")
     exp_info_out = data_file(f"{outputdir}STRmix_Files_sequence_info.csv")
     obs_outdir = str(tmp_path / "STRmix_Files")
-    obs_out = str(tmp_path / f"STRmix_Files/Sample1_{datatype}.csv")
-    obs_info_out = str(tmp_path / f"STRmix_Files/sequence_info.csv")
+    obs_out = str(tmp_path / f"STRmix_Files/Sample1_evidence_{datatype}.csv")
+    obs_info_out = str(tmp_path / f"STRmix_Files/STRmix_Files_sequence_info.csv")
     arglist = [
         "filter",
         "-o",
@@ -193,23 +194,10 @@ def test_STRmixoutput_format(outputdir, datatype, tmp_path):
     assert filecmp.cmp(exp_info_out, obs_info_out) is True
 
 
-def test_stdout(capsys):
-    input_file = data_file("test_stutter.txt")
-    output = data_file("RU_stutter_test/test_filtering_EFMoutput.csv")
-    arglist = ["filter", "--output-type", "efm", input_file]
-    args = lusSTR.cli.get_parser().parse_args(arglist)
-    lusSTR.filter.main(args)
-    with open(output, "r") as fh:
-        exp_out = fh.read().strip()
-    terminal = capsys.readouterr()
-    obs_out = terminal.out.strip()
-    assert obs_out == exp_out
-
-
 def test_nofilters(tmp_path):
     input_file = data_file("test_stutter.txt")
     exp_out = data_file("NGS_stutter_test/Sample1_nofilter.csv")
-    obs_out = str(tmp_path / "Sample1_ngs.csv")
+    obs_out = str(tmp_path / "Sample1_evidence_ngs.csv")
     arglist = [
         "filter",
         "-o",
@@ -230,7 +218,7 @@ def test_flags(tmp_path):
     input_file = data_file("test_stutter.txt")
     exp_out = data_file("RU_stutter_test/Flagged_Loci.csv")
     obs_outdir = str(tmp_path / "RU_stutter_test")
-    obs_out = str(tmp_path / "RU_stutter_test/Flagged_Loci.csv")
+    obs_out = str(tmp_path / "RU_stutter_test/RU_stutter_test_Flagged_Loci.csv")
     arglist = ["filter", "-o", obs_outdir, "--output-type", "strmix", "--info", input_file]
     args = lusSTR.cli.get_parser().parse_args(arglist)
     lusSTR.filter.main(args)
@@ -240,8 +228,8 @@ def test_flags(tmp_path):
 def test_efm_reference(tmp_path):
     input_file = data_file("test_references.txt")
     exp_out = data_file("RU_stutter_test/EFM_test_reference.csv")
-    obs_out = str(tmp_path / "test_output.csv")
-    obs_efm_out = str(tmp_path / "test_output_reference.csv")
+    obs_out = str(tmp_path / "test_output")
+    obs_efm_out = str(tmp_path / "test_output/test_output_reference_ce.csv")
     arglist = [
         "filter",
         "-o",
@@ -284,8 +272,9 @@ def test_strmix_reference(outputdir, datatype, tmp_path):
 def test_D7(tmp_path):
     input_file = data_file("test_D7.txt")
     exp_out = data_file("D7_microvariant_flagged.csv")
-    obs_out = str(tmp_path / "Flagged_Loci.csv")
-    arglist = ["filter", "-o", str(tmp_path), "--output-type", "strmix", "--info", input_file]
+    outpath = str(tmp_path / "test")
+    obs_out = str(tmp_path / "test/test_Flagged_Loci.csv")
+    arglist = ["filter", "-o", outpath, "--output-type", "strmix", "--info", input_file]
     args = lusSTR.cli.get_parser().parse_args(arglist)
     lusSTR.filter.main(args)
     assert filecmp.cmp(exp_out, obs_out)

@@ -157,7 +157,7 @@ def populate_efm_profile(profile):
 
 
 def write_sample_specific_efm_profiles(efm_profile, profile_type, outdir):
-    Path(outdir).mkdir(exist_ok=True)
+    Path(outdir).mkdir(parents=True, exist_ok=True)
     for sample in efm_profile.SampleName:
         sample_profile = efm_profile[efm_profile.SampleName == sample].reset_index(drop=True)
         sample_profile.dropna(axis=1, how="all", inplace=True)
@@ -179,14 +179,15 @@ def write_sample_specific_efm_profiles(efm_profile, profile_type, outdir):
 
 
 def write_aggregate_efm_profile(efm_profile, profile_type, outfile):
+    Path(outfile).mkdir(parents=True, exist_ok=True)
+    name = os.path.basename(outfile)
     if profile_type == "evidence":
-        efm_profile.to_csv(f"{outfile}/{outfile}_evidence_ce.csv", index=False)
+        efm_profile.to_csv(f"{outfile}/{name}_evidence_ce.csv", index=False)
     else:
         for i in range(len(efm_profile)):
             if pd.isna(efm_profile.loc[i, "Allele2"]):
                 efm_profile.loc[i, "Allele2"] = efm_profile.loc[i, "Allele1"]
-        prefix = outfile.replace(".csv", "")
-        efm_profile.iloc[:, :4].to_csv(f"{outfile}/{outfile}_reference_ce.csv", index=False)
+        efm_profile.iloc[:, :4].to_csv(f"{outfile}/{name}_reference_ce.csv", index=False)
 
 
 def determine_max_num_alleles(allele_heights):
@@ -199,6 +200,7 @@ def determine_max_num_alleles(allele_heights):
 
 
 def STRmix_output(profile, outdir, profile_type, data_type):
+    Path(outdir).mkdir(parents=True, exist_ok=True)
     if profile_type == "reference":
         filtered_df = profile[profile.allele_type == "real_allele"]
     else:
@@ -303,7 +305,7 @@ def main(args):
         raise ValueError(f"unknown output type '{output_type}'")
     full_df = pd.read_csv(args.input, sep="\t")
     if args.out is None:
-        outpath = sys.stdout
+        raise ValueError("No output specified using --out.")
     else:
         outpath = args.out
     if args.nofilters:
@@ -320,9 +322,7 @@ def main(args):
         else:
             STRmix_output(final_df, outpath, profile_type, data_type)
         if args.info:
-            if outpath != sys.stdout:
-                final_df.to_csv(f"{outpath}/{outpath}_sequence_info.csv", index=False)
-                if not flags_df.empty:
-                    flags_df.to_csv(f"{outputname}Flagged_Loci.csv", index=False)
-            else:
-                raise ValueError("No outfile provided. Please specify --out to create info file.")
+            name = os.path.basename(outpath)
+            final_df.to_csv(f"{outpath}/{name}_sequence_info.csv", index=False)
+            if not flags_df.empty:
+                flags_df.to_csv(f"{outpath}/{name}_Flagged_Loci.csv", index=False)
