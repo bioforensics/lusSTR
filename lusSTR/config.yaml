@@ -8,7 +8,6 @@ output: "output_test" ## output file/directory name; Example: "test_030923"
 
 ##format settings
 samp_input: "/Users/rebecca.mitchell/Documents/Human/lusSTR/lusSTR/tests/data/UAS_bulk_input/" ## input directory or sample
-#samp_input: "/Users/rebecca.mitchell/Documents/Human/lusSTR/lusSTR/tests/data/UAS_bulk_input/Positive Control Sample Details Report 2316.xlsx"
 
 ##annotate settings
 kit: "forenseq" ## forenseq/powerseq
@@ -17,8 +16,8 @@ separate: False ## True/False; create individual files for each sample
 
 ##filter settings
 output_type: "strmix" ## strmix/efm
-profile_type: "evidence" ## evidence/reference
+profile_type: "reference" ## evidence/reference
 data_type: "ce" ## ce/ngs
 info: True ## True/False; create allele information file
-filter_sep: True ##True/False; for EFM only, if True will create individual files for samples; if False, will create one file with all samples
+filter_sep: False ##True/False; for EFM only, if True will create individual files for samples; if False, will create one file with all samples
 nofilters: False ##True/False; skip all filtering steps

@@ -118,7 +118,7 @@ def EFM_output(profile, outfile, profile_type, separate=False):
         profile = profile[profile.allele_type != "BelowAT"]
     efm_profile = populate_efm_profile(profile)
     if separate:
-        write_sample_specific_efm_profiles(efm_profile, profile_type)
+        write_sample_specific_efm_profiles(efm_profile, profile_type, outfile)
     else:
         write_aggregate_efm_profile(efm_profile, profile_type, outfile)
 
@@ -156,13 +156,13 @@ def populate_efm_profile(profile):
     return efm_profile
 
 
-def write_sample_specific_efm_profiles(efm_profile, profile_type, outdir="Separated_EFM_Files"):
+def write_sample_specific_efm_profiles(efm_profile, profile_type, outdir):
     Path(outdir).mkdir(exist_ok=True)
     for sample in efm_profile.SampleName:
-        sample_profile = efm_profile[efm_profile.SampleName == sample]
+        sample_profile = efm_profile[efm_profile.SampleName == sample].reset_index(drop=True)
         sample_profile.dropna(axis=1, how="all", inplace=True)
         if profile_type == "evidence":
-            sample_profile.to_csv(f"Separated_EFM_Files/{sample}_evidence_ce.csv", index=False)
+            sample_profile.to_csv(f"{outdir}/{sample}_evidence_ce.csv", index=False)
         else:
             num_alleles = (len(sample_profile.columns) - 2) / 2
             if num_alleles > 2:
@@ -175,20 +175,18 @@ def write_sample_specific_efm_profiles(efm_profile, profile_type, outdir="Separa
             for i in range(len(sample_profile)):
                 if pd.isna(sample_profile.loc[i, "Allele2"]):
                     sample_profile.loc[i, "Allele2"] = sample_profile.loc[i, "Allele1"]
-            sample_profile.iloc[:, :4].to_csv(
-                f"Separated_EFM_Files/{id}_reference_ce.csv", index=False
-            )
+            sample_profile.iloc[:, :4].to_csv(f"{outdir}/{sample}_reference_ce.csv", index=False)
 
 
 def write_aggregate_efm_profile(efm_profile, profile_type, outfile):
     if profile_type == "evidence":
-        efm_profile.to_csv(outfile, index=False)
+        efm_profile.to_csv(f"{outfile}/{outfile}_evidence_ce.csv", index=False)
     else:
         for i in range(len(efm_profile)):
             if pd.isna(efm_profile.loc[i, "Allele2"]):
                 efm_profile.loc[i, "Allele2"] = efm_profile.loc[i, "Allele1"]
         prefix = outfile.replace(".csv", "")
-        efm_profile.iloc[:, :4].to_csv(f"{prefix}_reference_ce.csv", index=False)
+        efm_profile.iloc[:, :4].to_csv(f"{outfile}/{outfile}_reference_ce.csv", index=False)
 
 
 def determine_max_num_alleles(allele_heights):
@@ -323,11 +321,7 @@ def main(args):
             STRmix_output(final_df, outpath, profile_type, data_type)
         if args.info:
             if outpath != sys.stdout:
-                if output_type == "efm":
-                    outputname = outpath.replace(".csv", "_")
-                else:
-                    outputname = f"{outpath}/"
-                final_df.to_csv(f"{outputname}sequence_info.csv", index=False)
+                final_df.to_csv(f"{outpath}/{outpath}_sequence_info.csv", index=False)
                 if not flags_df.empty:
                     flags_df.to_csv(f"{outputname}Flagged_Loci.csv", index=False)
             else:

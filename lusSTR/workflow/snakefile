@@ -7,28 +7,33 @@ import re
 
 
 configfile: "config.yaml"
+output_name = config["output"]
+input_name = config["samp_input"]
+software = config["output_type"]
+prof = config["profile_type"]
+data = config["data_type"]
+filter_sep = config["filter_sep"]
 
 
-def get_sample_IDs(input, uas):
+def get_sample_IDs(input, uas, output, software, separate):
     file_ext = ".xlsx" if uas is True else ".txt"
-    if uas is True:
-        if os.path.isdir(input):
-            files = glob.glob(os.path.join(input, f"[!~]*{file_ext}"))
-        else:
-            files = input
-        ID_list = get_uas_ids(files)
+    if software == "efm" and separate is False:
+        return output
     else:
-        if os.path.isdir(input):
-            files = glob.glob(os.path.join(input, f"[!~]*{file_ext}"))
+        if uas is True:
+            if os.path.isdir(input):
+                files = glob.glob(os.path.join(input, f"[!~]*{file_ext}"))
+            else:
+                files = input
+            ID_list = get_uas_ids(files)
         else:
-            files = input
-        files = [sub.replace(dir, "") for sub in files]
-        ID_list = [sub.replace(file_ext, "") for sub in files]
-    return ID_list
-    #return expand(
-    #   "{outdir}{samplename}_{prof_t}_{data_t}.csv", outdir=config["output"],
-    #    samplename=ID_list, prof_t=config["profile_type"], data_t=config["data_type"]
-    #)
+            if os.path.isdir(input):
+                files = glob.glob(os.path.join(input, f"[!~]*{file_ext}"))
+            else:
+                files = input
+            files = [sub.replace(dir, "") for sub in files]
+            ID_list = [sub.replace(file_ext, "") for sub in files]
+        return ID_list
 
 
 def get_uas_ids(files):
@@ -54,20 +59,20 @@ def parse_sample_details(filename):
 
 rule all:
     input:
-        expand("{name}.csv", name=config["output"]),
-        expand("{name}.txt", name=config["output"]),
+        expand("{name}.csv", name=output_name),
+        expand("{name}.txt", name=output_name),
         expand(
-            "{outdir}/{samplename}_{prof_t}_{data_t}.csv", outdir=config["output"],
-            samplename=get_sample_IDs(config["samp_input"], config["uas"]),
-            prof_t=config["profile_type"], data_t=config["data_type"]
+            "{outdir}/{samplename}_{prof_t}_{data_t}.csv", outdir=output_name,
+            samplename=get_sample_IDs(input_name, config["uas"], output_name, software, 
+            filter_sep), prof_t=prof, data_t=data
         )
 
 
 rule format:
     input:
-       expand("{samp_input}", samp_input=config["samp_input"])
+       expand("{samp_input}", samp_input=input_name)
     output:
-        expand("{name}.csv", name=config["output"])
+        expand("{name}.csv", name=output_name)
     params:
        uas="--uas" if config["uas"] is True else "",
        sex="--include-sex" if config["sex"] is True else ""
@@ -79,7 +84,7 @@ rule annotate:
     input:
         rules.format.output
     output:
-        expand("{name}.txt", name=config["output"])
+        expand("{name}.txt", name=output_name)
     params:
         uas="--uas" if config["uas"] is True else "",
         sex="--include-sex" if config["sex"] is True else "",
@@ -96,20 +101,21 @@ rule filter:
         rules.annotate.output
     output:
         expand(
-            "{outdir}/{samplename}_{prof_t}_{data_t}.csv", outdir=config["output"],
-            samplename=get_sample_IDs(config["samp_input"], config["uas"]),
-            prof_t=config["profile_type"], data_t=config["data_type"]
+            "{outdir}/{samplename}_{prof_t}_{data_t}.csv", outdir=output_name,
+            samplename=get_sample_IDs(input_name, config["uas"], output_name, software, 
+            filter_sep), prof_t=prof, data_t=data
         )
     params:
-        output_dir=config["output"],
         output_type=config["output_type"],
         profile_type=config["profile_type"],
         data_type=config["data_type"],
+        output_dir=config["output"],
         info="--info" if config["info"] is True else "",
         filter_sep="--separate" if config["filter_sep"] is True else "",
         filters="--no-filters" if config["nofilters"] is True else ""
     shell:
         "lusstr filter {input} -o {params.output_dir} --output-type {params.output_type} "
-        "--profile-type {params.profile_type} --data-type {params.data_type}"
+        "--profile-type {params.profile_type} --data-type {params.data_type} {params.info} "
+        "{params.filters} {params.filter_sep}"
 
     
