@@ -326,3 +326,7 @@ def main(args):
             final_df.to_csv(f"{outpath}/{name}_sequence_info.csv", index=False)
             if not flags_df.empty:
                 flags_df.to_csv(f"{outpath}/{name}_Flagged_Loci.csv", index=False)
+
+
+if __name__ == "__main__":
+    main(snakemake.input, snakemake.output, output_type=snakemake.params.output_type, profile_type=snakemake.params.profile_type, data_type=snakemake.params.data_type, output_dir=snakemake.params.output_dir, info=snakemake.params.info, filter_sep=snakemake.params.filter_sep, filters=snakemake.params.filters)

@@ -1,4 +1,5 @@
 import glob
+import lusSTR
 import openpyxl
 import os
 import pandas as pd
@@ -74,10 +75,10 @@ rule format:
     output:
         expand("{name}.csv", name=output_name)
     params:
-       uas="--uas" if config["uas"] is True else "",
-       sex="--include-sex" if config["sex"] is True else ""
-    shell:
-        "lusstr format '{input}' -o {output} {params.uas} {params.sex}"
+       uas=config["uas"],
+       sex=config["sex"]
+    script:
+        lusSTR.wrapper("format")
 
 
 rule annotate:
@@ -86,14 +87,13 @@ rule annotate:
     output:
         expand("{name}.txt", name=output_name)
     params:
-        uas="--uas" if config["uas"] is True else "",
-        sex="--include-sex" if config["sex"] is True else "",
-        combine="--nocombine" if config["nocombine"] is True else "",
-        separate="--separate" if config["separate"] is True else "",
+        uas=config["uas"],
+        sex=config["sex"],
+        combine=config["nocombine"],
+        separate=config["separate"],
         kit=config["kit"]
-    shell:
-        "lusstr annotate {input} -o {output} --kit {params.kit} {params.uas} {params.sex} "
-        "{params.combine} {params.separate}"
+    script:
+        lusSTR.wrapper("annot")
 
 
 rule filter:
@@ -110,12 +110,9 @@ rule filter:
         profile_type=config["profile_type"],
         data_type=config["data_type"],
         output_dir=config["output"],
-        info="--info" if config["info"] is True else "",
-        filter_sep="--separate" if config["filter_sep"] is True else "",
-        filters="--no-filters" if config["nofilters"] is True else ""
-    shell:
-        "lusstr filter {input} -o {params.output_dir} --output-type {params.output_type} "
-        "--profile-type {params.profile_type} --data-type {params.data_type} {params.info} "
-        "{params.filters} {params.filter_sep}"
-
+        info=config["info"],
+        filter_sep=config["filter_sep"],
+        filters=config["nofilters"],
+    script:
+        lusSTR.wrapper("filter")
     

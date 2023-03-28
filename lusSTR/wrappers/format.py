@@ -186,14 +186,17 @@ def strait_razor_table(filename, analysisID, sexloci=False):
     return table
 
 
-def main(args):
-    if args.uas:
-        results, sex_results = uas_load(args.input, args.sex)
+def main(input, outfile, uas=True, sex=False):
+    if uas:
+        results, sex_results = uas_load(input, sex)
     else:
-        results, sex_results = strait_razor_concat(args.input, args.sex)
-    if args.out is None:
-        args.out = sys.stdout
-    results.to_csv(args.out, index=False)
-    if args.sex:
-        name = os.path.splitext(args.out)[0]
+        results, sex_results = strait_razor_concat(input, sex)
+    if outfile is None:
+        outfile = sys.stdout
+    results.to_csv(outfile, index=False)
+    if sex:
+        name = os.path.splitext(outfile)[0]
         sex_results.to_csv(f"{name}_sexloci.csv", index=False)
+
+if __name__ == "__main__":
+    main(snakemake.input, snakemake.output, uas=snakemake.params.uas, sex=snakemake.params.sex)

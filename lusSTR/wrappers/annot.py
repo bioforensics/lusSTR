@@ -250,3 +250,7 @@ def main(args):
             indiv_files(autosomal_final_table, input_name, ".txt")
         else:
             autosomal_final_table.to_csv(args.out, sep="\t", index=False)
+
+
+if __name__ == "__main__":
+    main(snakemake.input, snakemake.output, kit=snakemake.params.kit, uas=snakemake.params.uas, sex=snakemake.params.sex, combine=snakemake.params.combine, separate=snakemake.params.separate)

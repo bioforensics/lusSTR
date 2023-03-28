@@ -9,17 +9,3 @@
 # National Biodefense Analysis and Countermeasures Center (NBACC), a Federally Funded Research and
 # Development Center.
 # -------------------------------------------------------------------------------------------------
-
-from . import cli
-from ._version import get_versions
-
-__version__ = get_versions()["version"]
-del get_versions
-
-
-# def snakefile(workflow='all'):
-#    return resource_filename('lusSTR', f'workflows/{workflow}.smk')
-
-
-def wrapper(label):
-    return resource_filename("microcat", f"wrappers/{label}.py")
