@@ -10,6 +10,7 @@
 # Development Center.
 # -------------------------------------------------------------------------------------------------
 
+import glob
 from setuptools import setup
 import versioneer
 
@@ -19,23 +20,25 @@ setup(
     version=versioneer.get_version(),
     cmdclass=versioneer.get_cmdclass(),
     description=desc,
-    packages=["lusSTR", "lusSTR.tests"],
+    packages=["lusSTR", "lusSTR.cli", "lusSTR.tests"],
     package_data={
         "lusSTR": [
-            "lusSTR/str_markers.json",
-            "lusSTR/snp_data.json",
+            "lusSTR/data/*",
             "lusSTR/tests/data/*",
             "lusSTR/tests/data/STRait_Razor_test_output/*",
             "lusSTR/tests/data/UAS_bulk_input/*",
             "lusSTR/tests/data/snps/*",
             "lusSTR/tests/data/RU_stutter_test/*",
-            "lusSTR/filters.json",
             "lusSTR/tests/data/NGS_stutter_test/*",
+            "lusSTR/workflows/*",
+            "lusSTR/wrappers/*",
+            "lusSTR/config.yaml",
         ]
     },
     include_package_data=True,
     install_requires=["pandas>=1.0", "openpyxl>=3.0.6"],
     entry_points={"console_scripts": ["lusstr = lusSTR.cli:main"]},
+    scripts=glob.glob("lusSTR/scripts/*"),
     classifiers=[
         "Environment :: Console",
         "Framework :: IPython",

@@ -10,6 +10,7 @@
 # Development Center.
 # -------------------------------------------------------------------------------------------------
 
+from pkg_resources import resource_filename
 from lusSTR import cli
 from lusSTR._version import get_versions
 
@@ -17,9 +18,9 @@ __version__ = get_versions()["version"]
 del get_versions
 
 
-# def snakefile(workflow='all'):
-#    return resource_filename('lusSTR', f'workflows/{workflow}.smk')
+def snakefile(workflow="strs"):
+    return resource_filename("lusSTR", f"workflows/{workflow}.smk")
 
 
 def wrapper(label):
-    return resource_filename("microcat", f"wrappers/{label}.py")
+    return resource_filename("lusSTR", f"wrappers/{label}.py")

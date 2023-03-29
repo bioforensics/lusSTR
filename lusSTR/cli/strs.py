@@ -19,16 +19,17 @@ from pkg_resources import resource_filename
 def main(args):
     snakefile = resource_filename("lusSTR", "workflows/strs.smk")
     pretarget = "annotate" if args.filter else "all"
+    workdir = args.workdir
+    #config = args.config
     result = snakemake.snakemake(
-        snakefile, config=args.config, targets=pretarget,
-        workdir=args.work_dir
+        snakefile, targets=pretarget, workdir=workdir
     )
     if result is not True:
         raise SystemError('Snakemake failed')
 
 def subparser(subparsers):
     p = subparsers.add_parser("strs", description="Running the entire STR pipeline (format, annotate and filter)")
-    p.add_argument("--config", default="config.yaml", help="config file used to identify settings.")
+    #p.add_argument("--config", default="config.yaml", help="config file used to identify settings.")
     p.add_argument("-w", "--workdir", metavar="W", default=".", help="working directory")
     p.add_argument("--skip-filter", dest="filter", action = "store_true", help="Skip filtering step")
     

@@ -19,9 +19,9 @@ subparser_funcs = {
 def main(args=None):
     if args is None: 
         args = get_parser().parse_args()
-    if args.cmd is None:
+    if args.subcmd is None:
         get_parser().parse_args(["-h"])
-    mainmethod = mains[args.cmd]
+    mainmethod = mains[args.subcmd]
     result = mainmethod(args)
     return result
 
@@ -32,7 +32,7 @@ def get_parser():
         "-v", "--version", action="version", version="lusSTR v" + lusSTR.__version__
     )
     subcommandstr = ", ".join(sorted(subparser_funcs.keys()))
-    subparsers = parser.add_subparsers(dest="cmd", metavar="cmd", help=subcommandstr)
+    subparsers = parser.add_subparsers(dest="subcmd", metavar="subcmd", help=subcommandstr)
     for func in subparser_funcs.values():
         func(subparsers)
     return parser
