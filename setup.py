@@ -35,7 +35,7 @@ setup(
     },
     include_package_data=True,
     install_requires=["pandas>=1.0", "openpyxl>=3.0.6"],
-    entry_points={"console_scripts": ["lusstr = lusSTR.__main__:main"]},
+    entry_points={"console_scripts": ["lusstr = lusSTR.cli:main"]},
     classifiers=[
         "Environment :: Console",
         "Framework :: IPython",

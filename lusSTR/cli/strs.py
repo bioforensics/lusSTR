@@ -27,7 +27,7 @@ def main(args):
         raise SystemError('Snakemake failed')
 
 def subparser(subparsers):
-    p = subparsers.add_parser("all", description="Running the entire STR pipeline (format, annotate and filter)")
+    p = subparsers.add_parser("strs", description="Running the entire STR pipeline (format, annotate and filter)")
     p.add_argument("--config", default="config.yaml", help="config file used to identify settings.")
     p.add_argument("-w", "--workdir", metavar="W", default=".", help="working directory")
     p.add_argument("--skip-filter", dest="filter", action = "store_true", help="Skip filtering step")

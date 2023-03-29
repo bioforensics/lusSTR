@@ -1,15 +1,17 @@
-from . import all
-from . import snps
+import argparse
+import lusSTR
+from lusSTR.cli import strs
+from lusSTR.cli import snps
 import snakemake
 
 
 mains = {
-    "all": all.main,
+    "strs": strs.main,
     "snps": snps.main
 }
 
 subparser_funcs = {
-    "all": all.subparser,
+    "strs": strs.subparser,
     "snps": snps.subparser
 }
 
@@ -30,7 +32,7 @@ def get_parser():
         "-v", "--version", action="version", version="lusSTR v" + lusSTR.__version__
     )
     subcommandstr = ", ".join(sorted(subparser_funcs.keys()))
-    subparsers = parser.add_subparsers(dest="subcmd", metavar="subcmd", help=subcommandstr)
+    subparsers = parser.add_subparsers(dest="cmd", metavar="cmd", help=subcommandstr)
     for func in subparser_funcs.values():
         func(subparsers)
     return parser

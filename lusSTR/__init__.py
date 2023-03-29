@@ -10,8 +10,8 @@
 # Development Center.
 # -------------------------------------------------------------------------------------------------
 
-from . import cli
-from ._version import get_versions
+from lusSTR import cli
+from lusSTR._version import get_versions
 
 __version__ = get_versions()["version"]
 del get_versions

@@ -17,14 +17,14 @@ import pandas as pd
 import re
 
 import lusSTR
-from lusSTR.repeat import collapse_all_repeats, collapse_repeats_by_length
-from lusSTR.repeat import sequence_to_bracketed_form, split_by_n
-from lusSTR.repeat import reverse_complement, reverse_complement_bracketed
+from lusSTR.scripts.repeat import collapse_all_repeats, collapse_repeats_by_length
+from lusSTR.scripts.repeat import sequence_to_bracketed_form, split_by_n
+from lusSTR.scrips.repeat import reverse_complement, reverse_complement_bracketed
 from pkg_resources import resource_filename
 
 
 def get_str_metadata_file():
-    return resource_filename("lusSTR", "str_markers.json")
+    return resource_filename("lusSTR", "data/str_markers.json")
 
 
 with open(get_str_metadata_file(), "r") as fh:
