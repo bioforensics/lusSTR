@@ -3,7 +3,7 @@ include lusSTR/_version.py
 include lusSTR/data/filters.json
 include lusSTR/data/str_markers.json
 include lusSTR/data/snp_data.json
-include lusSTR/config.yaml
+include lusSTR/data/config.yaml
 include lusSTR/tests/data/*
 include lusSTR/workflows/*
 include lusSTR/wrappers/*

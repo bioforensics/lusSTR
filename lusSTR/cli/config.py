@@ -12,12 +12,13 @@
 
 import argparse
 import lusSTR
-import os.path
+from pathlib import Path
 from pkg_resources import resource_filename
 import shutil
 
 
 def main(args):
+    Path(args.workdir).mkdir(parents=True, exist_ok=True)
     final_dest = f"{args.workdir}/config.yaml"
     config = resource_filename("lusSTR", "data/config.yaml")
     shutil.copyfile(config, final_dest)

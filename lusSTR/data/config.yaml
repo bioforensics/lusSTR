@@ -18,4 +18,4 @@ profile_type: "evidence" ## evidence/reference
 data_type: "ngs" ## ce/ngs
 info: True ## True/False; create allele information file
 filter_sep: False ##True/False; for EFM only, if True will create individual files for samples; if False, will create one file with all samples
-nofilters: False ##True/False; skip all filtering steps
+nofilters: False ##True/False; skip all filtering steps but still creates EFM/STRmix output files

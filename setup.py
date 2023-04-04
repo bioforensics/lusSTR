@@ -32,7 +32,6 @@ setup(
             "lusSTR/tests/data/NGS_stutter_test/*",
             "lusSTR/workflows/*",
             "lusSTR/wrappers/*",
-            "lusSTR/config.yaml",
         ]
     },
     include_package_data=True,
