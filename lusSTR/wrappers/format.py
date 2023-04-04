@@ -188,14 +188,14 @@ def strait_razor_table(filename, analysisID, sexloci=False):
 
 def main(input, outfile, uas=True, sex=False):
     if uas:
-        results, sex_results = uas_load(input, sex)
+        results, sex_results = uas_load(str(input), sex)
     else:
-        results, sex_results = strait_razor_concat(input, sex)
+        results, sex_results = strait_razor_concat(str(input), sex)
     if outfile is None:
         outfile = sys.stdout
-    results.to_csv(outfile, index=False)
+    results.to_csv(str(outfile), index=False)
     if sex:
-        name = os.path.splitext(outfile)[0]
+        name = os.path.splitext(str(outfile))[0]
         sex_results.to_csv(f"{name}_sexloci.csv", index=False)
 
 if __name__ == "__main__":

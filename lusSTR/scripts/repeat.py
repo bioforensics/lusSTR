@@ -13,6 +13,23 @@
 import re
 
 
+
+def split_sequence_into_two_strings(sequence, repeat_for_split):
+    """
+    Function to split a sequence into two separate strings at a specified repeat unit.
+    """
+    last = 0
+    prev = 0
+    for m in re.finditer(repeat_for_split, sequence):
+        if m.start() == prev or m.start() == last or prev == 0:
+            prev = m.end()
+        else:
+            last = m.end()
+    first_string = sequence[:prev]
+    second_string = sequence[prev:]
+    return first_string, second_string
+
+
 def collapse_tandem_repeat(fullseq, repeat):
     """Collapse tandem stretches of the specified repeat sequence in a larger sequence.
 

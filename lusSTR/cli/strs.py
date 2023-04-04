@@ -18,7 +18,7 @@ from pkg_resources import resource_filename
 
 def main(args):
     snakefile = resource_filename("lusSTR", "workflows/strs.smk")
-    pretarget = "annotate" if args.filter else "all"
+    pretarget = "annotate" if args.filter else "filter"
     workdir = args.workdir
     #config = args.config
     result = snakemake.snakemake(

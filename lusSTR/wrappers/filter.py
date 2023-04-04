@@ -14,7 +14,7 @@ import argparse
 from collections import defaultdict
 import json
 import lusSTR
-from lusSTR.filter_settings import filters, flags
+from lusSTR.scripts.filter_settings import filters, flags
 import numpy as np
 import os
 import pandas as pd
@@ -56,7 +56,7 @@ strs = [
 
 
 def get_filter_metadata_file():
-    return resource_filename("lusSTR", "filters.json")
+    return resource_filename("lusSTR", "data/filters.json")
 
 
 with open(get_filter_metadata_file(), "r") as fh:
@@ -293,35 +293,33 @@ def format_ref_table(new_rows, sample_data, datatype):
     return sort_df
 
 
-def main(args):
-    profile_type = args.profile
+def main(input, output_type, profile_type, data_type, output_dir, info, separate, nofilters):
+    input = str(input)
     if profile_type not in ("evidence", "reference"):
         raise ValueError(f"unknown profile type '{profile_type}'")
-    data_type = args.data
     if data_type not in ("ce", "ngs"):
         raise ValueError(f"unknown data type '{data_type}'")
-    output_type = args.output
     if output_type not in ("efm", "strmix"):
         raise ValueError(f"unknown output type '{output_type}'")
-    full_df = pd.read_csv(args.input, sep="\t")
-    if args.out is None:
+    full_df = pd.read_csv(input, sep="\t")
+    if output_dir is None:
         raise ValueError("No output specified using --out.")
     else:
-        outpath = args.out
-    if args.nofilters:
+        outpath = output_dir
+    if nofilters:
         full_df["allele_type"] = "real_allele"
-        if args.output == "efm":
-            EFM_output(full_df, outpath, profile_type, args.separate)
+        if output_type == "efm":
+            EFM_output(full_df, outpath, profile_type, separate)
         else:
             STRmix_output(full_df, outpath, profile_type, data_type)
     else:
         dict_loc = {k: v for k, v in full_df.groupby(["SampleID", "Locus"])}
         final_df, flags_df = process_strs(dict_loc, data_type)
         if output_type == "efm":
-            EFM_output(final_df, outpath, profile_type, args.separate)
+            EFM_output(final_df, outpath, profile_type, separate)
         else:
             STRmix_output(final_df, outpath, profile_type, data_type)
-        if args.info:
+        if info:
             name = os.path.basename(outpath)
             final_df.to_csv(f"{outpath}/{name}_sequence_info.csv", index=False)
             if not flags_df.empty:
@@ -329,4 +327,4 @@ def main(args):
 
 
 if __name__ == "__main__":
-    main(snakemake.input, snakemake.output, output_type=snakemake.params.output_type, profile_type=snakemake.params.profile_type, data_type=snakemake.params.data_type, output_dir=snakemake.params.output_dir, info=snakemake.params.info, filter_sep=snakemake.params.filter_sep, filters=snakemake.params.filters)
+    main(snakemake.input, output_type=snakemake.params.output_type, profile_type=snakemake.params.profile_type, data_type=snakemake.params.data_type, output_dir=snakemake.params.output_dir, info=snakemake.params.info, separate=snakemake.params.filter_sep, nofilters=snakemake.params.filters)
