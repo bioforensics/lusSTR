@@ -12,17 +12,15 @@
 
 import argparse
 import lusSTR
-import snakemake
-from pkg_resources import resource_filename
+from snakemake import snakemake
 
 
 def main(args):
-    snakefile = resource_filename("lusSTR", "workflows/strs.smk")
-    pretarget = "annotate" if args.filter else "filter"
+    pretarget = "annotate" if args.nofilter else "filter"
     workdir = args.workdir
     #config = args.config
-    result = snakemake.snakemake(
-        snakefile, targets=pretarget, workdir=workdir
+    result = snakemake(
+        lusSTR.snakefile(workflow="strs"), targets=[pretarget], workdir=workdir
     )
     if result is not True:
         raise SystemError('Snakemake failed')
@@ -31,5 +29,5 @@ def subparser(subparsers):
     p = subparsers.add_parser("strs", description="Running the entire STR pipeline (format, annotate and filter)")
     #p.add_argument("--config", default="config.yaml", help="config file used to identify settings.")
     p.add_argument("-w", "--workdir", metavar="W", default=".", help="working directory")
-    p.add_argument("--skip-filter", dest="filter", action = "store_true", help="Skip filtering step")
+    p.add_argument("--skip-filter", dest="nofilter", action = "store_true", help="Skip filtering step")
     
