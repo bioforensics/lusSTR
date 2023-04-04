@@ -1,16 +1,19 @@
 import argparse
 import lusSTR
+from lusSTR.cli import config
 from lusSTR.cli import strs
 from lusSTR.cli import snps
 import snakemake
 
 
 mains = {
+    "config": config.main,
     "strs": strs.main,
     "snps": snps.main
 }
 
 subparser_funcs = {
+    "config": config.subparser,
     "strs": strs.subparser,
     "snps": snps.subparser
 }

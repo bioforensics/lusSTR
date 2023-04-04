@@ -12,20 +12,20 @@
 
 import argparse
 import lusSTR
-from snakemake import snakemake
+import os.path
+from pkg_resources import resource_filename
+import shutil
 
 
 def main(args):
-    pretarget = "annotate" if args.nofilter else "filter"
-    workdir = args.workdir
-    result = snakemake(
-        lusSTR.snakefile(workflow="strs"), targets=[pretarget], workdir=workdir
-    )
-    if result is not True:
-        raise SystemError('Snakemake failed')
+    final_dest = f"{args.workdir}/config.yaml"
+    config = resource_filename("lusSTR", "data/config.yaml")
+    shutil.copyfile(config, final_dest)
+
 
 def subparser(subparsers):
-    p = subparsers.add_parser("strs", description="Running the entire STR pipeline (format, annotate and filter)")
-    p.add_argument("-w", "--workdir", metavar="W", default=".", help="working directory")
-    p.add_argument("--skip-filter", dest="nofilter", action = "store_true", help="Skip filtering step")
+    p = subparsers.add_parser("config", description="Create config file for running STR pipeline")
+    p.add_argument(
+        "-w", "--workdir", metavar="W", default=".",
+        help="directory to add config file; default is current working directory")
     
