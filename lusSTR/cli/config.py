@@ -23,38 +23,38 @@ def main(args):
     config = resource_filename("lusSTR", "data/config.yaml")
     #shutil.copyfile(config, final_dest)
     final_config = edit_config(config, args)
-    with open(final_dest, 'w') as file:
+    with open(final_dest, "w") as file:
         yaml.dump(final_config, file)
 
 def edit_config(config, args):
-    with open(config, 'r') as file:
+    with open(config, "r") as file:
         data = yaml.safe_load(file)
     if args.straitrazor:
-        data['uas'] = False
+        data["uas"] = False
     if args.powerseq:
-        data['kit'] = 'powerseq'
+        data["kit"] = "powerseq"
     if args.input:
-        data['samp_input'] = args.input
+        data["samp_input"] = args.input
     if args.out:
-        data['output'] = args.out
+        data["output"] = args.out
     if args.sex:
-        data['sex'] = True
+        data["sex"] = True
     if args.separate:
-        data['separate'] = True
+        data["separate"] = True
     if args.nocombine:
-        data['nocombine'] = True
+        data["nocombine"] = True
     if args.efm_sep:
-        data['filter_sep'] = True
+        data["filter_sep"] = True
     if args.nofiltering:
-        data['nofilters'] = True
+        data["nofilters"] = True
     if args.noinfo:
-        data['info'] = False
+        data["info"] = False
     if args.reference:
-        data['profile_type'] = 'reference'
+        data["profile_type"] = "reference"
     if args.ce:
-        data['data_type'] = 'ce'
+        data["data_type"] = "ce"
     if args.efm:
-        data['output_type'] = 'efm'
+        data["output_type"] = "efm"
     return data
 
 
