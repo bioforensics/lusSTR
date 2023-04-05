@@ -27,6 +27,4 @@ def main(args):
 def subparser(subparsers):
     p = subparsers.add_parser("strs", description="Running the entire STR pipeline (format, annotate and filter)")
     p.add_argument('target', help="Steps to run; 'all' will run all steps of the STR workflow.")
-    p.add_argument("-w", "--workdir", metavar="W", default=".", help="working directory")
-    #p.add_argument("--skip-filter", dest="nofilter", action = "store_true", help="Skip filtering step")
-    
+    p.add_argument("-w", "--workdir", metavar="W", default=".", help="working directory")    
