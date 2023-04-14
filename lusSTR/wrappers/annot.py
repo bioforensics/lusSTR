@@ -182,7 +182,7 @@ def indiv_files(table, input_dir, ext):
         new_df.to_csv(f"{output_dir}/{samp}{ext}", sep="\t", index=False)
 
 
-def main(input, out, kit, uas, sex, combine, separate):
+def main(input, out, kit, uas, sex, nocombine, separate):
     input = str(input)
     out = str(out)
     if separate and os.path.exists("Separated_lusstr_Files") is False:
@@ -198,14 +198,13 @@ def main(input, out, kit, uas, sex, combine, separate):
         )
         if not uas:
             sex_flank_table.to_csv(f"{output_name}_sexloci_flanks_anno.txt", sep="\t", index=False)
-            if combine:
-                if not sex_final_table.empty:
-                    sex_final_table = combine_reads(sex_final_table, columns)
-                if args.separate:
-                    indiv_files(sex_final_table, input_name, "_sexloci.txt")
-                else:
-                    sex_final_table.to_csv(f"{output_name}_sexloci.txt", sep="\t", index=False)
+            if not sex_final_table.empty:
+                sex_final_table = combine_reads(sex_final_table, columns)
+            if separate:
+                indiv_files(sex_final_table, input_name, "_sexloci.txt")
             else:
+                sex_final_table.to_csv(f"{output_name}_sexloci.txt", sep="\t", index=False)
+            if nocombine:
                 if separate:
                     indiv_files(sex_final_table, input_name, "_sexloci_no_combined_reads.txt")
                 sex_final_table.to_csv(f"{output_name}_sexloci_no_combined_reads.txt", index=False)
@@ -216,14 +215,13 @@ def main(input, out, kit, uas, sex, combine, separate):
                 sex_final_table.to_csv(f"{output_name}_sexloci.txt", sep="\t", index=False)
     if not uas:
         autosomal_flank_table.to_csv(f"{output_name}_flanks_anno.txt", sep="\t", index=False)
-        if combine:
-            if not autosomal_final_table.empty:
-                autosomal_final_table = combine_reads(autosomal_final_table, columns)
-                if separate:
-                    indiv_files(autosomal_final_table, input_name, ".txt")
-                else:
-                    autosomal_final_table.to_csv(out, sep="\t", index=False)
-        else:
+        if not autosomal_final_table.empty:
+            autosomal_final_table = combine_reads(autosomal_final_table, columns)
+            if separate:
+                indiv_files(autosomal_final_table, input_name, ".txt")
+            else:
+                autosomal_final_table.to_csv(out, sep="\t", index=False)
+        if nocombine:
             autosomal_final_table.to_csv(
                 f"{output_name}_no_combined_reads.txt", sep="\t", index=False
             )
@@ -235,4 +233,4 @@ def main(input, out, kit, uas, sex, combine, separate):
 
 
 if __name__ == "__main__":
-    main(snakemake.input, snakemake.output, kit=snakemake.params.kit, uas=snakemake.params.uas, sex=snakemake.params.sex, combine=snakemake.params.combine, separate=snakemake.params.separate)
+    main(snakemake.input, snakemake.output, kit=snakemake.params.kit, uas=snakemake.params.uas, sex=snakemake.params.sex, nocombine=snakemake.params.nocombine, separate=snakemake.params.separate)

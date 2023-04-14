@@ -12,6 +12,7 @@
 
 import argparse
 import lusSTR
+import os
 from pathlib import Path
 from pkg_resources import resource_filename
 import yaml
@@ -21,7 +22,6 @@ def main(args):
     Path(args.workdir).mkdir(parents=True, exist_ok=True)
     final_dest = f"{args.workdir}/config.yaml"
     config = resource_filename("lusSTR", "data/config.yaml")
-    #shutil.copyfile(config, final_dest)
     final_config = edit_config(config, args)
     with open(final_dest, "w") as file:
         yaml.dump(final_config, file)
@@ -35,6 +35,8 @@ def edit_config(config, args):
         data["kit"] = "powerseq"
     if args.input:
         data["samp_input"] = args.input
+    else:
+        data["samp_input"] = os.getcwd()
     if args.out:
         data["output"] = args.out
     if args.sex:

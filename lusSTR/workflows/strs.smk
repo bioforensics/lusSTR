@@ -17,24 +17,27 @@ filter_sep = config["filter_sep"]
 
 
 def get_sample_IDs(input, uas, output, software, separate):
-    file_ext = ".xlsx" if uas is True else ".txt"
-    if software == "efm" and separate is False:
-        return os.path.basename(output)
+    if os.path.exists(f"{output}.csv"):
+        return None
     else:
-        if uas is True:
-            if os.path.isdir(input):
-                files = glob.glob(os.path.join(input, f"[!~]*{file_ext}"))
-            else:
-                files = input
-            ID_list = get_uas_ids(files)
+        file_ext = ".xlsx" if uas is True else ".txt"
+        if software == "efm" and separate is False:
+            return os.path.basename(output)
         else:
-            if os.path.isdir(input):
-                files = glob.glob(os.path.join(input, f"[!~]*{file_ext}"))
+            if uas is True:
+                if os.path.isdir(input):
+                    files = glob.glob(os.path.join(input, f"[!~]*{file_ext}"))
+                else:
+                    files = input
+                ID_list = get_uas_ids(files)
             else:
-                files = input
-            files = [sub.replace(dir, "") for sub in files]
-            ID_list = [sub.replace(file_ext, "") for sub in files]
-        return ID_list
+                if os.path.isdir(input):
+                    files = glob.glob(os.path.join(input, f"[!~]*{file_ext}"))
+                else:
+                    files = input
+                files = [sub.replace(dir, "") for sub in files]
+                ID_list = [sub.replace(file_ext, "") for sub in files]
+            return ID_list
 
 
 def get_uas_ids(files):
@@ -89,7 +92,7 @@ rule annotate:
     params:
         uas=config["uas"],
         sex=config["sex"],
-        combine=config["nocombine"],
+        nocombine=config["nocombine"],
         separate=config["separate"],
         kit=config["kit"]
     script:
