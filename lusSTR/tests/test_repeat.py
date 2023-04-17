@@ -11,10 +11,15 @@
 # -------------------------------------------------------------------------------------------------
 
 import lusSTR
-from lusSTR.repeat import collapse_tandem_repeat, collapse_all_repeats, repeat_copy_number
-from lusSTR.repeat import split_by_n, get_blocks, reverse_complement, reverse_complement_bracketed
-from lusSTR.repeat import collapse_repeats_by_length, collapse_repeats_by_length_flanks
-from lusSTR.repeat import sequence_to_bracketed_form
+from lusSTR.scripts.repeat import collapse_tandem_repeat, collapse_all_repeats, repeat_copy_number
+from lusSTR.scripts.repeat import (
+    split_by_n,
+    get_blocks,
+    reverse_complement,
+    reverse_complement_bracketed,
+)
+from lusSTR.scripts.repeat import collapse_repeats_by_length, collapse_repeats_by_length_flanks
+from lusSTR.scripts.repeat import sequence_to_bracketed_form
 import pytest
 
 
