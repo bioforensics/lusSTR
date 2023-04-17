@@ -33,10 +33,11 @@ def get_sample_IDs(input, uas, output, software, separate):
             else:
                 if os.path.isdir(input):
                     files = glob.glob(os.path.join(input, f"[!~]*{file_ext}"))
+                    files = [sub.replace(input, "") for sub in files]
+                    ID_list = [sub.replace(file_ext, "") for sub in files]
                 else:
-                    files = input
-                files = [sub.replace(dir, "") for sub in files]
-                ID_list = [sub.replace(file_ext, "") for sub in files]
+                    files = os.path.basename(input)
+                    ID_list = files.replace(file_ext, "")
             return ID_list
 
 
