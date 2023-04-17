@@ -12,7 +12,7 @@
 
 import pytest
 import lusSTR
-from lusSTR.marker import STRMarkerObject
+from lusSTR.scripts.marker import STRMarkerObject
 
 
 @pytest.mark.parametrize(
