@@ -81,12 +81,6 @@ def subparser(subparsers):
         "will be created.",
     )
     p.add_argument(
-        "--separate",
-        action="store_true",
-        help="This flag will result in the creation of individual output files per sample "
-        "for the 'annotate' step"
-    )
-    p.add_argument(
         "--nocombine", action="store_true",
         help="Do not combine read counts for duplicate sequences within the UAS region "
         "during the 'annotate' step. By default, read counts are combined for sequences "
@@ -103,7 +97,7 @@ def subparser(subparsers):
         help="Use to not create the Sequence Information File in the 'filter' step"
     )
     p.add_argument(
-        "--efm-separate",  dest="efm_sep", action="store_true", 
+        "--separate",  dest="separate", action="store_true", 
         help="Use to separate EFM profiles in the 'filter' step."
     )
     p.add_argument(

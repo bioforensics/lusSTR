@@ -10,12 +10,11 @@ output: "lusstr_output" ## output file/directory name; Example: "test_030923"
 ##annotate settings
 kit: "forenseq" ## forenseq/powerseq
 nocombine: False ## True/False; do not combine identical sequences (if using STRait Razor data)
-separate: False ## True/False; create individual files for each sample
 
 ##filter settings
 output_type: "strmix" ## strmix/efm
 profile_type: "evidence" ## evidence/reference
 data_type: "ngs" ## ce/ngs
 info: True ## True/False; create allele information file
-filter_sep: False ##True/False; for EFM only, if True will create individual files for samples; if False, will create one file with all samples
+separate: False ##True/False; for EFM only, if True will create individual files for samples; if False, will create one file with all samples
 nofilters: False ##True/False; skip all filtering steps but still creates EFM/STRmix output files

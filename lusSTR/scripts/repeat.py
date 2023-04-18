@@ -13,7 +13,6 @@
 import re
 
 
-
 def split_sequence_into_two_strings(sequence, repeat_for_split):
     """
     Function to split a sequence into two separate strings at a specified repeat unit.
