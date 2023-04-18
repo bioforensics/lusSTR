@@ -17,12 +17,16 @@ filter_sep = config["filter_sep"]
 
 
 def get_sample_IDs(input, uas, output, software, separate):
-    if os.path.exists(f"{output}.csv"):
-        return None
+    annot_out = f"{output}.txt"
+    format_out = f"{output}.csv"
+    if os.path.exists(annot_out):
+        ID_list = get_existing_IDs(annot_out, "\t")
+    elif os.path.exists(format_out):
+        ID_list = get_existing_IDs(format_out, ",")
     else:
         file_ext = ".xlsx" if uas is True else ".txt"
         if software == "efm" and separate is False:
-            return os.path.basename(output)
+            ID_list = os.path.basename(output)
         else:
             if uas is True:
                 if os.path.isdir(input):
@@ -38,7 +42,13 @@ def get_sample_IDs(input, uas, output, software, separate):
                 else:
                     files = os.path.basename(input)
                     ID_list = files.replace(file_ext, "")
-            return ID_list
+    return ID_list
+
+
+def get_existing_IDs(infile, separator):
+    data = pd.read_csv(infile, sep=separator)
+    IDs = data["SampleID"].unique()
+    return IDs
 
 
 def get_uas_ids(files):
