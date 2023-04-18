@@ -172,21 +172,21 @@ def sort_table(table):
 
 
 def indiv_files(table, input_dir, ext):
-    output_dir = f"Separated_lusstr_Files/{input_dir}"
+    #output_dir = f"Separated_lusstr_Files/{input_dir}"
     try:
-        os.mkdir(output_dir)
+        os.mkdir(input_dir)
     except FileExistsError:
         pass
     for samp in table["SampleID"].unique():
         new_df = table[table["SampleID"] == samp]
-        new_df.to_csv(f"{output_dir}/{samp}{ext}", sep="\t", index=False)
+        new_df.to_csv(f"{input_dir}/{samp}{ext}", sep="\t", index=False)
 
 
 def main(input, out, kit, uas, sex, nocombine, separate):
     input = str(input)
     out = str(out)
-    if separate and os.path.exists("Separated_lusstr_Files") is False:
-        os.mkdir("Separated_lusstr_Files")
+    #if separate and os.path.exists("Separated_lusstr_Files") is False:
+    #    os.mkdir("Separated_lusstr_Files")
     output_name = os.path.splitext(out)[0]
     input_name = os.path.splitext(input)[0]
     autosomal_final_table, autosomal_flank_table, columns = format_table(
@@ -197,39 +197,35 @@ def main(input, out, kit, uas, sex, nocombine, separate):
             f"{input_name}_sexloci.csv", uas, kit
         )
         if not uas:
-            sex_flank_table.to_csv(f"{output_name}_sexloci_flanks_anno.txt", sep="\t", index=False)
             if not sex_final_table.empty:
+                sex_flank_table.to_csv(f"{output_name}_sexloci_flanks_anno.txt", sep="\t", index=False)
+                if nocombine:
+                    if separate:
+                        indiv_files(sex_final_table, input_name, "_sexloci_no_combined_reads.txt")
+                    sex_final_table.to_csv(f"{output_name}_sexloci_no_combined_reads.txt", index=False)
                 sex_final_table = combine_reads(sex_final_table, columns)
-            if separate:
-                indiv_files(sex_final_table, input_name, "_sexloci.txt")
-            else:
-                sex_final_table.to_csv(f"{output_name}_sexloci.txt", sep="\t", index=False)
-            if nocombine:
                 if separate:
-                    indiv_files(sex_final_table, input_name, "_sexloci_no_combined_reads.txt")
-                sex_final_table.to_csv(f"{output_name}_sexloci_no_combined_reads.txt", index=False)
+                    indiv_files(sex_final_table, input_name, "_sexloci.txt")
+                sex_final_table.to_csv(f"{output_name}_sexloci.txt", sep="\t", index=False)
         else:
             if separate:
                 indiv_files(sex_final_table, input_name, "_sexloci.txt")
-            else:
-                sex_final_table.to_csv(f"{output_name}_sexloci.txt", sep="\t", index=False)
+            sex_final_table.to_csv(f"{output_name}_sexloci.txt", sep="\t", index=False)
     if not uas:
-        autosomal_flank_table.to_csv(f"{output_name}_flanks_anno.txt", sep="\t", index=False)
         if not autosomal_final_table.empty:
+            autosomal_flank_table.to_csv(f"{output_name}_flanks_anno.txt", sep="\t", index=False)
+            if nocombine:
+                autosomal_final_table.to_csv(
+                    f"{output_name}_no_combined_reads.txt", sep="\t", index=False
+            )
             autosomal_final_table = combine_reads(autosomal_final_table, columns)
             if separate:
                 indiv_files(autosomal_final_table, input_name, ".txt")
-            else:
-                autosomal_final_table.to_csv(out, sep="\t", index=False)
-        if nocombine:
-            autosomal_final_table.to_csv(
-                f"{output_name}_no_combined_reads.txt", sep="\t", index=False
-            )
+            autosomal_final_table.to_csv(out, sep="\t", index=False)
     else:
         if separate:
             indiv_files(autosomal_final_table, input_name, ".txt")
-        else:
-            autosomal_final_table.to_csv(out, sep="\t", index=False)
+        autosomal_final_table.to_csv(out, sep="\t", index=False)
 
 
 if __name__ == "__main__":
