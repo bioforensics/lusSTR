@@ -19,29 +19,28 @@ filter_sep = config["filter_sep"]
 def get_sample_IDs(input, uas, output, software, separate):
     annot_out = f"{output}.txt"
     format_out = f"{output}.csv"
-    if os.path.exists(annot_out):
+    if software == "efm" and separate is False:
+        ID_list = os.path.basename(output)
+    elif os.path.exists(annot_out):
         ID_list = get_existing_IDs(annot_out, "\t")
     elif os.path.exists(format_out):
         ID_list = get_existing_IDs(format_out, ",")
     else:
         file_ext = ".xlsx" if uas is True else ".txt"
-        if software == "efm" and separate is False:
-            ID_list = os.path.basename(output)
-        else:
-            if uas is True:
-                if os.path.isdir(input):
-                    files = glob.glob(os.path.join(input, f"[!~]*{file_ext}"))
-                else:
-                    files = input
-                ID_list = get_uas_ids(files)
+        if uas is True:
+            if os.path.isdir(input):
+                files = glob.glob(os.path.join(input, f"[!~]*{file_ext}"))
             else:
-                if os.path.isdir(input):
-                    files = glob.glob(os.path.join(input, f"[!~]*{file_ext}"))
-                    files = [sub.replace(input, "") for sub in files]
-                    ID_list = [sub.replace(file_ext, "") for sub in files]
-                else:
-                    files = os.path.basename(input)
-                    ID_list = files.replace(file_ext, "")
+                files = input
+            ID_list = get_uas_ids(files)
+        else:
+            if os.path.isdir(input):
+                files = glob.glob(os.path.join(input, f"[!~]*{file_ext}"))
+                files = [sub.replace(input, "") for sub in files]
+                ID_list = [sub.replace(file_ext, "") for sub in files]
+            else:
+                files = os.path.basename(input)
+                ID_list = files.replace(file_ext, "")
     return ID_list
 
 
