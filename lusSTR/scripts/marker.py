@@ -20,8 +20,6 @@ from pkg_resources import resource_filename
 import re
 
 
-
-
 def get_str_metadata_file():
     return resource_filename("lusSTR", "data/str_markers.json")
 

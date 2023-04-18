@@ -327,4 +327,13 @@ def main(input, output_type, profile_type, data_type, output_dir, info, separate
 
 
 if __name__ == "__main__":
-    main(snakemake.input, output_type=snakemake.params.output_type, profile_type=snakemake.params.profile_type, data_type=snakemake.params.data_type, output_dir=snakemake.params.output_dir, info=snakemake.params.info, separate=snakemake.params.filter_sep, nofilters=snakemake.params.filters)
+    main(
+        snakemake.input,
+        output_type=snakemake.params.output_type,
+        profile_type=snakemake.params.profile_type,
+        data_type=snakemake.params.data_type,
+        output_dir=snakemake.params.output_dir,
+        info=snakemake.params.info,
+        separate=snakemake.params.separate,
+        nofilters=snakemake.params.filters,
+    )

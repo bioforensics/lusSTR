@@ -198,5 +198,6 @@ def main(input, outfile, uas=True, sex=False):
         name = os.path.splitext(str(outfile))[0]
         sex_results.to_csv(f"{name}_sexloci.csv", index=False)
 
+
 if __name__ == "__main__":
     main(snakemake.input, snakemake.output, uas=snakemake.params.uas, sex=snakemake.params.sex)

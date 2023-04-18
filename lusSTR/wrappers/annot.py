@@ -22,7 +22,6 @@ from lusSTR.scripts.repeat import sequence_to_bracketed_form, split_by_n
 from lusSTR.scripts.repeat import reverse_complement, reverse_complement_bracketed
 
 
-
 with open(get_str_metadata_file(), "r") as fh:
     str_marker_data = json.load(fh)
 
@@ -171,45 +170,28 @@ def sort_table(table):
     return sorted_table
 
 
-def indiv_files(table, input_dir, ext):
-    #output_dir = f"Separated_lusstr_Files/{input_dir}"
-    try:
-        os.mkdir(input_dir)
-    except FileExistsError:
-        pass
-    for samp in table["SampleID"].unique():
-        new_df = table[table["SampleID"] == samp]
-        new_df.to_csv(f"{input_dir}/{samp}{ext}", sep="\t", index=False)
-
-
-def main(input, out, kit, uas, sex, nocombine, separate):
+def main(input, out, kit, uas, sex, nocombine):
     input = str(input)
     out = str(out)
-    #if separate and os.path.exists("Separated_lusstr_Files") is False:
-    #    os.mkdir("Separated_lusstr_Files")
     output_name = os.path.splitext(out)[0]
     input_name = os.path.splitext(input)[0]
-    autosomal_final_table, autosomal_flank_table, columns = format_table(
-        input, uas, kit
-    )
+    autosomal_final_table, autosomal_flank_table, columns = format_table(input, uas, kit)
     if sex:
         sex_final_table, sex_flank_table, columns = format_table(
             f"{input_name}_sexloci.csv", uas, kit
         )
         if not uas:
             if not sex_final_table.empty:
-                sex_flank_table.to_csv(f"{output_name}_sexloci_flanks_anno.txt", sep="\t", index=False)
+                sex_flank_table.to_csv(
+                    f"{output_name}_sexloci_flanks_anno.txt", sep="\t", index=False
+                )
                 if nocombine:
-                    if separate:
-                        indiv_files(sex_final_table, input_name, "_sexloci_no_combined_reads.txt")
-                    sex_final_table.to_csv(f"{output_name}_sexloci_no_combined_reads.txt", index=False)
+                    sex_final_table.to_csv(
+                        f"{output_name}_sexloci_no_combined_reads.txt", index=False
+                    )
                 sex_final_table = combine_reads(sex_final_table, columns)
-                if separate:
-                    indiv_files(sex_final_table, input_name, "_sexloci.txt")
                 sex_final_table.to_csv(f"{output_name}_sexloci.txt", sep="\t", index=False)
         else:
-            if separate:
-                indiv_files(sex_final_table, input_name, "_sexloci.txt")
             sex_final_table.to_csv(f"{output_name}_sexloci.txt", sep="\t", index=False)
     if not uas:
         if not autosomal_final_table.empty:
@@ -217,16 +199,19 @@ def main(input, out, kit, uas, sex, nocombine, separate):
             if nocombine:
                 autosomal_final_table.to_csv(
                     f"{output_name}_no_combined_reads.txt", sep="\t", index=False
-            )
+                )
             autosomal_final_table = combine_reads(autosomal_final_table, columns)
-            if separate:
-                indiv_files(autosomal_final_table, input_name, ".txt")
             autosomal_final_table.to_csv(out, sep="\t", index=False)
     else:
-        if separate:
-            indiv_files(autosomal_final_table, input_name, ".txt")
         autosomal_final_table.to_csv(out, sep="\t", index=False)
 
 
 if __name__ == "__main__":
-    main(snakemake.input, snakemake.output, kit=snakemake.params.kit, uas=snakemake.params.uas, sex=snakemake.params.sex, nocombine=snakemake.params.nocombine, separate=snakemake.params.separate)
+    main(
+        snakemake.input,
+        snakemake.output,
+        kit=snakemake.params.kit,
+        uas=snakemake.params.uas,
+        sex=snakemake.params.sex,
+        nocombine=snakemake.params.nocombine,
+    )

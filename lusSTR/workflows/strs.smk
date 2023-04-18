@@ -13,7 +13,7 @@ input_name = config["samp_input"]
 software = config["output_type"]
 prof = config["profile_type"]
 data = config["data_type"]
-filter_sep = config["filter_sep"]
+separate = config["separate"]
 
 
 def get_sample_IDs(input, uas, output, software, separate):
@@ -78,7 +78,7 @@ rule all:
         expand(
             "{outdir}/{samplename}_{prof_t}_{data_t}.csv", outdir=output_name,
             samplename=get_sample_IDs(input_name, config["uas"], output_name, software, 
-            filter_sep), prof_t=prof, data_t=data
+            separate), prof_t=prof, data_t=data
         )
 
 
@@ -103,7 +103,6 @@ rule annotate:
         uas=config["uas"],
         sex=config["sex"],
         nocombine=config["nocombine"],
-        separate=config["separate"],
         kit=config["kit"]
     script:
         lusSTR.wrapper("annot")
@@ -116,7 +115,7 @@ rule filter:
         expand(
             "{outdir}/{samplename}_{prof_t}_{data_t}.csv", outdir=output_name,
             samplename=get_sample_IDs(input_name, config["uas"], output_name, software, 
-            filter_sep), prof_t=prof, data_t=data
+            separate), prof_t=prof, data_t=data
         )
     params:
         output_type=config["output_type"],
@@ -124,7 +123,7 @@ rule filter:
         data_type=config["data_type"],
         output_dir=config["output"],
         info=config["info"],
-        filter_sep=config["filter_sep"],
+        separate=config["separate"],
         filters=config["nofilters"],
     script:
         lusSTR.wrapper("filter")
