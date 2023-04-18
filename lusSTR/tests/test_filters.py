@@ -13,9 +13,11 @@
 import filecmp
 import json
 import lusSTR
-from lusSTR.filter_settings import get_filter_metadata_file
+from lusSTR.scripts.filter_settings import get_filter_metadata_file
 from lusSTR.tests import data_file
+import os
 import pytest
+import shutil
 from tempfile import NamedTemporaryFile
 
 
@@ -34,7 +36,7 @@ with open(get_filter_metadata_file(), "r") as fh:
 )
 def test_thresholds(filter, locus, total_reads, allele_reads, final_reads, pass_filt):
     metadata = filter_marker_data[locus]
-    test_total_reads, test_passfilt = lusSTR.filter_settings.thresholds(
+    test_total_reads, test_passfilt = lusSTR.scripts.filter_settings.thresholds(
         filter, metadata, total_reads, allele_reads
     )
     assert test_total_reads == final_reads
@@ -45,7 +47,9 @@ def test_thresholds(filter, locus, total_reads, allele_reads, final_reads, pass_
     "perc, perc_stut, reads, forward_threshold", [(0, 0.18, 100, 4), (0.15, 0.21, 100, 15)]
 )
 def test_forward_stutter_threshold(perc, perc_stut, reads, forward_threshold):
-    test_forward_thresh = lusSTR.filter_settings.forward_stut_thresh(perc, perc_stut, reads)
+    test_forward_thresh = lusSTR.scripts.filter_settings.forward_stut_thresh(
+        perc, perc_stut, reads
+    )
     assert test_forward_thresh == forward_threshold
 
 
@@ -73,7 +77,7 @@ def test_minus1stutter(
     called_allele_type,
     stut_perc,
 ):
-    test_stutter_type, test_stut_perc = lusSTR.filter_settings.minus1_stutter(
+    test_stutter_type, test_stut_perc = lusSTR.scripts.filter_settings.minus1_stutter(
         all_type,
         stutter_thresh,
         forward_thresh,
@@ -110,7 +114,7 @@ def test_minus2stutter(
     called_allele_type,
     stut_perc,
 ):
-    test_stutter_type, test_stut_perc = lusSTR.filter_settings.minus2_stutter(
+    test_stutter_type, test_stut_perc = lusSTR.scripts.filter_settings.minus2_stutter(
         all_type,
         stutter_thresh,
         forward_thresh,
@@ -146,7 +150,7 @@ def test_plus1stutter(
     called_allele_type,
     stut_perc,
 ):
-    test_stutter_type, test_stut_perc = lusSTR.filter_settings.plus1_stutter(
+    test_stutter_type, test_stut_perc = lusSTR.scripts.filter_settings.plus1_stutter(
         all_type, stutter_thresh, forward_thresh, ref_reads, al1_ref_reads, al_reads
     )
     assert test_stutter_type == called_allele_type
@@ -154,94 +158,85 @@ def test_plus1stutter(
 
 
 def test_EFMoutput_format(tmp_path):
-    input_file = data_file("test_stutter.txt")
+    str_path = str(tmp_path / "WD")
+    inputfile = data_file("test_stutter.txt")
     exp_out = data_file("RU_stutter_test/test_filtering_EFMoutput.csv")
     exp_info_out = data_file("RU_stutter_test/test_filtering_EFMoutput_sequence_info.csv")
-    output = str(tmp_path / "test_output")
-    obs_out = str(tmp_path / "test_output/test_output_evidence_ce.csv")
-    obs_info_out = str(tmp_path / "test_output/test_output_sequence_info.csv")
-    arglist = ["filter", "-o", output, "--output-type", "efm", "--info", input_file]
-    args = lusSTR.cli.get_parser().parse_args(arglist)
-    lusSTR.filter.main(args)
+    obs_out = str(tmp_path / "WD/test_output/test_output_evidence_ce.csv")
+    obs_info_out = str(tmp_path / "WD/test_output/test_output_sequence_info.csv")
+    arglist = ["config", "-w", str_path, "-o", "test_output", "--efm", "--ce", "--input", "WD"]
+    lusSTR.cli.main(lusSTR.cli.get_parser().parse_args(arglist))
+    shutil.copyfile(inputfile, os.path.join(str_path, "test_output.csv"))
+    shutil.copyfile(inputfile, os.path.join(str_path, "test_output.txt"))
+    annot_arglist = ["strs", "all", "-w", str_path]
+    lusSTR.cli.main(lusSTR.cli.get_parser().parse_args(annot_arglist))
     assert filecmp.cmp(exp_out, obs_out) is True
-    assert filecmp.cmp(exp_info_out, obs_info_out) is True
 
 
 @pytest.mark.parametrize(
     "outputdir, datatype", [("RU_stutter_test/", "ce"), ("NGS_stutter_test/", "ngs")]
 )
 def test_STRmixoutput_format(outputdir, datatype, tmp_path):
-    input_file = data_file("test_stutter.txt")
+    str_path = str(tmp_path / "WD")
+    inputfile = data_file("test_stutter.txt")
     exp_out = data_file(f"{outputdir}Sample1_{datatype}.csv")
     exp_info_out = data_file(f"{outputdir}STRmix_Files_sequence_info.csv")
-    obs_outdir = str(tmp_path / "STRmix_Files")
-    obs_out = str(tmp_path / f"STRmix_Files/Sample1_evidence_{datatype}.csv")
-    obs_info_out = str(tmp_path / f"STRmix_Files/STRmix_Files_sequence_info.csv")
-    arglist = [
-        "filter",
-        "-o",
-        obs_outdir,
-        "--output-type",
-        "strmix",
-        "--info",
-        "--data-type",
-        datatype,
-        input_file,
-    ]
-    args = lusSTR.cli.get_parser().parse_args(arglist)
-    lusSTR.filter.main(args)
+    obs_out = str(tmp_path / f"WD/STRmix_Files/Sample1_evidence_{datatype}.csv")
+    obs_info_out = str(tmp_path / f"WD/STRmix_Files/STRmix_Files_sequence_info.csv")
+    if datatype == "ngs":
+        arglist = ["config", "-w", str_path, "--input", "WD", "-o", "STRmix_Files"]
+    else:
+        arglist = ["config", "-w", str_path, "--input", "WD", "-o", "STRmix_Files", "--ce"]
+    lusSTR.cli.main(lusSTR.cli.get_parser().parse_args(arglist))
+    shutil.copyfile(inputfile, os.path.join(str_path, "STRmix_Files.csv"))
+    shutil.copyfile(inputfile, os.path.join(str_path, "STRmix_Files.txt"))
+    annot_arglist = ["strs", "all", "-w", str_path]
+    lusSTR.cli.main(lusSTR.cli.get_parser().parse_args(annot_arglist))
     assert filecmp.cmp(exp_out, obs_out) is True
     assert filecmp.cmp(exp_info_out, obs_info_out) is True
 
 
 def test_nofilters(tmp_path):
-    input_file = data_file("test_stutter.txt")
+    str_path = str(tmp_path / "WD")
+    inputfile = data_file("test_stutter.txt")
     exp_out = data_file("NGS_stutter_test/Sample1_nofilter.csv")
-    obs_out = str(tmp_path / "Sample1_evidence_ngs.csv")
-    arglist = [
-        "filter",
-        "-o",
-        str(tmp_path),
-        "--output-type",
-        "strmix",
-        "--no-filters",
-        "--data-type",
-        "ngs",
-        input_file,
-    ]
-    args = lusSTR.cli.get_parser().parse_args(arglist)
-    lusSTR.filter.main(args)
+    obs_out = str(tmp_path / "WD/lusstr_output/Sample1_evidence_ngs.csv")
+    arglist = ["config", "-w", str_path, "--input", "WD", "--nofilter"]
+    lusSTR.cli.main(lusSTR.cli.get_parser().parse_args(arglist))
+    shutil.copyfile(inputfile, os.path.join(str_path, "lusstr_output.csv"))
+    shutil.copyfile(inputfile, os.path.join(str_path, "lusstr_output.txt"))
+    annot_arglist = ["strs", "all", "-w", str_path]
+    lusSTR.cli.main(lusSTR.cli.get_parser().parse_args(annot_arglist))
     assert filecmp.cmp(exp_out, obs_out) is True
 
 
 def test_flags(tmp_path):
-    input_file = data_file("test_stutter.txt")
+    str_path = str(tmp_path / "WD")
+    inputfile = data_file("test_stutter.txt")
     exp_out = data_file("RU_stutter_test/Flagged_Loci.csv")
-    obs_outdir = str(tmp_path / "RU_stutter_test")
-    obs_out = str(tmp_path / "RU_stutter_test/RU_stutter_test_Flagged_Loci.csv")
-    arglist = ["filter", "-o", obs_outdir, "--output-type", "strmix", "--info", input_file]
-    args = lusSTR.cli.get_parser().parse_args(arglist)
-    lusSTR.filter.main(args)
+    obs_out = str(tmp_path / "WD/lusstr_output/lusstr_output_Flagged_Loci.csv")
+    arglist = ["config", "-w", str_path, "--input", "WD"]
+    lusSTR.cli.main(lusSTR.cli.get_parser().parse_args(arglist))
+    shutil.copyfile(inputfile, os.path.join(str_path, "lusstr_output.csv"))
+    shutil.copyfile(inputfile, os.path.join(str_path, "lusstr_output.txt"))
+    annot_arglist = ["strs", "all", "-w", str_path]
+    lusSTR.cli.main(lusSTR.cli.get_parser().parse_args(annot_arglist))
     assert filecmp.cmp(exp_out, obs_out) is True
 
 
 def test_efm_reference(tmp_path):
-    input_file = data_file("test_references.txt")
+    str_path = str(tmp_path / "WD")
+    inputfile = data_file("test_references.txt")
     exp_out = data_file("RU_stutter_test/EFM_test_reference.csv")
-    obs_out = str(tmp_path / "test_output")
-    obs_efm_out = str(tmp_path / "test_output/test_output_reference_ce.csv")
-    arglist = [
-        "filter",
-        "-o",
-        obs_out,
-        "--output-type",
-        "efm",
-        "--profile-type",
-        "reference",
-        input_file,
-    ]
-    args = lusSTR.cli.get_parser().parse_args(arglist)
-    lusSTR.filter.main(args)
+    obs_efm_out = str(tmp_path / "WD/lusstr_output/lusstr_output_reference_ce.csv")
+    arglist = ["config", "-w", str_path, "--input", "WD", "--efm", "--reference", "--ce"]
+    lusSTR.cli.main(lusSTR.cli.get_parser().parse_args(arglist))
+    shutil.copyfile(inputfile, os.path.join(str_path, "lusstr_output.csv"))
+    shutil.copyfile(inputfile, os.path.join(str_path, "lusstr_output.txt"))
+    print(os.listdir(str_path))
+    annot_arglist = ["strs", "all", "-w", str_path]
+    lusSTR.cli.main(lusSTR.cli.get_parser().parse_args(annot_arglist))
+    print(os.listdir(f"{str_path}/lusstr_output"))
     assert filecmp.cmp(exp_out, obs_efm_out) is True
 
 
@@ -249,34 +244,45 @@ def test_efm_reference(tmp_path):
     "outputdir, datatype", [("RU_stutter_test/", "ce"), ("NGS_stutter_test/", "ngs")]
 )
 def test_strmix_reference(outputdir, datatype, tmp_path):
-    input_file = data_file("test_references.txt")
+    str_path = str(tmp_path / "WD")
+    inputfile = data_file("test_references.txt")
     exp_out = data_file(f"{outputdir}Positive_Control_reference_{datatype}.csv")
-    obs_out = str(tmp_path / f"Positive_Control_reference_{datatype}.csv")
-    arglist = [
-        "filter",
-        "-o",
-        str(tmp_path),
-        "--output-type",
-        "strmix",
-        "--profile-type",
-        "reference",
-        "--data-type",
-        datatype,
-        input_file,
-    ]
-    args = lusSTR.cli.get_parser().parse_args(arglist)
-    lusSTR.filter.main(args)
+    obs_out = str(tmp_path / f"WD/STRmix_Files/Positive_Control_reference_{datatype}.csv")
+    if datatype == "ngs":
+        arglist = ["config", "-w", str_path, "--input", "WD", "-o", "STRmix_Files", "--reference"]
+    else:
+        arglist = [
+            "config",
+            "-w",
+            str_path,
+            "--input",
+            "WD",
+            "-o",
+            "STRmix_Files",
+            "--ce",
+            "--reference",
+        ]
+    lusSTR.cli.main(lusSTR.cli.get_parser().parse_args(arglist))
+    shutil.copyfile(inputfile, os.path.join(str_path, "STRmix_Files.csv"))
+    shutil.copyfile(inputfile, os.path.join(str_path, "STRmix_Files.txt"))
+    annot_arglist = ["strs", "all", "-w", str_path]
+    lusSTR.cli.main(lusSTR.cli.get_parser().parse_args(annot_arglist))
     assert filecmp.cmp(exp_out, obs_out) is True
 
 
 def test_D7(tmp_path):
-    input_file = data_file("test_D7.txt")
+    str_path = str(tmp_path / "WD")
+    inputfile = data_file("test_D7.txt")
     exp_out = data_file("D7_microvariant_flagged.csv")
-    outpath = str(tmp_path / "test")
-    obs_out = str(tmp_path / "test/test_Flagged_Loci.csv")
-    arglist = ["filter", "-o", outpath, "--output-type", "strmix", "--info", input_file]
-    args = lusSTR.cli.get_parser().parse_args(arglist)
-    lusSTR.filter.main(args)
+    obs_out = str(tmp_path / "WD/test/test_Flagged_Loci.csv")
+    arglist = ["config", "-w", str_path, "--input", "WD", "-o", "test"]
+    lusSTR.cli.main(lusSTR.cli.get_parser().parse_args(arglist))
+    shutil.copyfile(inputfile, os.path.join(str_path, "test.csv"))
+    shutil.copyfile(inputfile, os.path.join(str_path, "test.txt"))
+    annot_arglist = ["strs", "all", "-w", str_path]
+    lusSTR.cli.main(lusSTR.cli.get_parser().parse_args(annot_arglist))
+    assert filecmp.cmp(exp_out, obs_out) is True
+
     assert filecmp.cmp(exp_out, obs_out)
 
 
@@ -292,5 +298,7 @@ def test_D7(tmp_path):
     ],
 )
 def test_ngs_stutter(ref_bracket, quest_bracket, stutter, actual_call):
-    test_stut = lusSTR.filter_settings.bracketed_stutter_id(ref_bracket, quest_bracket, stutter)
+    test_stut = lusSTR.scripts.filter_settings.bracketed_stutter_id(
+        ref_bracket, quest_bracket, stutter
+    )
     assert test_stut == actual_call

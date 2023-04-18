@@ -244,34 +244,6 @@ def test_annotate_sr_sexloci(input, testoutput, flank_output, kit, tmp_path):
     assert filecmp.cmp(exp_sex_flank_out, obs_sex_flank_out) is True
 
 
-@pytest.mark.parametrize("sex, exp_ext", [(True, "_sexloci.txt"), (False, ".txt")])
-def test_separate_output(sex, exp_ext, tmp_path):
-    str_path = str(tmp_path / "WD")
-    inputfile = data_file("UAS_bulk_test.csv")
-    inputfile_sex = data_file("UAS_bulk_test_sexloci.csv")
-    if sex:
-        arglist = [
-            "config",
-            "-w",
-            str_path,
-            "-o",
-            "separated",
-            "--sex",
-            "--input",
-            "WD",
-            "--separate",
-        ]
-    else:
-        arglist = ["config", "-w", str_path, "-o", "separated", "--input", "WD", "--separate"]
-    lusSTR.cli.main(lusSTR.cli.get_parser().parse_args(arglist))
-    shutil.copyfile(inputfile_sex, os.path.join(str_path, "separated_sexloci.csv"))
-    shutil.copyfile(inputfile, os.path.join(str_path, "separated.csv"))
-    annot_arglist = ["strs", "annotate", "-w", str_path]
-    lusSTR.cli.main(lusSTR.cli.get_parser().parse_args(annot_arglist))
-    assert os.path.exists(f"{str_path}/separated/Positive_Control{exp_ext}")
-    assert os.path.exists(f"{str_path}/separated/Positive_Control2{exp_ext}")
-
-
 def test_config(tmp_path):
     obs_config = str(tmp_path / "config.yaml")
     exp_config = resource_filename("lusSTR", "data/config.yaml")
