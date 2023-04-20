@@ -94,11 +94,11 @@ def test_convert_full_nocombine(
         assert len(fh.readlines()) == xy_len_sum
 
 
-def test_flank_anno(tmp_path):
+def test_flanks(tmp_path):
     inputfile = data_file("test_flank.csv")
-    exp_out = data_file("testflanks_flanks_anno.txt")
+    exp_out = data_file("testflanks_flanks.txt")
     str_path = str(tmp_path / "WD")
-    obs_out = str(tmp_path / "WD/testflanks_flanks_anno.txt")
+    obs_out = str(tmp_path / "WD/testflanks_flanks.txt")
     arglist = ["config", "-w", str_path, "-o", "testflanks", "--straitrazor", "--input", "WD"]
     lusSTR.cli.main(lusSTR.cli.get_parser().parse_args(arglist))
     shutil.copyfile(inputfile, os.path.join(str_path, "testflanks.csv"))
@@ -147,11 +147,11 @@ def test_indel_flag(locus, sequence, uas, kit, output):
     assert marker.indel_flag == output
 
 
-def test_powerseq_flanking_anno(tmp_path):
-    inputfile = data_file("powerseq_flanking_anno_test.csv")
-    exp_out = data_file("powerseq_flanking_anno_test_flanks_anno.txt")
+def test_powerseq_flanks(tmp_path):
+    inputfile = data_file("powerseq_flanking_convert_test.csv")
+    exp_out = data_file("powerseq_flanking_convert_test_flanks.txt")
     str_path = str(tmp_path / "WD")
-    obs_out = str(tmp_path / "WD/powerseq_flanks_anno.txt")
+    obs_out = str(tmp_path / "WD/powerseq_flanks.txt")
     arglist = [
         "config",
         "-w",
@@ -191,13 +191,13 @@ def test_convert_uas_sexloci(tmp_path):
         (
             "testformat_sr",
             "testformat_sr_sexloci.txt",
-            "testformat_sr_sexloci_flanks_anno.txt",
+            "testformat_sr_sexloci_flanks.txt",
             "forenseq",
         ),
         (
-            "powerseq_flanking_anno_test",
-            "powerseq_flanking_anno_test_sexloci.txt",
-            "powerseq_flanking_anno_test_sexloci_flanks_anno.txt",
+            "powerseq_flanking_convert_test",
+            "powerseq_flanking_convert_test_sexloci.txt",
+            "powerseq_flanking_convert_test_sexloci_flanks.txt",
             "powerseq",
         ),
     ],
@@ -209,7 +209,7 @@ def test_convert_sr_sexloci(input, testoutput, flank_output, kit, tmp_path):
     exp_sex_out = data_file(testoutput)
     exp_sex_flank_out = data_file(flank_output)
     obs_sex_out = str(tmp_path / "WD/testformatsr_sexloci.txt")
-    obs_sex_flank_out = str(tmp_path / "WD/testformatsr_sexloci_flanks_anno.txt")
+    obs_sex_flank_out = str(tmp_path / "WD/testformatsr_sexloci_flanks.txt")
     if kit == "forenseq":
         arglist = [
             "config",

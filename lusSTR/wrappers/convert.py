@@ -182,9 +182,7 @@ def main(input, out, kit, uas, sex, nocombine):
         )
         if not uas:
             if not sex_final_table.empty:
-                sex_flank_table.to_csv(
-                    f"{output_name}_sexloci_flanks_anno.txt", sep="\t", index=False
-                )
+                sex_flank_table.to_csv(f"{output_name}_sexloci_flanks.txt", sep="\t", index=False)
                 if nocombine:
                     sex_final_table.to_csv(
                         f"{output_name}_sexloci_no_combined_reads.txt", index=False
@@ -195,7 +193,7 @@ def main(input, out, kit, uas, sex, nocombine):
             sex_final_table.to_csv(f"{output_name}_sexloci.txt", sep="\t", index=False)
     if not uas:
         if not autosomal_final_table.empty:
-            autosomal_flank_table.to_csv(f"{output_name}_flanks_anno.txt", sep="\t", index=False)
+            autosomal_flank_table.to_csv(f"{output_name}_flanks.txt", sep="\t", index=False)
             if nocombine:
                 autosomal_final_table.to_csv(
                     f"{output_name}_no_combined_reads.txt", sep="\t", index=False

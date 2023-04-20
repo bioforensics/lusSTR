@@ -168,8 +168,8 @@ def test_EFMoutput_format(tmp_path):
     lusSTR.cli.main(lusSTR.cli.get_parser().parse_args(arglist))
     shutil.copyfile(inputfile, os.path.join(str_path, "test_output.csv"))
     shutil.copyfile(inputfile, os.path.join(str_path, "test_output.txt"))
-    annot_arglist = ["strs", "all", "-w", str_path]
-    lusSTR.cli.main(lusSTR.cli.get_parser().parse_args(annot_arglist))
+    all_arglist = ["strs", "all", "-w", str_path]
+    lusSTR.cli.main(lusSTR.cli.get_parser().parse_args(all_arglist))
     assert filecmp.cmp(exp_out, obs_out) is True
 
 
@@ -190,8 +190,8 @@ def test_STRmixoutput_format(outputdir, datatype, tmp_path):
     lusSTR.cli.main(lusSTR.cli.get_parser().parse_args(arglist))
     shutil.copyfile(inputfile, os.path.join(str_path, "STRmix_Files.csv"))
     shutil.copyfile(inputfile, os.path.join(str_path, "STRmix_Files.txt"))
-    annot_arglist = ["strs", "all", "-w", str_path]
-    lusSTR.cli.main(lusSTR.cli.get_parser().parse_args(annot_arglist))
+    all_arglist = ["strs", "all", "-w", str_path]
+    lusSTR.cli.main(lusSTR.cli.get_parser().parse_args(all_arglist))
     assert filecmp.cmp(exp_out, obs_out) is True
     assert filecmp.cmp(exp_info_out, obs_info_out) is True
 
@@ -205,8 +205,8 @@ def test_nofilters(tmp_path):
     lusSTR.cli.main(lusSTR.cli.get_parser().parse_args(arglist))
     shutil.copyfile(inputfile, os.path.join(str_path, "lusstr_output.csv"))
     shutil.copyfile(inputfile, os.path.join(str_path, "lusstr_output.txt"))
-    annot_arglist = ["strs", "all", "-w", str_path]
-    lusSTR.cli.main(lusSTR.cli.get_parser().parse_args(annot_arglist))
+    all_arglist = ["strs", "all", "-w", str_path]
+    lusSTR.cli.main(lusSTR.cli.get_parser().parse_args(all_arglist))
     assert filecmp.cmp(exp_out, obs_out) is True
 
 
@@ -219,8 +219,8 @@ def test_flags(tmp_path):
     lusSTR.cli.main(lusSTR.cli.get_parser().parse_args(arglist))
     shutil.copyfile(inputfile, os.path.join(str_path, "lusstr_output.csv"))
     shutil.copyfile(inputfile, os.path.join(str_path, "lusstr_output.txt"))
-    annot_arglist = ["strs", "all", "-w", str_path]
-    lusSTR.cli.main(lusSTR.cli.get_parser().parse_args(annot_arglist))
+    all_arglist = ["strs", "all", "-w", str_path]
+    lusSTR.cli.main(lusSTR.cli.get_parser().parse_args(all_arglist))
     assert filecmp.cmp(exp_out, obs_out) is True
 
 
@@ -234,8 +234,8 @@ def test_efm_reference(tmp_path):
     shutil.copyfile(inputfile, os.path.join(str_path, "lusstr_output.csv"))
     shutil.copyfile(inputfile, os.path.join(str_path, "lusstr_output.txt"))
     print(os.listdir(str_path))
-    annot_arglist = ["strs", "all", "-w", str_path]
-    lusSTR.cli.main(lusSTR.cli.get_parser().parse_args(annot_arglist))
+    all_arglist = ["strs", "all", "-w", str_path]
+    lusSTR.cli.main(lusSTR.cli.get_parser().parse_args(all_arglist))
     print(os.listdir(f"{str_path}/lusstr_output"))
     assert filecmp.cmp(exp_out, obs_efm_out) is True
 
@@ -265,8 +265,8 @@ def test_strmix_reference(outputdir, datatype, tmp_path):
     lusSTR.cli.main(lusSTR.cli.get_parser().parse_args(arglist))
     shutil.copyfile(inputfile, os.path.join(str_path, "STRmix_Files.csv"))
     shutil.copyfile(inputfile, os.path.join(str_path, "STRmix_Files.txt"))
-    annot_arglist = ["strs", "all", "-w", str_path]
-    lusSTR.cli.main(lusSTR.cli.get_parser().parse_args(annot_arglist))
+    all_arglist = ["strs", "all", "-w", str_path]
+    lusSTR.cli.main(lusSTR.cli.get_parser().parse_args(all_arglist))
     assert filecmp.cmp(exp_out, obs_out) is True
 
 
@@ -279,8 +279,8 @@ def test_D7(tmp_path):
     lusSTR.cli.main(lusSTR.cli.get_parser().parse_args(arglist))
     shutil.copyfile(inputfile, os.path.join(str_path, "test.csv"))
     shutil.copyfile(inputfile, os.path.join(str_path, "test.txt"))
-    annot_arglist = ["strs", "all", "-w", str_path]
-    lusSTR.cli.main(lusSTR.cli.get_parser().parse_args(annot_arglist))
+    all_arglist = ["strs", "all", "-w", str_path]
+    lusSTR.cli.main(lusSTR.cli.get_parser().parse_args(all_arglist))
     assert filecmp.cmp(exp_out, obs_out) is True
 
     assert filecmp.cmp(exp_out, obs_out)

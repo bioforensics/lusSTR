@@ -46,9 +46,9 @@ sex: ```False``` (True/False); include sex-chromosome STRs (invoke ```--sex``` f
 samp_input: ```/path/to/input/directory/or/samples``` input directory or sample; if not provided, will be current working directory (indicate using ```--input path/to/dir``` )  
 output: ```lusstr_output``` output file/directory name (indicate using ```--out dir/sampleid e.g. --out test_030923```)
 
-### annotate settings  
+### convert settings  
 kit: ```forenseq``` (forenseq/powerseq) (invoke the ```--powerseq``` flag if using PowerSeq data)  
-nocombine: ```False``` (True/False); do not combine identical sequences during the ```annotate``` step, if using STRait Razor data. (invoke the ```--nocombine``` flag)  
+nocombine: ```False``` (True/False); do not combine identical sequences during the ```convert``` step, if using STRait Razor data. (invoke the ```--nocombine``` flag)  
 
 ### filter settings  
 output_type: ```strmix``` (strmix/efm) (invoke ```--efm``` flag if creating output for EuroForMix)  
@@ -67,7 +67,7 @@ ___
 
 The lusSTR STR workflow consists of three steps:  
 (1) ```format```: formatting input  
-(2) ```annotate```: converting sequences to other sequence representations and allele designations  
+(2) ```convert```: converting sequences to other sequence representations and allele designations  
 (3) ```filter```: performing several filtering steps and creating appropriately formatted files for use in EuroForMix or STRmix.
 
 Any or all steps can be run. In order to run all three steps, the following command can be used:  
@@ -88,10 +88,10 @@ lusstr strs format
 ```
 
 ```
-lusstr strs annotate -w lusstr_files/
+lusstr strs convert -w lusstr_files/
 ```
 
-**In order to run the ```annotate``` step, the appropriately formatted ```.csv``` file containing the sequences normally created in the ```format``` step must be present in the working directory. See the above ```Usage``` section for specific information about that file (required columns, etc.).** 
+**In order to run the ```convert``` step, the appropriately formatted ```.csv``` file containing the sequences normally created in the ```format``` step must be present in the working directory. See the above ```Usage``` section for specific information about that file (required columns, etc.).** 
 
 ----
 
@@ -100,7 +100,7 @@ lusstr strs annotate -w lusstr_files/
 
 ### Formatting input for STR loci sequences
 
-If inputting data from either the UAS Sample Details Report or STRait Razor output, the user must first invoke the ```format``` step to extract necessary information and format for the ```annotate``` step.
+If inputting data from either the UAS Sample Details Report or STRait Razor output, the user must first invoke the ```format``` step to extract necessary information and format for the ```convert``` step.
 
 The ```format``` command removes unnecessary rows/columns and outputs a table in CSV format containing the following columns:
 *  Locus
@@ -116,14 +116,14 @@ If including the sex chromosome loci as specified in the config file, the ```for
 
 ### Converting STR sequences to other sequence representations and allele designations
 
-The ```annotate``` step produces a tab-delineated table with the following columns:
+The ```convert``` step produces a tab-delineated table with the following columns:
 *  Sample ID
 *  Project ID (if provided)
 *  Analysis ID (if provided)
 *  Locus
 *  UAS Output sequence: can be forward or reverse strand
 *  Forward strand sequence: will be same as UAS Output sequence for those loci reported on forward strand
-*  UAS Output Bracketed notation: Bracketed annotation for the reported UAS sequence output (will be same for those loci which report the forward strand)
+*  UAS Output Bracketed notation: Bracketed sequence form for the reported UAS sequence output (will be same for those loci which report the forward strand)
 *  Forward Strand Bracketed notation: Bracketed notation for forward strand sequence
 *  CE allele: common length-based CE allele designation (also called the repeat unit, or RU, allele)
 *  LUS: Longest uninterrupted stretch
@@ -133,11 +133,11 @@ The ```annotate``` step produces a tab-delineated table with the following colum
 If including the sex chromosome loci as specified in the config file, a second table with the above columns for the sex chromosome loci will be outputted as well.
 
 
-If STRait Razor data is specified, several additional processes occur with the ```annotate``` step:
+If STRait Razor data is specified, several additional processes occur with the ```convert``` step:
 *  The full sequences are filtered to the UAS region before the translation step. The number of bases to remove is determined based on the specified kit.
 *  Once the sequences are filtered to the UAS region, any duplicated sequences are removed and their reads are summed in with the remaining sequence ```Reads``` column. NOTE: This step can be skipped with the ```nocombine``` setting in the config file.
   
-Further, a second table (labeled as ```*_flanks_anno.txt```) containing information related to the flanking sequences surrounding the UAS sequence region is also produced with the following columns:
+Further, a second table (labeled as ```*_flanks.txt```) containing information related to the flanking sequences surrounding the UAS sequence region is also produced with the following columns:
 *  Sample ID
 *  Project ID
 *  Analysis ID (same as Project ID)
