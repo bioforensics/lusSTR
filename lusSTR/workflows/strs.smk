@@ -17,12 +17,12 @@ separate = config["separate"]
 
 
 def get_sample_IDs(input, uas, output, software, separate):
-    annot_out = f"{output}.txt"
+    convert_out = f"{output}.txt"
     format_out = f"{output}.csv"
     if software == "efm" and separate is False:
         ID_list = os.path.basename(output)
-    elif os.path.exists(annot_out):
-        ID_list = get_existing_IDs(annot_out, "\t")
+    elif os.path.exists(convert_out):
+        ID_list = get_existing_IDs(convert_out, "\t")
     elif os.path.exists(format_out):
         ID_list = get_existing_IDs(format_out, ",")
     else:
@@ -94,7 +94,7 @@ rule format:
         lusSTR.wrapper("format")
 
 
-rule annotate:
+rule convert:
     input:
         rules.format.output
     output:
@@ -105,12 +105,12 @@ rule annotate:
         nocombine=config["nocombine"],
         kit=config["kit"]
     script:
-        lusSTR.wrapper("annot")
+        lusSTR.wrapper("convert")
 
 
 rule filter:
     input:
-        rules.annotate.output
+        rules.convert.output
     output:
         expand(
             "{outdir}/{samplename}_{prof_t}_{data_t}.csv", outdir=output_name,

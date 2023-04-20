@@ -110,7 +110,7 @@ def format_table(input, uas=False, kit="forenseq"):
                 marker.canonical,
                 marker.sequence,
                 marker.flank_5p,
-                marker.annotation,
+                marker.convert,
                 marker.flank_3p,
                 marker.indel_flag,
             ]

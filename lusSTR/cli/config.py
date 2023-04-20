@@ -81,7 +81,7 @@ def subparser(subparsers):
     p.add_argument(
         "--nocombine", action="store_true",
         help="Do not combine read counts for duplicate sequences within the UAS region "
-        "during the 'annotate' step. By default, read counts are combined for sequences "
+        "during the 'convert' step. By default, read counts are combined for sequences "
         "not run through the UAS.",
     )
     p.add_argument(

@@ -20,7 +20,7 @@ import sys
 
 
 def uas_load(inpath, sexloci=False):
-    """Format a UAS Sample Details Report (.xlsx) for use with `lusSTR annotate`.
+    """Format a UAS Sample Details Report (.xlsx).
 
     The `inpath` argument can refer to a report file or a directory of report files. Any files
     without the `.xlsx` file extension are ignored. The `sexloci` argument determines whether X and
@@ -69,7 +69,7 @@ def uas_format(infile, sexloci=False):
 
 
 def strait_razor_concat(inpath, sexloci=False):
-    """Format a directory of STRait Razor output files for use with `lusSTR annotate`."""
+    """Format a directory of STRait Razor output files."""
     locus_list = [
         "CSF1PO",
         "D10S1248",

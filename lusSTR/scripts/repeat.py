@@ -94,7 +94,7 @@ def get_blocks(sequence, n, rev=False):
 
 
 def collapse_repeats_by_length(sequence, n):
-    """Convert to bracketed annotation form by splitting the sequence into blocks of size n."""
+    """Convert to bracketed sequence form by splitting the sequence into blocks of size n."""
     units = list()
     for unit, count in get_blocks(sequence, n, False):
         assert unit is not None, (sequence, n)
@@ -108,7 +108,7 @@ def collapse_repeats_by_length(sequence, n):
 
 
 def sequence_to_bracketed_form(sequence, n, repeats):
-    """Convert sequence to bracketed annotation.
+    """Convert sequence to bracketed sequence form.
 
     Uses a combination of repeat-based and length-based methods to convert a sequence containing
     tandem repeats into a concise bracketed representation.
@@ -140,7 +140,7 @@ def reverse_complement(sequence):
 
 
 def reverse_complement_bracketed(forward_bracket):
-    """Compute reverse complement of a bracketed form annotation."""
+    """Compute reverse complement of a bracketed sequence form."""
     inblocks = forward_bracket.split(" ")
     outblocks = list()
     for block in reversed(inblocks):
@@ -151,7 +151,7 @@ def reverse_complement_bracketed(forward_bracket):
             rcblock = f"[{rcrep}]{count}"
         else:
             if re.match(r"[^ACGT]", block):
-                raise ValueError(f'annotation block "{block}" includes invalid characters')
+                raise ValueError(f'bracketed block "{block}" includes invalid characters')
             rcblock = reverse_complement(block)
         outblocks.append(rcblock)
     return " ".join(outblocks)
@@ -160,7 +160,7 @@ def reverse_complement_bracketed(forward_bracket):
 def repeat_copy_number(bf, repeat):
     """Determine the longest uninterrupted stretch of the specified repeat.
 
-    The input is a sequence string collapsed to bracketed annotation form.
+    The input is a sequence string collapsed to bracketed sequence form.
     """
     longest = 0
     for block in bf.split(" "):
@@ -176,7 +176,7 @@ def repeat_copy_number(bf, repeat):
 
 
 def collapse_repeats_by_length_flanks(sequence, n):
-    """Convert to bracketed annotation form by splitting the sequence into blocks of size n."""
+    """Convert to bracketed sequence form by splitting the sequence into blocks of size n."""
     units = list()
     for unit, count in get_blocks(sequence, n, True):
         assert unit is not None, (sequence, n)

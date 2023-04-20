@@ -29,9 +29,9 @@ def subparser(subparsers):
         "strs", description="Running the STR pipeline"
     )
     p.add_argument(
-        "target", choices=["format", "annotate", "all"], 
+        "target", choices=["format", "convert", "all"], 
         help="Steps to run. Specifying 'format' will run only 'format'. Specifying "
-        "'annotate' will run both 'format' and 'annotate'. Specifying 'all' will run "
-        "all steps of the STR workflow ('format', 'annotate' and 'filter')."
+        "'convert' will run both 'format' and 'convert'. Specifying 'all' will run "
+        "all steps of the STR workflow ('format', 'convert' and 'filter')."
     )
     p.add_argument("-w", "--workdir", metavar="W", default=".", help="working directory")

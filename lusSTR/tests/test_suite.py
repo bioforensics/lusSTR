@@ -44,7 +44,7 @@ def test_split_sequence_into_two_strings():
         ("powerseq", 353, 441, 256, 303, True),
     ],
 )
-def test_annotate_full_nocombine(
+def test_convert_full_nocombine(
     infile, len_sum, len_uncom, xy_len_sum, xy_len_uncom, pwrseq, tmp_path
 ):
     str_path = str(tmp_path / "WD")
@@ -82,8 +82,8 @@ def test_annotate_full_nocombine(
     lusSTR.cli.main(lusSTR.cli.get_parser().parse_args(arglist))
     shutil.copyfile(inputfile_sex, os.path.join(str_path, obs_sex_out))
     shutil.copyfile(inputfile, os.path.join(str_path, obs_out))
-    annot_arglist = ["strs", "annotate", "-w", str_path]
-    lusSTR.cli.main(lusSTR.cli.get_parser().parse_args(annot_arglist))
+    convert_arglist = ["strs", "convert", "-w", str_path]
+    lusSTR.cli.main(lusSTR.cli.get_parser().parse_args(convert_arglist))
     with open(f"{str_path}/{infile}_no_combined_reads.txt", "r") as fh:
         assert len(fh.readlines()) == len_uncom
     with open(f"{str_path}/{infile}_sexloci_no_combined_reads.txt", "r") as fh:
@@ -102,23 +102,23 @@ def test_flank_anno(tmp_path):
     arglist = ["config", "-w", str_path, "-o", "testflanks", "--straitrazor", "--input", "WD"]
     lusSTR.cli.main(lusSTR.cli.get_parser().parse_args(arglist))
     shutil.copyfile(inputfile, os.path.join(str_path, "testflanks.csv"))
-    annot_arglist = ["strs", "annotate", "-w", str_path]
-    lusSTR.cli.main(lusSTR.cli.get_parser().parse_args(annot_arglist))
+    convert_arglist = ["strs", "convert", "-w", str_path]
+    lusSTR.cli.main(lusSTR.cli.get_parser().parse_args(convert_arglist))
     assert filecmp.cmp(exp_out, obs_out) is True
 
 
 @pytest.mark.parametrize(
     "input, exp_length", [("Flanks_testing_file.csv", 952), ("test_FGA_short_seq.csv", 2)]
 )
-def test_annotate_combine(input, exp_length, tmp_path):
+def test_convert_combine(input, exp_length, tmp_path):
     inputfile = data_file(input)
     str_path = str(tmp_path / "WD")
     obs_out = str(tmp_path / "WD/testflanks.txt")
     arglist = ["config", "-w", str_path, "-o", "testflanks", "--straitrazor", "--input", "WD"]
     lusSTR.cli.main(lusSTR.cli.get_parser().parse_args(arglist))
     shutil.copyfile(inputfile, os.path.join(str_path, "testflanks.csv"))
-    annot_arglist = ["strs", "annotate", "-w", str_path]
-    lusSTR.cli.main(lusSTR.cli.get_parser().parse_args(annot_arglist))
+    convert_arglist = ["strs", "convert", "-w", str_path]
+    lusSTR.cli.main(lusSTR.cli.get_parser().parse_args(convert_arglist))
     with open(obs_out, "r") as fh:
         assert len(fh.readlines()) == exp_length
 
@@ -165,12 +165,12 @@ def test_powerseq_flanking_anno(tmp_path):
     ]
     lusSTR.cli.main(lusSTR.cli.get_parser().parse_args(arglist))
     shutil.copyfile(inputfile, os.path.join(str_path, "powerseq.csv"))
-    annot_arglist = ["strs", "annotate", "-w", str_path]
-    lusSTR.cli.main(lusSTR.cli.get_parser().parse_args(annot_arglist))
+    convert_arglist = ["strs", "convert", "-w", str_path]
+    lusSTR.cli.main(lusSTR.cli.get_parser().parse_args(convert_arglist))
     assert filecmp.cmp(exp_out, obs_out) is True
 
 
-def test_annotate_uas_sexloci(tmp_path):
+def test_convert_uas_sexloci(tmp_path):
     str_path = str(tmp_path / "WD")
     inputfile = data_file("testformat_uas.csv")
     inputfile_sex = data_file("testformat_uas_sexloci.csv")
@@ -180,8 +180,8 @@ def test_annotate_uas_sexloci(tmp_path):
     lusSTR.cli.main(lusSTR.cli.get_parser().parse_args(arglist))
     shutil.copyfile(inputfile_sex, os.path.join(str_path, "testformatuas_sexloci.csv"))
     shutil.copyfile(inputfile, os.path.join(str_path, "testformatuas.csv"))
-    annot_arglist = ["strs", "annotate", "-w", str_path]
-    lusSTR.cli.main(lusSTR.cli.get_parser().parse_args(annot_arglist))
+    convert_arglist = ["strs", "convert", "-w", str_path]
+    lusSTR.cli.main(lusSTR.cli.get_parser().parse_args(convert_arglist))
     assert filecmp.cmp(exp_sex_out, obs_sex_out) is True
 
 
@@ -202,7 +202,7 @@ def test_annotate_uas_sexloci(tmp_path):
         ),
     ],
 )
-def test_annotate_sr_sexloci(input, testoutput, flank_output, kit, tmp_path):
+def test_convert_sr_sexloci(input, testoutput, flank_output, kit, tmp_path):
     str_path = str(tmp_path / "WD")
     inputfile = data_file(f"{input}.csv")
     inputfile_sex = data_file(f"{input}_sexloci.csv")
@@ -238,8 +238,8 @@ def test_annotate_sr_sexloci(input, testoutput, flank_output, kit, tmp_path):
     lusSTR.cli.main(lusSTR.cli.get_parser().parse_args(arglist))
     shutil.copyfile(inputfile_sex, os.path.join(str_path, "testformatsr_sexloci.csv"))
     shutil.copyfile(inputfile, os.path.join(str_path, "testformatsr.csv"))
-    annot_arglist = ["strs", "annotate", "-w", str_path]
-    lusSTR.cli.main(lusSTR.cli.get_parser().parse_args(annot_arglist))
+    convert_arglist = ["strs", "convert", "-w", str_path]
+    lusSTR.cli.main(lusSTR.cli.get_parser().parse_args(convert_arglist))
     assert filecmp.cmp(exp_sex_out, obs_sex_out) is True
     assert filecmp.cmp(exp_sex_flank_out, obs_sex_flank_out) is True
 
@@ -264,26 +264,26 @@ def test_config_settings(tmp_path):
 
 
 @pytest.mark.parametrize(
-    "command, output, format_out, annot_out, all_out",
+    "command, output, format_out, convert_out, all_out",
     [
         ("format", "lusstr_output.csv", True, False, False),
-        ("annotate", "lusstr_output.txt", True, True, False),
+        ("convert", "lusstr_output.txt", True, True, False),
         ("all", "lusstr_output/Positive_Control_evidence_ngs.csv", True, True, True),
     ],
 )
-def test_snakemake(command, output, format_out, annot_out, all_out, tmp_path):
+def test_snakemake(command, output, format_out, convert_out, all_out, tmp_path):
     config = str(tmp_path / "config.yaml")
     inputfile = data_file("UAS_bulk_input/Positive Control Sample Details Report 2315.xlsx")
     exp_output = data_file(output)
     obs_output = str(tmp_path / output)
     obs_format_output = str(tmp_path / "lusstr_output.csv")
-    obs_annotate_output = str(tmp_path / "lusstr_output.txt")
+    obs_convert_output = str(tmp_path / "lusstr_output.txt")
     obs_all_output = str(tmp_path / "lusstr_output/")
     arglist = ["config", "-w", str(tmp_path), "--input", inputfile]
     lusSTR.cli.main(lusSTR.cli.get_parser().parse_args(arglist))
     snakemake_arglist = ["strs", command, "-w", str(tmp_path)]
     lusSTR.cli.main(lusSTR.cli.get_parser().parse_args(snakemake_arglist))
     assert os.path.exists(obs_format_output) is format_out
-    assert os.path.exists(obs_annotate_output) is annot_out
+    assert os.path.exists(obs_convert_output) is convert_out
     assert os.path.exists(obs_all_output) is all_out
     assert filecmp.cmp(exp_output, obs_output) is True

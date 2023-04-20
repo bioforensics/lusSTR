@@ -262,7 +262,7 @@ class STRMarker:
         return not self.cannot_split or self.split_compatible
 
     @property
-    def annotation(self):
+    def convert(self):
         bylength = (
             self.split_compatible
             or (self.data["ReverseCompNeeded"] == "Yes" and self.split_compatible)
@@ -278,19 +278,19 @@ class STRMarker:
         return collapseseq
 
     @property
-    def annotation_uas(self):
+    def convert_uas(self):
         if self.data["ReverseCompNeeded"] == "Yes":
-            return reverse_complement_bracketed(self.annotation)
-        return self.annotation
+            return reverse_complement_bracketed(self.convert)
+        return self.convert
 
     @property
     def designation(self):
         lus, sec, ter = None, None, None
-        lus = repeat_copy_number(self.annotation, self.data["LUS"])
+        lus = repeat_copy_number(self.convert, self.data["LUS"])
         if self.data["Sec"] != "":
-            sec = repeat_copy_number(self.annotation, self.data["Sec"])
+            sec = repeat_copy_number(self.convert, self.data["Sec"])
         if self.data["Tert"] != "":
-            ter = repeat_copy_number(self.annotation, self.data["Tert"])
+            ter = repeat_copy_number(self.convert, self.data["Tert"])
         return lus, sec, ter
 
     @property
@@ -308,8 +308,8 @@ class STRMarker:
         return [
             self.uas_sequence,
             self.forward_sequence,
-            self.annotation_uas,
-            self.annotation,
+            self.convert_uas,
+            self.convert,
             canon,
             lus_final_output,
             lus_plus,
@@ -371,7 +371,7 @@ class STRMarker_D13S317(STRMarker):
         return flank
 
     @property
-    def annotation(self):
+    def convert(self):
         if len(self.uas_sequence) < 110:
             bracketed_form = collapse_repeats_by_length(self.uas_sequence, 4)
         else:
@@ -457,7 +457,7 @@ class STRMarker_D7S820(STRMarker):
         return flank
 
     @property
-    def annotation(self):
+    def convert(self):
         """
         Function to correctly bracket microvariants in the D7S820 locus.
 
@@ -492,9 +492,9 @@ class STRMarker_D7S820(STRMarker):
     @property
     def designation(self):
         lus, sec, ter = None, None, None
-        lus = repeat_copy_number(self.annotation, self.data["LUS"])
-        sec = repeat_copy_number(self.annotation, self.data["Sec"])
-        if str(self.annotation)[-1] == "T" and isinstance(self.canonical, str):
+        lus = repeat_copy_number(self.convert, self.data["LUS"])
+        sec = repeat_copy_number(self.convert, self.data["Sec"])
+        if str(self.convert)[-1] == "T" and isinstance(self.canonical, str):
             ter = 1
         else:
             ter = 0
@@ -562,11 +562,11 @@ class STRMarker_D1S1656(STRMarker):
         return flank
 
     @property
-    def annotation(self):
-        """Bracketed annotation for D1S1656
+    def convert(self):
+        """Bracketed sequence form for D1S1656
 
         This function identifies if the sequence is a microvariant in order to call different
-        functions to create the bracketed annotation.
+        functions to create the bracketed form.
         """
         sequence = self.forward_sequence
         sequence_filt = sequence[2:]
@@ -622,8 +622,8 @@ class STRMarker_PentaD(STRMarker):
         return lus, sec, ter
 
     @property
-    def annotation(self):
-        """Bracketed annotation for PentaD
+    def convert(self):
+        """Bracketed sequence form for PentaD
 
         If the sequence is >= 18bp, the flanking region (first 5 bases) is first split off in the
         sequence to preserve that sequence. Then the repeat units are identified and bracketed.
@@ -742,8 +742,8 @@ class STRMarker_FGA(STRMarker):
         return ""
 
     @property
-    def annotation(self):
-        """Bracketed annotation for FGA
+    def convert(self):
+        """Bracketed sequence form for FGA
 
         Specialized handling is required because which repeat unit should be identified differs
         based on its location in the sequence. For example, the 'GGAA' repeat should be identified
@@ -751,7 +751,7 @@ class STRMarker_FGA(STRMarker):
         sequence; and the repeat 'AAAG' should be identified within the two end repeats.
 
         Simply identifying repeat units in a specified order does not result in the final
-        annotation which is consistent with previously published annotation for this locus.
+        form which is consistent with the previously published sequence form for this locus.
         """
         sequence = self.forward_sequence
         if len(sequence) % self.repeat_size == 0 or (not ("GGAA") in sequence):
@@ -853,7 +853,7 @@ class STRMarker_D18S51(STRMarker):
         return flank
 
     @property
-    def annotation(self):
+    def convert(self):
         if isinstance(self.canonical, str):
             return sequence_to_bracketed_form(self.uas_sequence, self.repeat_size, self.repeats)
         elif isinstance(self.canonical, int):
@@ -884,13 +884,13 @@ class STRMarker_D21S11(STRMarker):
         return flank
 
     @property
-    def annotation(self):
-        """Bracketed annotation for D21
+    def convert(self):
+        """Bracketed sequence form for D21
 
         A specialized function is required for this locus due to the potential end of the sequence
         containing 'TA TCTA' and other variants. This sequence needs to remain intact to conform
-        with the conventional annotation for this particular locus. However, if the 'TATCTA' is
-        included in a repeat unit, the repeat unit needs to be reported (i.e. [TCTA]2).
+        with the conventional bracketed form for this particular locus. However, if the 'TATCTA'
+        is included in a repeat unit, the repeat unit needs to be reported (i.e. [TCTA]2).
         """
         forward_strand_brack_form = sequence_to_bracketed_form(
             self.uas_sequence, self.data["NumBasesToSeparate"], self.repeats
@@ -934,7 +934,7 @@ class STRMarker_D21S11(STRMarker):
         Special handling is required because the LUS repeat motif is the last 'TCTA' repeat set and
         the secondary repeat motif is the first set of 'TCTA' repeats in the sequence.
         """
-        sequence = self.annotation
+        sequence = self.convert
         repeat = self.data["LUS"]
         remaining = list()
         lus_sec = list()
@@ -966,8 +966,8 @@ class STRMarker_D21S11(STRMarker):
                 lus_allele = 0
                 sec_allele = lus_sec[0]
         finalcount = 0
-        for m in re.finditer(self.data["Tert"], self.annotation):
-            count = self.annotation[m.end() + 1 : m.end() + 3]
+        for m in re.finditer(self.data["Tert"], self.convert):
+            count = self.convert[m.end() + 1 : m.end() + 3]
             if count == "" or count[0] == "[" or count[0] == " " or count.isalpha():
                 count = 1
             try:
@@ -985,8 +985,8 @@ class STRMarker_D21S11(STRMarker):
 
 class STRMarker_TH01(STRMarker):
     @property
-    def annotation(self):
-        """Bracketed annotation for TH01
+    def convert(self):
+        """Bracketed sequence form for TH01
 
         Special handling is required for the microvariants of the TH01 locus because of the
         insertion of the 'ATG' between the repeat units 'AATG'.
@@ -1051,15 +1051,16 @@ class STRMarker_TPOX(STRMarker):
 
 class STRMarker_D19S433(STRMarker):
     @property
-    def annotation(self):
-        """Bracketed annotation for D19S433
+    def convert(self):
+        """Bracketed sequence form for D19S433
 
         A specialized function is required for this locus. The sequence is first broken into two
         different strings. The two sets of sequences are processed separately in order to identify
         the potential presence of a deletion in either sequence.
 
         Simply identifying repeat units in a specified order does not result in the final
-        annotation which is consistent with previously published annotation for this locus.
+        bracketed form which is consistent with the previously published bracketed form for this
+        locus.
         """
         sequence = self.forward_sequence
         final = list()
@@ -1133,7 +1134,7 @@ class STRMarker_DYS612(STRMarker):
         repeats.
         """
         lus, sec, ter = None, None, None
-        anno = self.annotation
+        anno = self.convert
         repeat = "TCT"
         match_list = []
         for block in anno.split(" "):
@@ -1204,7 +1205,7 @@ class STRMarker_DYS533(STRMarker):
 
 class STRMarker_DYS522(STRMarker):
     @property
-    def annotation(self):
+    def convert(self):
         sequence = self.forward_sequence
         final_seq = f"{sequence[:3]} {collapse_repeats_by_length(sequence[3:], 4)}"
         return final_seq
@@ -1230,7 +1231,7 @@ class STRMarker_DYS439(STRMarker):
         return canon_allele
 
     @property
-    def annotation(self):
+    def convert(self):
         sequence = self.forward_sequence
         if self.kit == "powerseq" or (len(sequence) % 4 != 0):
             final_seq = sequence_to_bracketed_form(sequence, self.repeat_size, self.repeats)
@@ -1294,7 +1295,7 @@ class STRMarker_DYS391(STRMarker):
         return canon_allele
 
     @property
-    def annotation(self):
+    def convert(self):
         sequence = self.forward_sequence
         if self.kit == "powerseq":
             final_seq = (
@@ -1324,7 +1325,7 @@ class STRMarker_DYS19(STRMarker):
 
 class STRMarker_DYS458(STRMarker):
     @property
-    def annotation(self):
+    def convert(self):
         sequence = self.forward_sequence
         final_string = (
             f"{collapse_repeats_by_length(sequence[:14], 4)} "
@@ -1376,7 +1377,7 @@ class STRMarker_DXS7132(STRMarker):
 
 class STRMarker_DXS10135(STRMarker):
     @property
-    def annotation(self):
+    def convert(self):
         sequence = self.forward_sequence
         final_string = (
             f"{collapse_repeats_by_length(sequence[:12], 4)} "
@@ -1407,7 +1408,7 @@ class STRMarker_DXS10074(STRMarker):
 
 class STRMarker_Y_GATA_H4(STRMarker):
     @property
-    def annotation(self):
+    def convert(self):
         sequence = self.forward_sequence
         if self.kit == "powerseq":
             final_string = collapse_repeats_by_length(sequence, self.repeat_size)
@@ -1458,12 +1459,12 @@ class STRMarker_DYS390(STRMarker):
     @property
     def designation(self):
         lus, sec, ter = None, None, None
-        lus = repeat_copy_number(self.annotation, self.data["LUS"])
-        sec = repeat_copy_number(self.annotation, self.data["Sec"])
+        lus = repeat_copy_number(self.convert, self.data["LUS"])
+        sec = repeat_copy_number(self.convert, self.data["Sec"])
         if self.uas or self.kit == "powerseq":
-            ter = repeat_copy_number(self.annotation, self.data["Tert"])
+            ter = repeat_copy_number(self.convert, self.data["Tert"])
         else:
-            if self.annotation[-1] == "G":
+            if self.convert[-1] == "G":
                 ter = "1"
             else:
                 ter = "0"
@@ -1500,7 +1501,7 @@ class STRMarker_DYS448(STRMarker):
     @property
     def designation(self):
         lus, sec, ter = None, None, None
-        anno = self.annotation
+        anno = self.convert
         repeat = "AGAGAT"
         match_list = []
         for block in anno.split(" "):
@@ -1539,7 +1540,7 @@ class STRMarker_DXS10103(STRMarker):
         is identified as the "TAGA" repeat sequence with the largest number of repeats.
         """
         lus, sec, ter = None, None, None
-        anno = self.annotation
+        anno = self.convert
         repeat = "TAGA"
         match_list = []
         for block in anno.split(" "):
@@ -1574,7 +1575,7 @@ class STRMarker_DYS389II(STRMarker):
         is identified as the "TAGA" repeat sequence with the largest number of repeats.
         """
         lus, sec, ter = None, None, None
-        anno = self.annotation
+        anno = self.convert
         repeat = "TAGA"
         match_list = []
         for block in anno.split(" "):
