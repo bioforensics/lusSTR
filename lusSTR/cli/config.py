@@ -45,8 +45,6 @@ def edit_config(config, args):
         data["separate"] = True
     if args.nocombine:
         data["nocombine"] = True
-    if args.efm_sep:
-        data["filter_sep"] = True
     if args.nofiltering:
         data["nofilters"] = True
     if args.noinfo:
@@ -97,7 +95,7 @@ def subparser(subparsers):
         help="Use to not create the Sequence Information File in the 'filter' step"
     )
     p.add_argument(
-        "--separate",  dest="separate", action="store_true", 
+        "--separate", action="store_true", 
         help="Use to separate EFM profiles in the 'filter' step."
     )
     p.add_argument(
