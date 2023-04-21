@@ -14,7 +14,7 @@ import glob
 from setuptools import setup
 import versioneer
 
-desc = "Tool for converting NGS sequence data of forensic STR loci to various annotation styles"
+desc = "Tool for converting NGS sequence data of forensic STR loci to various sequence representations and allele designations"
 setup(
     name="lusSTR",
     version=versioneer.get_version(),
@@ -35,7 +35,7 @@ setup(
         ]
     },
     include_package_data=True,
-    install_requires=["pandas>=1.0", "openpyxl>=3.0.6", "snakemake>=7.22.0", "pyyaml>=6.0"],
+    install_requires=["pandas>=1.0,<2.0", "openpyxl>=3.0.6", "snakemake>=7.22.0", "pyyaml>=6.0"],
     entry_points={"console_scripts": ["lusstr = lusSTR.cli:main"]},
     scripts=glob.glob("lusSTR/scripts/*"),
     classifiers=[
