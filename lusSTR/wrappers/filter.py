@@ -14,7 +14,7 @@ import argparse
 from collections import defaultdict
 import json
 import lusSTR
-from lusSTR.filter_settings import filters, flags
+from lusSTR.scripts.filter_settings import filters, flags
 import numpy as np
 import os
 import pandas as pd
@@ -56,7 +56,7 @@ strs = [
 
 
 def get_filter_metadata_file():
-    return resource_filename("lusSTR", "filters.json")
+    return resource_filename("lusSTR", "data/filters.json")
 
 
 with open(get_filter_metadata_file(), "r") as fh:
@@ -118,7 +118,7 @@ def EFM_output(profile, outfile, profile_type, separate=False):
         profile = profile[profile.allele_type != "BelowAT"]
     efm_profile = populate_efm_profile(profile)
     if separate:
-        write_sample_specific_efm_profiles(efm_profile, profile_type)
+        write_sample_specific_efm_profiles(efm_profile, profile_type, outfile)
     else:
         write_aggregate_efm_profile(efm_profile, profile_type, outfile)
 
@@ -156,13 +156,13 @@ def populate_efm_profile(profile):
     return efm_profile
 
 
-def write_sample_specific_efm_profiles(efm_profile, profile_type, outdir="Separated_EFM_Files"):
-    Path(outdir).mkdir(exist_ok=True)
+def write_sample_specific_efm_profiles(efm_profile, profile_type, outdir):
+    Path(outdir).mkdir(parents=True, exist_ok=True)
     for sample in efm_profile.SampleName:
-        sample_profile = efm_profile[efm_profile.SampleName == sample]
+        sample_profile = efm_profile[efm_profile.SampleName == sample].reset_index(drop=True)
         sample_profile.dropna(axis=1, how="all", inplace=True)
         if profile_type == "evidence":
-            sample_profile.to_csv(f"Separated_EFM_Files/{sample}.csv", index=False)
+            sample_profile.to_csv(f"{outdir}/{sample}_evidence_ce.csv", index=False)
         else:
             num_alleles = (len(sample_profile.columns) - 2) / 2
             if num_alleles > 2:
@@ -175,18 +175,19 @@ def write_sample_specific_efm_profiles(efm_profile, profile_type, outdir="Separa
             for i in range(len(sample_profile)):
                 if pd.isna(sample_profile.loc[i, "Allele2"]):
                     sample_profile.loc[i, "Allele2"] = sample_profile.loc[i, "Allele1"]
-            sample_profile.iloc[:, :4].to_csv(f"Separated_EFM_Files/{id}.csv", index=False)
+            sample_profile.iloc[:, :4].to_csv(f"{outdir}/{sample}_reference_ce.csv", index=False)
 
 
 def write_aggregate_efm_profile(efm_profile, profile_type, outfile):
+    Path(outfile).mkdir(parents=True, exist_ok=True)
+    name = os.path.basename(outfile)
     if profile_type == "evidence":
-        efm_profile.to_csv(outfile, index=False)
+        efm_profile.to_csv(f"{outfile}/{name}_evidence_ce.csv", index=False)
     else:
         for i in range(len(efm_profile)):
             if pd.isna(efm_profile.loc[i, "Allele2"]):
                 efm_profile.loc[i, "Allele2"] = efm_profile.loc[i, "Allele1"]
-        prefix = outfile.replace(".csv", "")
-        efm_profile.iloc[:, :4].to_csv(f"{prefix}_reference.csv", index=False)
+        efm_profile.iloc[:, :4].to_csv(f"{outfile}/{name}_reference_ce.csv", index=False)
 
 
 def determine_max_num_alleles(allele_heights):
@@ -199,6 +200,7 @@ def determine_max_num_alleles(allele_heights):
 
 
 def STRmix_output(profile, outdir, profile_type, data_type):
+    Path(outdir).mkdir(parents=True, exist_ok=True)
     if profile_type == "reference":
         filtered_df = profile[profile.allele_type == "real_allele"]
     else:
@@ -221,7 +223,7 @@ def STRmix_output(profile, outdir, profile_type, data_type):
     for id in id_list:
         sample_df = strmix_profile[strmix_profile["SampleID"] == id].reset_index(drop=True)
         if profile_type == "evidence":
-            sample_df.iloc[:, 1:].to_csv(f"{outdir}/{id}_{data_type}.csv", index=False)
+            sample_df.iloc[:, 1:].to_csv(f"{outdir}/{id}_evidence_{data_type}.csv", index=False)
         else:
             reference_df = reference_table(sample_df, data_type)
             reference_df.to_csv(f"{outdir}/{id}_reference_{data_type}.csv", index=False)
@@ -291,42 +293,47 @@ def format_ref_table(new_rows, sample_data, datatype):
     return sort_df
 
 
-def main(args):
-    profile_type = args.profile
+def main(input, output_type, profile_type, data_type, output_dir, info, separate, nofilters):
+    input = str(input)
     if profile_type not in ("evidence", "reference"):
         raise ValueError(f"unknown profile type '{profile_type}'")
-    data_type = args.data
     if data_type not in ("ce", "ngs"):
         raise ValueError(f"unknown data type '{data_type}'")
-    output_type = args.output
     if output_type not in ("efm", "strmix"):
         raise ValueError(f"unknown output type '{output_type}'")
-    full_df = pd.read_csv(args.input, sep="\t")
-    if args.out is None:
-        outpath = sys.stdout
+    full_df = pd.read_csv(input, sep="\t")
+    if output_dir is None:
+        raise ValueError("No output specified using --out.")
     else:
-        outpath = args.out
-    if args.nofilters:
+        outpath = output_dir
+    if nofilters:
         full_df["allele_type"] = "real_allele"
-        if args.output == "efm":
-            EFM_output(full_df, outpath, profile_type, args.separate)
+        if output_type == "efm":
+            EFM_output(full_df, outpath, profile_type, separate)
         else:
             STRmix_output(full_df, outpath, profile_type, data_type)
     else:
         dict_loc = {k: v for k, v in full_df.groupby(["SampleID", "Locus"])}
         final_df, flags_df = process_strs(dict_loc, data_type)
         if output_type == "efm":
-            EFM_output(final_df, outpath, profile_type, args.separate)
+            EFM_output(final_df, outpath, profile_type, separate)
         else:
             STRmix_output(final_df, outpath, profile_type, data_type)
-        if args.info:
-            if outpath != sys.stdout:
-                if output_type == "efm":
-                    outputname = outpath.replace(".csv", "_")
-                else:
-                    outputname = f"{outpath}/"
-                final_df.to_csv(f"{outputname}sequence_info.csv", index=False)
-                if not flags_df.empty:
-                    flags_df.to_csv(f"{outputname}Flagged_Loci.csv", index=False)
-            else:
-                raise ValueError("No outfile provided. Please specify --out to create info file.")
+        if info:
+            name = os.path.basename(outpath)
+            final_df.to_csv(f"{outpath}/{name}_sequence_info.csv", index=False)
+            if not flags_df.empty:
+                flags_df.to_csv(f"{outpath}/{name}_Flagged_Loci.csv", index=False)
+
+
+if __name__ == "__main__":
+    main(
+        snakemake.input,
+        output_type=snakemake.params.output_type,
+        profile_type=snakemake.params.profile_type,
+        data_type=snakemake.params.data_type,
+        output_dir=snakemake.params.output_dir,
+        info=snakemake.params.info,
+        separate=snakemake.params.separate,
+        nofilters=snakemake.params.filters,
+    )

@@ -20,6 +20,7 @@ import re
 from tempfile import NamedTemporaryFile
 
 
+@pytest.mark.snps
 def test_uas_all(tmp_path):
     inputdb = data_file("snps")
     exp_out = data_file("snps_uas_all.txt")
@@ -30,6 +31,7 @@ def test_uas_all(tmp_path):
     assert filecmp.cmp(exp_out, obs_out) is True
 
 
+@pytest.mark.snps
 @pytest.mark.parametrize("type, lines", [("i", 189), ("p", 157)])
 def test_uas_type(type, lines, tmp_path):
     inputdb = data_file("snps")
@@ -41,6 +43,7 @@ def test_uas_type(type, lines, tmp_path):
         assert len(fh.readlines()) == lines
 
 
+@pytest.mark.snps
 def test_sr_all(tmp_path):
     inputdb = data_file("snps")
     exp_out = data_file("snps_sr_all.txt")
@@ -54,6 +57,7 @@ def test_sr_all(tmp_path):
     assert filecmp.cmp(exp_out_full, obs_out_full) is True
 
 
+@pytest.mark.snps
 @pytest.mark.parametrize("type, lines, full_lines", [("i", 181, 2152), ("p", 158, 2982)])
 def test_sr_type(type, lines, full_lines, tmp_path):
     inputdb = data_file("snps")

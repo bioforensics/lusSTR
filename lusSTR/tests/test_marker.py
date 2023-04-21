@@ -12,7 +12,7 @@
 
 import pytest
 import lusSTR
-from lusSTR.marker import STRMarkerObject
+from lusSTR.scripts.marker import STRMarkerObject
 
 
 @pytest.mark.parametrize(
@@ -47,21 +47,21 @@ from lusSTR.marker import STRMarkerObject
 )
 def test_D21_bracket(sequence, bracket_form):
     marker = STRMarkerObject("D21S11", sequence, uas=True)
-    assert marker.annotation == bracket_form
+    assert marker.convert == bracket_form
 
 
-def test_D19_annotation():
+def test_D19_convert():
     uas_sequence = (
         "AAGGAAAAGGTAGGAAGGAAGGAAGGAAGGAAGGAAGGAAGGAAGGAAGGAAGGAAGGAAGGAAGGAAGGAGAGAAGAAGAAAGAGAG"
     )
     marker = STRMarkerObject("D19S433", uas_sequence, uas=True)
-    assert marker.annotation == "CT CTCT TTCT TCTT CTCT [CCTT]14 CCTA CCTT TT CCTT"
+    assert marker.convert == "CT CTCT TTCT TCTT CTCT [CCTT]14 CCTA CCTT TT CCTT"
 
 
-def test_D1_annotation():
+def test_D1_convert():
     uas_sequence = "TAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATGTGTATGTG"
     marker = STRMarkerObject("D1S1656", uas_sequence, uas=True)
-    assert marker.annotation == "CA CATA CACA [TCTA]11"
+    assert marker.convert == "CA CATA CACA [TCTA]11"
 
 
 @pytest.mark.parametrize(
@@ -79,26 +79,24 @@ def test_D1_annotation():
         ("AAAAGAAAAAAAAGAAAAGAAAAGAAAAGAAAAGAAAAGAAAAGAAAAGA", "AAAAG AAAAA [AAAGA]8"),
     ],
 )
-def test_PentaD_annotation(sequence, bracket_form):
+def test_PentaD_convert(sequence, bracket_form):
     marker = STRMarkerObject("PENTA D", sequence, uas=True)
-    assert marker.annotation == bracket_form
+    assert marker.convert == bracket_form
 
 
-def test_FGA_anno():
+def test_FGA_convert():
     uas_sequence = (
         "TTTCTTTCTTTCTTTCTTTTTTCTTTCTTTCTTTCTTTCTTTCTTTCTTTCTTTCTTTCTGTCTGTCTGTCTTTCTTTCTTTCTTTCTT"
         "TCTTTCTTTCTTTCTTTCTTTCTTTCTTTCTTTCTTTCTTTCTTCCTTCCTTCCTTTCTTTCTTTCTCCTTCCTTCCTTCCTTCC"
     )
-    annotation = "[GGAA]4 GGAG [AAAG]3 [GAAG]3 [AAAG]15 [ACAG]3 [AAAG]9 AA AAAA [GAAA]4"
+    convert = "[GGAA]4 GGAG [AAAG]3 [GAAG]3 [AAAG]15 [ACAG]3 [AAAG]9 AA AAAA [GAAA]4"
     marker = STRMarkerObject("FGA", uas_sequence, uas=True)
-    print(annotation)
-    print(marker.annotation)
-    assert marker.annotation == annotation
+    assert marker.convert == convert
 
 
 def test_THO1():
     marker = STRMarkerObject("TH01", "AATGAATGAATGAATGAATGATGATGAATGAATGAATG", uas=True)
-    assert marker.annotation == "[AATG]5 ATG ATG [AATG]3"
+    assert marker.convert == "[AATG]5 ATG ATG [AATG]3"
 
 
 @pytest.mark.parametrize(
@@ -134,7 +132,7 @@ def test_THO1():
         ),
     ],
 )
-def test_D21_anno(sequence, lus_allele, sec_allele, tert_allele):
+def test_D21_convert(sequence, lus_allele, sec_allele, tert_allele):
     marker = STRMarkerObject("D21S11", sequence, uas=True)
     lus, sec, tert = marker.designation
     assert str(lus) == lus_allele
@@ -210,9 +208,9 @@ def test_D21_lus_sec():
         ),
     ],
 )
-def test_annotation_and_lus(locus, sequence, forward_bracket, lus, sec, tert):
+def test_convert_and_lus(locus, sequence, forward_bracket, lus, sec, tert):
     marker = STRMarkerObject(locus, sequence, uas=True)
-    assert marker.annotation == forward_bracket
+    assert marker.convert == forward_bracket
     lus_out, sec_out, tert_out = marker.designation
     assert str(lus_out) == lus
     assert str(sec_out) == sec
@@ -237,7 +235,7 @@ def test_annotation_and_lus(locus, sequence, forward_bracket, lus, sec, tert):
 )
 def test_strobj_DYS389II(sequence, bracketed, conc, lus, sec, tert):
     marker = STRMarkerObject("DYS389II", sequence, uas=False, kit="forenseq")
-    assert marker.annotation == bracketed
+    assert marker.convert == bracketed
     assert marker.canonical == conc
     assert marker.designation == (lus, sec, tert)
 
@@ -251,8 +249,8 @@ def test_strobj_CSF1PO():
     )
     assert marker.uas_sequence == "AGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGAT"
     assert marker.forward_sequence == "ATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCT"
-    assert marker.annotation == "[ATCT]12"
-    assert marker.annotation_uas == "[AGAT]12"
+    assert marker.convert == "[ATCT]12"
+    assert marker.convert_uas == "[AGAT]12"
     assert marker.canonical == 12, " "
     assert marker.designation == ("12", "0", None)
     assert marker.flank_5p == "CT TCCT"
@@ -268,8 +266,8 @@ def test_strobj_D10S1248():
     )
     assert marker.uas_sequence == "GGAAGGAAGGAAGGAAGGAAGGAAGGAAGGAAGGAAGGAAGGAAGGAAGGAA"
     assert marker.forward_sequence == "GGAAGGAAGGAAGGAAGGAAGGAAGGAAGGAAGGAAGGAAGGAAGGAAGGAA"
-    assert marker.annotation == "[GGAA]13"
-    assert marker.annotation_uas == "[GGAA]13"
+    assert marker.convert == "[GGAA]13"
+    assert marker.convert_uas == "[GGAA]13"
     assert marker.canonical == 13, " "
     assert marker.designation == ("13", None, None)
 
@@ -284,8 +282,8 @@ def test_strobj_D1S1656():
     )
     assert marker.uas_sequence == "TAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGGTGTGTGTGTG"
     assert marker.forward_sequence == "CACACACACACCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTA"
-    assert marker.annotation == "CA [CACA]2 CCTA [TCTA]11"
-    assert marker.annotation_uas == "[TAGA]11 TAGG [TGTG]2 TG"
+    assert marker.convert == "CA [CACA]2 CCTA [TCTA]11"
+    assert marker.convert_uas == "[TAGA]11 TAGG [TGTG]2 TG"
     assert marker.canonical == 12, " "
     assert marker.designation == ("11", "1", "0")
 
@@ -299,8 +297,8 @@ def test_strobj_D5S818():
     )
     assert marker.uas_sequence == "AGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGAG"
     assert marker.forward_sequence == "CTCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCT"
-    assert marker.annotation == "CTCT [ATCT]12"
-    assert marker.annotation_uas == "[AGAT]12 AGAG"
+    assert marker.convert == "CTCT [ATCT]12"
+    assert marker.convert_uas == "[AGAT]12 AGAG"
     assert marker.canonical == 12, " "
     assert marker.designation == ("12", None, None)
 
@@ -317,7 +315,7 @@ def test_strobj_D16S539():
     assert marker.forward_sequence == "GATAGATAGATAGATTGATTGATAGATAGATAGATAGATA"
     assert marker.flank_5p == "TC CTCT T CCCT AGAT CAAT [ACAG]4 GTG"
     assert marker.flank_3p == "TCAT TGAA AGAC AAA A CAGA [GATG]2 ATA GA T AC"
-    assert marker.annotation == "[GATA]3 [GATT]2 [GATA]5"
+    assert marker.convert == "[GATA]3 [GATT]2 [GATA]5"
 
 
 def test_strobj_D7S820():
@@ -332,7 +330,7 @@ def test_strobj_D7S820():
     assert marker.forward_sequence == "AAAACTATCAATCTGTCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATC"
     assert marker.flank_5p == "T ATTT AGTG AGAT AAAAAA"
     assert marker.flank_3p == "GTTA [GTTC]2 TAAA CTAT"
-    assert marker.annotation == "A AAAC TATC AATC TGTC [TATC]10"
+    assert marker.convert == "A AAAC TATC AATC TGTC [TATC]10"
 
 
 def test_strobj_D3S1358():
@@ -340,7 +338,7 @@ def test_strobj_D3S1358():
     marker = STRMarkerObject("D3S1358", sequence, uas=True, kit="forenseq")
     assert marker.forward_sequence == sequence
     assert marker.uas_sequence == sequence
-    assert marker.annotation == "TCTA [TCTG]2 [TCTA]9 [ACTA]2 [TCTA]2"
+    assert marker.convert == "TCTA [TCTG]2 [TCTA]9 [ACTA]2 [TCTA]2"
 
 
 def test_strobj_D19S433_newformat():
@@ -351,7 +349,7 @@ def test_strobj_D19S433_newformat():
         uas=False,
         kit="forenseq",
     )
-    assert marker.annotation == "CT CTCT TTCT TCCT CTCT [CCTT]12 CCTA [CCTT]3"
+    assert marker.convert == "CT CTCT TTCT TCCT CTCT [CCTT]12 CCTA [CCTT]3"
 
 
 def test_strobj_D21S11_newformat():
@@ -363,16 +361,14 @@ def test_strobj_D21S11_newformat():
         uas=False,
         kit="forenseq",
     )
-    assert marker.annotation == (
-        "[TCTA]5 [TCTG]6 [TCTA]3 TA [TCTA]3 TCA [TCTA]2 TCCA TA [TCTA]11 TA"
-    )
+    assert marker.convert == ("[TCTA]5 [TCTG]6 [TCTA]3 TA [TCTA]3 TCA [TCTA]2 TCCA TA [TCTA]11 TA")
 
 
 def test_strobj_FGA_newformat():
     marker = STRMarkerObject(
         "FGA", "CCAGCAAAAAAGAAAGAAAGAGAAAAAAGAAAGAAAGAAA", uas=False, kit="forenseq"
     )
-    assert marker.annotation == "AAAA [AGAA]3 A"
+    assert marker.convert == "AAAA [AGAA]3 A"
 
 
 def test_strobj_DYS643_foren():
@@ -383,7 +379,7 @@ def test_strobj_DYS643_foren():
         uas=False,
         kit="forenseq",
     )
-    assert marker.annotation == "[CTTTT]10 CTTTC TTTT"
+    assert marker.convert == "[CTTTT]10 CTTTC TTTT"
     assert str(marker.canonical) == "10"
     assert marker.designation == ("10", None, None)
     assert marker.flank_3p == "TAAAA CTT"
@@ -397,7 +393,7 @@ def test_strobj_DYS635_foren():
         uas=False,
         kit="forenseq",
     )
-    assert marker.annotation == "[TAGA]12 [TACA]2 [TAGA]2 [TACA]2 [TAGA]4"
+    assert marker.convert == "[TAGA]12 [TACA]2 [TAGA]2 [TACA]2 [TAGA]4"
     assert str(marker.canonical) == "22"
     assert marker.designation == ("12", None, None)
     assert marker.flank_5p == "A [TCAA]2 TGAA TGGA TAAA GAAA ATGT GA"
@@ -411,7 +407,7 @@ def test_strobj_DYS612():
         uas=False,
         kit="forenseq",
     )
-    assert marker.annotation == "[CCT]5 CTT [TCT]4 CCT [TCT]24"
+    assert marker.convert == "[CCT]5 CTT [TCT]4 CCT [TCT]24"
     assert marker.canonical == 29
     assert marker.designation == (24, 4, None)
     assert marker.flank_3p == "G TCA CTT TTC CAA [ATT]2 TTC TTT T"
@@ -425,7 +421,7 @@ def test_strobj_DYS576_foren():
         uas=False,
         kit="forenseq",
     )
-    assert marker.annotation == "[AAAG]17"
+    assert marker.convert == "[AAAG]17"
     assert str(marker.canonical) == "17"
     assert marker.designation == ("17", None, None)
     assert marker.flank_3p == "AAAA AGCC AAGA CAAA TACG CTTA TTAC TCCC ATCT CCT"
@@ -439,7 +435,7 @@ def test_strobj_DYS549_foren():
         uas=False,
         kit="forenseq",
     )
-    assert marker.annotation == "[GATA]13"
+    assert marker.convert == "[GATA]13"
     assert str(marker.canonical) == "13"
     assert marker.designation == ("13", None, None)
     assert marker.flank_5p == (
@@ -455,7 +451,7 @@ def test_strobj_DYS533():
         uas=False,
         kit="forenseq",
     )
-    assert marker.annotation == "[TATC]13"
+    assert marker.convert == "[TATC]13"
     assert str(marker.canonical) == "13"
     assert marker.designation == ("13", None, None)
     assert marker.flank_3p == "ATCT ATCA TCTT CTAT TGTT T"
@@ -470,7 +466,7 @@ def test_strobj_DYS522():
         uas=False,
         kit="forenseq",
     )
-    assert marker.annotation == "ATA GATG [ATAG]12"
+    assert marker.convert == "ATA GATG [ATAG]12"
     assert marker.canonical == 12
     assert marker.designation == ("12", None, None)
 
@@ -501,7 +497,7 @@ def test_strobj_DYS522():
 )
 def test_strobj_DYS439(sequence, bracketed, conc, lus, sec, tert, kit):
     marker = STRMarkerObject("DYS439", sequence, uas=False, kit=kit)
-    assert marker.annotation == bracketed
+    assert marker.convert == bracketed
     assert str(marker.canonical) == conc
     assert marker.designation == (lus, sec, tert)
 
@@ -515,7 +511,7 @@ def test_strobj_DYS437_foren():
         uas=False,
         kit="forenseq",
     )
-    assert marker.annotation == "[TCTA]9 [TCTG]3 [TCTA]4"
+    assert marker.convert == "[TCTA]9 [TCTG]3 [TCTA]4"
     assert str(marker.canonical) == "16"
     assert marker.designation == ("9", None, None)
     assert marker.flank_3p == (
@@ -533,7 +529,7 @@ def test_strobj_DYS392_foren():
         uas=False,
         kit="forenseq",
     )
-    assert marker.annotation == "[ATA]13"
+    assert marker.convert == "[ATA]13"
     assert str(marker.canonical) == "13"
     assert marker.designation == ("13", None, None)
     assert marker.flank_3p == (
@@ -550,7 +546,7 @@ def test_strobj_DYS391_foren():
         uas=False,
         kit="forenseq",
     )
-    assert marker.annotation == "[TCTG]3 [TCTA]13 TCTG"
+    assert marker.convert == "[TCTG]3 [TCTA]13 TCTG"
     assert str(marker.canonical) == "13"
     assert marker.designation == ("13", None, None)
     assert marker.flank_3p == "CCTA TCT [GCCT]2 ACCT ATCC CTCT AT"
@@ -565,7 +561,7 @@ def test_strobj_DYS19_foren():
         uas=False,
         kit="forenseq",
     )
-    assert marker.annotation == "[TCTA]11 CCTA [TCTA]3"
+    assert marker.convert == "[TCTA]11 CCTA [TCTA]3"
     assert str(marker.canonical) == "14"
     assert marker.designation == ("11", None, None)
     assert marker.flank_3p == ""
@@ -579,7 +575,7 @@ def test_strobj_HPRTB():
         uas=False,
         kit="forenseq",
     )
-    assert marker.annotation == "[ATCT]12"
+    assert marker.convert == "[ATCT]12"
     assert marker.canonical == 12
     assert marker.designation == ("12", None, None)
     assert marker.flank_5p == (
@@ -597,7 +593,7 @@ def test_strobj_DXS8378():
         uas=False,
         kit="forenseq",
     )
-    assert marker.annotation == "[ATAG]11"
+    assert marker.convert == "[ATAG]11"
     assert marker.canonical == 11
     assert marker.designation == ("11", None, None)
     assert marker.flank_5p == (
@@ -618,7 +614,7 @@ def test_strobj_DXS7132():
         uas=False,
         kit="forenseq",
     )
-    assert marker.annotation == "[TAGA]13"
+    assert marker.convert == "[TAGA]13"
     assert marker.canonical == 13
     assert marker.designation == ("13", None, None)
     assert marker.flank_3p == (
@@ -654,7 +650,7 @@ def test_strobj_DXS7132():
 )
 def test_strobj_DXS10135(sequence, bracketed, conc, lus, sec, tert):
     marker = STRMarkerObject("DXS10135", sequence, uas=False, kit="forenseq")
-    assert marker.annotation == bracketed
+    assert marker.convert == bracketed
     assert str(marker.canonical) == conc
     assert marker.designation == (lus, sec, tert)
 
@@ -692,7 +688,7 @@ def test_strobj_DXS10135(sequence, bracketed, conc, lus, sec, tert):
 )
 def test_strobj_DXS10074(sequence, bracketed, conc, lus, sec, tert, flank_5p, flank_3p):
     marker = STRMarkerObject("DXS10074", sequence, uas=False, kit="forenseq")
-    assert marker.annotation == bracketed
+    assert marker.convert == bracketed
     assert str(marker.canonical) == conc
     assert marker.designation == (lus, sec, tert)
     assert marker.flank_5p == flank_5p
@@ -707,7 +703,7 @@ def test_strobj_Y_GATA_H4():
         uas=False,
         kit="forenseq",
     )
-    assert marker.annotation == (
+    assert marker.convert == (
         "C [TATC]3 TATT [CATC]2 TAAT CTAT CCAT [TCTA]11 [CCTA]3 [TCTA]2 TAGA [TCTA]3 TCT"
     )
     assert str(marker.canonical) == "11"
@@ -745,7 +741,7 @@ def test_strobj_Y_GATA_H4():
 )
 def test_strobj_DYS390(sequence, bracketed, conc, lus, sec, tert, flank_5p, kit):
     marker = STRMarkerObject("DYS390", sequence, uas=False, kit=kit)
-    assert marker.annotation == bracketed
+    assert marker.convert == bracketed
     assert str(marker.canonical) == conc
     assert marker.designation == (lus, sec, tert)
     assert marker.flank_5p == flank_5p
@@ -783,7 +779,7 @@ def test_strobj_DYS390(sequence, bracketed, conc, lus, sec, tert, flank_5p, kit)
 )
 def test_strobj_DYS385(sequence, bracketed, conc, lus, sec, tert, kit):
     marker = STRMarkerObject("DYS385A-B", sequence, uas=False, kit=kit)
-    assert marker.annotation == bracketed
+    assert marker.convert == bracketed
     assert str(marker.canonical) == conc
     assert marker.designation == (lus, sec, tert)
 
@@ -815,7 +811,7 @@ def test_strobj_DYS385(sequence, bracketed, conc, lus, sec, tert, kit):
 )
 def test_strobj_DYS448(sequence, bracketed, conc, lus, sec, tert):
     marker = STRMarkerObject("DYS448", sequence, uas=False, kit="forenseq")
-    assert marker.annotation == bracketed
+    assert marker.convert == bracketed
     assert marker.canonical == conc
     assert marker.designation == (lus, sec, tert)
 
@@ -845,7 +841,7 @@ def test_strobj_DYS448(sequence, bracketed, conc, lus, sec, tert):
 )
 def test_strobj_DXS10103(sequence, bracketed, conc, lus, sec, tert):
     marker = STRMarkerObject("DXS10103", sequence, uas=False, kit="forenseq")
-    assert marker.annotation == bracketed
+    assert marker.convert == bracketed
     assert marker.canonical == conc
     assert marker.designation == (lus, sec, tert)
 
@@ -868,7 +864,7 @@ def test_strobj_DXS10103(sequence, bracketed, conc, lus, sec, tert):
 )
 def test_strobj_DYS389II(sequence, bracketed, conc, lus, sec, tert):
     marker = STRMarkerObject("DYS389II", sequence, uas=False, kit="forenseq")
-    assert marker.annotation == bracketed
+    assert marker.convert == bracketed
     assert marker.canonical == conc
     assert marker.designation == (lus, sec, tert)
 
@@ -904,7 +900,7 @@ def test_strobj_DYS389II(sequence, bracketed, conc, lus, sec, tert):
 )
 def test_strobj_D18S51(sequence, bracketed, lus, sec, tert, flank_5, flank_3, kit):
     marker = STRMarkerObject("D18S51", sequence, uas=False, kit=kit)
-    assert marker.annotation == bracketed
+    assert marker.convert == bracketed
     assert marker.designation == (lus, sec, tert)
     assert marker.flank_5p == flank_5
     assert marker.flank_3p == flank_3
@@ -1441,7 +1437,7 @@ def test_strobj_D18S51(sequence, bracketed, lus, sec, tert, flank_5, flank_3, ki
 )
 def test_new_power_config(locus, sequence, bracketed, conc, lus, sec, tert, flank_5, flank_3):
     marker = STRMarkerObject(locus, sequence, uas=False, kit="powerseq")
-    assert marker.annotation == bracketed
+    assert marker.convert == bracketed
     assert str(marker.canonical) == conc
     assert marker.designation == (lus, sec, tert)
     assert marker.flank_5p == flank_5

@@ -19,7 +19,7 @@ import re
 
 
 def get_filter_metadata_file():
-    return resource_filename("lusSTR", "filters.json")
+    return resource_filename("lusSTR", "data/filters.json")
 
 
 with open(get_filter_metadata_file(), "r") as fh:

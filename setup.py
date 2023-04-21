@@ -10,32 +10,34 @@
 # Development Center.
 # -------------------------------------------------------------------------------------------------
 
+import glob
 from setuptools import setup
 import versioneer
 
-desc = "Tool for converting NGS sequence data of forensic STR loci to various annotation styles"
+desc = "Tool for converting NGS sequence data of forensic STR loci to various sequence representations and allele designations"
 setup(
     name="lusSTR",
     version=versioneer.get_version(),
     cmdclass=versioneer.get_cmdclass(),
     description=desc,
-    packages=["lusSTR", "lusSTR.tests"],
+    packages=["lusSTR", "lusSTR.cli", "lusSTR.tests"],
     package_data={
         "lusSTR": [
-            "lusSTR/str_markers.json",
-            "lusSTR/snp_data.json",
+            "lusSTR/data/*",
             "lusSTR/tests/data/*",
             "lusSTR/tests/data/STRait_Razor_test_output/*",
             "lusSTR/tests/data/UAS_bulk_input/*",
             "lusSTR/tests/data/snps/*",
             "lusSTR/tests/data/RU_stutter_test/*",
-            "lusSTR/filters.json",
             "lusSTR/tests/data/NGS_stutter_test/*",
+            "lusSTR/workflows/*",
+            "lusSTR/wrappers/*",
         ]
     },
     include_package_data=True,
-    install_requires=["pandas>=1.0", "openpyxl>=3.0.6"],
-    entry_points={"console_scripts": ["lusstr = lusSTR.__main__:main"]},
+    install_requires=["pandas>=1.0,<2.0", "openpyxl>=3.0.6", "snakemake>=7.22.0", "pyyaml>=6.0"],
+    entry_points={"console_scripts": ["lusstr = lusSTR.cli:main"]},
+    scripts=glob.glob("lusSTR/scripts/*"),
     classifiers=[
         "Environment :: Console",
         "Framework :: IPython",

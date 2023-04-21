@@ -10,17 +10,16 @@
 # Development Center.
 # -------------------------------------------------------------------------------------------------
 
-from pkg_resources import resource_filename
-from lusSTR import cli
-from lusSTR._version import get_versions
+import lusSTR
+import snakemake
 
-__version__ = get_versions()["version"]
-del get_versions
+## placeholder until I update this
 
+def main(args):
+    raise NotImplementedError('SNP workflow implementation pending')
 
-def snakefile(workflow="strs"):
-    return resource_filename("lusSTR", f"workflows/{workflow}.smk")
-
-
-def wrapper(label):
-    return resource_filename("lusSTR", f"wrappers/{label}.py")
+def subparser(subparsers):
+    p = subparsers.add_parser("snps", description="Running the entire STR pipeline (format, annotate and filter)")
+    p.add_argument("--config", default="config.yaml", help="config file used to identify settings.")
+    p.add_argument("-w", "--workdir", metavar="W", default=".", help="working directory")
+    p.add_argument("--skip-filter", dest="filter", action = "store_true", help="Skip filtering step")

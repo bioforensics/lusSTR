@@ -20,7 +20,7 @@ import sys
 
 
 def uas_load(inpath, sexloci=False):
-    """Format a UAS Sample Details Report (.xlsx) for use with `lusSTR annotate`.
+    """Format a UAS Sample Details Report (.xlsx).
 
     The `inpath` argument can refer to a report file or a directory of report files. Any files
     without the `.xlsx` file extension are ignored. The `sexloci` argument determines whether X and
@@ -69,7 +69,7 @@ def uas_format(infile, sexloci=False):
 
 
 def strait_razor_concat(inpath, sexloci=False):
-    """Format a directory of STRait Razor output files for use with `lusSTR annotate`."""
+    """Format a directory of STRait Razor output files."""
     locus_list = [
         "CSF1PO",
         "D10S1248",
@@ -186,14 +186,18 @@ def strait_razor_table(filename, analysisID, sexloci=False):
     return table
 
 
-def main(args):
-    if args.uas:
-        results, sex_results = uas_load(args.input, args.sex)
+def main(input, outfile, uas=True, sex=False):
+    if uas:
+        results, sex_results = uas_load(str(input), sex)
     else:
-        results, sex_results = strait_razor_concat(args.input, args.sex)
-    if args.out is None:
-        args.out = sys.stdout
-    results.to_csv(args.out, index=False)
-    if args.sex:
-        name = os.path.splitext(args.out)[0]
+        results, sex_results = strait_razor_concat(str(input), sex)
+    if outfile is None:
+        outfile = sys.stdout
+    results.to_csv(str(outfile), index=False)
+    if sex:
+        name = os.path.splitext(str(outfile))[0]
         sex_results.to_csv(f"{name}_sexloci.csv", index=False)
+
+
+if __name__ == "__main__":
+    main(snakemake.input, snakemake.output, uas=snakemake.params.uas, sex=snakemake.params.sex)
