@@ -45,7 +45,7 @@ def main(args):
     pretarget = args.target if args.target != "all" else "format"
     workdir = args.workdir
     result = snakemake(
-        lusSTR.snakefile(workflow="snps"), targets=[pretarget], workdir=workdir
+        lusSTR.snakefile(workflow="snps"), targets=[pretarget], workdir=workdir, verbose=True
     )
     if result is not True:
         raise SystemError('Snakemake failed')

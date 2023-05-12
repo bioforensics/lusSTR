@@ -43,6 +43,8 @@ def edit_snp_config(config, args):
             data["output"] = args.out
         if args.snptype:
             data["type"] = args.snptype
+        if args.kintelligence:
+            data["kit"] = "kintelligence"
         return data
 
 
@@ -131,4 +133,8 @@ def subparser(subparsers):
         help="Specify the type of SNPs to include in the final report. 'p' will include only the "
         "Phenotype and Ancestry SNPs; 'i' will include only the Identity SNPs; and 'all' will "
         "include all SNPs. Default is Identity SNPs only (i)."
+    )
+    p.add_argument(
+        "--kintelligence", action="store_true",
+        help="Use if processing Kintelligence SNPs within a Kintellience Report(s)"
     )
