@@ -42,9 +42,11 @@ def edit_snp_config(config, args):
         if args.out:
             data["output"] = args.out
         if args.snptype:
-            data["type"] = args.snptype
+            data["types"] = args.snptype
         if args.kintelligence:
             data["kit"] = "kintelligence"
+        if args.separate:
+            data["separate"] = True
         return data
 
 

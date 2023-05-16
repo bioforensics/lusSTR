@@ -116,7 +116,7 @@ def uas_load(indir, type="i"):
     snp_final_output = pd.DataFrame()
     files = glob.glob(os.path.join(indir, "[!~]*.xlsx"))
     for filename in sorted(files):
-        if "Phenotype" in filename or "Sample Details" in filename:
+        if "Phenotype" in filename or "Sample" in filename:
             snps = uas_types(filename, type)
             if snps is not None:
                 snp_final_output = snp_final_output.append(snps)
@@ -134,6 +134,8 @@ def uas_types(infile, snp_type):
         snp_data = parse_snp_table_from_sheet(infile, "iSNPs", snp_type)
     elif "Phenotype" in infile and (snp_type == "all" or "a" in snp_type or "p" in snp_type):
         snp_data = parse_snp_table_from_sheet(infile, "SNP Data", snp_type)
+    elif "Sample Report" in infile:
+        snp_data = process_kin(infile)
     else:
         snp_data = None
     return snp_data
@@ -166,6 +168,94 @@ def parse_snp_table_from_sheet(infile, sheet, snp_type_arg):
     final_df["Project"] = table.iloc[3, 1]
     final_df["Analysis"] = table.iloc[4, 1]
     return final_df
+
+
+def process_kin(input):
+    """
+    This function processes the Kintelligence Sample Report.
+    """
+    file = openpyxl.load_workbook(input)
+    sheet_names = ["Ancestry SNPs", "Phenotype SNPs", "Identity SNPs", "Kinship SNPs"]
+    data_filt = pd.DataFrame()
+    for sheet in sheet_names:
+        file_sheet = file[sheet]
+        table = pd.DataFrame(file_sheet.values)
+        offset = table[table.iloc[:, 0] == "Locus"].index.tolist()[0]
+        data = table.iloc[offset + 1 :]
+        data.columns = table.iloc[offset]
+        data = data[["Locus", "Reads", "Allele Name", "Typed Allele?"]]
+        data_filt = data_filt.append(data).reset_index(drop=True)
+    sampid = table.iloc[2, 1]
+    projid = table.iloc[3, 1]
+    analyid = table.iloc[4, 1]
+    data_df = []
+    for j, row in data_filt.iterrows():
+        tmp_row = create_row(data_filt, j, sampid, projid, analyid)
+        data_df.append(tmp_row)
+    data_final = pd.DataFrame(
+        data_df,
+        columns=[
+            "SampleID",
+            "Project",
+            "Analysis",
+            "SNP",
+            "Reads",
+            "Forward_Strand_Allele",
+            "UAS_Allele",
+            "Issues",
+        ],
+    )
+    data_final_sort = data_final.sort_values(
+        by=["Project", "SampleID", "SNP", "Reads"], ascending=False
+    ).reset_index(drop=True)
+    return data_final_sort
+
+
+def create_row(df, j, sampleid, projectid, analysisid):
+    """
+    This function first it identifies the ForenSeq SNPs (reverse complements those SNPs if
+    neccesary and checks SNP allele calls for incorrect allele calls), and reports all SNP calls
+    in the same general format.
+    """
+    snpid = df.loc[j, "Locus"]
+    uas_allele = df.loc[j, "Allele Name"]
+    try:
+        metadata = snp_marker_data[snpid]
+        if metadata["ReverseCompNeeded"] == "Yes":
+            forward_strand_allele = complement_base(uas_allele)
+        else:
+            forward_strand_allele = uas_allele
+        flag = flags(df, forward_strand_allele, j, metadata)
+    except KeyError:
+        forward_strand_allele = uas_allele
+        if df.loc[j, "Typed Allele?"] == "No":
+            df.loc[j, "Reads"] = 0
+        flag = None
+    new_row = [
+        sampleid,
+        projectid,
+        analysisid,
+        snpid,
+        df.loc[j, "Reads"],
+        forward_strand_allele,
+        uas_allele,
+        flag,
+    ]
+    return new_row
+
+
+def flags(df, allele, j, metadata):
+    """
+    Checks that allele call is one of two known alleles for that SNP.
+    """
+    if df.loc[j, "Typed Allele?"] == "No":
+        df.loc[j, "Reads"] = 0
+        flag = None
+    elif allele in metadata["Alleles"]:
+        flag = None
+    else:
+        flag = "Allele call does not match expected allele!"
+    return flag
 
 
 def strait_razor_format(infile, snp_type_arg):
@@ -371,9 +461,16 @@ def snp_call_exception(seq, expected_size, metadata, base):
 
 
 def main(input, output, kit, uas, snptypes):
+    output = str(output)
+    input = str(input)
     output_name = os.path.splitext(output)[0]
     if uas:
-        results = uas_format(input, snptypes)
+        if kit == "forenseq":
+            results = uas_format(input, snptypes)
+        elif kit == "kintelligence":
+            results = process_kin(input)
+        else:
+            raise ValueError("Incorrect kit specified! Choose either forenseq or kintelligence!")
         results.to_csv(output, index=False, sep="\t")
     else:
         results, results_combined = strait_razor_format(input, snptypes)
