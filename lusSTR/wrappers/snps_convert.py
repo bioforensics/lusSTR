@@ -51,14 +51,14 @@ def complement_base(base):
     return comp_base
 
 
-def uas_format(infile, snp_type_arg):
+def uas_format(infile, snp_type_arg, nofilter):
     """
     This function begins with the compiled data from all files within the specified directory.
     It removes any allele with Reads of 0; identifies whether the allele call needs to be reverse
     complemented to be reported on the forward strand; and checks that the called allele is one of
     two expected alleles for the SNP (and flags any SNP call which is unexpected).
     """
-    data_df = uas_load(infile, snp_type_arg).reset_index(drop=True)
+    data_df = uas_load(infile, nofilter, snp_type_arg).reset_index(drop=True)
     data_df.columns = [
         "SampleID",
         "Project",
@@ -76,21 +76,21 @@ def uas_format(infile, snp_type_arg):
     return data_final
 
 
-def uas_load(input, type="i"):
+def uas_load(input, nofilter, type="i"):
     """
     This function lists input .xlsx files within the specified directory and performs a check to
     ensure the correct file is processed (must contain either "Phenotype" or "Sample Details").
     This also compiles the SNP data for each file within the directory.
     """
     if os.path.isfile(input):
-        snp_final_output = uas_types(input, type)
+        snp_final_output = uas_types(input, type, nofilter)
     else:
         snp_final_output = pd.DataFrame()
         files = glob.glob(os.path.join(input, "[!~]*.xlsx"))
         for filename in sorted(files):
             print(filename)
             if "Phenotype" in filename or "Sample" in filename:
-                snps = uas_types(filename, type)
+                snps = uas_types(filename, type, nofilter)
             if snps is not None:
                 snp_final_output = snp_final_output.append(snps)
             else:
@@ -98,23 +98,23 @@ def uas_load(input, type="i"):
     return snp_final_output
 
 
-def uas_types(infile, snp_type):
+def uas_types(infile, snp_type, nofilter):
     """
     This function determines which tab within the specified file is required to extract the SNP
     data from based on the name of the file.
     """
     if "Sample Details" in infile and (snp_type == "all" or snp_type == "i"):
-        snp_data = parse_snp_table_from_sheet(infile, "iSNPs", snp_type)
+        snp_data = parse_snp_table_from_sheet(infile, "iSNPs", snp_type, nofilter)
     elif "Phenotype" in infile and (snp_type == "all" or "a" in snp_type or "p" in snp_type):
-        snp_data = parse_snp_table_from_sheet(infile, "SNP Data", snp_type)
+        snp_data = parse_snp_table_from_sheet(infile, "SNP Data", snp_type, nofilter)
     elif "Sample Report" in infile:
-        snp_data = process_kin(infile)
+        snp_data = process_kin(infile, nofilter)
     else:
         snp_data = None
     return snp_data
 
 
-def parse_snp_table_from_sheet(infile, sheet, snp_type_arg):
+def parse_snp_table_from_sheet(infile, sheet, snp_type_arg, nofilter):
     """
     This function formats the SNP data from the original file and filters the SNPs based on the
     indicated SNP type.
@@ -126,16 +126,20 @@ def parse_snp_table_from_sheet(infile, sheet, snp_type_arg):
     data = table.iloc[offset + 2 :]
     data.columns = table.iloc[offset + 1]
     data = data[["Locus", "Reads", "Allele Name", "Typed Allele?"]]
+    if nofilter:
+        data_typed = data
+    else:
+        data_typed = data[data["Typed Allele?"] == "Yes"]
     concat_df = pd.DataFrame()
     if snp_type_arg == "all":
-        concat_df = data
+        concat_df = data_typed
     elif snp_type_arg == "i":
         filtered_dict = {k: v for k, v in snp_marker_data.items() if "i" in v["Type"]}
-        filtered_data = data[data["Locus"].isin(filtered_dict)].reset_index(drop=True)
+        filtered_data = data_typed[data_typed["Locus"].isin(filtered_dict)].reset_index(drop=True)
         concat_df = final_df.append(concat_data)
     else:
         filtered_dict = {k: v for k, v in snp_marker_data.items() if "i" not in v["Type"]}
-        filtered_data = data[data["Locus"].isin(filtered_dict)].reset_index(drop=True)
+        filtered_data = data_typed[data_typed["Locus"].isin(filtered_dict)].reset_index(drop=True)
         concat_df = concat_df.append(filtered_data)
     sampleid = table.iloc[2, 1]
     projectid = table.iloc[3, 1]
@@ -168,7 +172,7 @@ def process_forenseq_snps(foren_df, sampid, projid, analyid):
     return data_df
 
 
-def process_kin(input):
+def process_kin(input, nofilter):
     """
     This function processes the Kintelligence Sample Report.
     """
@@ -182,7 +186,12 @@ def process_kin(input):
         data = table.iloc[offset + 1 :]
         data.columns = table.iloc[offset]
         data = data[["Locus", "Reads", "Allele Name", "Typed Allele?"]]
-        data_filt = data_filt.append(data).reset_index(drop=True)
+        if nofilter:
+            data_typed = data
+        else:
+            data_typed = data[data["Typed Allele?"] == "Yes"]
+        data_filt = data_filt.append(data_typed).reset_index(drop=True)
+
     sampid = table.iloc[2, 1]
     projid = table.iloc[3, 1]
     analyid = table.iloc[4, 1]
@@ -472,7 +481,7 @@ def main(input, output, kit, uas, snptypes, nofilter):
     input = str(input)
     output_name = os.path.splitext(output)[0]
     if uas:
-        results = uas_format(input, snptypes)
+        results = uas_format(input, snptypes, nofilter)
         results.to_csv(output, index=False, sep="\t")
     else:
         results, results_combined = strait_razor_format(input, snptypes)

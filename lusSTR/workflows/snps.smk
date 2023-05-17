@@ -98,7 +98,8 @@ rule convert:
     params:
        uas=config["uas"],
        kit=config["kit"],
-       types=config["types"]
+       types=config["types"],
+       nofilter=config["nofilter"]
     script:
         lusSTR.wrapper("snps_convert")
 

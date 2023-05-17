@@ -47,6 +47,8 @@ def edit_snp_config(config, args):
             data["kit"] = "kintelligence"
         if args.separate:
             data["separate"] = True
+        if args.nofilter:
+            data["nofilter"] = True
         return data
 
 
@@ -139,4 +141,9 @@ def subparser(subparsers):
     p.add_argument(
         "--kintelligence", action="store_true",
         help="Use if processing Kintelligence SNPs within a Kintellience Report(s)"
+    )
+    p.add_argument(
+        "--nofilter", action="store_true",
+        help="Use if desire to keep all alleles, regardless of read count. If not invoked, "
+        "only alleles specified as 'Typed' by the UAS will be included."
     )
