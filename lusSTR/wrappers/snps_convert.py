@@ -58,70 +58,43 @@ def uas_format(infile, snp_type_arg):
     complemented to be reported on the forward strand; and checks that the called allele is one of
     two expected alleles for the SNP (and flags any SNP call which is unexpected).
     """
-    data_filt = uas_load(infile, snp_type_arg).reset_index(drop=True)
-    data_df = []
-    for j, row in data_filt.iterrows():
-        snpid = data_filt.iloc[j, 0]
-        metadata = snp_marker_data[snpid]
-        type = metadata["Type"]
-        uas_allele = data_filt.iloc[j, 2]
-        if metadata["ReverseCompNeeded"] == "Yes":
-            forward_strand_allele = complement_base(uas_allele)
-        else:
-            forward_strand_allele = uas_allele
-        if data_filt.loc[j, "Typed Allele?"] == "No":
-            flag = "Contains untyped allele"
-        elif forward_strand_allele in metadata["Alleles"]:
-            flag = ""
-        else:
-            flag = "Allele call does not match expected allele!"
-        row_tmp = [
-            data_filt.loc[j, "SampleID"],
-            data_filt.loc[j, "Project"],
-            data_filt.loc[j, "Analysis"],
-            snpid,
-            data_filt.loc[j, "Reads"],
-            forward_strand_allele,
-            uas_allele,
-            snp_type_dict[type],
-            flag,
-        ]
-        data_df.append(row_tmp)
-    data_final = pd.DataFrame(
-        data_df,
-        columns=[
-            "SampleID",
-            "Project",
-            "Analysis",
-            "SNP",
-            "Reads",
-            "Forward_Strand_Allele",
-            "UAS_Allele",
-            "Type",
-            "Issues",
-        ],
-    )
-    data_final_sort = data_final.sort_values(
+    data_df = uas_load(infile, snp_type_arg).reset_index(drop=True)
+    data_df.columns = [
+        "SampleID",
+        "Project",
+        "Analysis",
+        "SNP",
+        "Reads",
+        "Forward_Strand_Allele",
+        "UAS_Allele",
+        "Type",
+        "Issues",
+    ]
+    data_final = data_df.sort_values(
         by=["SampleID", "Project", "Analysis", "SNP", "Reads"], ascending=False
     )
-    return data_final_sort
+    return data_final
 
 
-def uas_load(indir, type="i"):
+def uas_load(input, type="i"):
     """
     This function lists input .xlsx files within the specified directory and performs a check to
     ensure the correct file is processed (must contain either "Phenotype" or "Sample Details").
     This also compiles the SNP data for each file within the directory.
     """
-    snp_final_output = pd.DataFrame()
-    files = glob.glob(os.path.join(indir, "[!~]*.xlsx"))
-    for filename in sorted(files):
-        if "Phenotype" in filename or "Sample" in filename:
-            snps = uas_types(filename, type)
+    if os.path.isfile(input):
+        snp_final_output = uas_types(input, type)
+    else:
+        snp_final_output = pd.DataFrame()
+        files = glob.glob(os.path.join(input, "[!~]*.xlsx"))
+        for filename in sorted(files):
+            print(filename)
+            if "Phenotype" in filename or "Sample" in filename:
+                snps = uas_types(filename, type)
             if snps is not None:
                 snp_final_output = snp_final_output.append(snps)
-        else:
-            continue
+            else:
+                continue
     return snp_final_output
 
 
@@ -153,21 +126,46 @@ def parse_snp_table_from_sheet(infile, sheet, snp_type_arg):
     data = table.iloc[offset + 2 :]
     data.columns = table.iloc[offset + 1]
     data = data[["Locus", "Reads", "Allele Name", "Typed Allele?"]]
-    final_df = pd.DataFrame()
+    concat_df = pd.DataFrame()
     if snp_type_arg == "all":
-        final_df = data
+        concat_df = data
     elif snp_type_arg == "i":
         filtered_dict = {k: v for k, v in snp_marker_data.items() if "i" in v["Type"]}
         filtered_data = data[data["Locus"].isin(filtered_dict)].reset_index(drop=True)
-        final_df = final_df.append(filtered_data)
+        concat_df = final_df.append(concat_data)
     else:
         filtered_dict = {k: v for k, v in snp_marker_data.items() if "i" not in v["Type"]}
         filtered_data = data[data["Locus"].isin(filtered_dict)].reset_index(drop=True)
-        final_df = final_df.append(filtered_data)
-    final_df["SampleID"] = table.iloc[2, 1]
-    final_df["Project"] = table.iloc[3, 1]
-    final_df["Analysis"] = table.iloc[4, 1]
+        concat_df = concat_df.append(filtered_data)
+    sampleid = table.iloc[2, 1]
+    projectid = table.iloc[3, 1]
+    analysisid = table.iloc[4, 1]
+    final_df = process_forenseq_snps(concat_df, sampleid, projectid, analysisid)
     return final_df
+
+
+def process_forenseq_snps(foren_df, sampid, projid, analyid):
+    data_df = []
+    for j, row in foren_df.iterrows():
+        snpid = foren_df.loc[j, "Locus"]
+        metadata = snp_marker_data[snpid]
+        type = metadata["Type"]
+        uas_allele = foren_df.loc[j, "Allele Name"]
+        forward_strand_allele = check_rev_comp(uas_allele, snpid, metadata)
+        flag = flags(foren_df, forward_strand_allele, j, metadata)
+        row_tmp = [
+            sampid,
+            projid,
+            analyid,
+            snpid,
+            foren_df.loc[j, "Reads"],
+            forward_strand_allele,
+            uas_allele,
+            snp_type_dict[type],
+            flag,
+        ]
+        data_df.append(row_tmp)
+    return data_df
 
 
 def process_kin(input):
@@ -202,6 +200,7 @@ def process_kin(input):
             "Reads",
             "Forward_Strand_Allele",
             "UAS_Allele",
+            "Type",
             "Issues",
         ],
     )
@@ -221,16 +220,16 @@ def create_row(df, j, sampleid, projectid, analysisid):
     uas_allele = df.loc[j, "Allele Name"]
     try:
         metadata = snp_marker_data[snpid]
-        if metadata["ReverseCompNeeded"] == "Yes":
-            forward_strand_allele = complement_base(uas_allele)
-        else:
-            forward_strand_allele = uas_allele
+        forward_strand_allele = check_rev_comp(uas_allele, snpid, metadata)
         flag = flags(df, forward_strand_allele, j, metadata)
+        type = snp_type_dict[metadata["Type"]]
     except KeyError:
         forward_strand_allele = uas_allele
         if df.loc[j, "Typed Allele?"] == "No":
-            df.loc[j, "Reads"] = 0
-        flag = None
+            flag = "Contains untyped allele"
+        else:
+            flag = None
+        type = "Kintelligence"
     new_row = [
         sampleid,
         projectid,
@@ -239,9 +238,18 @@ def create_row(df, j, sampleid, projectid, analysisid):
         df.loc[j, "Reads"],
         forward_strand_allele,
         uas_allele,
+        type,
         flag,
     ]
     return new_row
+
+
+def check_rev_comp(allele, snpid, metadata):
+    if metadata["ReverseCompNeeded"] == "Yes":
+        f_strand_allele = complement_base(allele)
+    else:
+        f_strand_allele = allele
+    return f_strand_allele
 
 
 def flags(df, allele, j, metadata):
@@ -249,8 +257,7 @@ def flags(df, allele, j, metadata):
     Checks that allele call is one of two known alleles for that SNP.
     """
     if df.loc[j, "Typed Allele?"] == "No":
-        df.loc[j, "Reads"] = 0
-        flag = None
+        flag = "Contains untyped allele"
     elif allele in metadata["Alleles"]:
         flag = None
     else:
@@ -460,17 +467,12 @@ def snp_call_exception(seq, expected_size, metadata, base):
         return base, flag
 
 
-def main(input, output, kit, uas, snptypes):
+def main(input, output, kit, uas, snptypes, nofilter):
     output = str(output)
     input = str(input)
     output_name = os.path.splitext(output)[0]
     if uas:
-        if kit == "forenseq":
-            results = uas_format(input, snptypes)
-        elif kit == "kintelligence":
-            results = process_kin(input)
-        else:
-            raise ValueError("Incorrect kit specified! Choose either forenseq or kintelligence!")
+        results = uas_format(input, snptypes)
         results.to_csv(output, index=False, sep="\t")
     else:
         results, results_combined = strait_razor_format(input, snptypes)
@@ -485,4 +487,5 @@ if __name__ == "__main__":
         kit=snakemake.params.kit,
         uas=snakemake.params.uas,
         snptypes=snakemake.params.types,
+        nofilter=snakemake.params.nofilter,
     )
