@@ -313,44 +313,22 @@ def strait_razor_format(infile, snp_type_arg):
     return results_sort, results_combine_sort
 
 
-def strait_razor_concat(indir, snp_type_arg):
+def strait_razor_concat(input, snp_type_arg):
     """
     This function reads in all .txt files within the specified directory. For each file, the
     forward and reverse reads are summed and each sequence is processed and compiled into one
     final dataframe.
     """
-    snps = pd.DataFrame()
-    analysisID = os.path.basename(indir.rstrip(os.sep))
-    files = glob.glob(os.path.join(indir, "[!~]*.txt"))
-    for filename in sorted(files):
-        name = filename.replace(".txt", "").split(os.sep)[-1]
-        table = pd.read_csv(
-            filename,
-            sep="\t",
-            header=None,
-            names=["Locus_allele", "Length", "Sequence", "Forward_Reads", "Reverse_Reads"],
-        )
-        try:
-            table[["SNP", "Bases_off"]] = table.Locus_allele.str.split(":", expand=True)
-        except ValueError:
-            print(
-                f"Error found with {filename}. Will bypass and continue. Please check file"
-                f" and rerun the command, if necessary."
-            )
-            continue
-        table["Total_Reads"] = table["Forward_Reads"] + table["Reverse_Reads"]
-        snps_only = pd.DataFrame(table[table["SNP"].str.contains("rs|mh16|insA")]).reset_index(
-            drop=True
-        )
-        for j, row in snps_only.iterrows():
-            snpid = snps_only.iloc[j, 5]
-            try:
-                row = compile_row_of_snp_data(snps_only, snpid, j, snp_type_arg, name, analysisID)
-            except KeyError:
-                continue
-            if row is not None:
-                snps = snps.append(row)
-    snps.columns = [
+    if os.path.isdir(input):
+        analysisID = os.path.basename(input.rstrip(os.sep))
+        files = glob.glob(os.path.join(input, "[!~]*.txt"))
+        all_snps = pd.DataFrame()
+        for filename in sorted(files):
+            snps = process_straitrazor_data(filename, snp_type_arg, analysisID)
+            all_snps = all_snps.append(snps)
+    else:
+        all_snps = process_straitrazor_data(input, snp_type_arg, None)
+    all_snps.columns = [
         "SampleID",
         "Project",
         "Analysis",
@@ -360,9 +338,50 @@ def strait_razor_concat(indir, snp_type_arg):
         "Forward_Strand_Allele",
         "UAS_Allele",
         "Type",
-        "Potential_Issues",
+        "Issues",
     ]
+    return all_snps
+
+
+def process_straitrazor_data(filename, snp_type_arg, analysisid):
+    name = filename.replace(".txt", "").split(os.sep)[-1]
+    if analysisid is None:
+        analysisid = name
+    table = pd.read_csv(
+        filename,
+        sep="\t",
+        header=None,
+        names=["Locus_allele", "Length", "Sequence", "Forward_Reads", "Reverse_Reads"],
+    )
+    row = straitrazor_row(table, snp_type_arg, name, analysisid)
+    snps = pd.DataFrame()
+    if row is not None:
+        snps = snps.append(row)
     return snps
+
+
+def straitrazor_row(table, snp_type_arg, name, analysisid):
+    try:
+        snp_df = pd.DataFrame()
+        table[["SNP", "Bases_off"]] = table.Locus_allele.str.split(":", expand=True)
+        table["Total_Reads"] = table["Forward_Reads"] + table["Reverse_Reads"]
+        snps_only = pd.DataFrame(table[table["SNP"].str.contains("rs|mh16|insA")]).reset_index(
+            drop=True
+        )
+        for j, row in snps_only.iterrows():
+            snpid = snps_only.loc[j, "SNP"]
+            try:
+                row = compile_row_of_snp_data(snps_only, snpid, j, snp_type_arg, name, analysisid)
+            except KeyError:
+                row = None
+            snp_df = snp_df.append(row)
+    except ValueError:
+        print(
+            f"Error found with {filename}. Will bypass and continue. Please check file"
+            f" and rerun the command, if necessary."
+        )
+        snp_df = None
+    return snp_df
 
 
 def compile_row_of_snp_data(infile, snp, table_loc, type, name, analysis):
