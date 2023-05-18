@@ -324,10 +324,10 @@ def strait_razor_concat(input, snp_type_arg):
         files = glob.glob(os.path.join(input, "[!~]*.txt"))
         all_snps = pd.DataFrame()
         for filename in sorted(files):
-            snps = process_straitrazor_data(filename, snp_type_arg, analysisID)
+            snps = read_straitrazor_data(filename, snp_type_arg, analysisID)
             all_snps = all_snps.append(snps)
     else:
-        all_snps = process_straitrazor_data(input, snp_type_arg, None)
+        all_snps = read_straitrazor_data(input, snp_type_arg, None)
     all_snps.columns = [
         "SampleID",
         "Project",
@@ -343,7 +343,7 @@ def strait_razor_concat(input, snp_type_arg):
     return all_snps
 
 
-def process_straitrazor_data(filename, snp_type_arg, analysisid):
+def read_straitrazor_data(filename, snp_type_arg, analysisid):
     name = filename.replace(".txt", "").split(os.sep)[-1]
     if analysisid is None:
         analysisid = name
@@ -353,14 +353,14 @@ def process_straitrazor_data(filename, snp_type_arg, analysisid):
         header=None,
         names=["Locus_allele", "Length", "Sequence", "Forward_Reads", "Reverse_Reads"],
     )
-    row = straitrazor_row(table, snp_type_arg, name, analysisid)
+    row = process_straitrazor_data(table, snp_type_arg, name, analysisid)
     snps = pd.DataFrame()
     if row is not None:
         snps = snps.append(row)
     return snps
 
 
-def straitrazor_row(table, snp_type_arg, name, analysisid):
+def process_straitrazor_data(table, snp_type_arg, name, analysisid):
     try:
         snp_df = pd.DataFrame()
         table[["SNP", "Bases_off"]] = table.Locus_allele.str.split(":", expand=True)
@@ -375,9 +375,9 @@ def straitrazor_row(table, snp_type_arg, name, analysisid):
             except KeyError:
                 row = None
             snp_df = snp_df.append(row)
-    except ValueError:
+    except:
         print(
-            f"Error found with {filename}. Will bypass and continue. Please check file"
+            f"Error found with {name}. Will bypass and continue. Please check file"
             f" and rerun the command, if necessary."
         )
         snp_df = None
