@@ -134,10 +134,11 @@ def subparser(subparsers):
         help="Use to create a config file for the SNP workflow"
     )
     p.add_argument(
-        "--snp-type",  choices=["all", "p", "i"], default="all", dest="snptype",
+        "--snp-type", default="all", dest="snptype",
         help="Specify the type of SNPs to include in the final report. 'p' will include only the "
-        "Phenotype and Ancestry SNPs; 'i' will include only the Identity SNPs; and 'all' will "
-        "include all SNPs. Default is Identity SNPs only (i)."
+        "Phenotype SNPs; 'a' will include only the Ancestry SNPs; 'i' will include only the "
+        "Identity SNPs; and 'all' will include all SNPs. More than one type can be specified (e.g. "
+        " 'p, a'). Default is all."
     )
     p.add_argument(
         "--kintelligence", action="store_true",

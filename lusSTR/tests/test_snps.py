@@ -47,14 +47,25 @@ def test_uas_all(input, filtering, tmp_path):
     assert filecmp.cmp(exp_out, obs_out) is True
 
 
-@pytest.mark.snps
-@pytest.mark.parametrize("type, lines", [("i", 189), ("p", 157)])
+@pytest.mark.parametrize("type, lines", [("i", 131), ("p", 30), ("a", 69), ("p, a", 98)])
 def test_uas_type(type, lines, tmp_path):
     inputdb = data_file("snps")
     obs_out = str(tmp_path / "uas.txt")
-    arglist = ["snps", inputdb, "-o", obs_out, "--type", type, "--uas"]
-    args = lusSTR.cli.get_parser().parse_args(arglist)
-    lusSTR.snps.main(args)
+    arglist = [
+        "config",
+        "-w",
+        str(tmp_path),
+        "-o",
+        "uas",
+        "--input",
+        inputdb,
+        "--snps",
+        "--snp-type",
+        type,
+    ]
+    lusSTR.cli.main(lusSTR.cli.get_parser().parse_args(arglist))
+    convert_arglist = ["snps", "convert", "-w", str(tmp_path)]
+    lusSTR.cli.main(lusSTR.cli.get_parser().parse_args(convert_arglist))
     with open(obs_out, "r") as fh:
         assert len(fh.readlines()) == lines
 

@@ -58,7 +58,7 @@ def uas_format(infile, snp_type_arg, nofilter):
     complemented to be reported on the forward strand; and checks that the called allele is one of
     two expected alleles for the SNP (and flags any SNP call which is unexpected).
     """
-    data_df = uas_load(infile, nofilter, snp_type_arg).reset_index(drop=True)
+    data_df = uas_load(infile, nofilter, snp_type_arg)
     data_df.columns = [
         "SampleID",
         "Project",
@@ -131,20 +131,21 @@ def parse_snp_table_from_sheet(infile, sheet, snp_type_arg, nofilter):
     else:
         data_typed = data[data["Typed Allele?"] == "Yes"]
     concat_df = pd.DataFrame()
-    if snp_type_arg == "all":
-        concat_df = data_typed
-    elif snp_type_arg == "i":
-        filtered_dict = {k: v for k, v in snp_marker_data.items() if "i" in v["Type"]}
-        filtered_data = data_typed[data_typed["Locus"].isin(filtered_dict)].reset_index(drop=True)
-        concat_df = concat_df.append(filtered_data)
-    else:
-        filtered_dict = {k: v for k, v in snp_marker_data.items() if "i" not in v["Type"]}
-        filtered_data = data_typed[data_typed["Locus"].isin(filtered_dict)].reset_index(drop=True)
-        concat_df = concat_df.append(filtered_data)
+    for snp_type in snp_type_arg:
+        if snp_type == "all":
+            concat_df = data_typed
+        else:
+            filtered_dict = {k: v for k, v in snp_marker_data.items() if snp_type in v["Type"]}
+            filtered_data = data_typed[data_typed["Locus"].isin(filtered_dict)].reset_index(
+                drop=True
+            )
+            concat_df = concat_df.append(filtered_data)
     sampleid = table.iloc[2, 1]
     projectid = table.iloc[3, 1]
     analysisid = table.iloc[4, 1]
-    final_df = process_forenseq_snps(concat_df, sampleid, projectid, analysisid)
+    final_df = process_forenseq_snps(
+        concat_df.reset_index(drop=True), sampleid, projectid, analysisid
+    )
     return final_df
 
 
@@ -501,7 +502,6 @@ def main(input, output, kit, uas, snptypes, nofilter):
     output_name = os.path.splitext(output)[0]
     if uas:
         results = uas_format(input, snptypes, nofilter)
-        print(results)
         results.to_csv(output, index=False, sep="\t")
     else:
         results, results_combined = strait_razor_format(input, snptypes)
