@@ -70,7 +70,8 @@ def uas_format(infile, snp_type_arg, nofilter):
         "Type",
         "Issues",
     ]
-    data_final = data_df.sort_values(
+    data_dropdups = data_df.drop_duplicates()
+    data_final = data_dropdups.sort_values(
         by=["SampleID", "Project", "Analysis", "SNP", "Reads"], ascending=False
     ).reset_index(drop=True)
     return data_final
@@ -408,7 +409,7 @@ def compile_row_of_snp_data(infile, snp, table_loc, type, name, analysis):
     return final_snp_df
 
 
-def collect_snp_info(infile, snpid, j, type, name, analysis):
+def collect_snp_info(infile, snpid, j, allowed_snptype, name, analysis):
     """
     This function compiles allele calls, reads, reverse complements allele call if necessary to
     match how the UAS reports the allele, and any flags associated with the allele call. The flags
@@ -420,7 +421,7 @@ def collect_snp_info(infile, snpid, j, type, name, analysis):
     if snpid == "N29insA":
         snpid = "rs312262906_N29insA"
     metadata = snp_marker_data[snpid]
-    snp_type = metadata["Type"]
+    current_snp_type = metadata["Type"]
     seq = infile.iloc[j, 2]
     expected_alleles = metadata["Alleles"]
     snp_loc = metadata["Coord"]
@@ -455,6 +456,8 @@ def collect_snp_info(infile, snpid, j, type, name, analysis):
             (type == "p" and (snp_type == "p" or snp_type == "a" or snp_type == "p/a"))
             or (type == "i" and snp_type == "i")
             or (type == "all")
+            # for snp in allowed_snp_type:
+            # if snp in
         ):
             row_tmp = [
                 name,

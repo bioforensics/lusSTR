@@ -21,7 +21,7 @@ from tempfile import NamedTemporaryFile
 
 
 @pytest.mark.parametrize(
-    "input, filtering", {("snps_uas_all.txt", False), ("snps_uas_filtered.txt", True)}
+    "input, filtering", [("snps_uas_all.txt", False), ("snps_uas_filtered.txt", True)]
 )
 def test_uas_all(input, filtering, tmp_path):
     inputdb = data_file("snps")
@@ -47,7 +47,7 @@ def test_uas_all(input, filtering, tmp_path):
     assert filecmp.cmp(exp_out, obs_out) is True
 
 
-@pytest.mark.parametrize("type, lines", [("i", 131), ("p", 30), ("a", 69), ("p, a", 98)])
+@pytest.mark.parametrize("type, lines", [("i", 131), ("p", 30), ("a", 69), ("p, a", 95)])
 def test_uas_type(type, lines, tmp_path):
     inputdb = data_file("snps")
     obs_out = str(tmp_path / "uas.txt")
@@ -70,22 +70,33 @@ def test_uas_type(type, lines, tmp_path):
         assert len(fh.readlines()) == lines
 
 
-@pytest.mark.snps
 def test_sr_all(tmp_path):
     inputdb = data_file("snps")
     exp_out = data_file("snps_sr_all.txt")
     exp_out_full = data_file("snps_sr_all_full_output.txt")
     obs_out = str(tmp_path / "sr.txt")
     obs_out_full = str(tmp_path / "sr_full_output.txt")
-    arglist = ["snps", inputdb, "-o", obs_out, "--type", "all"]
-    args = lusSTR.cli.get_parser().parse_args(arglist)
-    lusSTR.snps.main(args)
+    arglist = [
+        "config",
+        "-w",
+        str(tmp_path),
+        "-o",
+        "sr",
+        "--input",
+        inputdb,
+        "--snps",
+        "--straitrazor",
+    ]
+    lusSTR.cli.main(lusSTR.cli.get_parser().parse_args(arglist))
+    convert_arglist = ["snps", "convert", "-w", str(tmp_path)]
+    lusSTR.cli.main(lusSTR.cli.get_parser().parse_args(convert_arglist))
     assert filecmp.cmp(exp_out, obs_out) is True
     assert filecmp.cmp(exp_out_full, obs_out_full) is True
 
 
-@pytest.mark.snps
-@pytest.mark.parametrize("type, lines, full_lines", [("i", 181, 2152), ("p", 158, 2982)])
+@pytest.mark.parametrize(
+    "type, lines, full_lines", [("i", 181, 2152), ("p", 158, 2982), ("a", 2, 2), ("p, a", 2, 2)]
+)
 def test_sr_type(type, lines, full_lines, tmp_path):
     inputdb = data_file("snps")
     obs_out = str(tmp_path / "sr.txt")
