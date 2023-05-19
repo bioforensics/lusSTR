@@ -20,14 +20,30 @@ import re
 from tempfile import NamedTemporaryFile
 
 
-@pytest.mark.snps
-def test_uas_all(tmp_path):
+@pytest.mark.parametrize(
+    "input, filtering", {("snps_uas_all.txt", False), ("snps_uas_filtered.txt", True)}
+)
+def test_uas_all(input, filtering, tmp_path):
     inputdb = data_file("snps")
-    exp_out = data_file("snps_uas_all.txt")
+    exp_out = data_file(input)
     obs_out = str(tmp_path / "uas.txt")
-    arglist = ["snps", inputdb, "-o", obs_out, "--type", "all", "--uas"]
-    args = lusSTR.cli.get_parser().parse_args(arglist)
-    lusSTR.snps.main(args)
+    if filtering:
+        arglist = ["config", "-w", str(tmp_path), "-o", "uas", "--input", inputdb, "--snps"]
+    else:
+        arglist = [
+            "config",
+            "-w",
+            str(tmp_path),
+            "-o",
+            "uas",
+            "--input",
+            inputdb,
+            "--snps",
+            "--nofiltering",
+        ]
+    lusSTR.cli.main(lusSTR.cli.get_parser().parse_args(arglist))
+    convert_arglist = ["snps", "convert", "-w", str(tmp_path)]
+    lusSTR.cli.main(lusSTR.cli.get_parser().parse_args(convert_arglist))
     assert filecmp.cmp(exp_out, obs_out) is True
 
 

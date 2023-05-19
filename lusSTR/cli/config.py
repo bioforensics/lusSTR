@@ -47,7 +47,7 @@ def edit_snp_config(config, args):
             data["kit"] = "kintelligence"
         if args.separate:
             data["separate"] = True
-        if args.nofilter:
+        if args.nofiltering:
             data["nofilter"] = True
         return data
 
@@ -126,14 +126,15 @@ def subparser(subparsers):
     )
     p.add_argument(
         "--nofiltering", action="store_true", 
-        help="Use to perform no filtering during the 'filter' step"
+        help="For STRs, use to perform no filtering during the 'filter' step. For SNPs, "
+        "only alleles specified as 'Typed' by the UAS will be included."
     )
     p.add_argument(
         "--snps", action="store_true",
         help="Use to create a config file for the SNP workflow"
     )
     p.add_argument(
-        "--snp-type",  choices=["all", "p", "i"], default="i", dest="snptype",
+        "--snp-type",  choices=["all", "p", "i"], default="all", dest="snptype",
         help="Specify the type of SNPs to include in the final report. 'p' will include only the "
         "Phenotype and Ancestry SNPs; 'i' will include only the Identity SNPs; and 'all' will "
         "include all SNPs. Default is Identity SNPs only (i)."
@@ -141,9 +142,4 @@ def subparser(subparsers):
     p.add_argument(
         "--kintelligence", action="store_true",
         help="Use if processing Kintelligence SNPs within a Kintellience Report(s)"
-    )
-    p.add_argument(
-        "--nofilter", action="store_true",
-        help="Use if desire to keep all alleles, regardless of read count. If not invoked, "
-        "only alleles specified as 'Typed' by the UAS will be included."
     )

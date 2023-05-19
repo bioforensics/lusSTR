@@ -72,7 +72,7 @@ def uas_format(infile, snp_type_arg, nofilter):
     ]
     data_final = data_df.sort_values(
         by=["SampleID", "Project", "Analysis", "SNP", "Reads"], ascending=False
-    )
+    ).reset_index(drop=True)
     return data_final
 
 
@@ -136,7 +136,7 @@ def parse_snp_table_from_sheet(infile, sheet, snp_type_arg, nofilter):
     elif snp_type_arg == "i":
         filtered_dict = {k: v for k, v in snp_marker_data.items() if "i" in v["Type"]}
         filtered_data = data_typed[data_typed["Locus"].isin(filtered_dict)].reset_index(drop=True)
-        concat_df = final_df.append(concat_data)
+        concat_df = concat_df.append(filtered_data)
     else:
         filtered_dict = {k: v for k, v in snp_marker_data.items() if "i" not in v["Type"]}
         filtered_data = data_typed[data_typed["Locus"].isin(filtered_dict)].reset_index(drop=True)
@@ -501,6 +501,7 @@ def main(input, output, kit, uas, snptypes, nofilter):
     output_name = os.path.splitext(output)[0]
     if uas:
         results = uas_format(input, snptypes, nofilter)
+        print(results)
         results.to_csv(output, index=False, sep="\t")
     else:
         results, results_combined = strait_razor_format(input, snptypes)
