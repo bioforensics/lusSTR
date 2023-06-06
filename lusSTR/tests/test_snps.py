@@ -95,15 +95,31 @@ def test_sr_all(tmp_path):
 
 
 @pytest.mark.parametrize(
-    "type, lines, full_lines", [("i", 181, 2152), ("p", 158, 2982), ("a", 2, 2), ("p, a", 2, 2)]
+    "type, lines, full_lines",
+    [("i", 181, 2152), ("p", 56, 1628), ("a", 107, 1381), ("p, a", 158, 3008)],
 )
 def test_sr_type(type, lines, full_lines, tmp_path):
     inputdb = data_file("snps")
+    exp_out = data_file("snps_sr_all.txt")
+    exp_out_full = data_file("snps_sr_all_full_output.txt")
     obs_out = str(tmp_path / "sr.txt")
     obs_out_full = str(tmp_path / "sr_full_output.txt")
-    arglist = ["snps", inputdb, "-o", obs_out, "--type", type]
-    args = lusSTR.cli.get_parser().parse_args(arglist)
-    lusSTR.snps.main(args)
+    arglist = [
+        "config",
+        "-w",
+        str(tmp_path),
+        "-o",
+        "sr",
+        "--input",
+        inputdb,
+        "--snps",
+        "--straitrazor",
+        "--snp-type",
+        type,
+    ]
+    lusSTR.cli.main(lusSTR.cli.get_parser().parse_args(arglist))
+    convert_arglist = ["snps", "convert", "-w", str(tmp_path)]
+    lusSTR.cli.main(lusSTR.cli.get_parser().parse_args(convert_arglist))
     with open(obs_out, "r") as fh:
         assert len(fh.readlines()) == lines
     with open(obs_out_full, "r") as fh:

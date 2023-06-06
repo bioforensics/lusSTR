@@ -132,10 +132,10 @@ def parse_snp_table_from_sheet(infile, sheet, snp_type_arg, nofilter):
     else:
         data_typed = data[data["Typed Allele?"] == "Yes"]
     concat_df = pd.DataFrame()
-    for snp_type in snp_type_arg:
-        if snp_type == "all":
-            concat_df = data_typed
-        else:
+    if snp_type_arg == "all":
+        concat_df = data_typed
+    else:
+        for snp_type in snp_type_arg:
             filtered_dict = {k: v for k, v in snp_marker_data.items() if snp_type in v["Type"]}
             filtered_data = data_typed[data_typed["Locus"].isin(filtered_dict)].reset_index(
                 drop=True
@@ -151,7 +151,7 @@ def parse_snp_table_from_sheet(infile, sheet, snp_type_arg, nofilter):
 
 
 def process_forenseq_snps(foren_df, sampid, projid, analyid):
-    data_df = []
+    data_list = []
     for j, row in foren_df.iterrows():
         snpid = foren_df.loc[j, "Locus"]
         metadata = snp_marker_data[snpid]
@@ -170,8 +170,8 @@ def process_forenseq_snps(foren_df, sampid, projid, analyid):
             snp_type_dict[type],
             flag,
         ]
-        data_df.append(row_tmp)
-    return data_df
+        data_list.append(row_tmp)
+    return data_list
 
 
 def process_kin(input, nofilter):
@@ -303,7 +303,7 @@ def strait_razor_format(infile, snp_type_arg):
             "Type",
         ]
     ]
-    results_combine["Issues"] = ""
+    results_combine.loc[:, "Issues"] = None
     for j, row in results_combine.iterrows():
         snpid = results_combine.iloc[j, 3]
         metadata = snp_marker_data[snpid]
@@ -393,20 +393,19 @@ def compile_row_of_snp_data(infile, snp, table_loc, type, name, analysis):
     respectively. This function reports out each SNP from the sequence amplicon as individual
     rows and calls another function to compile data on each SNP.
     """
-    snp_df = []
+    snp_df = pd.DataFrame()
     if "mh16" in snp:
         locus_data = snps_within_loci[snp]
         for k in range(0, len(locus_data["SNPs"])):
             snp_id = locus_data["SNPs"][k]
             row_tmp = collect_snp_info(infile, snp_id, table_loc, type, name, analysis)
             if row_tmp is not None:
-                snp_df.append(row_tmp)
+                snp_df = snp_df.append(row_tmp)
     else:
         row_tmp = collect_snp_info(infile, snp, table_loc, type, name, analysis)
         if row_tmp is not None:
-            snp_df.append(row_tmp)
-    final_snp_df = pd.DataFrame(snp_df)
-    return final_snp_df
+            snp_df = snp_df.append(row_tmp)
+    return snp_df
 
 
 def collect_snp_info(infile, snpid, j, allowed_snptype, name, analysis):
@@ -422,9 +421,10 @@ def collect_snp_info(infile, snpid, j, allowed_snptype, name, analysis):
         snpid = "rs312262906_N29insA"
     metadata = snp_marker_data[snpid]
     current_snp_type = metadata["Type"]
-    seq = infile.iloc[j, 2]
+    seq = infile.loc[j, "Sequence"]
     expected_alleles = metadata["Alleles"]
     snp_loc = metadata["Coord"]
+    all_rows = []
     if len(seq) > snp_loc:
         snp_call = seq[snp_loc]
         if snpid == "rs312262906_N29insA" and snp_call == "A":
@@ -451,31 +451,40 @@ def collect_snp_info(infile, snpid, j, allowed_snptype, name, analysis):
         elif differ_length != 0:
             allele_flag = "Check for indels (does not match expected sequence length)"
         else:
-            allele_flag = ""
-        if (
-            (type == "p" and (snp_type == "p" or snp_type == "a" or snp_type == "p/a"))
-            or (type == "i" and snp_type == "i")
-            or (type == "all")
-            # for snp in allowed_snp_type:
-            # if snp in
-        ):
+            allele_flag = None
+        if allowed_snptype == "all":
             row_tmp = [
                 name,
                 analysis,
                 analysis,
                 snpid,
                 seq,
-                infile.iloc[j, 7],
+                infile.loc[j, "Total_Reads"],
                 snp_call,
                 snp_call_uas,
-                snp_type_dict[snp_type],
+                snp_type_dict[current_snp_type],
                 allele_flag,
             ]
+            all_rows.append(row_tmp)
         else:
-            row_tmp = None
+            for snp in allowed_snptype:
+                if snp in current_snp_type:
+                    row_tmp = [
+                        name,
+                        analysis,
+                        analysis,
+                        snpid,
+                        seq,
+                        infile.loc[j, "Total_Reads"],
+                        snp_call,
+                        snp_call_uas,
+                        snp_type_dict[current_snp_type],
+                        allele_flag,
+                    ]
+                    all_rows.append(row_tmp)
     else:
-        row_tmp = None
-    return row_tmp
+        all_rows = None
+    return all_rows
 
 
 def snp_call_exception(seq, expected_size, metadata, base):
