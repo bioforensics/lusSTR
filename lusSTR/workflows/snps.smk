@@ -116,6 +116,7 @@ rule format:
     params:
         uas=config["uas"],
         separate=config["separate"],
-        kit=config["kit"]
+        kit=config["kit"],
+        refs=config["references"]
     script:
         lusSTR.wrapper("snps_format")

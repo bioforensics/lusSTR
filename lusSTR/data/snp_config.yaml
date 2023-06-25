@@ -1,0 +1,17 @@
+%YAML 1.2
+---
+
+## general settings
+uas: True  ## True/False; if ran through UAS
+samp_input: "/path/to/input/directory/or/samples" ## input directory or sample; if not provided, will be cwd
+output: "lusstr_output" ## output file/directory name; Example: "test_030923"
+
+## convert settings
+kit: "sigprep" ## sigprep/kintelligence 
+types: "i" ## choices are "all", "i" (identity SNPs only), "p" (phenotype only), "a" (ancestry only) or any combination
+nofilter: False ## True/False if no filtering is desired; if False, will remove any allele designated as Not Typed
+
+## format settings
+strand: "forward" ## forward/uas; indicates which oritentation to report the alleles for the ForenSeq SNPs; uas indicates the orientation as reported by the UAS or the forward strand
+references: "" ## list IDs of the samples to be run as references in EFM
+separate: false ## True/False; if want to separate samples into individual files for use in EFM

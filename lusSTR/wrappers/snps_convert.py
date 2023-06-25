@@ -144,13 +144,13 @@ def parse_snp_table_from_sheet(infile, sheet, snp_type_arg, nofilter):
     sampleid = table.iloc[2, 1]
     projectid = table.iloc[3, 1]
     analysisid = table.iloc[4, 1]
-    final_df = process_forenseq_snps(
+    final_df = process_sigprep_snps(
         concat_df.reset_index(drop=True), sampleid, projectid, analysisid
     )
     return final_df
 
 
-def process_forenseq_snps(foren_df, sampid, projid, analyid):
+def process_sigprep_snps(foren_df, sampid, projid, analyid):
     data_list = []
     for j, row in foren_df.iterrows():
         snpid = foren_df.loc[j, "Locus"]
@@ -223,7 +223,7 @@ def process_kin(input, nofilter):
 
 def create_row(df, j, sampleid, projectid, analysisid):
     """
-    This function first it identifies the ForenSeq SNPs (reverse complements those SNPs if
+    This function first it identifies the Sig Prep SNPs (reverse complements those SNPs if
     neccesary and checks SNP allele calls for incorrect allele calls), and reports all SNP calls
     in the same general format.
     """
