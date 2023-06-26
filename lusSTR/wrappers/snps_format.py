@@ -1,5 +1,6 @@
-import pandas as pd
 import os
+import pandas as pd
+from pathlib import Path
 
 
 def kintelligence_filtering(input):
@@ -24,6 +25,7 @@ def create_evidence(evid_df, orientation, separate):
         compiled_table.insert(0, "Sample Name", sample)
         all_samples_df = all_samples_df.append(compiled_table)
         if separate:
+            Path("evidence_samples").mkdir(parents=True, exist_ok=True)
             compiled_table.to_csv(
                 f"evidence_samples/{sample}_snp_evidence.csv", index=False, sep="\t"
             )
@@ -34,6 +36,7 @@ def main(input, output, kit, strand, separate, refs):
     output = str(output)
     input = str(input)
     output_name = os.path.splitext(output)[0]
+    print(output_name)
     input_file = pd.read_csv(input, sep="\t")
     if kit == "kintelligence":
         results = kintelligence_filtering(input)
@@ -45,17 +48,17 @@ def main(input, output, kit, strand, separate, refs):
         ref_samples = results[results["SampleID"].isin([refs])]
         if len(ref_samples) > 0:
             ref_table = create_ref(ref_samples)
-            ref_table.to_csv(f"{output_name}_snp_references.csv", index=False, sep="\t")
+            ref_table.to_csv(f"{output_name}_snp_reference.csv", index=False, sep="\t")
         evid_samples = results[~results["SampleID"].isin([refs])]
         if len(evid_samples) > 0:
             evid_table = create_evidence(evid_samples, strand, separate)
-            evid_table.to_csv(output, index=False, sep="\t")
+            evid_table.to_csv(f"{output}_snp_evidence.csv", index=False, sep="\t")
 
 
 if __name__ == "__main__":
     main(
         snakemake.input,
-        snakemake.output,
+        output=snakemake.params.outputid,
         kit=snakemake.params.kit,
         strand=snakemake.params.strand,
         separate=snakemake.params.separate,
