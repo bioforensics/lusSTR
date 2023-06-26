@@ -43,6 +43,7 @@ rule format:
         separate=config["separate"],
         kit=config["kit"],
         refs=refs,
-        outputid=output_name
+        outputid=output_name,
+        uas=config["uas"]
     script:
         lusSTR.wrapper("snps_format")
