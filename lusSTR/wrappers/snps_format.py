@@ -41,25 +41,21 @@ def create_output_table(sample_df, orientation, separate, output_type, uas):
 
 
 def create_sample_df(indiv_df, output_type, all_col):
-    if output_type == "evidence":
-        compiled_table = (
-            indiv_df.groupby([indiv_df.groupby(["SampleID", "SNP"]).cumcount() + 1, "SNP"])
-            .first()[[all_col, "Reads"]]
-            .unstack(0)
-            .reset_index()
-        )
-        try:
-            compiled_table.columns = ["Marker", "Allele 1", "Allele 2", "Height 1", "Height 2"]
-        except ValueError:
-            print("Too many alleles!")
-    else:
-        compiled_table = (
-            indiv_df.groupby([indiv_df.groupby(["SampleID", "SNP"]).cumcount() + 1, "SNP"])
-            .first()[all_col]
-            .unstack(0)
-            .reset_index()
-        )
-        compiled_table.columns = ["Marker", "Allele 1", "Allele 2"]
+    compiled_table = (
+        indiv_df.groupby([indiv_df.groupby(["SampleID", "SNP"]).cumcount() + 1, "SNP"])
+        .first()[[all_col, "Reads"]]
+        .unstack(0)
+        .reset_index()
+    )
+    try:
+        compiled_table.columns = ["Marker", "Allele 1", "Allele 2", "Height 1", "Height 2"]
+    except ValueError:
+        print("Too many alleles!")
+    if output_type == "reference":
+        for i, row in compiled_table.iterrows():
+            if compiled_table.loc[i, "Height 2"] == 0:
+                compiled_table.loc[i, "Allele 2"] = compiled_table.loc[i, "Allele 1"]
+        compiled_table = compiled_table[["Marker", "Allele 1", "Allele 2"]]
     return compiled_table
 
 
@@ -69,14 +65,16 @@ def check_allele_calls(df, output_type):
         marker_info = snp_marker_data[snpid]
         real_alleles = marker_info["Alleles"]
         if pd.isnull(df.loc[i, "Allele 2"]):
-            if df.loc[i, "Allele 1"] == real_alleles[0]:
-                df.loc[i, "Allele 2"] = real_alleles[1]
-            elif df.loc[i, "Allele 1"] == real_alleles[1]:
-                df.loc[i, "Allele 2"] = real_alleles[0]
-            else:
-                print(f"{snpid} does not contain the correct alleles!")
             if output_type == "evidence":
+                if df.loc[i, "Allele 1"] == real_alleles[0]:
+                    df.loc[i, "Allele 2"] = real_alleles[1]
+                elif df.loc[i, "Allele 1"] == real_alleles[1]:
+                    df.loc[i, "Allele 2"] = real_alleles[0]
+                else:
+                    print(f"{snpid} does not contain the correct alleles!")
                 df.loc[i, "Height 2"] = 0
+            else:
+                df.loc[i, "Allele 2"] = df.loc[i, "Allele 1"]
     return df
 
 
