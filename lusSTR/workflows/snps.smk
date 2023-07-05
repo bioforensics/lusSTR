@@ -6,6 +6,7 @@ output_name = config["output"]
 input_name = config["samp_input"]
 refs = config["references"]
 
+
 def format_filename(id, refs):
     if refs == "":
         return f"{id}_snp_evidence"
@@ -19,7 +20,7 @@ rule all:
         expand("{name}.csv", name=format_filename(output_name, refs))
 
 
-rule convert:
+rule format:
     input:
        expand("{samp_input}", samp_input=input_name)
     output:
@@ -30,12 +31,12 @@ rule convert:
        types=config["types"],
        nofilter=config["nofilter"]
     script:
-        lusSTR.wrapper("snps_convert")
+        lusSTR.wrapper("snps_format")
 
 
-rule format:
+rule convert:
     input:
-        rules.convert.output
+        rules.format.output
     output:
         expand("{name}.csv", name=format_filename(output_name, refs))
     params:
@@ -44,6 +45,7 @@ rule format:
         kit=config["kit"],
         refs=refs,
         outputid=output_name,
-        uas=config["uas"]
+        uas=config["uas"],
+        thresh=config["thresh"]
     script:
-        lusSTR.wrapper("snps_format")
+        lusSTR.wrapper("snps_convert")

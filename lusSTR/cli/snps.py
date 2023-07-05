@@ -42,7 +42,7 @@ from snakemake import snakemake
 
 
 def main(args):
-    pretarget = args.target if args.target != "all" else "format"
+    pretarget = args.target if args.target != "all" else "convert"
     workdir = args.workdir
     result = snakemake(
         lusSTR.snakefile(workflow="snps"), targets=[pretarget], workdir=workdir, verbose=True
@@ -55,8 +55,8 @@ def subparser(subparsers):
         "snps", description="Running the SNP pipeline"
     )
     p.add_argument(
-        "target", choices=["convert", "all"], 
-        help="Steps to run. Specifying 'convert' will run only 'convert'. Specifying "
-        "'all' will run all steps of the SNP workflow ('convert' and 'format')."
+        "target", choices=["format", "all"], 
+        help="Steps to run. Specifying 'format' will run only 'format'. Specifying "
+        "'all' will run all steps of the SNP workflow ('format' and 'convert')."
     )
     p.add_argument("-w", "--workdir", metavar="W", default=".", help="working directory")
