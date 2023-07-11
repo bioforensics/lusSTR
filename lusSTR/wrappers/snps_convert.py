@@ -25,7 +25,9 @@ def create_output_table(sample_df, orientation, separate, output_type, uas):
         allele_col = "Forward_Strand_Allele"
     all_samples_df = pd.DataFrame()
     for sample in sample_df["SampleID"].unique():
-        indiv_df = sample_df[sample_df["SampleID"] == sample]
+        indiv_df = sample_df[
+            (sample_df["SampleID"] == sample) & (sample_df["Issues"] != "Contains untyped allele")
+        ]
         compiled_table = create_sample_df(indiv_df, output_type, allele_col)
         if not uas:
             compiled_table = check_allele_calls(compiled_table, output_type)
@@ -47,14 +49,15 @@ def create_sample_df(indiv_df, output_type, all_col):
         .unstack(0)
         .reset_index()
     )
-    print(compiled_table)
+    compiled_table.to_csv("test.csv", index=False)
     try:
         compiled_table.columns = ["Marker", "Allele 1", "Allele 2", "Height 1", "Height 2"]
     except ValueError:
         print("Too many alleles!")
     if output_type == "reference":
+        print(compiled_table)
         for i, row in compiled_table.iterrows():
-            if compiled_table.loc[i, "Height 2"] == 0:
+            if pd.isnull(compiled_table.loc[i, "Height 2"]):
                 compiled_table.loc[i, "Allele 2"] = compiled_table.loc[i, "Allele 1"]
         compiled_table = compiled_table[["Marker", "Allele 1", "Allele 2"]]
     return compiled_table
