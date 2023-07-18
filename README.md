@@ -27,16 +27,18 @@ make devenv
 ## Usage
 
 lusSTR accomodates three different input formats:  
-(1) UAS Sample Details Report and UAS Phenotype Report (for SNP processing) in .xlsx format (a single file or directory containing multiple files)  
+(1) UAS Sample Details Report, UAS Sample Report, and UAS Phenotype Report (for SNP processing) in .xlsx format (a single file or directory containing multiple files)  
 (2) STRait Razor output with one sample per file (a single file or directory containing multiple files)  
 (3) Sample(s) sequences in CSV format; first four columns must be Locus, NumReads, Sequence, SampleID; Optional last two columns can be Project and Analysis IDs.  
 
 *These individual sample files or directory of files must be specified in the config file (see below).*
 
 
-lusSTR utilizes the ```lusstr``` command to invoke various Snakemake workflows. The ```lusstr strs``` command invokes the STR analysis workflow. *The SNP workflow is currently under construction.*
+lusSTR utilizes the ```lusstr``` command to invoke various Snakemake workflows. The ```lusstr strs``` command invokes the STR analysis workflow.  
+
+The ```lusstr snps``` command invokes the SNP analysis workflow. Please see below for further information on processing SNP data.
 ___
-### Creating the config file
+### Creating the STR config file
 
 Running ```lusstr config``` creates a config file containing the default settings for the lusSTR STR analysis pipeline. The settings can be changed with command line arguments (see below) or by manually editing the config file. The default settings, along with their descriptions, are as follows:
 
@@ -175,8 +177,55 @@ ___
 
  ## SNP Data Processing
 
-Currently under construction
+lusSTR is able to process SNPs derived from the ForenSeq Signature Prep assay and the ForenSeq Kintelligence assay. SNPs from the ForenSeq Signature Prep assay could be analyzed using either the Verogen UAS or STRait Razor. SNPs from the ForenSeq Kintelligence assay must first be analyzed using the UAS.
+
+___
+### Creating the STR config file
+
+Running ```lusstr config --snps``` creates a config file containing the default settings for the lusSTR SNP analysis pipeline. The settings can be changed with command line arguments (see below) or by manually editing the config file. The default settings, along with their descriptions, are as follows:  
+
+
+### general settings  
+uas: ```True```  (True/False); if ran through UAS  (invoke ```--straitrazor``` flag if STRait Razor was used)  
+samp_input: ```/path/to/input/directory/or/samples``` input directory or sample; if not provided, will be current working directory (indicate using ```--input path/to/dir```)  
+output: ```lusstr_output``` output file/directory name; (indicate using ```--out dir/sampleid e.g. --out test_030923```)   
+kit: ```sigprep``` (sigprep/kintelligence) (invoke using the ```--kintelligence``` flag if using Kintelligence data)  
+
+### format settings  
+types: ```all``` choices are "all", "i" (identity SNPs only), "p" (phenotype only), "a" (ancestry only) or any combination (indicate using the ```--snp-type e.g. --snp-type i, p```)  
+nofilter: ```False``` (True/False); if no filtering is desired at the format step; if False, will remove any allele designated as Not Typed (invoke using the ```--nofiltering```)  
+
+### convert settings  
+strand: ```forward``` (forward/uas); indicates which orientation to report the alleles for the SigPrep SNPs; uas indicates the orientation as reported by the UAS or the forward strand
+references:  ## list IDs of the samples to be run as references in EFM; default is no reference samples  
+separate: false ## True/False; if want to separate samples into individual files for use in EFM  
+thresh: 0.03 ## Analytical threshold value    
+
+
+One additional argument can be provided with ```lusstr config```:  
+```-w```/```-workdir``` sets the working directory (e.g. ```-w lusstr_files/```) and all created files are stored in that directory.
+
+
+
+### general settings:  
+uas: ```True``` (True/False); if ran through UAS (invoke ```--straitrazor``` flag if STRait Razor was used)  
+sex: ```False``` (True/False); include sex-chromosome STRs (invoke ```--sex``` flag)  
+samp_input: ```/path/to/input/directory/or/samples``` input directory or sample; if not provided, will be current working directory (indicate using ```--input path/to/dir``` )  
+output: ```lusstr_output``` output file/directory name (indicate using ```--out dir/sampleid e.g. --out test_030923```)
+
+### convert settings  
+kit: ```forenseq``` (forenseq/powerseq) (invoke the ```--powerseq``` flag if using PowerSeq data)  
+nocombine: ```False``` (True/False); do not combine identical sequences during the ```convert``` step, if using STRait Razor data. (invoke the ```--nocombine``` flag)  
+
+### filter settings  
+output_type: ```strmix``` (strmix/efm) (invoke ```--efm``` flag if creating output for EuroForMix)  
+profile_type: ```evidence``` (evidence/reference) (invoke ```--reference``` flag if creating a reference output file)  
+data_type: ```ngs``` (ce/ngs) (invoke ```--ce``` if using CE allele data)  
+info: ```True``` (True/False); create allele information file (invoke ```--noinfo``` flag to not create the allele information file)  
+separate: ```False``` (True/False); for EFM only, if True will create individual files for samples; if False, will create one file with all samples (invoke ```--separate``` flag to separate EFM output files)  
+nofilters: ```False``` (True/False); skip all filtering steps but still creates EFM/STRmix output files (invoke ```--nofilters``` flag)  
 
 ----
+
 
 lusSTR is still under development and any suggestions/issues found are welcome!

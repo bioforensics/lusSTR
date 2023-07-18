@@ -49,6 +49,10 @@ def edit_snp_config(config, args):
             data["separate"] = True
         if args.nofiltering:
             data["nofilter"] = True
+        if args.ref:
+            data["references"] = args.ref
+        else:
+            data["references"] = None
         return data
 
 
@@ -112,7 +116,7 @@ def subparser(subparsers):
     )
     p.add_argument(
         "--reference", action="store_true", 
-        help="Use for creating Reference profiles"
+        help="Use for creating Reference profiles for STR workflow"
     )
     p.add_argument("--efm", action="store_true",help="Use to create EuroForMix profiles")
     p.add_argument("--ce", action="store_true", help="Use for CE data")
@@ -127,7 +131,7 @@ def subparser(subparsers):
     p.add_argument(
         "--nofiltering", action="store_true", 
         help="For STRs, use to perform no filtering during the 'filter' step. For SNPs, "
-        "only alleles specified as 'Typed' by the UAS will be included."
+        "only alleles specified as 'Typed' by the UAS will be included at the 'format' step."
     )
     p.add_argument(
         "--snps", action="store_true",
@@ -143,4 +147,8 @@ def subparser(subparsers):
     p.add_argument(
         "--kintelligence", action="store_true",
         help="Use if processing Kintelligence SNPs within a Kintellience Report(s)"
+    )
+    p.add_argument(
+        "--snp-reference", dest="ref",
+        help="Specify any references for SNP data for use in EFM."
     )

@@ -8,7 +8,7 @@ refs = config["references"]
 
 
 def format_filename(id, refs):
-    if refs == "":
+    if refs is None:
         return f"{id}_snp_evidence"
     else:
         return f"{id}_snp_reference"

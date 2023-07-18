@@ -8,7 +8,7 @@ output: "lusstr_output" ## output file/directory name; Example: "test_030923"
 kit: "sigprep" ## sigprep/kintelligence 
 
 ## format settings
-types: "i" ## choices are "all", "i" (identity SNPs only), "p" (phenotype only), "a" (ancestry only) or any combination
+types: "all" ## choices are "all", "i" (identity SNPs only), "p" (phenotype only), "a" (ancestry only) or any combination
 nofilter: False ## True/False if no filtering is desired; if False, will remove any allele designated as Not Typed
 
 ## convert settings

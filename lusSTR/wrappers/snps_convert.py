@@ -55,7 +55,6 @@ def create_sample_df(indiv_df, output_type, all_col):
     except ValueError:
         print("Too many alleles!")
     if output_type == "reference":
-        print(compiled_table)
         for i, row in compiled_table.iterrows():
             if pd.isnull(compiled_table.loc[i, "Height 2"]):
                 compiled_table.loc[i, "Allele 2"] = compiled_table.loc[i, "Allele 1"]
@@ -107,11 +106,19 @@ def main(input, output, kit, strand, separate, refs, uas, thresh):
         results = input_file
     else:
         results = straitrazor_filtering(input_file, thresh)
-    ref_samples = results[results["SampleID"].isin([refs])]
+    if "," in refs:
+        ref_ids = []
+        ref_samples = pd.DataFrame()
+        for ref in refs.split(","):
+            ref_samples = ref_samples.append(results[results["SampleID"].isin([ref])])
+            ref_ids.append(ref)
+    else:
+        ref_ids = [refs]
+        ref_samples = results[results["SampleID"].isin([refs])]
     if len(ref_samples) > 0:
         ref_table = create_output_table(ref_samples, strand, separate, "reference", uas)
         ref_table.to_csv(f"{output_name}_snp_reference.csv", index=False, sep="\t")
-    evid_samples = results[~results["SampleID"].isin([refs])]
+    evid_samples = results[~results["SampleID"].isin(ref_ids)]
     if len(evid_samples) > 0:
         evid_table = create_output_table(evid_samples, strand, separate, "evidence", uas)
         evid_table.to_csv(f"{output}_snp_evidence.csv", index=False, sep="\t")
