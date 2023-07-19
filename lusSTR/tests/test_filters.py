@@ -302,3 +302,27 @@ def test_ngs_stutter(ref_bracket, quest_bracket, stutter, actual_call):
         ref_bracket, quest_bracket, stutter
     )
     assert test_stut == actual_call
+
+
+def test_forward_strand_orientation(tmp_path):
+    str_path = str(tmp_path / "WD")
+    inputfile = data_file("test_stutter.txt")
+    exp_out = data_file("NGS_stutter_test/Sample1_forwardstrand.csv")
+    obs_out = str(tmp_path / f"WD/STRmix_Files/Sample1_evidence_ngs.csv")
+    arglist = [
+        "config",
+        "-w",
+        str_path,
+        "--input",
+        "WD",
+        "-o",
+        "STRmix_Files",
+        "--strand",
+        "forward",
+    ]
+    lusSTR.cli.main(lusSTR.cli.get_parser().parse_args(arglist))
+    shutil.copyfile(inputfile, os.path.join(str_path, "STRmix_Files.csv"))
+    shutil.copyfile(inputfile, os.path.join(str_path, "STRmix_Files.txt"))
+    all_arglist = ["strs", "all", "-w", str_path]
+    lusSTR.cli.main(lusSTR.cli.get_parser().parse_args(all_arglist))
+    assert filecmp.cmp(exp_out, obs_out) is True

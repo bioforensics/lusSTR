@@ -109,7 +109,7 @@ def process_strs(dict_loc, datatype, seq_col):
             ],
             fill_value=None,
         )
-        filtered_df = filters(data_order, locus, total_reads, datatype)
+        filtered_df = filters(data_order, locus, total_reads, datatype, brack_col)
         final_df = final_df.append(filtered_df)
         flags_df = flags_df.append(flags(filtered_df))
     final_df = final_df.astype({"CE_Allele": "float64", "Reads": "int"})
@@ -218,7 +218,6 @@ def STRmix_output(profile, outdir, profile_type, data_type, seq_col):
             {"CE_Allele": "CE Allele", seq_col: "Allele Seq"}, axis=1, inplace=True
         )
         strmix_profile = strmix_profile.sort_values(by=["SampleID", "Locus", "CE Allele"])
-        print(strmix_profile)
     strmix_profile.replace(
         {"Locus": {"VWA": "vWA", "PENTA D": "PentaD", "PENTA E": "PentaE"}}, inplace=True
     )
