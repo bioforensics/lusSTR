@@ -59,6 +59,7 @@ data_type: ```ngs``` (ce/ngs) (invoke ```--ce``` if using CE allele data)
 info: ```True``` (True/False); create allele information file (invoke ```--noinfo``` flag to not create the allele information file)  
 separate: ```False``` (True/False); for EFM only, if True will create individual files for samples; if False, will create one file with all samples (invoke ```--separate``` flag to separate EFM output files)  
 nofilters: ```False``` (True/False); skip all filtering steps but still creates EFM/STRmix output files (invoke ```--nofilters``` flag)  
+strand: ```uas``` (uas/forward); indicates the strand orientation in which to report the sequence in the final output table for STRmix NGS only (indicate using ```--strand```)
 
 One additional argument can be provided with ```lusstr config```:  
 ```-w```/```-workdir``` sets the working directory (e.g. ```-w lusstr_files/```) and all created files are stored in that directory.
@@ -224,6 +225,7 @@ data_type: ```ngs``` (ce/ngs) (invoke ```--ce``` if using CE allele data)
 info: ```True``` (True/False); create allele information file (invoke ```--noinfo``` flag to not create the allele information file)  
 separate: ```False``` (True/False); for EFM only, if True will create individual files for samples; if False, will create one file with all samples (invoke ```--separate``` flag to separate EFM output files)  
 nofilters: ```False``` (True/False); skip all filtering steps but still creates EFM/STRmix output files (invoke ```--nofilters``` flag)  
+strand: ```forward``` (uas/forward); indicates the strand orientation in which to report the alleles in the final output table (indicate using ```--strand```)
 
 ----
 
