@@ -14,7 +14,7 @@ import glob
 from setuptools import setup
 import versioneer
 
-desc = "Tool for converting NGS sequence data of forensic STR loci to various sequence representations and allele designations"
+desc = "Tool for processing NGS sequence data of forensic STR loci and SNPs for use in probabilistic genotyping software"
 setup(
     name="lusSTR",
     version=versioneer.get_version(),
@@ -30,7 +30,7 @@ setup(
             "lusSTR/tests/data/snps/*",
             "lusSTR/tests/data/RU_stutter_test/*",
             "lusSTR/tests/data/NGS_stutter_test/*",
-            "lusSTR/workflows/*",
+            "lusSTR/tests/data/kinsnps/*" "lusSTR/workflows/*",
             "lusSTR/wrappers/*",
         ]
     },

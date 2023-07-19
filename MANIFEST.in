@@ -12,3 +12,4 @@ include lusSTR/tests/data/UAS_bulk_input/*
 include lusSTR/tests/data/snps/*
 include lusSTR/tests/data/RU_stutter_test/*
 include lusSTR/tests/data/NGS_stutter_test/*
+include lusSTR/tests/data/kinsnps/*
