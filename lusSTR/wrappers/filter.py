@@ -63,9 +63,14 @@ with open(get_filter_metadata_file(), "r") as fh:
     filter_marker_data = json.load(fh)
 
 
-def process_strs(dict_loc, datatype):
+def process_strs(dict_loc, datatype, seq_col):
     final_df = pd.DataFrame()
     flags_df = pd.DataFrame()
+    brack_col = (
+        "UAS_Output_Bracketed_Notation"
+        if seq_col == "UAS_Output_Sequence"
+        else "Forward_Strand_Bracketed_Notation"
+    )
     for key, value in dict_loc.items():
         data = dict_loc[key].reset_index(drop=True)
         if datatype == "ce":
@@ -80,9 +85,9 @@ def process_strs(dict_loc, datatype):
                 [
                     "SampleID",
                     "Locus",
-                    "UAS_Output_Sequence",
+                    seq_col,
                     "CE_Allele",
-                    "UAS_Output_Bracketed_Notation",
+                    brack_col,
                     "Reads",
                 ]
             ]
@@ -199,7 +204,7 @@ def determine_max_num_alleles(allele_heights):
     return max_num_alleles
 
 
-def STRmix_output(profile, outdir, profile_type, data_type):
+def STRmix_output(profile, outdir, profile_type, data_type, seq_col):
     Path(outdir).mkdir(parents=True, exist_ok=True)
     if profile_type == "reference":
         filtered_df = profile[profile.allele_type == "real_allele"]
@@ -208,13 +213,12 @@ def STRmix_output(profile, outdir, profile_type, data_type):
     if data_type == "ce":
         strmix_profile = strmix_ce_processing(filtered_df)
     else:
-        strmix_profile = filtered_df.loc[
-            :, ["SampleID", "Locus", "CE_Allele", "UAS_Output_Sequence", "Reads"]
-        ]
+        strmix_profile = filtered_df.loc[:, ["SampleID", "Locus", "CE_Allele", seq_col, "Reads"]]
         strmix_profile.rename(
-            {"CE_Allele": "CE Allele", "UAS_Output_Sequence": "Allele Seq"}, axis=1, inplace=True
+            {"CE_Allele": "CE Allele", seq_col: "Allele Seq"}, axis=1, inplace=True
         )
         strmix_profile = strmix_profile.sort_values(by=["SampleID", "Locus", "CE Allele"])
+        print(strmix_profile)
     strmix_profile.replace(
         {"Locus": {"VWA": "vWA", "PENTA D": "PentaD", "PENTA E": "PentaE"}}, inplace=True
     )
@@ -293,7 +297,9 @@ def format_ref_table(new_rows, sample_data, datatype):
     return sort_df
 
 
-def main(input, output_type, profile_type, data_type, output_dir, info, separate, nofilters):
+def main(
+    input, output_type, profile_type, data_type, output_dir, info, separate, nofilters, strand
+):
     input = str(input)
     if profile_type not in ("evidence", "reference"):
         raise ValueError(f"unknown profile type '{profile_type}'")
@@ -306,19 +312,20 @@ def main(input, output_type, profile_type, data_type, output_dir, info, separate
         raise ValueError("No output specified using --out.")
     else:
         outpath = output_dir
+    seq_col = "UAS_Output_Sequence" if strand == "uas" else "Forward_Strand_Sequence"
     if nofilters:
         full_df["allele_type"] = "real_allele"
         if output_type == "efm":
             EFM_output(full_df, outpath, profile_type, separate)
         else:
-            STRmix_output(full_df, outpath, profile_type, data_type)
+            STRmix_output(full_df, outpath, profile_type, data_type, seq_col)
     else:
         dict_loc = {k: v for k, v in full_df.groupby(["SampleID", "Locus"])}
-        final_df, flags_df = process_strs(dict_loc, data_type)
+        final_df, flags_df = process_strs(dict_loc, data_type, seq_col)
         if output_type == "efm":
             EFM_output(final_df, outpath, profile_type, separate)
         else:
-            STRmix_output(final_df, outpath, profile_type, data_type)
+            STRmix_output(final_df, outpath, profile_type, data_type, seq_col)
         if info:
             name = os.path.basename(outpath)
             final_df.to_csv(f"{outpath}/{name}_sequence_info.csv", index=False)
@@ -336,4 +343,5 @@ if __name__ == "__main__":
         info=snakemake.params.info,
         separate=snakemake.params.separate,
         nofilters=snakemake.params.filters,
+        strand=snakemake.params.strand,
     )

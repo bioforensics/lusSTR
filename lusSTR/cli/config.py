@@ -53,6 +53,8 @@ def edit_snp_config(config, args):
             data["references"] = args.ref
         else:
             data["references"] = None
+        if args.strand:
+            data["strand"] = args.strand
         return data
 
 
@@ -85,6 +87,8 @@ def edit_str_config(config, args):
         data["data_type"] = "ce"
     if args.efm:
         data["output_type"] = "efm"
+    if args.strand:
+        data["strand"] = args.strand
     return data
 
 
@@ -151,4 +155,9 @@ def subparser(subparsers):
     p.add_argument(
         "--snp-reference", dest="ref",
         help="Specify any references for SNP data for use in EFM."
+    )
+    p.add_argument(
+        "--strand", choices=["uas", "forward"],
+        help="Specify the strand orientation for the final output files. UAS orientation is "
+        "default for STRs; forward strand is default for SNPs."
     )
