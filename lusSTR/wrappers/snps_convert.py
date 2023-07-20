@@ -110,6 +110,7 @@ def main(input, output, kit, strand, separate, refs, uas, thresh):
         ref_ids = []
         ref_samples = pd.DataFrame()
         for ref in refs.split(","):
+            ref = ref.strip()
             ref_samples = ref_samples.append(results[results["SampleID"].isin([ref])])
             ref_ids.append(ref)
     else:
@@ -118,7 +119,7 @@ def main(input, output, kit, strand, separate, refs, uas, thresh):
     if len(ref_samples) > 0:
         ref_table = create_output_table(ref_samples, strand, separate, "reference", uas)
         ref_table.to_csv(f"{output_name}_snp_reference.csv", index=False, sep="\t")
-    evid_samples = results[~results["SampleID"].isin(ref_ids)]
+    evid_samples = results[~results.SampleID.isin(ref_ids)]
     if len(evid_samples) > 0:
         evid_table = create_output_table(evid_samples, strand, separate, "evidence", uas)
         evid_table.to_csv(f"{output}_snp_evidence.csv", index=False, sep="\t")

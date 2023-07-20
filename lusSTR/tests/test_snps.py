@@ -189,3 +189,26 @@ def test_kintelligence_all(tmp_path):
     lusSTR.cli.main(lusSTR.cli.get_parser().parse_args(all_arglist))
     assert filecmp.cmp(evid_exp_output, evid_obs_output) is True
     assert filecmp.cmp(ref_exp_output, ref_obs_output) is True
+
+
+def test_multiple_reference_profiles(tmp_path):
+    inputdb = data_file("kinsnps/")
+    exp_out = data_file("kinsnps/multiplerefs.csv")
+    obs_out = str(tmp_path / "kin_snp_reference.csv")
+    arglist = [
+        "config",
+        "-w",
+        str(tmp_path),
+        "-o",
+        "kin",
+        "--input",
+        inputdb,
+        "--snps",
+        "--kintelligence",
+        "--snp-reference",
+        "Kin_pos_reference, Kin_pos_1ng",
+    ]
+    lusSTR.cli.main(lusSTR.cli.get_parser().parse_args(arglist))
+    all_arglist = ["snps", "all", "-w", str(tmp_path)]
+    lusSTR.cli.main(lusSTR.cli.get_parser().parse_args(all_arglist))
+    assert filecmp.cmp(exp_out, obs_out) is True
