@@ -7,7 +7,6 @@ This Python package has been written for use with either: (1) the 27 autosomal S
 lusSTR can perform filtering and stutter identification using the RU allele or the sequence bracketed form for autosomal loci and create files for direct input into two probabilistic genotyping software packages, EuroForMix (EFM) and STRmix.
 
 lusSTR also processes SNP data from the Verogen ForenSeq panel. ForenSeq consists of 94 identity SNPs, 22 phenotype (hair/eye color) SNPs, 54 ancestry SNPs and 2 phenotype and ancestry SNPs. Identity SNP data is provided in the UAS Sample Details Report; phenotype and ancestry SNP data is provided in the UAS Phenotype Report. All SNP calls are also reported in the STRait Razor output.  
-***SNP processing currently a work in progress.**
 
 
 ## Installation
@@ -65,7 +64,7 @@ One additional argument can be provided with ```lusstr config```:
 ```-w```/```-workdir``` sets the working directory (e.g. ```-w lusstr_files/```) and all created files are stored in that directory.
 
 **Once the config file is created with all the desired settings, the STR workflow can be run. The config file must be located in the working directory.**
-___  
+___
 ## Running the lusSTR STR workflow
 
 The lusSTR STR workflow consists of three steps:  
