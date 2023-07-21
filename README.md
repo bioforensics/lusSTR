@@ -65,7 +65,7 @@ One additional argument can be provided with ```lusstr config```:
 ```-w```/```-workdir``` sets the working directory (e.g. ```-w lusstr_files/```) and all created files are stored in that directory.
 
 **Once the config file is created with all the desired settings, the STR workflow can be run. The config file must be located in the working directory.**
-___
+___  
 ## Running the lusSTR STR workflow
 
 The lusSTR STR workflow consists of three steps:  
