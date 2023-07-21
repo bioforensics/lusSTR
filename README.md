@@ -38,7 +38,7 @@ lusSTR utilizes the ```lusstr``` command to invoke various Snakemake workflows. 
 
 The ```lusstr snps``` command invokes the SNP analysis workflow. Please see below for further information on processing SNP data.
 ___
-### Creating the SNP config file
+### Creating the STR config file
 
 Running ```lusstr config``` creates a config file containing the default settings for the lusSTR STR analysis pipeline. The settings can be changed with command line arguments (see below) or by manually editing the config file. The default settings, along with their descriptions, are as follows:
 
@@ -181,7 +181,7 @@ ___
 lusSTR is able to process SNPs derived from the ForenSeq Signature Prep assay and the ForenSeq Kintelligence assay. SNPs from the ForenSeq Signature Prep assay could be analyzed using either the Verogen UAS or STRait Razor. SNPs from the ForenSeq Kintelligence assay must first be analyzed using the UAS.
 
 ___
-### Creating the STR config file
+### Creating the SNP config file
 
 Running ```lusstr config --snps``` creates a config file containing the default settings for the lusSTR SNP analysis pipeline. The settings can be changed with command line arguments (see below) or by manually editing the config file. The default settings, along with their descriptions, are as follows:  
 
