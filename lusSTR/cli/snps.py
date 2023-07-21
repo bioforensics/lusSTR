@@ -1,5 +1,5 @@
 # -------------------------------------------------------------------------------------------------
-# Copyright (c) 2020, DHS.
+# Copyright (c) 2023, DHS.
 #
 # This file is part of lusSTR (http://github.com/bioforensics/lusSTR) and is licensed under
 # the BSD license: see LICENSE.txt.
@@ -10,16 +10,27 @@
 # Development Center.
 # -------------------------------------------------------------------------------------------------
 
+import argparse
 import lusSTR
-import snakemake
+from snakemake import snakemake
 
-## placeholder until I update this
 
 def main(args):
-    raise NotImplementedError('SNP workflow implementation pending')
+    pretarget = args.target if args.target != "all" else "convert"
+    workdir = args.workdir
+    result = snakemake(
+        lusSTR.snakefile(workflow="snps"), targets=[pretarget], workdir=workdir, verbose=True
+    )
+    if result is not True:
+        raise SystemError('Snakemake failed')
 
 def subparser(subparsers):
-    p = subparsers.add_parser("snps", description="Running the entire STR pipeline (format, annotate and filter)")
-    p.add_argument("--config", default="config.yaml", help="config file used to identify settings.")
+    p = subparsers.add_parser(
+        "snps", description="Running the SNP pipeline"
+    )
+    p.add_argument(
+        "target", choices=["format", "all"], 
+        help="Steps to run. Specifying 'format' will run only 'format'. Specifying "
+        "'all' will run all steps of the SNP workflow ('format' and 'convert')."
+    )
     p.add_argument("-w", "--workdir", metavar="W", default=".", help="working directory")
-    p.add_argument("--skip-filter", dest="filter", action = "store_true", help="Skip filtering step")

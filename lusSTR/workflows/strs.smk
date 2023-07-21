@@ -125,6 +125,7 @@ rule filter:
         info=config["info"],
         separate=config["separate"],
         filters=config["nofilters"],
+        strand=config["strand"]
     script:
         lusSTR.wrapper("filter")
     

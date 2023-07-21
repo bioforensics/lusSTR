@@ -20,13 +20,45 @@ import yaml
 
 def main(args):
     Path(args.workdir).mkdir(parents=True, exist_ok=True)
-    final_dest = f"{args.workdir}/config.yaml"
-    config = resource_filename("lusSTR", "data/config.yaml")
-    final_config = edit_config(config, args)
+    if args.snps:
+        final_dest = f"{args.workdir}/snp_config.yaml"
+        config = resource_filename("lusSTR", "data/snp_config.yaml")
+        final_config = edit_snp_config(config, args)
+    else:
+        final_dest = f"{args.workdir}/config.yaml"
+        config = resource_filename("lusSTR", "data/config.yaml")
+        final_config = edit_str_config(config, args)
     with open(final_dest, "w") as file:
         yaml.dump(final_config, file)
 
-def edit_config(config, args):
+
+def edit_snp_config(config, args):
+    with open(config, "r") as file:
+        data = yaml.safe_load(file)
+        if args.straitrazor:
+            data["uas"] = False
+        if args.input:
+            data["samp_input"] = args.input
+        if args.out:
+            data["output"] = args.out
+        if args.snptype:
+            data["types"] = args.snptype
+        if args.kintelligence:
+            data["kit"] = "kintelligence"
+        if args.separate:
+            data["separate"] = True
+        if args.nofiltering:
+            data["nofilter"] = True
+        if args.ref:
+            data["references"] = args.ref
+        else:
+            data["references"] = None
+        if args.strand:
+            data["strand"] = args.strand
+        return data
+
+
+def edit_str_config(config, args):
     with open(config, "r") as file:
         data = yaml.safe_load(file)
     if args.straitrazor:
@@ -55,6 +87,8 @@ def edit_config(config, args):
         data["data_type"] = "ce"
     if args.efm:
         data["output_type"] = "efm"
+    if args.strand:
+        data["strand"] = args.strand
     return data
 
 
@@ -86,7 +120,7 @@ def subparser(subparsers):
     )
     p.add_argument(
         "--reference", action="store_true", 
-        help="Use for creating Reference profiles"
+        help="Use for creating Reference profiles for STR workflow"
     )
     p.add_argument("--efm", action="store_true",help="Use to create EuroForMix profiles")
     p.add_argument("--ce", action="store_true", help="Use for CE data")
@@ -100,5 +134,30 @@ def subparser(subparsers):
     )
     p.add_argument(
         "--nofiltering", action="store_true", 
-        help="Use to perform no filtering during the 'filter' step"
+        help="For STRs, use to perform no filtering during the 'filter' step. For SNPs, "
+        "only alleles specified as 'Typed' by the UAS will be included at the 'format' step."
+    )
+    p.add_argument(
+        "--snps", action="store_true",
+        help="Use to create a config file for the SNP workflow"
+    )
+    p.add_argument(
+        "--snp-type", default="all", dest="snptype",
+        help="Specify the type of SNPs to include in the final report. 'p' will include only the "
+        "Phenotype SNPs; 'a' will include only the Ancestry SNPs; 'i' will include only the "
+        "Identity SNPs; and 'all' will include all SNPs. More than one type can be specified (e.g. "
+        " 'p, a'). Default is all."
+    )
+    p.add_argument(
+        "--kintelligence", action="store_true",
+        help="Use if processing Kintelligence SNPs within a Kintellience Report(s)"
+    )
+    p.add_argument(
+        "--snp-reference", dest="ref",
+        help="Specify any references for SNP data for use in EFM."
+    )
+    p.add_argument(
+        "--strand", choices=["uas", "forward"],
+        help="Specify the strand orientation for the final output files. UAS orientation is "
+        "default for STRs; forward strand is default for SNPs."
     )
