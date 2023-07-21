@@ -1,13 +1,27 @@
 # lusSTR
 
-lusSTR is a tool written in Python to convert NGS sequence data of forensic STR loci to different sequence representations (sequence bracketed form) and allele designations (CE allele, LUS/LUS+ alleles) for ease in downstream analyses. See the below section ```Converting STR sequences to other sequence representations and allele designations``` for more information).
+lusSTR is a tool written in Python to convert NGS sequence data of forensic STR loci to different sequence representations (sequence bracketed form) and allele designations (CE allele, LUS/LUS+ alleles) for ease in downstream analyses. See the below section ```Converting STR sequences to other sequence representations and allele designations``` for more information. 
 
-This Python package has been written for use with either: (1) the 27 autosomal STR loci, 24 Y-chromosome STR loci and 7 X-chromosome STR loci from the Verogen ForenSeq panel, or (2) the 22 autosomal STR loci and 22 Y-chromosome loci from the Promega PowerSeq panel. The package accomodates either the Sample Details Report from the ForenSeq Universal Analysis Software (UAS) or STRait Razor output. If STRait Razor output is provided, sequences are filtered to the UAS sequence region for conversion.
+Further, lusSTR can perform filtering and stutter identification using the CE allele or the bracketed sequence form for autosomal loci and create files for direct input into two probabilistic genotyping software packages, EuroForMix (EFM) and STRmix (both CE and NGS). 
 
-lusSTR can perform filtering and stutter identification using the RU allele or the sequence bracketed form for autosomal loci and create files for direct input into two probabilistic genotyping software packages, EuroForMix (EFM) and STRmix.
+lusSTR also processes SNP data from the Verogen ForenSeq and Kintelligence panels and create evidence and/or reference files for use in EFM. See the below section ```SNP Data Processing``` for more information.
 
-lusSTR also processes SNP data from the Verogen ForenSeq panel. ForenSeq consists of 94 identity SNPs, 22 phenotype (hair/eye color) SNPs, 54 ancestry SNPs and 2 phenotype and ancestry SNPs. Identity SNP data is provided in the UAS Sample Details Report; phenotype and ancestry SNP data is provided in the UAS Phenotype Report. All SNP calls are also reported in the STRait Razor output.  
-***SNP processing currently a work in progress.**
+This Python package has been written for use with either:  
+* ForenSeq Signature Prep panel
+  * 27 autosomal STR loci
+  * 24 Y-chromosome STR loci
+  * 7 X-chromosome STR loci
+  * 94 identity SNPs
+  * 22 phenotype (hair/eye color) SNPs
+  * 54 ancestry SNPs
+  * 2 phenotype and ancestry SNPs
+* ForenSeq Kintelligence panel
+  * 10,230 SNPs for forensic genetic genealogy purposes
+* Promega PowerSeq panel
+  * 22 autosomal STR loci
+  * 22 Y-chromosome loci
+  
+The package accomodates either the Sample Details Report/Phenotype Report/Sample Report from the ForenSeq Universal Analysis Software (UAS) or STRait Razor output. If STRait Razor output is provided, sequences are filtered to the UAS sequence region for conversion.
 
 
 ## Installation
@@ -34,15 +48,13 @@ lusSTR accomodates three different input formats:
 *These individual sample files or directory of files must be specified in the config file (see below).*
 
 
-lusSTR utilizes the ```lusstr``` command to invoke various Snakemake workflows. The ```lusstr strs``` command invokes the STR analysis workflow.  
-
-The ```lusstr snps``` command invokes the SNP analysis workflow. Please see below for further information on processing SNP data.
+lusSTR utilizes the ```lusstr``` command to invoke various Snakemake workflows. The ```lusstr strs``` command invokes the STR analysis workflow while the ```lusstr snps``` command invokes the SNP analysis workflow. Please see below for further information on processing SNP data.
 ___
 ### Creating the STR config file
 
 Running ```lusstr config``` creates a config file containing the default settings for the lusSTR STR analysis pipeline. The settings can be changed with command line arguments (see below) or by manually editing the config file. The default settings, along with their descriptions, are as follows:
 
-### general settings:  
+### general settings
 uas: ```True``` (True/False); if ran through UAS (invoke ```--straitrazor``` flag if STRait Razor was used)  
 sex: ```False``` (True/False); include sex-chromosome STRs (invoke ```--sex``` flag)  
 samp_input: ```/path/to/input/directory/or/samples``` input directory or sample; if not provided, will be current working directory (indicate using ```--input path/to/dir``` )  
@@ -80,21 +92,21 @@ lusstr strs all
 
 One additional argument can be provided, a working directory.  
 **This working directory must contain the config file.**  
-The default working directory is the current directory.
+If not specified, the working directory is the current directory.
 ```
 lusstr strs all -w lusstr_files/
 ```
 
 Individual steps can also be run
 ```
-lusstr strs format
+lusstr strs format -w lusstr_files/
 ```
 
 ```
 lusstr strs convert -w lusstr_files/
 ```
 
-**In order to run the ```convert``` step, the appropriately formatted ```.csv``` file containing the sequences normally created in the ```format``` step must be present in the working directory. See the above ```Usage``` section for specific information about that file (required columns, etc.).** 
+**In order to run the ```convert``` step, the appropriately formatted ```.csv``` file containing the sequences normally created in the ```format``` step must be present in the working directory. See the below ```Formatting input for STR loci sequences``` section for specific information about that file (required columns, etc.).** 
 
 ----
 
@@ -183,7 +195,7 @@ lusSTR is able to process SNPs derived from the ForenSeq Signature Prep assay an
 ___
 ### Creating the SNP config file
 
-Running ```lusstr config --snps``` creates a config file containing the default settings for the lusSTR SNP analysis pipeline. The settings can be changed with command line arguments (see below) or by manually editing the config file. The default settings, along with their descriptions, are as follows:  
+Running ```lusstr config --snps``` creates a config file containing the default settings for the lusSTR SNP workflow. The settings can be changed with command line arguments (see below) or by manually editing the config file. The default settings, along with their descriptions, are as follows:  
 
 
 ### general settings  
@@ -198,34 +210,75 @@ nofilter: ```False``` (True/False); if no filtering is desired at the format ste
 
 ### convert settings  
 strand: ```forward``` (forward/uas); indicates which orientation to report the alleles for the SigPrep SNPs; uas indicates the orientation as reported by the UAS or the forward strand
-references:  ## list IDs of the samples to be run as references in EFM; default is no reference samples  
-separate: false ## True/False; if want to separate samples into individual files for use in EFM  
-thresh: 0.03 ## Analytical threshold value    
+references: ```None```; list IDs of the samples to be run as references in EFM; default is no reference samples  
+separate: ```False``` (True/False); if want to separate samples into individual files for use in EFM  
+thresh: ```0.03```; Analytical threshold value    
 
 
-One additional argument can be provided with ```lusstr config```:  
+One additional argument can be provided with ```lusstr config --snps```:  
 ```-w```/```-workdir``` sets the working directory (e.g. ```-w lusstr_files/```) and all created files are stored in that directory.
 
+**Once the config file is created with all the desired settings, the SNP workflow can be run. The config file must be located in the working directory.**
+___
+## Running the lusSTR SNP workflow
+
+The lusSTR SNP workflow consists of three steps:  
+(1) ```format```: formatting input and calling alleles if using STRait Razor data  
+(2) ```convert```: applying analytical threshold; converting data to correct format for input into EuroForMix;  
+
+Any or all steps can be run. In order to run all three steps, the following command can be used:  
+```
+lusstr snps all
+```
+
+One additional argument can be provided, a working directory.  
+**This working directory must contain the config file.**  
+The default working directory is the current directory.  
+```
+lusstr snps all -w lusstr_files/  
+```
+
+Individual steps can also be run  
+```
+lusstr snps format -w lusstr_files/  
+```
+
+```
+lusstr snps convert -w lusstr_files/  
+```
+
+**In order to run the ```convert``` step, the appropriately formatted ```.csv``` file containing the sequences normally created in the ```format``` step must be present in the working directory. See the below ```Usage``` section for specific information about that file (required columns, etc.).**  
+
+----
+
+## Additional information about each step  
 
 
-### general settings:  
-uas: ```True``` (True/False); if ran through UAS (invoke ```--straitrazor``` flag if STRait Razor was used)  
-sex: ```False``` (True/False); include sex-chromosome STRs (invoke ```--sex``` flag)  
-samp_input: ```/path/to/input/directory/or/samples``` input directory or sample; if not provided, will be current working directory (indicate using ```--input path/to/dir``` )  
-output: ```lusstr_output``` output file/directory name (indicate using ```--out dir/sampleid e.g. --out test_030923```)
+### Formatting input for SNP data  
 
-### convert settings  
-kit: ```forenseq``` (forenseq/powerseq) (invoke the ```--powerseq``` flag if using PowerSeq data)  
-nocombine: ```False``` (True/False); do not combine identical sequences during the ```convert``` step, if using STRait Razor data. (invoke the ```--nocombine``` flag)  
+If inputting data from either the UAS Sample Details Report/Phenotype Report/Sample Report or STRait Razor output, the user must first invoke the ```format``` step to extract necessary information and format for the ```convert``` step.  
 
-### filter settings  
-output_type: ```strmix``` (strmix/efm) (invoke ```--efm``` flag if creating output for EuroForMix)  
-profile_type: ```evidence``` (evidence/reference) (invoke ```--reference``` flag if creating a reference output file)  
-data_type: ```ngs``` (ce/ngs) (invoke ```--ce``` if using CE allele data)  
-info: ```True``` (True/False); create allele information file (invoke ```--noinfo``` flag to not create the allele information file)  
-separate: ```False``` (True/False); for EFM only, if True will create individual files for samples; if False, will create one file with all samples (invoke ```--separate``` flag to separate EFM output files)  
-nofilters: ```False``` (True/False); skip all filtering steps but still creates EFM/STRmix output files (invoke ```--nofilters``` flag)  
-strand: ```forward``` (uas/forward); indicates the strand orientation in which to report the alleles in the final output table (indicate using ```--strand```)
+The ```format``` command removes unnecessary rows/columns and outputs a table in CSV format containing the following columns:  
+*  Sample ID  
+*  Project ID  
+*  Analysis ID  
+*  SNP (rsID)  
+*  Reads  
+*  Forward Strand Allele  
+*  UAS orientation Allele  
+*  Type (ancestry/identity/phenotype/kintelligence)  
+*  Issues  
+
+### Converting to appropriately formatted files for use in EuroForMix  
+
+This step will convert the table generated in the ```format``` step into the correct format for use in EuroForMix. An analytical threshold can be applied (this is especially useful for data analyzed using STRait Razor) in this step.  
+
+If any samples are to be used as references, their IDs can be provided in the config file to create a separate file appropriately formatted for use as reference profiles in EFM. Any samples not specified as references are assumed to be evidence samples and will be formatted as such.  
+
+There is the option to create separate evidence files for each sample (as specified in the config file); this is especially useful for Kintelligence profiles given their larger size.  
+
+This command also changes the alleles to numeric (```A```=```1```, ```C```=```2```, ```G```=```3```, ```T```=```4```)
+
 
 ----
 

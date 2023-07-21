@@ -61,7 +61,6 @@ def create_sample_df(indiv_df, output_type, all_col):
         .unstack(0)
         .reset_index()
     )
-    compiled_table.to_csv("test.csv", index=False)
     try:
         compiled_table.columns = ["Marker", "Allele 1", "Allele 2", "Height 1", "Height 2"]
     except ValueError:
