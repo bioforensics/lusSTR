@@ -1,5 +1,5 @@
 # -------------------------------------------------------------------------------------------------
-# Copyright (c) 2020, DHS.
+# Copyright (c) 2023, DHS.
 #
 # This file is part of lusSTR (http://github.com/bioforensics/lusSTR) and is licensed under
 # the BSD license: see LICENSE.txt.

@@ -38,7 +38,7 @@ lusSTR utilizes the ```lusstr``` command to invoke various Snakemake workflows. 
 
 The ```lusstr snps``` command invokes the SNP analysis workflow. Please see below for further information on processing SNP data.
 ___
-### Creating the STR config file
+### Creating the SNP config file
 
 Running ```lusstr config``` creates a config file containing the default settings for the lusSTR STR analysis pipeline. The settings can be changed with command line arguments (see below) or by manually editing the config file. The default settings, along with their descriptions, are as follows:
 
