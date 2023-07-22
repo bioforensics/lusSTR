@@ -209,7 +209,7 @@ types: ```all``` choices are "all", "i" (identity SNPs only), "p" (phenotype onl
 nofilter: ```False``` (True/False); if no filtering is desired at the format step; if False, will remove any allele designated as Not Typed (invoke using the ```--nofiltering```)  
 
 ### convert settings  
-strand: ```forward``` (forward/uas); indicates which orientation to report the alleles for the SigPrep SNPs; uas indicates the orientation as reported by the UAS or the forward strand
+strand: ```forward``` (forward/uas); indicates which orientation to report the alleles for the SigPrep SNPs; uas indicates the orientation as reported by the UAS or the forward strand  
 references: ```None```; list IDs of the samples to be run as references in EFM; default is no reference samples  
 separate: ```False``` (True/False); if want to separate samples into individual files for use in EFM  
 thresh: ```0.03```; Analytical threshold value    

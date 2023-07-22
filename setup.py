@@ -30,7 +30,8 @@ setup(
             "lusSTR/tests/data/snps/*",
             "lusSTR/tests/data/RU_stutter_test/*",
             "lusSTR/tests/data/NGS_stutter_test/*",
-            "lusSTR/tests/data/kinsnps/*" "lusSTR/workflows/*",
+            "lusSTR/tests/data/kinsnps/*",
+            "lusSTR/workflows/*",
             "lusSTR/wrappers/*",
         ]
     },
