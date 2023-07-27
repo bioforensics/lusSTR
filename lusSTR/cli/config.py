@@ -55,6 +55,10 @@ def edit_snp_config(config, args):
             data["references"] = None
         if args.strand:
             data["strand"] = args.strand
+        if args.input:
+            data["samp_input"] = args.input
+        else:
+            data["samp_input"] = os.getcwd()
         return data
 
 
