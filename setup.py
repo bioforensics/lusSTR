@@ -31,6 +31,7 @@ setup(
             "lusSTR/tests/data/RU_stutter_test/*",
             "lusSTR/tests/data/NGS_stutter_test/*",
             "lusSTR/tests/data/kinsnps/*",
+            "lusSTR/tests/data/lusstr_output/*",
             "lusSTR/workflows/*",
             "lusSTR/wrappers/*",
         ]
