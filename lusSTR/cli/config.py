@@ -87,81 +87,89 @@ def edit_str_config(config, args):
         data["info"] = False
     if args.reference:
         data["profile_type"] = "reference"
-    if args.ce:
-        data["data_type"] = "ce"
     if args.efm:
         data["output_type"] = "efm"
     if args.strand:
         data["strand"] = args.strand
+    data["data_type"] = args.allele
     return data
 
 
 def subparser(subparsers):
-    p = subparsers.add_parser("config", description="Create config file for running STR pipeline")
-    p.add_argument(
+    p = subparsers.add_parser("config", description="Create config file for running lusSTR")
+    all_args = p.add_argument_group("General Settings")
+    all_args.add_argument(
         "-w", "--workdir", metavar="W", default=".",
         help="directory to add config file; default is current working directory")
-    p.add_argument(
+    all_args.add_argument(
         "--straitrazor", action="store_true",
         help="Use if sequences have been previously run through STRait Razor."
     )
-    p.add_argument("--input", help="Input file or directory")
-    p.add_argument("--out", "-o", help="Output file/directory name")
-    p.add_argument(
+    all_args.add_argument("--input", help="Input file or directory")
+    all_args.add_argument("--out", "-o", help="Output file/directory name")
+    all_args.add_argument(
+        "--nofiltering", action="store_true", 
+        help="For STRs, use to perform no filtering during the 'filter' step. For SNPs, "
+        "only alleles specified as 'Typed' by the UAS will be included at the 'format' step."
+    )
+    all_args.add_argument(
+        "--strand", choices=["uas", "forward"],
+        help="Specify the strand orientation for the final output files. UAS orientation is "
+        "default for STRs; forward strand is default for SNPs."
+    )
+
+    str_args = p.add_argument_group("Setting Specific for STR Workflow")
+    str_args.add_argument(
         "--powerseq", action="store_true",
         help="Use to indicate sequences were created using the PowerSeq Kit."
     )
-    p.add_argument(
+    str_args.add_argument(
         "--sex", action="store_true",
         help="Use if including the X and Y STR markers. Separate reports for these markers "
         "will be created.",
     )
-    p.add_argument(
+    str_args.add_argument(
         "--nocombine", action="store_true",
         help="Do not combine read counts for duplicate sequences within the UAS region "
         "during the 'convert' step. By default, read counts are combined for sequences "
         "not run through the UAS.",
     )
-    p.add_argument(
+    str_args.add_argument(
         "--reference", action="store_true", 
         help="Use for creating Reference profiles for STR workflow"
     )
-    p.add_argument("--efm", action="store_true",help="Use to create EuroForMix profiles")
-    p.add_argument("--ce", action="store_true", help="Use for CE data")
-    p.add_argument(
+    str_args.add_argument("--efm", action="store_true",help="Use to create EuroForMix profiles")
+    str_args.add_argument(
+        "--allele", choices=["ce", "ngs", "lusplus"], default="ce",
+        help="Specify the allele type for the files generated for use in STRmix or EuroForMix. "
+        "Options for STRmix: 'ce' or 'ngs'. Options for EuroForMix: 'ce' or 'lusplus'."
+    )
+    str_args.add_argument(
         "--noinfo", action="store_true", 
         help="Use to not create the Sequence Information File in the 'filter' step"
     )
-    p.add_argument(
+    str_args.add_argument(
         "--separate", action="store_true", 
         help="Use to separate EFM profiles in the 'filter' step."
     )
-    p.add_argument(
-        "--nofiltering", action="store_true", 
-        help="For STRs, use to perform no filtering during the 'filter' step. For SNPs, "
-        "only alleles specified as 'Typed' by the UAS will be included at the 'format' step."
-    )
-    p.add_argument(
-        "--snps", action="store_true",
-        help="Use to create a config file for the SNP workflow"
-    )
-    p.add_argument(
+
+    snp_args = p.add_argument_group("Setting Specific for SNP Workflow")
+    snp_args.add_argument(
         "--snp-type", default="all", dest="snptype",
         help="Specify the type of SNPs to include in the final report. 'p' will include only the "
         "Phenotype SNPs; 'a' will include only the Ancestry SNPs; 'i' will include only the "
         "Identity SNPs; and 'all' will include all SNPs. More than one type can be specified (e.g. "
         " 'p, a'). Default is all."
     )
-    p.add_argument(
+    snp_args.add_argument(
+        "--snps", action="store_true",
+        help="Use to create a config file for the SNP workflow"
+    )
+    snp_args.add_argument(
         "--kintelligence", action="store_true",
         help="Use if processing Kintelligence SNPs within a Kintellience Report(s)"
     )
-    p.add_argument(
+    snp_args.add_argument(
         "--snp-reference", dest="ref",
         help="Specify any references for SNP data for use in EFM."
-    )
-    p.add_argument(
-        "--strand", choices=["uas", "forward"],
-        help="Specify the strand orientation for the final output files. UAS orientation is "
-        "default for STRs; forward strand is default for SNPs."
     )

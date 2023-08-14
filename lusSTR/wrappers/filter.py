@@ -80,6 +80,13 @@ def process_strs(dict_loc, datatype, seq_col):
             data_order = data_combine.sort_values(by=["CE_Allele"], ascending=False).reset_index(
                 drop=True
             )
+        elif datatype == "lusplus":
+            data_combine = data.groupby(["SampleID", "Locus", "LUS_Plus"], as_index=False)[
+                "Reads"
+            ].sum()
+            data_order = data_combine.sort_values(by=["LUS_Plus"], ascending=False).reset_index(
+                drop=True
+            )
         else:
             data_combine = data[
                 [
@@ -112,27 +119,39 @@ def process_strs(dict_loc, datatype, seq_col):
         filtered_df = filters(data_order, locus, total_reads, datatype, brack_col)
         final_df = final_df.append(filtered_df)
         flags_df = flags_df.append(flags(filtered_df))
-    final_df = final_df.astype({"CE_Allele": "float64", "Reads": "int"})
+    if datatype == "lusplus":
+        final_df = final_df.astype({"Reads": "int"})
+    else:
+        final_df = final_df.astype({"CE_Allele": "float64", "Reads": "int"})
     return final_df, flags_df
 
 
-def EFM_output(profile, outfile, profile_type, separate=False):
+def EFM_output(profile, outfile, profile_type, data_type, separate=False):
     if profile_type == "reference":
         profile = profile[profile.allele_type == "real_allele"]
     else:
         profile = profile[profile.allele_type != "BelowAT"]
-    efm_profile = populate_efm_profile(profile)
-    if separate:
-        write_sample_specific_efm_profiles(efm_profile, profile_type, outfile)
+    if data_type == "ce":
+        allele_col = "CE_Allele"
+    elif data_type == "lusplus":
+        allele_col = "LUS_Plus"
     else:
-        write_aggregate_efm_profile(efm_profile, profile_type, outfile)
+        error_msg = "Incorrect allele type specified for EFM! " "Choose either 'ce' or 'lusplus'"
+        raise ValueError(error_msg)
+    efm_profile = populate_efm_profile(profile, allele_col)
+    if separate:
+        write_sample_specific_efm_profiles(efm_profile, profile_type, data_type, outfile)
+    else:
+        write_aggregate_efm_profile(efm_profile, profile_type, data_type, outfile)
 
 
-def populate_efm_profile(profile):
-    profile = profile.sort_values(by=["SampleID", "Locus", "CE_Allele"])
+def populate_efm_profile(profile, allele_col):
+    print(profile)
+    profile = profile.sort_values(by=["SampleID", "Locus", allele_col])
+    profile = profile.rename(columns=[{allele_col: "alleles"}])
     allele_heights = defaultdict(lambda: defaultdict(dict))
     for i, row in profile.iterrows():
-        allele_heights[row.SampleID][row.Locus][float(row.CE_Allele)] = int(row.Reads)
+        allele_heights[row.SampleID][row.Locus][float(row.alleles)] = int(row.Reads)
     max_num_alleles = determine_max_num_alleles(allele_heights)
     reformatted_profile = list()
     for sampleid, loci in allele_heights.items():
@@ -161,13 +180,13 @@ def populate_efm_profile(profile):
     return efm_profile
 
 
-def write_sample_specific_efm_profiles(efm_profile, profile_type, outdir):
+def write_sample_specific_efm_profiles(efm_profile, profile_type, data_type, outdir):
     Path(outdir).mkdir(parents=True, exist_ok=True)
     for sample in efm_profile.SampleName:
         sample_profile = efm_profile[efm_profile.SampleName == sample].reset_index(drop=True)
         sample_profile.dropna(axis=1, how="all", inplace=True)
         if profile_type == "evidence":
-            sample_profile.to_csv(f"{outdir}/{sample}_evidence_ce.csv", index=False)
+            sample_profile.to_csv(f"{outdir}/{sample}_evidence_{data_type}.csv", index=False)
         else:
             num_alleles = (len(sample_profile.columns) - 2) / 2
             if num_alleles > 2:
@@ -180,19 +199,21 @@ def write_sample_specific_efm_profiles(efm_profile, profile_type, outdir):
             for i in range(len(sample_profile)):
                 if pd.isna(sample_profile.loc[i, "Allele2"]):
                     sample_profile.loc[i, "Allele2"] = sample_profile.loc[i, "Allele1"]
-            sample_profile.iloc[:, :4].to_csv(f"{outdir}/{sample}_reference_ce.csv", index=False)
+            sample_profile.iloc[:, :4].to_csv(
+                f"{outdir}/{sample}_reference_{data_type}.csv", index=False
+            )
 
 
-def write_aggregate_efm_profile(efm_profile, profile_type, outfile):
+def write_aggregate_efm_profile(efm_profile, profile_type, data_type, outfile):
     Path(outfile).mkdir(parents=True, exist_ok=True)
     name = os.path.basename(outfile)
     if profile_type == "evidence":
-        efm_profile.to_csv(f"{outfile}/{name}_evidence_ce.csv", index=False)
+        efm_profile.to_csv(f"{outfile}/{name}_evidence_{data_type}.csv", index=False)
     else:
         for i in range(len(efm_profile)):
             if pd.isna(efm_profile.loc[i, "Allele2"]):
                 efm_profile.loc[i, "Allele2"] = efm_profile.loc[i, "Allele1"]
-        efm_profile.iloc[:, :4].to_csv(f"{outfile}/{name}_reference_ce.csv", index=False)
+        efm_profile.iloc[:, :4].to_csv(f"{outfile}/{name}_reference_{data_type}.csv", index=False)
 
 
 def determine_max_num_alleles(allele_heights):
@@ -302,7 +323,7 @@ def main(
     input = str(input)
     if profile_type not in ("evidence", "reference"):
         raise ValueError(f"unknown profile type '{profile_type}'")
-    if data_type not in ("ce", "ngs"):
+    if data_type not in ("ce", "ngs", "lusplus"):
         raise ValueError(f"unknown data type '{data_type}'")
     if output_type not in ("efm", "strmix"):
         raise ValueError(f"unknown output type '{output_type}'")
@@ -315,14 +336,14 @@ def main(
     if nofilters:
         full_df["allele_type"] = "real_allele"
         if output_type == "efm":
-            EFM_output(full_df, outpath, profile_type, separate)
+            EFM_output(full_df, outpath, profile_type, data_type, separate)
         else:
             STRmix_output(full_df, outpath, profile_type, data_type, seq_col)
     else:
         dict_loc = {k: v for k, v in full_df.groupby(["SampleID", "Locus"])}
         final_df, flags_df = process_strs(dict_loc, data_type, seq_col)
         if output_type == "efm":
-            EFM_output(final_df, outpath, profile_type, separate)
+            EFM_output(final_df, outpath, profile_type, data_type, separate)
         else:
             STRmix_output(final_df, outpath, profile_type, data_type, seq_col)
         if info:
