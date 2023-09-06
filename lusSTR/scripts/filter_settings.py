@@ -56,7 +56,7 @@ def multiple_allele_thresholds(metadata, locus_reads, locus_allele_info):
     for i in range(len(locus_allele_info)):  # check for alleles below detection threshold
         quest_al_reads = locus_allele_info.loc[i, "Reads"]
         if thresholds("Detection", metadata, locus_reads, quest_al_reads)[1] is False:
-            locus_allele_info = locus_allele_info.drop(locus_allele_info.index[i])
+            locus_allele_info = locus_allele_info.drop(index=i)
             locus_reads = thresholds("Detection", metadata, locus_reads, quest_al_reads)[0]
     locus_allele_info = locus_allele_info.reset_index(drop=True)
     for i in range(len(locus_allele_info)):  # check for alleles below AT threshold
