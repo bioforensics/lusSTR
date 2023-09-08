@@ -87,8 +87,8 @@ def edit_str_config(config, args):
         data["info"] = False
     if args.reference:
         data["profile_type"] = "reference"
-    if args.ce:
-        data["data_type"] = "ce"
+    if args.datatype:
+        data["data_type"] = args.datatype
     if args.efm:
         data["output_type"] = "efm"
     if args.strand:
@@ -127,7 +127,11 @@ def subparser(subparsers):
         help="Use for creating Reference profiles for STR workflow"
     )
     p.add_argument("--efm", action="store_true",help="Use to create EuroForMix profiles")
-    p.add_argument("--ce", action="store_true", help="Use for CE data")
+    p.add_argument(
+        "--str-type", choices=["ce", "sequence", "lusplus"], default="sequence",
+        dest="datatype", help="Data type for STRs. Options are: CE allele ('ce'), the bracketed "
+        "sequence ('sequence'), or LUS+ allele ('lusplus'). Default is 'sequence'.",
+    )
     p.add_argument(
         "--noinfo", action="store_true", 
         help="Use to not create the Sequence Information File in the 'filter' step"
