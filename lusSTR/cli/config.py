@@ -128,9 +128,9 @@ def subparser(subparsers):
     )
     p.add_argument("--efm", action="store_true",help="Use to create EuroForMix profiles")
     p.add_argument(
-        "--str-type", choices=["ce", "sequence", "lusplus"], default="sequence",
-        dest="datatype", help="Data type for STRs. Options are: CE allele ('ce'), the bracketed "
-        "sequence ('sequence'), or LUS+ allele ('lusplus'). Default is 'sequence'.",
+        "--str-type", choices=["ce", "ngs", "lusplus"], default="ngs",
+        dest="datatype", help="Data type for STRs. Options are: CE allele ('ce'), sequence "
+        "('ngs'), or LUS+ allele ('lusplus'). Default is 'ngs'.",
     )
     p.add_argument(
         "--noinfo", action="store_true", 

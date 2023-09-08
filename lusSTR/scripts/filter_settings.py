@@ -146,14 +146,20 @@ def allele_ident(
     locus_allele_info, init_type_all, metadata, ref_allele_reads, i, j, datatype, brack_col
 ):
     quest_al_reads = locus_allele_info.loc[j, "Reads"]
-    ref_allele = float(locus_allele_info.loc[i, "CE_Allele"])
-    question_allele = float(locus_allele_info.loc[j, "CE_Allele"])
-    if datatype == "ngs":
-        ref_bracket = locus_allele_info.loc[i, brack_col]
-        question_bracket = locus_allele_info.loc[j, brack_col]
-    else:
+    if datatype == "lusplus":
+        ref_allele = float(locus_allele_info.loc[i, "LUS_Plus"].split("_")[0])
+        question_allele = float(locus_allele_info.loc[j, "LUS_Plus"].split("_")[0])
         ref_bracket = None
         question_bracket = None
+    else:
+        ref_allele = float(locus_allele_info.loc[i, "CE_Allele"])
+        question_allele = float(locus_allele_info.loc[j, "CE_Allele"])
+        if datatype == "ngs":
+            ref_bracket = locus_allele_info.loc[i, brack_col]
+            question_bracket = locus_allele_info.loc[j, brack_col]
+        else:
+            ref_bracket = None
+            question_bracket = None
     locus_allele_info.loc[j, ["allele_type", "perc_stutter"]] = allele_type(
         ref_allele,
         question_allele,
@@ -430,10 +436,13 @@ def allele_imbalance_check(allele_df):
     return imbalance_df
 
 
-def check_D7(allele_df):
+def check_D7(allele_df, datatype):
     D7_df = pd.DataFrame(columns=["SampleID", "Locus", "Flags"])
     for i in range(len(allele_df)):
-        al = allele_df.loc[i, "CE_Allele"]
+        if datatype == "lusplus":
+            al = allele_df.loc[i, "LUS_Plus"].split("_")[0]
+        else:
+            al = allele_df.loc[i, "CE_Allele"]
         try:
             if str(al).split(".")[1] == "1" and allele_df.loc[i, "allele_type"] != "BelowAT":
                 print("D7 microvariants detected! Check flagged file for details.")
@@ -447,11 +456,11 @@ def check_D7(allele_df):
     return D7_df
 
 
-def flags(allele_df):
+def flags(allele_df, datatype):
     flags_df = pd.DataFrame(columns=["SampleID", "Locus", "Flags"])
     flags_df = flags_df.append(allele_counts(allele_df))
     flags_df = flags_df.append(allele_imbalance_check(allele_df))
-    flags_df = flags_df.append(check_D7(allele_df))
+    flags_df = flags_df.append(check_D7(allele_df, datatype))
     return flags_df
 
 
