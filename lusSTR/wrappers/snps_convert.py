@@ -48,10 +48,18 @@ def create_output_table(sample_df, orientation, separate, output_type, uas):
         all_samples_df = all_samples_df.append(compiled_table)
         if separate:
             Path(f"{output_type}_samples").mkdir(parents=True, exist_ok=True)
+            if output_type == "evidence":
+                separated_table = bin_snps(compiled_table)
             compiled_table.to_csv(
                 f"{output_type}_samples/{sample}_snp_{output_type}.csv", index=False, sep="\t"
             )
     return all_samples_df
+
+
+def bin_snps(sample_file):
+    print(sample_file)
+    # sample_file["Total_Reads"]
+    # sorted_file = sample_file.sort_values(by=[""])
 
 
 def create_sample_df(indiv_df, output_type, all_col):
@@ -117,6 +125,8 @@ def main(input, output, kit, strand, separate, refs, uas, thresh):
         results = input_file
     else:
         results = straitrazor_filtering(input_file, thresh)
+    if refs is None:
+        refs = []
     if "," in refs:
         ref_ids = []
         ref_samples = pd.DataFrame()
