@@ -135,7 +135,7 @@ def subparser(subparsers):
     p.add_argument(
         "--separate", action="store_true", 
         help="Use to separate EFM profiles in the 'filter' step. If specifying for SNPs, "
-        "each sample will also be separated into 10 different sets for mixture deconvolution."
+        "each sample will also be separated into 10 different bins for mixture deconvolution."
     )
     p.add_argument(
         "--nofiltering", action="store_true", 
