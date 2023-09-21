@@ -51,7 +51,7 @@ def create_output_table(sample_df, orientation, separate, output_type, uas):
             if output_type == "evidence":
                 separated_table = bin_snps(compiled_table, output_type, sample)
                 separated_table.to_csv(
-                    f"{output_type}_samples/{sample}_snpsetscombined_{output_type}.csv",
+                    f"evidence_samples/{sample}_snpsetscombined_evidence.csv",
                     index=False,
                     sep="\t",
                 )
