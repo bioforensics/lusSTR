@@ -55,6 +55,7 @@ def create_output_table(sample_df, orientation, separate, output_type, uas):
                     index=False,
                     sep="\t",
                 )
+            print(separated_table)
             compiled_table.to_csv(
                 f"{output_type}_samples/{sample}_snp_{output_type}.csv", index=False, sep="\t"
             )
