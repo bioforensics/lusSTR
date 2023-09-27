@@ -233,11 +233,9 @@ def test_snp_bins(tmp_path):
     lusSTR.cli.main(lusSTR.cli.get_parser().parse_args(arglist))
     all_arglist = ["snps", "all", "-w", str(tmp_path)]
     lusSTR.cli.main(lusSTR.cli.get_parser().parse_args(all_arglist))
+    with open(obs_out, "r") as fh:
+        print(fh.read(), end="")
     assert filecmp.cmp(exp_out, obs_out) is True
     for snp_set in range(0, 10):
-        assert (
-            os.path.exists(
-                f"{str(tmp_path)}/evidence_samples/Kin_pos_1ng_snp_evidence_set{snp_set}.csv"
-            )
-            is True
-        )
+        path = tmp_path / f"evidence_samples/Kin_pos_1ng_snp_evidence_set{snp_set}.csv"
+        assert path.is_file()
