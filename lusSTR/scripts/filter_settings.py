@@ -11,15 +11,15 @@
 # -------------------------------------------------------------------------------------------------
 
 from collections import defaultdict
-import importlib.resources
 import json
 import numpy as np
 import pandas as pd
+from pkg_resources import resource_filename
 import re
 
 
 def get_filter_metadata_file():
-    return str(importlib.resources.files("lusSTR").joinpath("data/filters.json"))
+    return resource_filename("lusSTR", "data/filters.json")
 
 
 with open(get_filter_metadata_file(), "r") as fh:
