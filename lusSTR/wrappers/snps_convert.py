@@ -45,7 +45,7 @@ def create_output_table(sample_df, orientation, separate, output_type, uas):
             compiled_table = check_allele_calls(compiled_table, output_type)
         compiled_table = compiled_table.replace(allele_des)
         compiled_table.insert(0, "Sample Name", sample)
-        all_samples_df = all_samples_df.append(compiled_table)
+        all_samples_df = pd.concat([all_samples_df, compiled_table])
         if separate:
             Path(f"{output_type}_samples").mkdir(parents=True, exist_ok=True)
             if output_type == "evidence":
@@ -78,7 +78,7 @@ def bin_snps(sample_file, output_type, sample):
                 start : len(sorted_file),
             ].reset_index(drop=True)
         bin_df["Sample Name"] = bin_df["Sample Name"] + "_set" + str(snp_num)
-        compiled_table = compiled_table.append(bin_df)
+        compiled_table = pd.concat([compiled_table, bin_df])
         bin_df.to_csv(
             f"{output_type}_samples/{sample}_snp_{output_type}_set{snp_num}.csv",
             index=False,
