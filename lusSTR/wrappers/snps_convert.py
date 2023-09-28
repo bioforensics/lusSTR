@@ -10,15 +10,15 @@
 # Development Center.
 # -------------------------------------------------------------------------------------------------
 
+import importlib.resources
 import json
 import os
 import pandas as pd
 from pathlib import Path
-from pkg_resources import resource_filename
 
 
 def get_snp_metadata_file():
-    return resource_filename("lusSTR", "data/snp_data.json")
+    return str(importlib.resources.files("lusSTR").joinpath("data/snp_data.json"))
 
 
 with open(get_snp_metadata_file(), "r") as fh:
