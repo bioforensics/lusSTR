@@ -45,13 +45,46 @@ def create_output_table(sample_df, orientation, separate, output_type, uas):
             compiled_table = check_allele_calls(compiled_table, output_type)
         compiled_table = compiled_table.replace(allele_des)
         compiled_table.insert(0, "Sample Name", sample)
-        all_samples_df = all_samples_df.append(compiled_table)
+        all_samples_df = pd.concat([all_samples_df, compiled_table])
         if separate:
             Path(f"{output_type}_samples").mkdir(parents=True, exist_ok=True)
+            if output_type == "evidence":
+                separated_table = bin_snps(compiled_table, output_type, sample)
+                separated_table.to_csv(
+                    f"evidence_samples/{sample}_snpsetscombined_evidence.csv",
+                    index=False,
+                    sep="\t",
+                )
             compiled_table.to_csv(
                 f"{output_type}_samples/{sample}_snp_{output_type}.csv", index=False, sep="\t"
             )
     return all_samples_df
+
+
+def bin_snps(sample_file, output_type, sample):
+    height_cols = [col for col in sample_file.columns if "Height" in col]
+    sample_file["Total_Reads"] = sample_file[height_cols].sum(axis=1)
+    sorted_file = sample_file.sort_values(by=["Total_Reads", "Marker"])
+    compiled_table = pd.DataFrame()
+    for snp_num in range(0, 10):
+        start = snp_num * 1000
+        if snp_num != 9:
+            end = start + 1000
+            bin_df = sorted_file.iloc[
+                start:end,
+            ].reset_index(drop=True)
+        else:
+            bin_df = sorted_file.iloc[
+                start : len(sorted_file),
+            ].reset_index(drop=True)
+        bin_df["Sample Name"] = bin_df["Sample Name"] + "_set" + str(snp_num)
+        compiled_table = pd.concat([compiled_table, bin_df])
+        bin_df.to_csv(
+            f"{output_type}_samples/{sample}_snp_{output_type}_set{snp_num}.csv",
+            index=False,
+            sep="\t",
+        )
+    return compiled_table
 
 
 def create_sample_df(indiv_df, output_type, all_col):
@@ -117,6 +150,8 @@ def main(input, output, kit, strand, separate, refs, uas, thresh):
         results = input_file
     else:
         results = straitrazor_filtering(input_file, thresh)
+    if refs is None:
+        refs = []
     if "," in refs:
         ref_ids = []
         ref_samples = pd.DataFrame()
