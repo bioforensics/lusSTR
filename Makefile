@@ -6,7 +6,7 @@ help: Makefile
 
 ## test:      run the automated test suite and print coverage information
 test:
-	pytest -m "not snps" --cov=lusSTR --doctest-modules lusSTR/tests/test_*.py
+	pytest --cov=lusSTR --doctest-modules lusSTR/tests/test_*.py
 
 ## style:     check code style
 style:
