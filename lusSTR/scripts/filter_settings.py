@@ -149,17 +149,16 @@ def allele_ident(
     if datatype == "lusplus":
         ref_allele = float(locus_allele_info.loc[i, "LUS_Plus"].split("_")[0])
         question_allele = float(locus_allele_info.loc[j, "LUS_Plus"].split("_")[0])
-        ref_bracket = None
-        question_bracket = None
+        ref_altformat = locus_allele_info.loc[i, "LUS_Plus"]
+        question_altformat = locus_allele_info.loc[j, "LUS_Plus"]
     else:
         ref_allele = float(locus_allele_info.loc[i, "CE_Allele"])
         question_allele = float(locus_allele_info.loc[j, "CE_Allele"])
+        ref_altformat = None
+        question_altformat = None
         if datatype == "ngs":
-            ref_bracket = locus_allele_info.loc[i, brack_col]
-            question_bracket = locus_allele_info.loc[j, brack_col]
-        else:
-            ref_bracket = None
-            question_bracket = None
+            ref_altformat = locus_allele_info.loc[i, brack_col]
+            question_altformat = locus_allele_info.loc[j, brack_col]
     locus_allele_info.loc[j, ["allele_type", "perc_stutter"]] = allele_type(
         ref_allele,
         question_allele,
@@ -169,8 +168,8 @@ def allele_ident(
         ref_allele_reads,
         locus_allele_info.loc[j, "allele1_ref_reads"],
         locus_allele_info,
-        ref_bracket,
-        question_bracket,
+        ref_altformat,
+        question_altformat,
         datatype,
         brack_col,
     )
@@ -178,13 +177,13 @@ def allele_ident(
         if "/" in locus_allele_info.loc[j, "allele_type"] and pd.isnull(
             locus_allele_info.loc[j, "parent_allele2"]
         ):
-            stut_allele2 = ref_allele if datatype == "ce" else ref_bracket
+            stut_allele2 = ref_allele if datatype == "ce" else ref_altformat
             locus_allele_info.loc[j, ["parent_allele2", "allele2_ref_reads"]] = [
                 stut_allele2,
                 ref_allele_reads,
             ]
         elif pd.isnull(locus_allele_info.loc[j, "parent_allele1"]):
-            stut_allele1 = ref_allele if datatype == "ce" else ref_bracket
+            stut_allele1 = ref_allele if datatype == "ce" else ref_altformat
             locus_allele_info.loc[j, ["parent_allele1", "allele1_ref_reads"]] = [
                 stut_allele1,
                 ref_allele_reads,
@@ -269,8 +268,8 @@ def allele_type(
     ref_reads,
     al1_ref_reads,
     all_type_df,
-    ref_bracket,
-    question_bracket,
+    ref_altformat,
+    question_altformat,
     datatype,
     brack_col,
 ):
@@ -281,8 +280,17 @@ def allele_type(
     allele_diff = round(ref - ce, 1)
     if allele_diff == 1 and ref_reads > quest_al_reads:  # -1 stutter
         if (
-            datatype == "ngs" and bracketed_stutter_id(ref_bracket, question_bracket, -1) == -1
-        ) or datatype == "ce":
+            (
+                datatype == "ngs"
+                and bracketed_stutter_id(ref_altformat, question_altformat, -1) == -1
+            )
+            or datatype == "ce"
+            or (
+                datatype == "lusplus"
+                and lusplus_stutter_id(ref_altformat, question_altformat, -1) == -1
+            )
+        ):
+            print("-1 stutter")
             all_type, stut_perc = minus1_stutter(
                 all_type,
                 stutter_thresh,
@@ -293,11 +301,20 @@ def allele_type(
                 quest_al_reads,
             )
     elif allele_diff == 2 and ref_reads > quest_al_reads:  # -2 stutter
-        allele = ce if datatype == "ce" else question_bracket
+        allele = ce if datatype == "ce" else question_altformat
         if check_2stutter(all_type_df, datatype, allele, brack_col)[0] is True:
+            print("-2 stutter")
             if (
-                datatype == "ngs" and bracketed_stutter_id(ref_bracket, question_bracket, -2) == -2
-            ) or datatype == "ce":
+                (
+                    datatype == "ngs"
+                    and bracketed_stutter_id(ref_altformat, question_altformat, -2) == -2
+                )
+                or datatype == "ce"
+                or (
+                    datatype == "lusplus"
+                    and lusplus_stutter_id(ref_altformat, question_altformat, -2) == -2
+                )
+            ):
                 ref_reads = check_2stutter(all_type_df, datatype, allele, brack_col)[1]
                 stutter_thresh_reads = stutter_thresh * ref_reads
                 all_type, stut_perc = minus2_stutter(
@@ -311,8 +328,14 @@ def allele_type(
                 )
     elif allele_diff == -1 and ref_reads > quest_al_reads:  # +1 stutter
         if (
-            datatype == "ngs" and bracketed_stutter_id(ref_bracket, question_bracket, 1) == 1
-        ) or datatype == "ce":
+            (datatype == "ngs" and bracketed_stutter_id(ref_altformat, question_altformat, 1) == 1)
+            or datatype == "ce"
+            or (
+                datatype == "lusplus"
+                and lusplus_stutter_id(ref_altformat, question_altformat, 1) == 1
+            )
+        ):
+            print("+1 stutter")
             all_type, stut_perc = plus1_stutter(
                 all_type, stutter_thresh, forward_thresh, ref_reads, al1_ref_reads, quest_al_reads
             )
@@ -348,9 +371,11 @@ def check_2stutter(stutter_df, allele_des, allele, brack_col):
                     break
         else:
             for k, row in stutter_df.iterrows():
-                bracket_test = stutter_df.loc[k, brack_col]
-                if bracketed_stutter_id(bracket_test, allele, -1) == -1:
-                    is_true, reads = True, stutter_df.loc[k, "Reads"]
+                if allele_des == "ngs":
+                    bracket_test = stutter_df.loc[k, brack_col]
+                    if bracketed_stutter_id(bracket_test, allele, -1) == -1:
+                        is_true, reads = True, stutter_df.loc[k, "Reads"]
+                # else:
     return is_true, reads
 
 
@@ -413,6 +438,19 @@ def bracketed_stutter_id(ref_bracket, quest_bracket, stutter_id):
                     stutter = None
                     break
     return stutter
+
+
+def lusplus_stutter_id(ref_lusp, question_lusp, stutter_id):
+    print(ref_lusp)
+    print(question_lusp)
+    nonmatch = 0
+    for j in range(1, len(ref_lusp.split("_"))):
+        if float(ref_lusp.split("_")[j]) == round(float(question_lusp.split("_")[j]) - 1, 2):
+            nonmatch += 1
+        elif float(ref_lusp.split("_")[j]) != float(question_lusp.split("_")[j]):
+            nonmatch -= 1
+    print(nonmatch)
+    return nonmatch
 
 
 def allele_imbalance_check(allele_df):
