@@ -147,12 +147,14 @@ def populate_efm_profile(profile, data_type):
             "'ce' or 'lusplus'."
         )
         raise ValueError(message)
-    print(profile)
     profile = profile.sort_values(by=["SampleID", "Locus", prof_col])
     profile = profile.rename(columns={prof_col: "Allele"})
     allele_heights = defaultdict(lambda: defaultdict(dict))
     for i, row in profile.iterrows():
-        allele_heights[row.SampleID][row.Locus][float(row.Allele)] = int(row.Reads)
+        if data_type == "ce":
+            allele_heights[row.SampleID][row.Locus][float(row.Allele)] = int(row.Reads)
+        else:
+            allele_heights[row.SampleID][row.Locus][row.Allele] = int(row.Reads)
     max_num_alleles = determine_max_num_alleles(allele_heights)
     reformatted_profile = list()
     for sampleid, loci in allele_heights.items():
