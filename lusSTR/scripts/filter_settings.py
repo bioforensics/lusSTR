@@ -37,8 +37,8 @@ def filters(locus_allele_info, locus, locus_reads, datatype, brack_col):
         locus_allele_info = ce_filtering(
             locus_allele_info, locus_reads, metadata, datatype, brack_col
         )
-        if datatype == "ngs":
-            locus_allele_info = same_size_filter(locus_allele_info, metadata)
+        if datatype != "ce":
+            locus_allele_info = same_size_filter(locus_allele_info, metadata, datatype)
     return locus_allele_info
 
 
@@ -290,7 +290,6 @@ def allele_type(
                 and lusplus_stutter_id(ref_altformat, question_altformat, -1) == -1
             )
         ):
-            print("-1 stutter")
             all_type, stut_perc = minus1_stutter(
                 all_type,
                 stutter_thresh,
@@ -303,7 +302,6 @@ def allele_type(
     elif allele_diff == 2 and ref_reads > quest_al_reads:  # -2 stutter
         allele = ce if datatype == "ce" else question_altformat
         if check_2stutter(all_type_df, datatype, allele, brack_col)[0] is True:
-            print("-2 stutter")
             if (
                 (
                     datatype == "ngs"
@@ -335,7 +333,6 @@ def allele_type(
                 and lusplus_stutter_id(ref_altformat, question_altformat, 1) == 1
             )
         ):
-            print("+1 stutter")
             all_type, stut_perc = plus1_stutter(
                 all_type, stutter_thresh, forward_thresh, ref_reads, al1_ref_reads, quest_al_reads
             )
@@ -441,15 +438,12 @@ def bracketed_stutter_id(ref_bracket, quest_bracket, stutter_id):
 
 
 def lusplus_stutter_id(ref_lusp, question_lusp, stutter_id):
-    print(ref_lusp)
-    print(question_lusp)
     nonmatch = 0
     for j in range(1, len(ref_lusp.split("_"))):
         if float(ref_lusp.split("_")[j]) == round(float(question_lusp.split("_")[j]) - 1, 2):
             nonmatch += 1
         elif float(ref_lusp.split("_")[j]) != float(question_lusp.split("_")[j]):
             nonmatch -= 1
-    print(nonmatch)
     return nonmatch
 
 
@@ -502,8 +496,10 @@ def flags(allele_df, datatype):
     return flags_df
 
 
-def same_size_filter(df, metadata):
+def same_size_filter(df, metadata, datatype):
     final_df = pd.DataFrame()
+    if datatype == "lusplus":
+        df["CE_Allele"] = df["LUS_Plus"].apply(lambda x: x.split("_")[0])
     al_list = df["CE_Allele"].unique()
     for ce_allele in al_list:
         df_filt = (
@@ -522,4 +518,6 @@ def same_size_filter(df, metadata):
         else:
             final_df = final_df.append(df_filt)
     final_df = final_df.reset_index(drop=True)
+    if datatype == "lusplus":
+        final_df = final_df.drop("CE_Allele", axis=1)
     return final_df

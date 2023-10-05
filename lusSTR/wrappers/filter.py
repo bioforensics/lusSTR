@@ -234,6 +234,12 @@ def STRmix_output(profile, outdir, profile_type, data_type, seq_col):
         filtered_df = profile[profile.allele_type != "BelowAT"]
     if data_type == "ce":
         strmix_profile = strmix_ce_processing(filtered_df)
+    elif data_type == "lusplus":
+        error_message = (
+            "LUSPlus specified as the data type. STRmix does not accept LUSPlus! Please rerun with "
+            "'ce' or 'ngs' specified."
+        )
+        raise ValueError(error_message)
     else:
         strmix_profile = filtered_df.loc[:, ["SampleID", "Locus", "CE_Allele", seq_col, "Reads"]]
         strmix_profile.rename(
