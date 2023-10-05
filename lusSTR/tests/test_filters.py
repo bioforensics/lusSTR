@@ -164,7 +164,18 @@ def test_EFMoutput_format(tmp_path):
     exp_info_out = data_file("RU_stutter_test/test_filtering_EFMoutput_sequence_info.csv")
     obs_out = str(tmp_path / "WD/test_output/test_output_evidence_ce.csv")
     obs_info_out = str(tmp_path / "WD/test_output/test_output_sequence_info.csv")
-    arglist = ["config", "-w", str_path, "-o", "test_output", "--efm", "--ce", "--input", "WD"]
+    arglist = [
+        "config",
+        "-w",
+        str_path,
+        "-o",
+        "test_output",
+        "--efm",
+        "--str-type",
+        "ce",
+        "--input",
+        "WD",
+    ]
     lusSTR.cli.main(lusSTR.cli.get_parser().parse_args(arglist))
     shutil.copyfile(inputfile, os.path.join(str_path, "test_output.csv"))
     shutil.copyfile(inputfile, os.path.join(str_path, "test_output.txt"))
@@ -183,10 +194,17 @@ def test_STRmixoutput_format(outputdir, datatype, tmp_path):
     exp_info_out = data_file(f"{outputdir}STRmix_Files_sequence_info.csv")
     obs_out = str(tmp_path / f"WD/STRmix_Files/Sample1_evidence_{datatype}.csv")
     obs_info_out = str(tmp_path / f"WD/STRmix_Files/STRmix_Files_sequence_info.csv")
-    if datatype == "ngs":
-        arglist = ["config", "-w", str_path, "--input", "WD", "-o", "STRmix_Files"]
-    else:
-        arglist = ["config", "-w", str_path, "--input", "WD", "-o", "STRmix_Files", "--ce"]
+    arglist = [
+        "config",
+        "-w",
+        str_path,
+        "--input",
+        "WD",
+        "-o",
+        "STRmix_Files",
+        "--str-type",
+        datatype,
+    ]
     lusSTR.cli.main(lusSTR.cli.get_parser().parse_args(arglist))
     shutil.copyfile(inputfile, os.path.join(str_path, "STRmix_Files.csv"))
     shutil.copyfile(inputfile, os.path.join(str_path, "STRmix_Files.txt"))
@@ -229,7 +247,17 @@ def test_efm_reference(tmp_path):
     inputfile = data_file("test_references.txt")
     exp_out = data_file("RU_stutter_test/EFM_test_reference.csv")
     obs_efm_out = str(tmp_path / "WD/lusstr_output/lusstr_output_reference_ce.csv")
-    arglist = ["config", "-w", str_path, "--input", "WD", "--efm", "--reference", "--ce"]
+    arglist = [
+        "config",
+        "-w",
+        str_path,
+        "--input",
+        "WD",
+        "--efm",
+        "--reference",
+        "--str-type",
+        "ce",
+    ]
     lusSTR.cli.main(lusSTR.cli.get_parser().parse_args(arglist))
     shutil.copyfile(inputfile, os.path.join(str_path, "lusstr_output.csv"))
     shutil.copyfile(inputfile, os.path.join(str_path, "lusstr_output.txt"))
@@ -248,20 +276,18 @@ def test_strmix_reference(outputdir, datatype, tmp_path):
     inputfile = data_file("test_references.txt")
     exp_out = data_file(f"{outputdir}Positive_Control_reference_{datatype}.csv")
     obs_out = str(tmp_path / f"WD/STRmix_Files/Positive_Control_reference_{datatype}.csv")
-    if datatype == "ngs":
-        arglist = ["config", "-w", str_path, "--input", "WD", "-o", "STRmix_Files", "--reference"]
-    else:
-        arglist = [
-            "config",
-            "-w",
-            str_path,
-            "--input",
-            "WD",
-            "-o",
-            "STRmix_Files",
-            "--ce",
-            "--reference",
-        ]
+    arglist = [
+        "config",
+        "-w",
+        str_path,
+        "--input",
+        "WD",
+        "-o",
+        "STRmix_Files",
+        "--reference",
+        "--str-type",
+        datatype,
+    ]
     lusSTR.cli.main(lusSTR.cli.get_parser().parse_args(arglist))
     shutil.copyfile(inputfile, os.path.join(str_path, "STRmix_Files.csv"))
     shutil.copyfile(inputfile, os.path.join(str_path, "STRmix_Files.txt"))

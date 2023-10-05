@@ -254,7 +254,7 @@ def test_config(tmp_path):
 
 def test_config_settings(tmp_path):
     obs_config = str(tmp_path / "config.yaml")
-    arglist = ["config", "-w", str(tmp_path), "--straitrazor", "--reference", "--ce"]
+    arglist = ["config", "-w", str(tmp_path), "--straitrazor", "--reference", "--str-type", "ce"]
     lusSTR.cli.main(lusSTR.cli.get_parser().parse_args(arglist))
     with open(obs_config, "r") as file:
         data = yaml.safe_load(file)
