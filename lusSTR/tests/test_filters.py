@@ -242,11 +242,14 @@ def test_flags(tmp_path):
     assert filecmp.cmp(exp_out, obs_out) is True
 
 
-def test_efm_reference(tmp_path):
+@pytest.mark.parametrize(
+    "outputdir, datatype", [("RU_stutter_test/", "ce"), ("LUSPlus_stutter_test/", "lusplus")]
+)
+def test_efm_reference(outputdir, datatype, tmp_path):
     str_path = str(tmp_path / "WD")
     inputfile = data_file("test_references.txt")
-    exp_out = data_file("RU_stutter_test/EFM_test_reference.csv")
-    obs_efm_out = str(tmp_path / "WD/lusstr_output/lusstr_output_reference_ce.csv")
+    exp_out = data_file(f"{outputdir}EFM_test_reference_{datatype}.csv")
+    obs_efm_out = str(tmp_path / f"WD/lusstr_output/lusstr_output_reference_{datatype}.csv")
     arglist = [
         "config",
         "-w",
@@ -256,15 +259,13 @@ def test_efm_reference(tmp_path):
         "--efm",
         "--reference",
         "--str-type",
-        "ce",
+        datatype,
     ]
     lusSTR.cli.main(lusSTR.cli.get_parser().parse_args(arglist))
     shutil.copyfile(inputfile, os.path.join(str_path, "lusstr_output.csv"))
     shutil.copyfile(inputfile, os.path.join(str_path, "lusstr_output.txt"))
-    print(os.listdir(str_path))
     all_arglist = ["strs", "all", "-w", str_path]
     lusSTR.cli.main(lusSTR.cli.get_parser().parse_args(all_arglist))
-    print(os.listdir(f"{str_path}/lusstr_output"))
     assert filecmp.cmp(exp_out, obs_efm_out) is True
 
 
