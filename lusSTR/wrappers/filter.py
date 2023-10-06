@@ -77,16 +77,10 @@ def process_strs(dict_loc, datatype, seq_col):
             data_combine = data.groupby(["SampleID", "Locus", "CE_Allele"], as_index=False)[
                 "Reads"
             ].sum()
-            data_order = data_combine.sort_values(by=["CE_Allele"], ascending=False).reset_index(
-                drop=True
-            )
         elif datatype == "lusplus":
-            data_combine = data.groupby(["SampleID", "Locus", "LUS_Plus"], as_index=False)[
-                "Reads"
-            ].sum()
-            data_order = data_combine.sort_values(by=["LUS_Plus"], ascending=False).reset_index(
-                drop=True
-            )
+            data_combine = data.groupby(
+                ["SampleID", "Locus", "CE_Allele", "LUS_Plus"], as_index=False
+            )["Reads"].sum()
         else:
             data_combine = data[
                 [
@@ -98,9 +92,9 @@ def process_strs(dict_loc, datatype, seq_col):
                     "Reads",
                 ]
             ]
-            data_order = data_combine.sort_values(by=["CE_Allele"], ascending=False).reset_index(
-                drop=True
-            )
+        data_order = data_combine.sort_values(by=["CE_Allele"], ascending=False).reset_index(
+            drop=True
+        )
         total_reads = data_order["Reads"].sum()
         locus = key[1]
         data_order = data_order.reindex(

@@ -224,6 +224,7 @@ def minus2_stutter(
     al1_ref_reads,
     quest_al_reads,
 ):
+    print(all_type)
     stut_perc = None
     if all_type == "-1_stutter":
         all_thresh = stutter_thresh_reads + np.ceil(stutter_thresh * al1_ref_reads)
@@ -242,6 +243,7 @@ def minus2_stutter(
 def plus1_stutter(
     all_type, stutter_thresh, forward_thresh, ref_reads, al1_ref_reads, quest_al_reads
 ):
+    print(all_type)
     stut_perc = None
     if all_type == "-1_stutter":
         all_thresh = np.ceil(stutter_thresh * al1_ref_reads) + forward_stut_thresh(
@@ -254,6 +256,7 @@ def plus1_stutter(
         )
         all_type = output_allele_call(quest_al_reads, all_thresh, "+1_stutter/-2_stutter")
     elif quest_al_reads <= forward_stut_thresh(forward_thresh, stutter_thresh, ref_reads):
+        print("here")
         all_type = "+1_stutter"
         stut_perc = round(quest_al_reads / ref_reads, 3)
     return all_type, stut_perc
@@ -324,6 +327,7 @@ def allele_type(
                     al1_ref_reads,
                     quest_al_reads,
                 )
+                print(all_type)
     elif allele_diff == -1 and ref_reads > quest_al_reads:  # +1 stutter
         if (
             (datatype == "ngs" and bracketed_stutter_id(ref_altformat, question_altformat, 1) == 1)
@@ -372,7 +376,10 @@ def check_2stutter(stutter_df, allele_des, allele, brack_col):
                     bracket_test = stutter_df.loc[k, brack_col]
                     if bracketed_stutter_id(bracket_test, allele, -1) == -1:
                         is_true, reads = True, stutter_df.loc[k, "Reads"]
-                # else:
+                else:
+                    lusp_test = stutter_df.loc[k, "LUS_Plus"]
+                    if lusplus_stutter_id(lusp_test, allele, -1) == -1:
+                        is_true, reads = True, stutter_df.loc[k, "Reads"]
     return is_true, reads
 
 
@@ -438,13 +445,23 @@ def bracketed_stutter_id(ref_bracket, quest_bracket, stutter_id):
 
 
 def lusplus_stutter_id(ref_lusp, question_lusp, stutter_id):
-    nonmatch = 0
+    diffcount = 0
+    stutter = None
     for j in range(1, len(ref_lusp.split("_"))):
-        if float(ref_lusp.split("_")[j]) == round(float(question_lusp.split("_")[j]) - 1, 2):
-            nonmatch += 1
-        elif float(ref_lusp.split("_")[j]) != float(question_lusp.split("_")[j]):
-            nonmatch -= 1
-    return nonmatch
+        diff = float(question_lusp.split("_")[j]) - round(float(ref_lusp.split("_")[j]))
+        if diff == 0:
+            continue
+        elif diff == stutter_id:
+            if diffcount == 0:
+                diffcount = diff
+                stutter = stutter_id
+            else:
+                stutter = None
+                break
+        else:
+            stutter = None
+            break
+    return stutter
 
 
 def allele_imbalance_check(allele_df):
