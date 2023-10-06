@@ -395,8 +395,8 @@ def test_lusplus_sequence_info(tmp_path):
         "--efm",
     ]
     lusSTR.cli.main(lusSTR.cli.get_parser().parse_args(arglist))
-    shutil.copyfile(inputfile, os.path.join(str_path, "LUSplus.csv"))
-    shutil.copyfile(inputfile, os.path.join(str_path, "LUSplus.txt"))
+    shutil.copyfile(inputfile, os.path.join(str_path, "LUSPlus.csv"))
+    shutil.copyfile(inputfile, os.path.join(str_path, "LUSPlus.txt"))
     all_arglist = ["strs", "all", "-w", str_path]
     lusSTR.cli.main(lusSTR.cli.get_parser().parse_args(all_arglist))
     assert filecmp.cmp(exp_out, obs_out) is True
