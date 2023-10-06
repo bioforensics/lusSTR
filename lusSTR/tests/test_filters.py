@@ -387,7 +387,7 @@ def test_lusplus_sequence_info(tmp_path):
         "--input",
         "WD",
         "-o",
-        "LUSplus",
+        "LUSPlus",
         "--strand",
         "forward",
         "--str-type",
