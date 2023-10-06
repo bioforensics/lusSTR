@@ -378,7 +378,7 @@ def test_forward_strand_orientation(tmp_path):
 def test_lusplus_sequence_info(tmp_path):
     str_path = str(tmp_path / "WD")
     inputfile = data_file("test_stutter_lusp.txt")
-    exp_out = data_file("LUSPlus_stutter_test/LUSplus_sequence_info.csv")
+    exp_out = data_file("LUSPlus_stutter_test/LUSPlus_sequence_info.csv")
     obs_out = str(tmp_path / f"WD/LUSplus/LUSPlus_sequence_info.csv")
     arglist = [
         "config",
