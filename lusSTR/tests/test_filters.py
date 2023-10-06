@@ -373,3 +373,30 @@ def test_forward_strand_orientation(tmp_path):
     all_arglist = ["strs", "all", "-w", str_path]
     lusSTR.cli.main(lusSTR.cli.get_parser().parse_args(all_arglist))
     assert filecmp.cmp(exp_out, obs_out) is True
+
+
+def test_lusplus_sequence_info(tmp_path):
+    str_path = str(tmp_path / "WD")
+    inputfile = data_file("test_stutter_lusp.txt")
+    exp_out = data_file("LUSPlus_stutter_test/LUSplus_sequence_info.csv")
+    obs_out = str(tmp_path / f"WD/LUSplus/LUSPlus_sequence_info.csv")
+    arglist = [
+        "config",
+        "-w",
+        str_path,
+        "--input",
+        "WD",
+        "-o",
+        "LUSplus",
+        "--strand",
+        "forward",
+        "--str-type",
+        "lusplus",
+        "--efm",
+    ]
+    lusSTR.cli.main(lusSTR.cli.get_parser().parse_args(arglist))
+    shutil.copyfile(inputfile, os.path.join(str_path, "LUSplus.csv"))
+    shutil.copyfile(inputfile, os.path.join(str_path, "LUSplus.txt"))
+    all_arglist = ["strs", "all", "-w", str_path]
+    lusSTR.cli.main(lusSTR.cli.get_parser().parse_args(all_arglist))
+    assert filecmp.cmp(exp_out, obs_out) is True
