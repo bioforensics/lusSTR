@@ -1,0 +1,28 @@
+SampleName,Marker,Allele1,Allele2,Allele3,Allele4,Height1,Height2,Height3,Height4
+Sample1,CSF1PO,,,,,,,,
+Sample1,D10S1248,,,,,,,,
+Sample1,D12S391,,,,,,,,
+Sample1,D13S317,,,,,,,,
+Sample1,D16S539,,,,,,,,
+Sample1,D17S1301,,,,,,,,
+Sample1,D18S51,,,,,,,,
+Sample1,D19S433,,,,,,,,
+Sample1,D1S1656,,,,,,,,
+Sample1,D20S482,,,,,,,,
+Sample1,D21S11,,,,,,,,
+Sample1,D22S1045,,,,,,,,
+Sample1,D2S1338,,,,,,,,
+Sample1,D2S441,,,,,,,,
+Sample1,D3S1358,,,,,,,,
+Sample1,D4S2408,10_10_0,8_8_0,9_9_0,,900,1000,1357,
+Sample1,D5S818,,,,,,,,
+Sample1,D6S1043,,,,,,,,
+Sample1,D7S820,,,,,,,,
+Sample1,D8S1179,12_9_1_0,13_10_1_0,13_11_1_0,14_11_1_0,26,89,95,739
+Sample1,D9S1122,10_10,11_11,12_10,13_11,87,991,108,948
+Sample1,FGA,18_10_3_0,20_12_3_0,22_14_3_0,23_15_3_0,181,1750,262,1436
+Sample1,PENTA D,13_13,15_15,,,1000,50,,
+Sample1,PENTA E,7_7,,,,505,,,
+Sample1,TH01,6_6,7_7,,,1632,2197,,
+Sample1,TPOX,,,,,,,,
+Sample1,VWA,,,,,,,,

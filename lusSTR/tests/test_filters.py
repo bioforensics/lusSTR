@@ -157,12 +157,15 @@ def test_plus1stutter(
     assert test_stut_perc == stut_perc
 
 
-def test_EFMoutput_format(tmp_path):
+@pytest.mark.parametrize(
+    "outputdir, datatype", [("RU_stutter_test/", "ce"), ("LUSPlus_stutter_test/", "lusplus")]
+)
+def test_EFMoutput_format(outputdir, datatype, tmp_path):
     str_path = str(tmp_path / "WD")
     inputfile = data_file("test_stutter.txt")
-    exp_out = data_file("RU_stutter_test/test_filtering_EFMoutput.csv")
-    exp_info_out = data_file("RU_stutter_test/test_filtering_EFMoutput_sequence_info.csv")
-    obs_out = str(tmp_path / "WD/test_output/test_output_evidence_ce.csv")
+    exp_out = data_file(f"{outputdir}test_filtering_EFMoutput_{datatype}.csv")
+    exp_info_out = data_file(f"{outputdir}test_filtering_EFMoutput_sequence_info.csv")
+    obs_out = str(tmp_path / f"WD/test_output/test_output_evidence_{datatype}.csv")
     obs_info_out = str(tmp_path / "WD/test_output/test_output_sequence_info.csv")
     arglist = [
         "config",
@@ -172,7 +175,7 @@ def test_EFMoutput_format(tmp_path):
         "test_output",
         "--efm",
         "--str-type",
-        "ce",
+        datatype,
         "--input",
         "WD",
     ]
@@ -328,6 +331,23 @@ def test_ngs_stutter(ref_bracket, quest_bracket, stutter, actual_call):
     test_stut = lusSTR.scripts.filter_settings.bracketed_stutter_id(
         ref_bracket, quest_bracket, stutter
     )
+    assert test_stut == actual_call
+
+
+@pytest.mark.parametrize(
+    "ref_lusp, question_lusp, stutter, actual_call",
+    [
+        ("10_10_1_0", "9_9_1_0", -1, -1),
+        ("10_10_1_0", "9_10_0_0", -1, -1),
+        ("12_11_1_0", "11_9_2_0", -1, None),
+        ("19_13_1", "20_14_1", 1, 1),
+        ("19_13_1", "20_15_0", 1, None),
+        ("19_13_1", "17_11_1", -2, -2),
+        ("19_13_1", "17_12_0", -2, None),
+    ],
+)
+def test_lusplus_stutter(ref_lusp, question_lusp, stutter, actual_call):
+    test_stut = lusSTR.scripts.filter_settings.lusplus_stutter_id(ref_lusp, question_lusp, stutter)
     assert test_stut == actual_call
 
 
