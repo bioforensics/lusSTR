@@ -189,21 +189,18 @@ def process_kin(input, nofilter):
             data = process_v5(table)
         else:
             data = process_v0(table)
-        print(data)
         data = data[["Locus", "Reads", "Allele Name", "Typed Allele?"]]
         if nofilter:
             data_typed = data
         else:
             data_typed = data[data["Typed Allele?"] == "Yes"]
-        print(data_typed)
         data_filt = data_filt.append(data_typed).reset_index(drop=True)
     sampid = table.iloc[2, 1]
     projid = table.iloc[3, 1]
     analyid = table.iloc[4, 1]
     data_df = []
-    print(data_filt)
     for j, row in data_filt.iterrows():
-        tmp_row = create_row(data_filt, j, sampid, projid, analyid)
+        tmp_row = create_row(data_filt, j, sampid, projid, analyid, uas_version)
         data_df.append(tmp_row)
     data_final = pd.DataFrame(
         data_df,
@@ -249,7 +246,7 @@ def process_v5(table):
     return data
 
 
-def create_row(df, j, sampleid, projectid, analysisid):
+def create_row(df, j, sampleid, projectid, analysisid, ver):
     """
     This function first it identifies the Sig Prep SNPs (reverse complements those SNPs if
     neccesary and checks SNP allele calls for incorrect allele calls), and reports all SNP calls
@@ -257,10 +254,12 @@ def create_row(df, j, sampleid, projectid, analysisid):
     """
     snpid = df.loc[j, "Locus"]
     uas_allele = df.loc[j, "Allele Name"]
-    print(snpid)
     try:
         metadata = snp_marker_data[snpid]
-        forward_strand_allele = check_rev_comp(uas_allele, snpid, metadata)
+        if ver == "2.0":
+            forward_strand_allele = check_rev_comp(uas_allele, snpid, metadata)
+        else:
+            forward_strand_allele = uas_allele
         flag = flags(df, forward_strand_allele, j, metadata)
         type = snp_type_dict[metadata["Type"]]
     except KeyError:
