@@ -185,21 +185,23 @@ def process_kin(input, nofilter):
     for sheet in sheet_names:
         file_sheet = file[sheet]
         table = pd.DataFrame(file_sheet.values)
-        if version == "2.5.0":
+        if uas_version == "2.5.0":
             data = process_v5(table)
         else:
             data = process_v0(table)
+        print(data)
         data = data[["Locus", "Reads", "Allele Name", "Typed Allele?"]]
         if nofilter:
             data_typed = data
         else:
             data_typed = data[data["Typed Allele?"] == "Yes"]
+        print(data_typed)
         data_filt = data_filt.append(data_typed).reset_index(drop=True)
-
     sampid = table.iloc[2, 1]
     projid = table.iloc[3, 1]
     analyid = table.iloc[4, 1]
     data_df = []
+    print(data_filt)
     for j, row in data_filt.iterrows():
         tmp_row = create_row(data_filt, j, sampid, projid, analyid)
         data_df.append(tmp_row)
@@ -230,9 +232,7 @@ def determine_version(file):
         version = table.loc[table[0] == "Software Version", 1].iloc[0]
     except IndexError:
         version = 2.0
-
-
-return version
+    return version
 
 
 def process_v0(table):
@@ -245,7 +245,7 @@ def process_v0(table):
 def process_v5(table):
     offset = table[table.iloc[:, 4] == "Locus"].index.tolist()[0]
     data = table.iloc[offset + 1 :, 4:8]
-    data.columns = [["Locus", "Allele Name", "Typed Allele?", "Reads"]]
+    data.columns = ["Locus", "Allele Name", "Typed Allele?", "Reads"]
     return data
 
 
@@ -257,6 +257,7 @@ def create_row(df, j, sampleid, projectid, analysisid):
     """
     snpid = df.loc[j, "Locus"]
     uas_allele = df.loc[j, "Allele Name"]
+    print(snpid)
     try:
         metadata = snp_marker_data[snpid]
         forward_strand_allele = check_rev_comp(uas_allele, snpid, metadata)
