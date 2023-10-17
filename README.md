@@ -222,11 +222,11 @@ One additional argument can be provided with ```lusstr config --snps```:
 ___
 ## Running the lusSTR SNP workflow
 
-The lusSTR SNP workflow consists of three steps:  
+The lusSTR SNP workflow consists of two steps:  
 (1) ```format```: formatting input and calling alleles if using STRait Razor data  
-(2) ```convert```: applying analytical threshold; converting data to correct format for input into EuroForMix;  
+(2) ```convert```: applying analytical threshold and converting data to correct format for input into EuroForMix
 
-Any or all steps can be run. In order to run all three steps, the following command can be used:  
+Either the first step, format, or both steps can be run. In order to run both steps, the following command can be used:  
 ```
 lusstr snps all
 ```
@@ -238,16 +238,12 @@ The default working directory is the current directory.
 lusstr snps all -w lusstr_files/  
 ```
 
-Individual steps can also be run  
+Individual format step can also be run  
 ```
 lusstr snps format -w lusstr_files/  
 ```
 
-```
-lusstr snps convert -w lusstr_files/  
-```
-
-**In order to run the ```convert``` step, the appropriately formatted ```.csv``` file containing the sequences normally created in the ```format``` step must be present in the working directory. See the below ```Usage``` section for specific information about that file (required columns, etc.).**  
+**In order to run the ```all``` step, the appropriately formatted ```.csv``` file containing the sequences normally created in the ```format``` step must be present in the working directory. See the below ```Usage``` section for specific information about that file (required columns, etc.).**  
 
 ----
 
@@ -256,7 +252,7 @@ lusstr snps convert -w lusstr_files/
 
 ### Formatting input for SNP data  
 
-If inputting data from either the UAS Sample Details Report/Phenotype Report/Sample Report or STRait Razor output, the user must first invoke the ```format``` step to extract necessary information and format for the ```convert``` step.  
+If inputting data from either the UAS Sample Details Report/Phenotype Report/Sample Report or STRait Razor output, the user must first invoke the ```format``` step to extract necessary information and format for the final ```convert``` step.  
 
 The ```format``` command removes unnecessary rows/columns and outputs a table in CSV format containing the following columns:  
 *  Sample ID  
@@ -271,7 +267,7 @@ The ```format``` command removes unnecessary rows/columns and outputs a table in
 
 ### Converting to appropriately formatted files for use in EuroForMix  
 
-This step will convert the table generated in the ```format``` step into the correct format for use in EuroForMix. An analytical threshold can be applied (this is especially useful for data analyzed using STRait Razor) in this step.  
+This final step will convert the table generated in the ```format``` step into the correct format for use in EuroForMix. An analytical threshold can be applied (this is especially useful for data analyzed using STRait Razor) in this step.  
 
 If any samples are to be used as references, their IDs can be provided in the config file to create a separate file appropriately formatted for use as reference profiles in EFM. Any samples not specified as references are assumed to be evidence samples and will be formatted as such.  
 
