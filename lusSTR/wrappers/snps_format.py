@@ -228,7 +228,7 @@ def determine_version(file):
     try:
         version = table.loc[table[0] == "Software Version", 1].iloc[0]
     except IndexError:
-        version = 2.0
+        version = "2.0"
     return version
 
 
