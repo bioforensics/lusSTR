@@ -181,12 +181,14 @@ def process_kin(input, nofilter):
     file = openpyxl.load_workbook(input)
     sheet_names = ["Ancestry SNPs", "Phenotype SNPs", "Identity SNPs", "Kinship SNPs"]
     data_filt = pd.DataFrame()
+    uas_version = determine_version(file)
     for sheet in sheet_names:
         file_sheet = file[sheet]
         table = pd.DataFrame(file_sheet.values)
-        offset = table[table.iloc[:, 0] == "Locus"].index.tolist()[0]
-        data = table.iloc[offset + 1 :]
-        data.columns = table.iloc[offset]
+        if version == "2.5.0":
+            data = process_v5(table)
+        else:
+            data = process_v0(table)
         data = data[["Locus", "Reads", "Allele Name", "Typed Allele?"]]
         if nofilter:
             data_typed = data
@@ -219,6 +221,32 @@ def process_kin(input, nofilter):
         by=["Project", "SampleID", "SNP", "Reads"], ascending=False
     ).reset_index(drop=True)
     return data_final_sort
+
+
+def determine_version(file):
+    file_sheet = file["Settings"]
+    table = pd.DataFrame(file_sheet.values)
+    try:
+        version = table.loc[table[0] == "Software Version", 1].iloc[0]
+    except IndexError:
+        version = 2.0
+
+
+return version
+
+
+def process_v0(table):
+    offset = table[table.iloc[:, 0] == "Locus"].index.tolist()[0]
+    data = table.iloc[offset + 1 :]
+    data.columns = table.iloc[offset]
+    return data
+
+
+def process_v5(table):
+    offset = table[table.iloc[:, 4] == "Locus"].index.tolist()[0]
+    data = table.iloc[offset + 1 :, 4:8]
+    data.columns = [["Locus", "Allele Name", "Typed Allele?", "Reads"]]
+    return data
 
 
 def create_row(df, j, sampleid, projectid, analysisid):
