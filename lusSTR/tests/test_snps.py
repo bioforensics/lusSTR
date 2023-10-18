@@ -244,7 +244,7 @@ def test_snp_bins(tmp_path):
 def test_uas_version5(tmp_path):
     input_sample = data_file("NA24385 Sample Report 2023_09_07_15_11_11.xlsx")
     exp_out = data_file("kinsnps/uasversion_snp_evidence.csv")
-    obs_out = str(tmp_path / "kin_v5_snps_evidence.csv")
+    obs_out = str(tmp_path / "kin_v5_snp_evidence.csv")
     arglist = [
         "config",
         "-w",
@@ -259,3 +259,4 @@ def test_uas_version5(tmp_path):
     lusSTR.cli.main(lusSTR.cli.get_parser().parse_args(arglist))
     all_arglist = ["snps", "all", "-w", str(tmp_path)]
     lusSTR.cli.main(lusSTR.cli.get_parser().parse_args(all_arglist))
+    assert filecmp.cmp(exp_out, obs_out) is True
