@@ -95,7 +95,7 @@ Positive Control	Project1	Analysis1	rs3737576	60	T	A	Ancestry
 Positive Control	Project1	Analysis1	rs354439	110	A	T	Identity	
 Positive Control	Project1	Analysis1	rs338882	66	G	C	Identity	
 Positive Control	Project1	Analysis1	rs321198	196	T	T	Identity	
-Positive Control	Project1	Analysis1	rs312262906_N29insA	273	C	C	Phenotype	
+Positive Control	Project1	Analysis1	rs312262906	273	C	C	Phenotype	
 Positive Control	Project1	Analysis1	rs310644	34	T	A	Ancestry	
 Positive Control	Project1	Analysis1	rs2920816	59	A	T	Identity	
 Positive Control	Project1	Analysis1	rs28777	168	A	A	Phenotype	
