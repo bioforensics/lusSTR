@@ -155,8 +155,6 @@ def process_sigprep_snps(foren_df, sampid, projid, analyid):
     data_list = []
     for j, row in foren_df.iterrows():
         snpid = foren_df.loc[j, "Locus"]
-        # if snpid == "N29insA" or snpid == "rs312262906_N29insA":
-        #    snpid = "rs312262906"
         metadata = snp_marker_data[snpid]
         type = metadata["Type"]
         uas_allele = foren_df.loc[j, "Allele Name"]
