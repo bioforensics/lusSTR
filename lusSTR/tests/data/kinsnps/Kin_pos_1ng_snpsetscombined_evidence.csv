@@ -1911,7 +1911,6 @@ Kin_pos_1ng_set1	rs543502	3	4	42.0	33.0	75.0
 Kin_pos_1ng_set1	rs6671673	4	2	45.0	30.0	75.0
 Kin_pos_1ng_set1	rs7176165	4		75.0		75.0
 Kin_pos_1ng_set1	rs7706034	1		75.0		75.0
-Kin_pos_1ng_set1	N29insA	2		76.0		76.0
 Kin_pos_1ng_set1	rs1009930	1		76.0		76.0
 Kin_pos_1ng_set1	rs10167782	4		76.0		76.0
 Kin_pos_1ng_set1	rs10196560	2		76.0		76.0
@@ -1949,6 +1948,7 @@ Kin_pos_1ng_set1	rs2723696	1		76.0		76.0
 Kin_pos_1ng_set1	rs2816999	4	2	40.0	36.0	76.0
 Kin_pos_1ng_set1	rs295340	1		76.0		76.0
 Kin_pos_1ng_set1	rs3018845	2	4	44.0	32.0	76.0
+Kin_pos_1ng_set1	rs312262906	2		76.0		76.0
 Kin_pos_1ng_set1	rs340828	3	1	46.0	30.0	76.0
 Kin_pos_1ng_set1	rs369005	2	4	39.0	37.0	76.0
 Kin_pos_1ng_set1	rs3923451	4		76.0		76.0
