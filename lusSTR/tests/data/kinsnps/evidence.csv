@@ -1,5 +1,4 @@
 Sample Name	Marker	Allele 1	Allele 2	Height 1	Height 2
-Kin_pos_1ng	N29insA	2		76.0	
 Kin_pos_1ng	rs1000022	2	4	176.0	142.0
 Kin_pos_1ng	rs1000137	4	2	66.0	36.0
 Kin_pos_1ng	rs10002268	4		365.0	
@@ -4521,6 +4520,7 @@ Kin_pos_1ng	rs3117915	1	3	85.0	117.0
 Kin_pos_1ng	rs3118520	3		554.0	
 Kin_pos_1ng	rs312154	4	3	69.0	51.0
 Kin_pos_1ng	rs312185	1	2	152.0	146.0
+Kin_pos_1ng	rs312262906	2		76.0	
 Kin_pos_1ng	rs312272	2		32.0	
 Kin_pos_1ng	rs3124028	4		96.0	
 Kin_pos_1ng	rs3124041	3		221.0	

@@ -132,6 +132,7 @@ def parse_snp_table_from_sheet(infile, sheet, snp_type_arg, nofilter):
     else:
         data_typed = data[data["Typed Allele?"] == "Yes"]
     concat_df = pd.DataFrame()
+    data_typed = data_typed.replace("rs312262906_N29insA", "rs312262906")
     if snp_type_arg == "all":
         concat_df = data_typed
     else:
@@ -253,6 +254,8 @@ def create_row(df, j, sampleid, projectid, analysisid, ver):
     in the same general format.
     """
     snpid = df.loc[j, "Locus"]
+    if snpid == "N29insA" or snpid == "rs312262906_N29insA":
+        snpid = "rs312262906"
     uas_allele = df.loc[j, "Allele Name"]
     try:
         metadata = snp_marker_data[snpid]
@@ -445,8 +448,8 @@ def collect_snp_info(infile, snpid, j, allowed_snptype, name, analysis):
     incorrect allele call. This function also determines if the SNP should be included in the
     final table based on the specified SNP type from the CLI.
     """
-    if snpid == "N29insA":
-        snpid = "rs312262906_N29insA"
+    if snpid == "N29insA" or snpid == "rs312262906_N29insA":
+        snpid = "rs312262906"
     metadata = snp_marker_data[snpid]
     current_snp_type = metadata["Type"]
     seq = infile.loc[j, "Sequence"]
@@ -455,7 +458,7 @@ def collect_snp_info(infile, snpid, j, allowed_snptype, name, analysis):
     all_rows = []
     if len(seq) > snp_loc:
         snp_call = seq[snp_loc]
-        if snpid == "rs312262906_N29insA" and snp_call == "A":
+        if snpid == "rs312262906" and snp_call == "A":
             snp_call = "insA"
         if metadata["ReverseCompNeeded"] == "Yes":
             snp_call_uas = complement_base(snp_call)

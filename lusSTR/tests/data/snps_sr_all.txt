@@ -149,7 +149,7 @@ SampleID	Project	Analysis	SNP	Reads	Forward_Strand_Allele	UAS_Allele	Type	Issues
 2800M_STRaitRazor	snps	snps	rs338882	70	G	C	Identity	
 2800M_STRaitRazor	snps	snps	rs321198	111	T	T	Identity	
 2800M_STRaitRazor	snps	snps	rs321198	1	C	C	Identity	
-2800M_STRaitRazor	snps	snps	rs312262906_N29insA	379	C	C	Phenotype	
+2800M_STRaitRazor	snps	snps	rs312262906	379	C	C	Phenotype	
 2800M_STRaitRazor	snps	snps	rs310644	50	T	A	Ancestry	
 2800M_STRaitRazor	snps	snps	rs2920816	73	A	T	Identity	
 2800M_STRaitRazor	snps	snps	rs2920816	1	T	A	Identity	Allele call does not match expected allele!

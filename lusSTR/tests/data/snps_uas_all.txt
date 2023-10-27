@@ -145,8 +145,8 @@ Positive Control	Project1	Analysis1	rs338882	66	G	C	Identity
 Positive Control	Project1	Analysis1	rs338882	0	A	T	Identity	Contains untyped allele
 Positive Control	Project1	Analysis1	rs321198	196	T	T	Identity	
 Positive Control	Project1	Analysis1	rs321198	0	C	C	Identity	Contains untyped allele
-Positive Control	Project1	Analysis1	rs312262906_N29insA	273	C	C	Phenotype	
-Positive Control	Project1	Analysis1	rs312262906_N29insA	0	insA	insA	Phenotype	Contains untyped allele
+Positive Control	Project1	Analysis1	rs312262906	273	C	C	Phenotype	
+Positive Control	Project1	Analysis1	rs312262906	0	insA	insA	Phenotype	Contains untyped allele
 Positive Control	Project1	Analysis1	rs310644	34	T	A	Ancestry	
 Positive Control	Project1	Analysis1	rs310644	0	C	G	Ancestry	Contains untyped allele
 Positive Control	Project1	Analysis1	rs2920816	59	A	T	Identity	
