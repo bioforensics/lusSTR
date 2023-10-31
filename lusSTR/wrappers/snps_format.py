@@ -132,6 +132,7 @@ def parse_snp_table_from_sheet(infile, sheet, snp_type_arg, nofilter):
     else:
         data_typed = data[data["Typed Allele?"] == "Yes"]
     concat_df = pd.DataFrame()
+    data_typed = data_typed.replace("rs312262906_N29insA", "rs312262906")
     if snp_type_arg == "all":
         concat_df = data_typed
     else:
@@ -181,25 +182,26 @@ def process_kin(input, nofilter):
     file = openpyxl.load_workbook(input)
     sheet_names = ["Ancestry SNPs", "Phenotype SNPs", "Identity SNPs", "Kinship SNPs"]
     data_filt = pd.DataFrame()
+    uas_version = determine_version(file)
     for sheet in sheet_names:
         file_sheet = file[sheet]
         table = pd.DataFrame(file_sheet.values)
-        offset = table[table.iloc[:, 0] == "Locus"].index.tolist()[0]
-        data = table.iloc[offset + 1 :]
-        data.columns = table.iloc[offset]
+        if uas_version == "2.5.0":
+            data = process_v5(table)
+        else:
+            data = process_v0(table)
         data = data[["Locus", "Reads", "Allele Name", "Typed Allele?"]]
         if nofilter:
             data_typed = data
         else:
             data_typed = data[data["Typed Allele?"] == "Yes"]
         data_filt = data_filt.append(data_typed).reset_index(drop=True)
-
     sampid = table.iloc[2, 1]
     projid = table.iloc[3, 1]
     analyid = table.iloc[4, 1]
     data_df = []
     for j, row in data_filt.iterrows():
-        tmp_row = create_row(data_filt, j, sampid, projid, analyid)
+        tmp_row = create_row(data_filt, j, sampid, projid, analyid, uas_version)
         data_df.append(tmp_row)
     data_final = pd.DataFrame(
         data_df,
@@ -221,17 +223,46 @@ def process_kin(input, nofilter):
     return data_final_sort
 
 
-def create_row(df, j, sampleid, projectid, analysisid):
+def determine_version(file):
+    file_sheet = file["Settings"]
+    table = pd.DataFrame(file_sheet.values)
+    try:
+        version = table.loc[table[0] == "Software Version", 1].iloc[0]
+    except IndexError:
+        version = "2.0"
+    return version
+
+
+def process_v0(table):
+    offset = table[table.iloc[:, 0] == "Locus"].index.tolist()[0]
+    data = table.iloc[offset + 1 :]
+    data.columns = table.iloc[offset]
+    return data
+
+
+def process_v5(table):
+    offset = table[table.iloc[:, 4] == "Locus"].index.tolist()[0]
+    data = table.iloc[offset + 1 :, 4:8]
+    data.columns = ["Locus", "Allele Name", "Typed Allele?", "Reads"]
+    return data
+
+
+def create_row(df, j, sampleid, projectid, analysisid, ver):
     """
     This function first it identifies the Sig Prep SNPs (reverse complements those SNPs if
     neccesary and checks SNP allele calls for incorrect allele calls), and reports all SNP calls
     in the same general format.
     """
     snpid = df.loc[j, "Locus"]
+    if snpid == "N29insA" or snpid == "rs312262906_N29insA":
+        snpid = "rs312262906"
     uas_allele = df.loc[j, "Allele Name"]
     try:
         metadata = snp_marker_data[snpid]
-        forward_strand_allele = check_rev_comp(uas_allele, snpid, metadata)
+        if ver == "2.0":
+            forward_strand_allele = check_rev_comp(uas_allele, snpid, metadata)
+        else:
+            forward_strand_allele = uas_allele
         flag = flags(df, forward_strand_allele, j, metadata)
         type = snp_type_dict[metadata["Type"]]
     except KeyError:
@@ -417,8 +448,8 @@ def collect_snp_info(infile, snpid, j, allowed_snptype, name, analysis):
     incorrect allele call. This function also determines if the SNP should be included in the
     final table based on the specified SNP type from the CLI.
     """
-    if snpid == "N29insA":
-        snpid = "rs312262906_N29insA"
+    if snpid == "N29insA" or snpid == "rs312262906_N29insA":
+        snpid = "rs312262906"
     metadata = snp_marker_data[snpid]
     current_snp_type = metadata["Type"]
     seq = infile.loc[j, "Sequence"]
@@ -427,7 +458,7 @@ def collect_snp_info(infile, snpid, j, allowed_snptype, name, analysis):
     all_rows = []
     if len(seq) > snp_loc:
         snp_call = seq[snp_loc]
-        if snpid == "rs312262906_N29insA" and snp_call == "A":
+        if snpid == "rs312262906" and snp_call == "A":
             snp_call = "insA"
         if metadata["ReverseCompNeeded"] == "Yes":
             snp_call_uas = complement_base(snp_call)

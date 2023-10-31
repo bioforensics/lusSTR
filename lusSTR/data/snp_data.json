@@ -623,7 +623,7 @@
         "ReverseCompNeeded": "Yes",
         "Coord": 50
     },
-    "rs312262906_N29insA": {
+    "rs312262906": {
         "Type": "p",
         "Alleles": ["C", "insA"],
         "ReverseCompNeeded": "No",

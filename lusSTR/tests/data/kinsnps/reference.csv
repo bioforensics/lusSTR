@@ -1,5 +1,4 @@
 Sample Name	Marker	Allele 1	Allele 2
-Kin_pos_reference	N29insA	2	2
 Kin_pos_reference	rs1000022	2	4
 Kin_pos_reference	rs1000137	4	2
 Kin_pos_reference	rs10002268	4	4
@@ -4521,6 +4520,7 @@ Kin_pos_reference	rs3117915	1	3
 Kin_pos_reference	rs3118520	3	3
 Kin_pos_reference	rs312154	4	3
 Kin_pos_reference	rs312185	1	2
+Kin_pos_reference	rs312262906	2	2
 Kin_pos_reference	rs312272	2	2
 Kin_pos_reference	rs3124028	4	4
 Kin_pos_reference	rs3124041	3	3
