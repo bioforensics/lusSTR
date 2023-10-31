@@ -12,6 +12,8 @@
 
 import csv
 import json
+import matplotlib.pyplot as plt
+import numpy as np
 import os
 import pandas as pd
 import re
@@ -20,6 +22,7 @@ from lusSTR.scripts.marker import get_str_metadata_file, STRMarkerObject
 from lusSTR.scripts.repeat import collapse_all_repeats, collapse_repeats_by_length
 from lusSTR.scripts.repeat import sequence_to_bracketed_form, split_by_n
 from lusSTR.scripts.repeat import reverse_complement, reverse_complement_bracketed
+from matplotlib.backends.backend_pdf import PdfPages
 
 
 with open(get_str_metadata_file(), "r") as fh:
@@ -170,6 +173,23 @@ def sort_table(table):
     return sorted_table
 
 
+def marker_plots(df, output_name):
+    df["CE_Allele"] = df["CE_Allele"].astype(float)
+    with PdfPages(f"{output_name}_marker_plots.pdf") as pdf:
+        fig = plt.figure(figsize=(30, 30))
+        n = 0
+        for marker in df["Locus"].unique():
+            n += 1
+            marker_df = df[df["Locus"] == marker].sort_values(by="CE_Allele")
+            ax = fig.add_subplot(6, 5, n)
+            ax.bar(marker_df["CE_Allele"], marker_df["Reads"])
+            ax.set_xticks(
+                np.arange(min(marker_df["CE_Allele"]) - 1, max(marker_df["CE_Allele"]) + 1, 1.0)
+            )
+            ax.title.set_text(marker)
+        pdf.savefig()
+
+
 def main(input, out, kit, uas, sex, nocombine):
     input = str(input)
     out = str(out)
@@ -202,6 +222,7 @@ def main(input, out, kit, uas, sex, nocombine):
             autosomal_final_table.to_csv(out, sep="\t", index=False)
     else:
         autosomal_final_table.to_csv(out, sep="\t", index=False)
+    marker_plots(autosomal_final_table, output_name)
 
 
 if __name__ == "__main__":
