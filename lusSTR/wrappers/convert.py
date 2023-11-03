@@ -190,8 +190,10 @@ def marker_plots(df, output_name, sex):
 def make_plot(df, id, sex, sameyaxis):
     sample_df = df[df["SampleID"] == id]
     sample_id = f"{id}_sexchr" if sex else id
-    max_yvalue = int(math.ceil(max(sample_df["Reads"]) / 100)) * 100
-    increase_value = int(math.ceil((max_yvalue / 5)) / 100) * 100
+    max_reads = max(sample_df["Reads"])
+    n = 100 if max_reads > 1000 else 10
+    max_yvalue = int(math.ceil(max_reads / n)) * n
+    increase_value = int(math.ceil((max_yvalue / 5)) / n) * n
     fig = plt.figure(figsize=(31, 31)) if sex is True else plt.figure(figsize=(30, 30))
     n = 0
     for marker in sample_df["Locus"].unique():
