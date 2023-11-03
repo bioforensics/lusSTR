@@ -215,7 +215,6 @@ def make_plot(df, id, sex, sameyaxis):
         plt.text(
             0.4, 0.95, "Marker Plots With Custom Y-Axis Scale", transform=fig.transFigure, size=24
         )
-    # return ax
 
 
 def main(input, out, kit, uas, sex, nocombine):
