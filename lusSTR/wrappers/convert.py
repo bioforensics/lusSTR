@@ -12,6 +12,7 @@
 
 import csv
 import json
+import math
 import matplotlib.pyplot as plt
 import numpy as np
 import os
@@ -23,6 +24,7 @@ from lusSTR.scripts.repeat import collapse_all_repeats, collapse_repeats_by_leng
 from lusSTR.scripts.repeat import sequence_to_bracketed_form, split_by_n
 from lusSTR.scripts.repeat import reverse_complement, reverse_complement_bracketed
 from matplotlib.backends.backend_pdf import PdfPages
+from pathlib import Path
 
 
 with open(get_str_metadata_file(), "r") as fh:
@@ -174,25 +176,44 @@ def sort_table(table):
 
 
 def marker_plots(df, output_name, sex):
+    Path("MarkerPlots").mkdir(parents=True, exist_ok=True)
     df["CE_Allele"] = df["CE_Allele"].astype(float)
     for id in df["SampleID"].unique():
-        sample_df = df[df["SampleID"] == id]
-        sample_id = f"{id}_sexchr" if sex is True else id
-        with PdfPages(f"{output_name}_{sample_id}_marker_plots.pdf") as pdf:
-            fig = plt.figure(figsize=(31, 31)) if sex is True else plt.figure(figsize=(30, 30))
-            n = 0
-            for marker in sample_df["Locus"].unique():
-                n += 1
-                marker_df = sample_df[sample_df["Locus"] == marker].sort_values(by="CE_Allele")
-                ax = fig.add_subplot(6, 6, n) if sex is True else fig.add_subplot(6, 5, n)
-                ax.bar(marker_df["CE_Allele"], marker_df["Reads"])
-                ax.set_xticks(
-                    np.arange(
-                        min(marker_df["CE_Allele"]) - 1, max(marker_df["CE_Allele"]) + 1, 1.0
-                    )
-                )
-                ax.title.set_text(marker)
+        sample_id = f"{id}_sexchr" if sex else id
+        with PdfPages(f"MarkerPlots/{output_name}_{sample_id}_marker_plots.pdf") as pdf:
+            make_plot(df, id, sex, False)
             pdf.savefig()
+            make_plot(df, id, sex, True)
+            pdf.savefig()
+
+
+def make_plot(df, id, sex, sameyaxis):
+    sample_df = df[df["SampleID"] == id]
+    sample_id = f"{id}_sexchr" if sex else id
+    max_yvalue = int(math.ceil(max(sample_df["Reads"]) / 100)) * 100
+    increase_value = int(math.ceil((max_yvalue / 5)) / 100) * 100
+    fig = plt.figure(figsize=(31, 31)) if sex is True else plt.figure(figsize=(30, 30))
+    n = 0
+    for marker in sample_df["Locus"].unique():
+        n += 1
+        marker_df = sample_df[sample_df["Locus"] == marker].sort_values(by="CE_Allele")
+        ax = fig.add_subplot(6, 6, n) if sex is True else fig.add_subplot(6, 5, n)
+        ax.bar(marker_df["CE_Allele"], marker_df["Reads"])
+        if sameyaxis:
+            ax.set_yticks(np.arange(0, max_yvalue, increase_value))
+        ax.set_xticks(
+            np.arange(min(marker_df["CE_Allele"]) - 1, max(marker_df["CE_Allele"]) + 2, 1.0)
+        )
+        ax.title.set_text(marker)
+    if sameyaxis:
+        plt.text(
+            0.4, 0.95, "Marker Plots With Same Y-Axis Scale", transform=fig.transFigure, size=24
+        )
+    else:
+        plt.text(
+            0.4, 0.95, "Marker Plots With Custom Y-Axis Scale", transform=fig.transFigure, size=24
+        )
+    # return ax
 
 
 def main(input, out, kit, uas, sex, nocombine):
