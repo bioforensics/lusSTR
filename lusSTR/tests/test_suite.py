@@ -287,3 +287,23 @@ def test_snakemake(command, output, format_out, convert_out, all_out, tmp_path):
     assert os.path.exists(obs_convert_output) is convert_out
     assert os.path.exists(obs_all_output) is all_out
     assert filecmp.cmp(exp_output, obs_output) is True
+
+
+@pytest.mark.parametrize(
+    "sex",
+    [True, False],
+)
+def test_marker_plots(sex, tmp_path):
+    inputfile = data_file("UAS_bulk_input/Positive Control Sample Details Report 2315.xlsx")
+    exp_output = str(tmp_path / "MarkerPlots/lusstr_output_Positive_Control_marker_plots.pdf")
+    sex_exp = str(tmp_path / "MarkerPlots/lusstr_output_Positive_Control_sexchr_marker_plots.pdf")
+    if sex:
+        arglist = ["config", "-w", str(tmp_path), "--input", inputfile, "--sex"]
+    else:
+        arglist = ["config", "-w", str(tmp_path), "--input", inputfile]
+    lusSTR.cli.main(lusSTR.cli.get_parser().parse_args(arglist))
+    snakemake_arglist = ["strs", "convert", "-w", str(tmp_path)]
+    lusSTR.cli.main(lusSTR.cli.get_parser().parse_args(snakemake_arglist))
+    assert os.path.exists(exp_output) is True
+    if sex:
+        assert os.path.exists(sex_exp) is True
