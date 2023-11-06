@@ -175,19 +175,19 @@ def sort_table(table):
     return sorted_table
 
 
-def marker_plots(df, output_name, sex):
+def marker_plots(df, output_name, sex=False):
     Path("MarkerPlots").mkdir(parents=True, exist_ok=True)
     df["CE_Allele"] = df["CE_Allele"].astype(float)
     for id in df["SampleID"].unique():
         sample_id = f"{id}_sexchr" if sex else id
         with PdfPages(f"MarkerPlots/{output_name}_{sample_id}_marker_plots.pdf") as pdf:
-            make_plot(df, id, sex, False)
+            make_plot(df, id, sex, sameyaxis=False)
             pdf.savefig()
-            make_plot(df, id, sex, True)
+            make_plot(df, id, sex)
             pdf.savefig()
 
 
-def make_plot(df, id, sex, sameyaxis):
+def make_plot(df, id, sex=False, sameyaxis=True):
     sample_df = df[df["SampleID"] == id]
     sample_id = f"{id}_sexchr" if sex else id
     max_reads = max(sample_df["Reads"])
@@ -238,7 +238,7 @@ def main(input, out, kit, uas, sex, nocombine):
                 sex_final_table.to_csv(f"{output_name}_sexloci.txt", sep="\t", index=False)
         else:
             sex_final_table.to_csv(f"{output_name}_sexloci.txt", sep="\t", index=False)
-        marker_plots(sex_final_table, output_name, True)
+        marker_plots(sex_final_table, output_name, sex=True)
     if not uas:
         if not autosomal_final_table.empty:
             autosomal_flank_table.to_csv(f"{output_name}_flanks.txt", sep="\t", index=False)
@@ -250,7 +250,7 @@ def main(input, out, kit, uas, sex, nocombine):
             autosomal_final_table.to_csv(out, sep="\t", index=False)
     else:
         autosomal_final_table.to_csv(out, sep="\t", index=False)
-    marker_plots(autosomal_final_table, output_name, False)
+    marker_plots(autosomal_final_table, output_name)
 
 
 if __name__ == "__main__":
