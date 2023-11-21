@@ -165,7 +165,12 @@ Further, a second table (labeled as ```*_flanks.txt```) containing information r
 *  3' Flanking Sequence Bracketed Notation
 *  Potential Issues (such as: Possible indel or partial sequence)
 
-The ```Potential Issues``` column in this report is to draw attention to potential problem sequences (due to perhaps an indel or partial sequence) and requires the attention of the user to further evaluate the sequence for it's authenticity.
+The ```Potential Issues``` column in this report is to draw attention to potential problem sequences (due to perhaps an indel or partial sequence) and requires the attention of the user to further evaluate the sequence for its authenticity.  
+
+Individual marker plots displaying reads vs. CE allele are created in PDF format. They are stored in the ```MarkerPlots/``` directory of the working directory:   
+* The first page of the PDF file contains the marker plots using a custom y-axis scale (i.e. the y-axis is scaled for each individual marker).  
+* The second page of the PDF file contains the marker plots using the same (i.e. the maximum) y-axis scale.  
+* A separate PDF file for the X- & Y-STRs are created, if specified.  
  
 ---
 
