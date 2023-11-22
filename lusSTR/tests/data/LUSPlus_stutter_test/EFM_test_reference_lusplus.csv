@@ -1,0 +1,28 @@
+SampleName,Marker,Allele1,Allele2
+Positive_Control,CSF1PO,12_12_0,12_12_0
+Positive_Control,D10S1248,13_13,15_15
+Positive_Control,D12S391,18_11_6_0,23_14_9_0
+Positive_Control,D13S317,11_12_3_1,9_9_3_1
+Positive_Control,D16S539,13_13_0,9_9_0
+Positive_Control,D17S1301,11_11,12_12
+Positive_Control,D18S51,16_16_1,18_18_1
+Positive_Control,D19S433,13_11_1_0,14_12_1_0
+Positive_Control,D1S1656,12_11_1_0,13_13_0_0
+Positive_Control,D20S482,14_14,15_15
+Positive_Control,D21S11,29_11_4_6,31.2_11_5_6
+Positive_Control,D22S1045,16_13,16_13
+Positive_Control,D2S1338,22_12_1_7,25_15_1_7
+Positive_Control,D2S441,10_10_0,14_11_0
+Positive_Control,D3S1358,17_13_3,18_14_3
+Positive_Control,D4S2408,9_9_0,9_9_0
+Positive_Control,D5S818,12_12,12_12
+Positive_Control,D6S1043,12_12_0,20_14_1
+Positive_Control,D7S820,11_11_1_0,8_8_1_0
+Positive_Control,D8S1179,14_12_1_0,15_12_1_0
+Positive_Control,D9S1122,12_10,12_12
+Positive_Control,FGA,20_12_3_0,23_15_3_0
+Positive_Control,PENTA D,12_12,13_13
+Positive_Control,PENTA E,14_14,7_7
+Positive_Control,TH01,6_6,9.3_6
+Positive_Control,TPOX,11_11,11_11
+Positive_Control,VWA,16_12_3_1,19_14_4_1

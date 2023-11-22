@@ -37,8 +37,8 @@ def filters(locus_allele_info, locus, locus_reads, datatype, brack_col):
         locus_allele_info = ce_filtering(
             locus_allele_info, locus_reads, metadata, datatype, brack_col
         )
-        if datatype == "ngs":
-            locus_allele_info = same_size_filter(locus_allele_info, metadata)
+        if datatype != "ce":
+            locus_allele_info = same_size_filter(locus_allele_info, metadata, datatype)
     return locus_allele_info
 
 
@@ -146,14 +146,19 @@ def allele_ident(
     locus_allele_info, init_type_all, metadata, ref_allele_reads, i, j, datatype, brack_col
 ):
     quest_al_reads = locus_allele_info.loc[j, "Reads"]
-    ref_allele = float(locus_allele_info.loc[i, "CE_Allele"])
-    question_allele = float(locus_allele_info.loc[j, "CE_Allele"])
-    if datatype == "ngs":
-        ref_bracket = locus_allele_info.loc[i, brack_col]
-        question_bracket = locus_allele_info.loc[j, brack_col]
+    if datatype == "lusplus":
+        ref_allele = float(locus_allele_info.loc[i, "LUS_Plus"].split("_")[0])
+        question_allele = float(locus_allele_info.loc[j, "LUS_Plus"].split("_")[0])
+        ref_altformat = locus_allele_info.loc[i, "LUS_Plus"]
+        question_altformat = locus_allele_info.loc[j, "LUS_Plus"]
     else:
-        ref_bracket = None
-        question_bracket = None
+        ref_allele = float(locus_allele_info.loc[i, "CE_Allele"])
+        question_allele = float(locus_allele_info.loc[j, "CE_Allele"])
+        ref_altformat = None
+        question_altformat = None
+        if datatype == "ngs":
+            ref_altformat = locus_allele_info.loc[i, brack_col]
+            question_altformat = locus_allele_info.loc[j, brack_col]
     locus_allele_info.loc[j, ["allele_type", "perc_stutter"]] = allele_type(
         ref_allele,
         question_allele,
@@ -163,8 +168,8 @@ def allele_ident(
         ref_allele_reads,
         locus_allele_info.loc[j, "allele1_ref_reads"],
         locus_allele_info,
-        ref_bracket,
-        question_bracket,
+        ref_altformat,
+        question_altformat,
         datatype,
         brack_col,
     )
@@ -172,13 +177,13 @@ def allele_ident(
         if "/" in locus_allele_info.loc[j, "allele_type"] and pd.isnull(
             locus_allele_info.loc[j, "parent_allele2"]
         ):
-            stut_allele2 = ref_allele if datatype == "ce" else ref_bracket
+            stut_allele2 = ref_allele if datatype == "ce" else ref_altformat
             locus_allele_info.loc[j, ["parent_allele2", "allele2_ref_reads"]] = [
                 stut_allele2,
                 ref_allele_reads,
             ]
         elif pd.isnull(locus_allele_info.loc[j, "parent_allele1"]):
-            stut_allele1 = ref_allele if datatype == "ce" else ref_bracket
+            stut_allele1 = ref_allele if datatype == "ce" else ref_altformat
             locus_allele_info.loc[j, ["parent_allele1", "allele1_ref_reads"]] = [
                 stut_allele1,
                 ref_allele_reads,
@@ -263,8 +268,8 @@ def allele_type(
     ref_reads,
     al1_ref_reads,
     all_type_df,
-    ref_bracket,
-    question_bracket,
+    ref_altformat,
+    question_altformat,
     datatype,
     brack_col,
 ):
@@ -275,8 +280,16 @@ def allele_type(
     allele_diff = round(ref - ce, 1)
     if allele_diff == 1 and ref_reads > quest_al_reads:  # -1 stutter
         if (
-            datatype == "ngs" and bracketed_stutter_id(ref_bracket, question_bracket, -1) == -1
-        ) or datatype == "ce":
+            (
+                datatype == "ngs"
+                and bracketed_stutter_id(ref_altformat, question_altformat, -1) == -1
+            )
+            or datatype == "ce"
+            or (
+                datatype == "lusplus"
+                and lusplus_stutter_id(ref_altformat, question_altformat, -1) == -1
+            )
+        ):
             all_type, stut_perc = minus1_stutter(
                 all_type,
                 stutter_thresh,
@@ -287,11 +300,19 @@ def allele_type(
                 quest_al_reads,
             )
     elif allele_diff == 2 and ref_reads > quest_al_reads:  # -2 stutter
-        allele = ce if datatype == "ce" else question_bracket
+        allele = ce if datatype == "ce" else question_altformat
         if check_2stutter(all_type_df, datatype, allele, brack_col)[0] is True:
             if (
-                datatype == "ngs" and bracketed_stutter_id(ref_bracket, question_bracket, -2) == -2
-            ) or datatype == "ce":
+                (
+                    datatype == "ngs"
+                    and bracketed_stutter_id(ref_altformat, question_altformat, -2) == -2
+                )
+                or datatype == "ce"
+                or (
+                    datatype == "lusplus"
+                    and lusplus_stutter_id(ref_altformat, question_altformat, -2) == -2
+                )
+            ):
                 ref_reads = check_2stutter(all_type_df, datatype, allele, brack_col)[1]
                 stutter_thresh_reads = stutter_thresh * ref_reads
                 all_type, stut_perc = minus2_stutter(
@@ -305,8 +326,13 @@ def allele_type(
                 )
     elif allele_diff == -1 and ref_reads > quest_al_reads:  # +1 stutter
         if (
-            datatype == "ngs" and bracketed_stutter_id(ref_bracket, question_bracket, 1) == 1
-        ) or datatype == "ce":
+            (datatype == "ngs" and bracketed_stutter_id(ref_altformat, question_altformat, 1) == 1)
+            or datatype == "ce"
+            or (
+                datatype == "lusplus"
+                and lusplus_stutter_id(ref_altformat, question_altformat, 1) == 1
+            )
+        ):
             all_type, stut_perc = plus1_stutter(
                 all_type, stutter_thresh, forward_thresh, ref_reads, al1_ref_reads, quest_al_reads
             )
@@ -342,9 +368,14 @@ def check_2stutter(stutter_df, allele_des, allele, brack_col):
                     break
         else:
             for k, row in stutter_df.iterrows():
-                bracket_test = stutter_df.loc[k, brack_col]
-                if bracketed_stutter_id(bracket_test, allele, -1) == -1:
-                    is_true, reads = True, stutter_df.loc[k, "Reads"]
+                if allele_des == "ngs":
+                    bracket_test = stutter_df.loc[k, brack_col]
+                    if bracketed_stutter_id(bracket_test, allele, -1) == -1:
+                        is_true, reads = True, stutter_df.loc[k, "Reads"]
+                else:
+                    lusp_test = stutter_df.loc[k, "LUS_Plus"]
+                    if lusplus_stutter_id(lusp_test, allele, -1) == -1:
+                        is_true, reads = True, stutter_df.loc[k, "Reads"]
     return is_true, reads
 
 
@@ -409,6 +440,26 @@ def bracketed_stutter_id(ref_bracket, quest_bracket, stutter_id):
     return stutter
 
 
+def lusplus_stutter_id(ref_lusp, question_lusp, stutter_id):
+    diffcount = 0
+    stutter = None
+    for j in range(1, len(ref_lusp.split("_"))):
+        diff = float(question_lusp.split("_")[j]) - round(float(ref_lusp.split("_")[j]))
+        if diff == 0:
+            continue
+        elif diff == stutter_id:
+            if diffcount == 0:
+                diffcount = diff
+                stutter = stutter_id
+            else:
+                stutter = None
+                break
+        else:
+            stutter = None
+            break
+    return stutter
+
+
 def allele_imbalance_check(allele_df):
     imbalance_df = pd.DataFrame(columns=["SampleID", "Locus", "Flags"])
     try:
@@ -430,10 +481,13 @@ def allele_imbalance_check(allele_df):
     return imbalance_df
 
 
-def check_D7(allele_df):
+def check_D7(allele_df, datatype):
     D7_df = pd.DataFrame(columns=["SampleID", "Locus", "Flags"])
     for i in range(len(allele_df)):
-        al = allele_df.loc[i, "CE_Allele"]
+        if datatype == "lusplus":
+            al = allele_df.loc[i, "LUS_Plus"].split("_")[0]
+        else:
+            al = allele_df.loc[i, "CE_Allele"]
         try:
             if str(al).split(".")[1] == "1" and allele_df.loc[i, "allele_type"] != "BelowAT":
                 print("D7 microvariants detected! Check flagged file for details.")
@@ -447,16 +501,18 @@ def check_D7(allele_df):
     return D7_df
 
 
-def flags(allele_df):
+def flags(allele_df, datatype):
     flags_df = pd.DataFrame(columns=["SampleID", "Locus", "Flags"])
     flags_df = flags_df.append(allele_counts(allele_df))
     flags_df = flags_df.append(allele_imbalance_check(allele_df))
-    flags_df = flags_df.append(check_D7(allele_df))
+    flags_df = flags_df.append(check_D7(allele_df, datatype))
     return flags_df
 
 
-def same_size_filter(df, metadata):
+def same_size_filter(df, metadata, datatype):
     final_df = pd.DataFrame()
+    if datatype == "lusplus":
+        df["CE_Allele"] = df["LUS_Plus"].apply(lambda x: x.split("_")[0])
     al_list = df["CE_Allele"].unique()
     for ce_allele in al_list:
         df_filt = (
@@ -475,4 +531,6 @@ def same_size_filter(df, metadata):
         else:
             final_df = final_df.append(df_filt)
     final_df = final_df.reset_index(drop=True)
+    if datatype == "lusplus":
+        final_df = final_df.drop("CE_Allele", axis=1)
     return final_df
