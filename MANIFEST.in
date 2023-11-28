@@ -11,3 +11,4 @@ include lusSTR/tests/data/RU_stutter_test/*
 include lusSTR/tests/data/NGS_stutter_test/*
 include lusSTR/tests/data/kinsnps/*
 include lusSTR/tests/data/lusstr_output/*
+include lusSTR/tests/data/LUSPlus_stutter_test/*
