@@ -2,7 +2,7 @@
 
 lusSTR is a tool written in Python to convert NGS sequence data of forensic STR loci to different sequence representations (sequence bracketed form) and allele designations (CE allele, LUS/LUS+ alleles) for ease in downstream analyses. See the below section ```Converting STR sequences to other sequence representations and allele designations``` for more information. 
 
-Further, lusSTR can perform filtering and stutter identification using the CE allele or the bracketed sequence form for autosomal loci and create files for direct input into two probabilistic genotyping software packages, EuroForMix (EFM) and STRmix (both CE and NGS). 
+Further, lusSTR can perform filtering and stutter identification using the CE allele, the LUS+ allele, or the bracketed sequence form for autosomal loci and create files for direct input into two probabilistic genotyping software packages, EuroForMix (CE and LUS+) and STRmix (CE and NGS). 
 
 lusSTR also processes SNP data from the Verogen ForenSeq and Kintelligence panels and create evidence and/or reference files for use in EFM. See the below section ```SNP Data Processing``` for more information.
 
@@ -67,7 +67,7 @@ nocombine: ```False``` (True/False); do not combine identical sequences during t
 ### filter settings  
 output_type: ```strmix``` (strmix/efm) (invoke ```--efm``` flag if creating output for EuroForMix)  
 profile_type: ```evidence``` (evidence/reference) (invoke ```--reference``` flag if creating a reference output file)  
-data_type: ```ngs``` (ce/ngs) (invoke ```--ce``` if using CE allele data)  
+data_type: ```ngs``` (ce/ngs/lusplus) (indicate using the ```--str-type```)  
 info: ```True``` (True/False); create allele information file (invoke ```--noinfo``` flag to not create the allele information file)  
 separate: ```False``` (True/False); for EFM only, if True will create individual files for samples; if False, will create one file with all samples (invoke ```--separate``` flag to separate EFM output files)  
 nofilters: ```False``` (True/False); skip all filtering steps but still creates EFM/STRmix output files (invoke ```--nofilters``` flag)  
@@ -187,7 +187,7 @@ In addition, stutter alleles can be identified using the ```info``` setting in t
 
 Each locus is checked for containing greater than 2 alleles (indicating a potential mixture) and for intralocus imbalance. If either are identified, a separate file (```Flagged_Loci.csv```) is created, containing the SampleID, Locus and either ```>2Alleles``` or ```IntraLocusImbalance```.
 
-When using STRmix data, the data type can be specified using the ```data-type``` setting as either ```ce``` or ```ngs``` (default is ```ngs```). If ```ngs``` is specified, the same size filter is applied following the stutter filter. Further, the columns and column names in the output file differ based on the data type.
+When using STRmix data, the data type can be specified using the ```data-type``` setting as either ```ce```, ```ngs``` or ```lusplus``` (default is ```ngs```). If ```ngs``` or ```lusplus``` is specified, the same size filter is applied following the stutter filter. Further, the columns and column names in the output file differ based on the data type.
 
 Finally, output files are created for direct use in EuroForMix (EFM) or STRmix. If EFM is specified, a single file is created containing all samples in the input file (however, separate output files for each sample can be created with the ```separate``` setting specified in the config file). If STRmix is specified, a directory containing files for each individual sample is created. The ```profile-type``` setting allows for the creation of either a ```reference``` or ```evidence``` profile. Both EuroForMix and STRmix require different formatting depending on the type of sample. 
 
