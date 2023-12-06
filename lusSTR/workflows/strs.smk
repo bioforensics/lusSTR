@@ -19,7 +19,7 @@ separate = config["separate"]
 def get_sample_IDs(input, uas, output, software, separate):
     convert_out = f"{output}.txt"
     format_out = f"{output}.csv"
-    if software == "efm" and separate is False:
+    if (software == "efm" or software == "mpsproto") and separate is False:
         ID_list = os.path.basename(output)
     elif os.path.exists(convert_out):
         ID_list = get_existing_IDs(convert_out, "\t")
