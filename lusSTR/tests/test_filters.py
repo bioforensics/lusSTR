@@ -162,7 +162,7 @@ def test_plus1stutter(
     [
         ("RU_stutter_test/", "ce", "efm"),
         ("LUSPlus_stutter_test/", "lusplus", "efm"),
-        ("MPSProto_test/", "ngs", "mpsproto"),
+        ("MPSproto_test/", "ngs", "mpsproto"),
     ],
 )
 def test_EFMoutput_format(outputdir, datatype, software, tmp_path):
@@ -256,7 +256,7 @@ def test_flags(tmp_path):
     [
         ("RU_stutter_test/", "ce", "efm"),
         ("LUSPlus_stutter_test/", "lusplus", "efm"),
-        ("MPSProto_test/", "ngs", "mpsproto"),
+        ("MPSproto_test/", "ngs", "mpsproto"),
     ],
 )
 def test_efm_reference(outputdir, datatype, software, tmp_path):
@@ -404,7 +404,8 @@ def test_lusplus_sequence_info(tmp_path):
         "forward",
         "--str-type",
         "lusplus",
-        "--efm",
+        "--software",
+        "efm",
     ]
     lusSTR.cli.main(lusSTR.cli.get_parser().parse_args(arglist))
     shutil.copyfile(inputfile, os.path.join(str_path, "LUSPlus.csv"))
