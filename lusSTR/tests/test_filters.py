@@ -158,9 +158,14 @@ def test_plus1stutter(
 
 
 @pytest.mark.parametrize(
-    "outputdir, datatype", [("RU_stutter_test/", "ce"), ("LUSPlus_stutter_test/", "lusplus")]
+    "outputdir, datatype, software",
+    [
+        ("RU_stutter_test/", "ce", "efm"),
+        ("LUSPlus_stutter_test/", "lusplus", "efm"),
+        ("MPSProto_test/", "ngs", "mpsproto"),
+    ],
 )
-def test_EFMoutput_format(outputdir, datatype, tmp_path):
+def test_EFMoutput_format(outputdir, datatype, software, tmp_path):
     str_path = str(tmp_path / "WD")
     inputfile = data_file("test_stutter.txt")
     exp_out = data_file(f"{outputdir}test_filtering_EFMoutput_{datatype}.csv")
@@ -173,7 +178,8 @@ def test_EFMoutput_format(outputdir, datatype, tmp_path):
         str_path,
         "-o",
         "test_output",
-        "--efm",
+        "--software",
+        software,
         "--str-type",
         datatype,
         "--input",
@@ -246,9 +252,14 @@ def test_flags(tmp_path):
 
 
 @pytest.mark.parametrize(
-    "outputdir, datatype", [("RU_stutter_test/", "ce"), ("LUSPlus_stutter_test/", "lusplus")]
+    "outputdir, datatype, software",
+    [
+        ("RU_stutter_test/", "ce", "efm"),
+        ("LUSPlus_stutter_test/", "lusplus", "efm"),
+        ("MPSProto_test/", "ngs", "mpsproto"),
+    ],
 )
-def test_efm_reference(outputdir, datatype, tmp_path):
+def test_efm_reference(outputdir, datatype, software, tmp_path):
     str_path = str(tmp_path / "WD")
     inputfile = data_file("test_references.txt")
     exp_out = data_file(f"{outputdir}EFM_test_reference_{datatype}.csv")
@@ -259,7 +270,8 @@ def test_efm_reference(outputdir, datatype, tmp_path):
         str_path,
         "--input",
         "WD",
-        "--efm",
+        "--software",
+        software,
         "--reference",
         "--str-type",
         datatype,
