@@ -10,18 +10,18 @@
 # Development Center.
 # -------------------------------------------------------------------------------------------------
 
+import importlib_resources
 import json
 import lusSTR
 from lusSTR.scripts.repeat import collapse_repeats_by_length, collapse_repeats_by_length_flanks
 from lusSTR.scripts.repeat import sequence_to_bracketed_form, split_sequence_into_two_strings
 from lusSTR.scripts.repeat import reverse_complement, reverse_complement_bracketed
 from lusSTR.scripts.repeat import repeat_copy_number, collapse_all_repeats, split_by_n
-from pkg_resources import resource_filename
 import re
 
 
 def get_str_metadata_file():
-    return resource_filename("lusSTR", "data/str_markers.json")
+    return importlib_resources.files("lusSTR") / "data/str_markers.json"
 
 
 with open(get_str_metadata_file(), "r") as fh:

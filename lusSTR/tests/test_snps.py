@@ -28,7 +28,7 @@ def test_uas_all(input, filtering, tmp_path):
     exp_out = data_file(input)
     obs_out = str(tmp_path / "uas.txt")
     if filtering:
-        arglist = ["config", "-w", str(tmp_path), "-o", "uas", "--input", inputdb, "--snps"]
+        arglist = ["config", "-w", str(tmp_path), "-o", "uas", "--input", str(inputdb), "--snps"]
     else:
         arglist = [
             "config",
@@ -37,7 +37,7 @@ def test_uas_all(input, filtering, tmp_path):
             "-o",
             "uas",
             "--input",
-            inputdb,
+            str(inputdb),
             "--snps",
             "--nofiltering",
         ]
@@ -58,7 +58,7 @@ def test_uas_type(type, lines, tmp_path):
         "-o",
         "uas",
         "--input",
-        inputdb,
+        str(inputdb),
         "--snps",
         "--snp-type",
         type,
@@ -83,7 +83,7 @@ def test_sr_all(tmp_path):
         "-o",
         "sr",
         "--input",
-        inputdb,
+        str(inputdb),
         "--snps",
         "--straitrazor",
     ]
@@ -111,7 +111,7 @@ def test_sr_type(type, lines, full_lines, tmp_path):
         "-o",
         "sr",
         "--input",
-        inputdb,
+        str(inputdb),
         "--snps",
         "--straitrazor",
         "--snp-type",
@@ -142,7 +142,7 @@ def test_kintelligence(output, filtering, tmp_path):
             "-o",
             "kin",
             "--input",
-            inputdb,
+            str(inputdb),
             "--snps",
             "--kintelligence",
         ]
@@ -154,7 +154,7 @@ def test_kintelligence(output, filtering, tmp_path):
             "-o",
             "kin",
             "--input",
-            inputdb,
+            str(inputdb),
             "--snps",
             "--kintelligence",
             "--nofiltering",
@@ -178,7 +178,7 @@ def test_kintelligence_all(tmp_path):
         "-o",
         "kin",
         "--input",
-        inputdb,
+        str(inputdb),
         "--snps",
         "--kintelligence",
         "--snp-reference",
@@ -202,7 +202,7 @@ def test_multiple_reference_profiles(tmp_path):
         "-o",
         "kin",
         "--input",
-        inputdb,
+        str(inputdb),
         "--snps",
         "--kintelligence",
         "--snp-reference",
@@ -225,7 +225,7 @@ def test_snp_bins(tmp_path):
         "-o",
         "kin",
         "--input",
-        input_sample,
+        str(input_sample),
         "--snps",
         "--kintelligence",
         "--separate",
@@ -252,7 +252,7 @@ def test_uas_version5(tmp_path):
         "-o",
         "kin_v5",
         "--input",
-        input_sample,
+        str(input_sample),
         "--snps",
         "--kintelligence",
     ]
