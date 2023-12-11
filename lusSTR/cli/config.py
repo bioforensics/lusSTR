@@ -89,8 +89,8 @@ def edit_str_config(config, args):
         data["profile_type"] = "reference"
     if args.datatype:
         data["data_type"] = args.datatype
-    if args.efm:
-        data["output_type"] = "efm"
+    if args.software:
+        data["output_type"] = args.software
     if args.strand:
         data["strand"] = args.strand
     return data
@@ -126,11 +126,15 @@ def subparser(subparsers):
         "--reference", action="store_true", 
         help="Use for creating Reference profiles for STR workflow"
     )
-    p.add_argument("--efm", action="store_true",help="Use to create EuroForMix profiles")
+    p.add_argument(
+        "--software", choices=["efm", "mpsproto", "strmix"], default="strmix",
+        help="Specify the probabilistic genotyping software package of choice. The final output"
+        " files will be in the correct format for direct use. Default is strmix."
+    )
     p.add_argument(
         "--str-type", choices=["ce", "ngs", "lusplus"], default="ngs",
         dest="datatype", help="Data type for STRs. Options are: CE allele ('ce'), sequence "
-        "('ngs'), or LUS+ allele ('lusplus'). Default is 'ngs'.",
+        "or bracketed sequence form('ngs'), or LUS+ allele ('lusplus'). Default is 'ngs'.",
     )
     p.add_argument(
         "--noinfo", action="store_true", 
