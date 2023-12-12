@@ -118,23 +118,25 @@ def process_strs(dict_loc, datatype, seq_col):
     return final_df, flags_df
 
 
-def EFM_output(profile, outfile, profile_type, data_type, separate=False):
+def EFM_output(profile, outfile, profile_type, data_type, col, separate=False):
     if profile_type == "reference":
         profile = profile[profile.allele_type == "real_allele"]
     else:
         profile = profile[profile.allele_type != "BelowAT"]
-    efm_profile = populate_efm_profile(profile, data_type)
+    efm_profile = populate_efm_profile(profile, data_type, col)
     if separate:
         write_sample_specific_efm_profiles(efm_profile, profile_type, data_type, outfile)
     else:
         write_aggregate_efm_profile(efm_profile, profile_type, data_type, outfile)
 
 
-def populate_efm_profile(profile, data_type):
+def populate_efm_profile(profile, data_type, colname):
     if data_type == "ce":
         prof_col = "CE_Allele"
     elif data_type == "lusplus":
         prof_col = "LUS_Plus"
+    elif data_type == "ngs":
+        prof_col = colname
     else:
         message = (
             f"Incorrect data type {data_type} specified for EFM. Please choose either "
@@ -328,7 +330,7 @@ def main(
         raise ValueError(f"unknown profile type '{profile_type}'")
     if data_type not in ("ce", "ngs", "lusplus"):
         raise ValueError(f"unknown data type '{data_type}'")
-    if output_type not in ("efm", "strmix"):
+    if output_type not in ("efm", "strmix", "mpsproto"):
         raise ValueError(f"unknown output type '{output_type}'")
     full_df = pd.read_csv(input, sep="\t")
     if output_dir is None:
@@ -336,17 +338,20 @@ def main(
     else:
         outpath = output_dir
     seq_col = "UAS_Output_Sequence" if strand == "uas" else "Forward_Strand_Sequence"
+    brack_col = (
+        "UAS_Output_Bracketed_Notation" if strand == "uas" else "Forward_Strand_Bracketed_Form"
+    )
     if nofilters:
         full_df["allele_type"] = "real_allele"
-        if output_type == "efm":
-            EFM_output(full_df, outpath, profile_type, data_type, separate)
+        if output_type == "efm" or output_type == "mpsproto":
+            EFM_output(full_df, outpath, profile_type, data_type, brack_col, separate)
         else:
             STRmix_output(full_df, outpath, profile_type, data_type, seq_col)
     else:
         dict_loc = {k: v for k, v in full_df.groupby(["SampleID", "Locus"])}
         final_df, flags_df = process_strs(dict_loc, data_type, seq_col)
-        if output_type == "efm":
-            EFM_output(final_df, outpath, profile_type, data_type, separate)
+        if output_type == "efm" or output_type == "mpsproto":
+            EFM_output(final_df, outpath, profile_type, data_type, brack_col, separate)
         else:
             STRmix_output(final_df, outpath, profile_type, data_type, seq_col)
         if info:
