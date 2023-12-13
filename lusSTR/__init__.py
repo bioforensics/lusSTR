@@ -24,3 +24,6 @@ def snakefile(workflow="strs"):
 
 def wrapper(label):
     return resource_filename("lusSTR", f"wrappers/{label}.py")
+
+from . import _version
+__version__ = _version.get_versions()['version']
