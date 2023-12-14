@@ -44,7 +44,7 @@ setup(
         "openpyxl>=3.0.6",
         "snakemake>=7.22.0",
         "pyyaml>=6.0",
-        "matplotlib>=3.5.3",
+        "matplotlib>=3.8",
     ],
     entry_points={"console_scripts": ["lusstr = lusSTR.cli:main"]},
     scripts=glob.glob("lusSTR/scripts/*"),
