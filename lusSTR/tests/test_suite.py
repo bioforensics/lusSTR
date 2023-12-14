@@ -11,6 +11,7 @@
 # -------------------------------------------------------------------------------------------------
 
 import filecmp
+import importlib.resources
 import os
 import pandas as pd
 import pytest
@@ -19,7 +20,6 @@ from lusSTR.scripts.marker import STRMarkerObject
 from lusSTR.scripts.repeat import reverse_complement
 from lusSTR.tests import data_file
 from pathlib import Path
-from pkg_resources import resource_filename
 import re
 from tempfile import NamedTemporaryFile
 import shutil
@@ -246,7 +246,7 @@ def test_convert_sr_sexloci(input, testoutput, flank_output, kit, tmp_path):
 
 def test_config(tmp_path):
     obs_config = str(tmp_path / "config.yaml")
-    exp_config = resource_filename("lusSTR", "data/config.yaml")
+    exp_config = importlib.resources.files("lusSTR") / "data/config.yaml"
     arglist = ["config", "-w", str(tmp_path)]
     lusSTR.cli.main(lusSTR.cli.get_parser().parse_args(arglist))
     assert os.path.exists(obs_config)
@@ -279,7 +279,7 @@ def test_snakemake(command, output, format_out, convert_out, all_out, tmp_path):
     obs_format_output = str(tmp_path / "lusstr_output.csv")
     obs_convert_output = str(tmp_path / "lusstr_output.txt")
     obs_all_output = str(tmp_path / "lusstr_output/")
-    arglist = ["config", "-w", str(tmp_path), "--input", inputfile]
+    arglist = ["config", "-w", str(tmp_path), "--input", str(inputfile)]
     lusSTR.cli.main(lusSTR.cli.get_parser().parse_args(arglist))
     snakemake_arglist = ["strs", command, "-w", str(tmp_path)]
     lusSTR.cli.main(lusSTR.cli.get_parser().parse_args(snakemake_arglist))
@@ -298,9 +298,9 @@ def test_marker_plots(sex, tmp_path):
     exp_output = str(tmp_path / "MarkerPlots/lusstr_output_Positive_Control_marker_plots.pdf")
     sex_exp = str(tmp_path / "MarkerPlots/lusstr_output_Positive_Control_sexchr_marker_plots.pdf")
     if sex:
-        arglist = ["config", "-w", str(tmp_path), "--input", inputfile, "--sex"]
+        arglist = ["config", "-w", str(tmp_path), "--input", str(inputfile), "--sex"]
     else:
-        arglist = ["config", "-w", str(tmp_path), "--input", inputfile]
+        arglist = ["config", "-w", str(tmp_path), "--input", str(inputfile)]
     lusSTR.cli.main(lusSTR.cli.get_parser().parse_args(arglist))
     snakemake_arglist = ["strs", "convert", "-w", str(tmp_path)]
     lusSTR.cli.main(lusSTR.cli.get_parser().parse_args(snakemake_arglist))
