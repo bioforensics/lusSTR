@@ -11,16 +11,16 @@
 # -------------------------------------------------------------------------------------------------
 
 import glob
+import importlib.resources
 import json
 import lusSTR
 import pandas as pd
 import openpyxl
 import os
-from pkg_resources import resource_filename
 
 
 def get_snp_metadata_file():
-    return resource_filename("lusSTR", "data/snp_data.json")
+    return importlib.resources.files("lusSTR") / "data/snp_data.json"
 
 
 with open(get_snp_metadata_file(), "r") as fh:
