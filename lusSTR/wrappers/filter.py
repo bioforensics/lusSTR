@@ -12,7 +12,7 @@
 
 import argparse
 from collections import defaultdict
-import importlib_resources
+import importlib.resources
 import json
 import lusSTR
 from lusSTR.scripts.filter_settings import filters, flags
@@ -56,7 +56,7 @@ strs = [
 
 
 def get_filter_metadata_file():
-    return importlib_resources.files("lusSTR") / "data/filters.json"
+    return importlib.resources.files("lusSTR") / "data/filters.json"
 
 
 with open(get_filter_metadata_file(), "r") as fh:

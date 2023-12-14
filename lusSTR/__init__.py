@@ -10,7 +10,7 @@
 # Development Center.
 # -------------------------------------------------------------------------------------------------
 
-import importlib_resources
+import importlib.resources
 from lusSTR import cli
 from lusSTR._version import get_versions
 
@@ -19,8 +19,8 @@ del get_versions
 
 
 def snakefile(workflow="strs"):
-    return importlib_resources.files("lusSTR") / f"workflows/{workflow}.smk"
+    return importlib.resources.files("lusSTR") / f"workflows/{workflow}.smk"
 
 
 def wrapper(label):
-    return importlib_resources.files("lusSTR") / f"wrappers/{label}.py"
+    return importlib.resources.files("lusSTR") / f"wrappers/{label}.py"

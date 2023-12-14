@@ -11,7 +11,7 @@
 # -------------------------------------------------------------------------------------------------
 
 from collections import defaultdict
-import importlib_resources
+import importlib.resources
 import json
 import numpy as np
 import pandas as pd
@@ -19,7 +19,7 @@ import re
 
 
 def get_filter_metadata_file():
-    return importlib_resources.files("lusSTR") / "data/filters.json"
+    return importlib.resources.files("lusSTR") / "data/filters.json"
 
 
 with open(get_filter_metadata_file(), "r") as fh:

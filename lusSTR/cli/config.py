@@ -11,7 +11,7 @@
 # -------------------------------------------------------------------------------------------------
 
 import argparse
-import importlib_resources
+import importlib.resources
 import lusSTR
 import os
 from pathlib import Path
@@ -22,11 +22,11 @@ def main(args):
     Path(args.workdir).mkdir(parents=True, exist_ok=True)
     if args.snps:
         final_dest = f"{args.workdir}/snp_config.yaml"
-        config = importlib_resources.files("lusSTR") / "data/snp_config.yaml"
+        config = importlib.resources.files("lusSTR") / "data/snp_config.yaml"
         final_config = edit_snp_config(config, args)
     else:
         final_dest = f"{args.workdir}/config.yaml"
-        config = importlib_resources.files("lusSTR") / "data/config.yaml"
+        config = importlib.resources.files("lusSTR") / "data/config.yaml"
         final_config = edit_str_config(config, args)
     with open(final_dest, "w") as file:
         yaml.dump(final_config, file)

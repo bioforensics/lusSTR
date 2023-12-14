@@ -11,7 +11,7 @@
 # -------------------------------------------------------------------------------------------------
 
 import glob
-import importlib_resources
+import importlib.resources
 import json
 import lusSTR
 import pandas as pd
@@ -20,7 +20,7 @@ import os
 
 
 def get_snp_metadata_file():
-    return importlib_resources.files("lusSTR") / "data/snp_data.json"
+    return importlib.resources.files("lusSTR") / "data/snp_data.json"
 
 
 with open(get_snp_metadata_file(), "r") as fh:

@@ -10,11 +10,11 @@
 # Development Center.
 # -------------------------------------------------------------------------------------------------
 
-import importlib_resources
+import importlib.resources
 import os
 
 
 def data_file(path):
     pathparts = path.split('/')
     relpath = os.path.join('tests', 'data', *pathparts)
-    return importlib_resources.files("lusSTR") / relpath
+    return importlib.resources.files("lusSTR") / relpath

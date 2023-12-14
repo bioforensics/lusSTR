@@ -10,7 +10,7 @@
 # Development Center.
 # -------------------------------------------------------------------------------------------------
 
-import importlib_resources
+import importlib.resources
 import json
 import os
 import pandas as pd
@@ -18,7 +18,7 @@ from pathlib import Path
 
 
 def get_snp_metadata_file():
-    return importlib_resources.files("lusSTR") / "data/snp_data.json"
+    return importlib.resources.files("lusSTR") / "data/snp_data.json"
 
 
 with open(get_snp_metadata_file(), "r") as fh:

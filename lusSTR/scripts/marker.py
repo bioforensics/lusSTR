@@ -10,7 +10,7 @@
 # Development Center.
 # -------------------------------------------------------------------------------------------------
 
-import importlib_resources
+import importlib.resources
 import json
 import lusSTR
 from lusSTR.scripts.repeat import collapse_repeats_by_length, collapse_repeats_by_length_flanks
@@ -21,7 +21,7 @@ import re
 
 
 def get_str_metadata_file():
-    return importlib_resources.files("lusSTR") / "data/str_markers.json"
+    return importlib.resources.files("lusSTR") / "data/str_markers.json"
 
 
 with open(get_str_metadata_file(), "r") as fh:

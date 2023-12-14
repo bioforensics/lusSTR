@@ -11,7 +11,7 @@
 # -------------------------------------------------------------------------------------------------
 
 import filecmp
-import importlib_resources
+import importlib.resources
 import os
 import pandas as pd
 import pytest
@@ -246,7 +246,7 @@ def test_convert_sr_sexloci(input, testoutput, flank_output, kit, tmp_path):
 
 def test_config(tmp_path):
     obs_config = str(tmp_path / "config.yaml")
-    exp_config = importlib_resources.files("lusSTR") / "data/config.yaml"
+    exp_config = importlib.resources.files("lusSTR") / "data/config.yaml"
     arglist = ["config", "-w", str(tmp_path)]
     lusSTR.cli.main(lusSTR.cli.get_parser().parse_args(arglist))
     assert os.path.exists(obs_config)
