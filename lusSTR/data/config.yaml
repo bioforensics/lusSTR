@@ -10,6 +10,7 @@ output: "lusstr_output" ## output file/directory name; Example: "test_030923"
 ##convert settings
 kit: "forenseq" ## forenseq/powerseq
 nocombine: False ## True/False; do not combine identical sequences (if using STRait Razor data)
+analysis_software: "uas" ## uas/straitrazor/genemarker; analysis software used prior to lusSTR
 
 ##filter settings
 output_type: "strmix" ## strmix/efm
