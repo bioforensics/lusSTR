@@ -41,17 +41,17 @@ class InvalidSequenceError(ValueError):
 
 
 class STRMarker:
-    def __init__(self, locus, sequence, uas=False, kit="forenseq"):
+    def __init__(self, locus, sequence, software, kit="forenseq"):
         self.locus = locus
         self.sequence = sequence
         if locus not in str_marker_data:
             raise InvalidLocusError(locus)
         self.data = str_marker_data[locus]
-        self.uas = uas
+        self.software = software
         if kit.lower() not in ("forenseq", "powerseq"):
             raise UnsupportedKitError(kit)
         self.kit = kit.lower()
-        if uas and self.data["ReverseCompNeeded"] == "Yes":
+        if software == "uas" and self.data["ReverseCompNeeded"] == "Yes":
             self.sequence = reverse_complement(sequence)
 
     @property
@@ -69,7 +69,7 @@ class STRMarker:
         function determines the number of bases that need to be trimmed from the full amplicon
         sequence to recover the UAS core sequence.
         """
-        if self.uas:
+        if self.software == "uas":
             return 0, 0
         elif self.kit == "forenseq":
             return self.data["Foren_5"], self.data["Foren_3"]
@@ -1608,7 +1608,7 @@ class STRMarker_DYS389II(STRMarker):
         return flank
 
 
-def STRMarkerObject(locus, sequence, uas=False, kit="forenseq"):
+def STRMarkerObject(locus, sequence, software, kit="forenseq"):
     constructors = {
         "D8S1179": STRMarker_D8S1179,
         "D13S317": STRMarker_D13S317,
