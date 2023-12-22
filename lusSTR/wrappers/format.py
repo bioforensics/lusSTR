@@ -34,9 +34,9 @@ def uas_load(inpath, sexloci=False):
             if "Sample Details" not in filename:
                 continue
             autodata, sexdata = uas_format(filename, sexloci)
-            auto_strs = auto_strs.append(autodata)
+            auto_strs = pd.concat([auto_strs, autodata])
             if sexloci is True:
-                sex_strs = sex_strs.append(sexdata)
+                sex_strs = pd.concat([sex_strs, sexdata])
     else:
         auto_strs, sex_strs = uas_format(inpath, sexloci)
     return auto_strs, sex_strs
@@ -68,8 +68,8 @@ def uas_format(infile, sexloci=False):
     return auto_strs, sex_strs
 
 
-def strait_razor_concat(inpath, sexloci=False):
-    """Format a directory of STRait Razor output files."""
+def nonuas_load(inpath, software, sexloci=False):
+    """Format a directory of STRait Razor/GeneMarker output files."""
     locus_list = [
         "CSF1PO",
         "D10S1248",
@@ -145,24 +145,37 @@ def strait_razor_concat(inpath, sexloci=False):
     sex_strs = pd.DataFrame() if sexloci is True else None
     if os.path.isdir(inpath):
         analysisID = os.path.basename(inpath.rstrip(os.sep))
-        files = glob.glob(os.path.join(inpath, "[!~]*.txt"))
+        suf = ".txt" if software == "straitrazor" else ".csv"
+        files = glob.glob(os.path.join(inpath, f"[!~]*{suf}"))
         for filename in sorted(files):
             try:
-                table = strait_razor_table(filename, analysisID, sexloci)
+                if software == "straitrazor":
+                    table = strait_razor_table(filename, analysisID, sexloci)
+                elif software == "genemarker":
+                    table = genemarker_table(filename, analysisID, sexloci)
+                else:
+                    print("Incorrect analysis software specified!")
+                    break
             except ValueError:
                 print(
                     f"Error found with {filename}. Will bypass and continue. Please check file"
                     f" and rerun the command, if necessary."
                 )
                 continue
-            auto_strs = auto_strs.append(table[table.Locus.isin(locus_list)])
+            auto_strs = pd.concat([auto_strs, table[table.Locus.isin(locus_list)]])
             if sexloci is True:
-                sex_strs = sex_strs.append(table[table.Locus.isin(sex_locus_list)])
+                sex_strs = pd.concat([sex_strs, table[table.Locus.isin(sex_locus_list)]])
     else:
-        table = strait_razor_table(inpath, "NA", sexloci)
-        auto_strs = auto_strs.append(table[table.Locus.isin(locus_list)])
+        print(software)
+        if software == "straitrazor":
+            table = strait_razor_table(inpath, "NA", sexloci)
+        elif software == "genemarker":
+            table = genemarker_table(inpath, "NA", sexloci)
+        else:
+            print("Incorrect analysis software specified!")
+        auto_strs = pd.concat([auto_strs, table[table.Locus.isin(locus_list)]])
         if sexloci is True:
-            sex_strs = sex_strs.append(table[table.Locus.isin(sex_locus_list)])
+            sex_strs = pd.concat([sex_strs, table[table.Locus.isin(sex_locus_list)]])
     return auto_strs, sex_strs
 
 
@@ -186,11 +199,26 @@ def strait_razor_table(filename, analysisID, sexloci=False):
     return table
 
 
-def main(input, outfile, uas=True, sex=False):
-    if uas:
+def genemarker_table(filename, analysisID, sexloci=False):
+    name = filename.replace(".csv", "").split(os.sep)[-1]
+    print(name)
+    table = pd.read_csv(
+        filename, comment="#", usecols=["Marker", "Sequence Total Count", "Sequence"]
+    )
+    table["SampleID"] = name
+    table["Project"] = analysisID
+    table["Analysis"] = analysisID
+    table["Sequence"] = table["Sequence"].str.upper()
+    table = table.rename(columns={"Marker": "Locus", "Sequence Total Count": "Total_Reads"})
+    table
+    return table[["Locus", "Total_Reads", "Sequence", "SampleID", "Project", "Analysis"]]
+
+
+def main(input, outfile, a_software, sex=False):
+    if a_software == "uas":
         results, sex_results = uas_load(str(input), sex)
     else:
-        results, sex_results = strait_razor_concat(str(input), sex)
+        results, sex_results = nonuas_load(str(input), a_software, sex)
     if outfile is None:
         outfile = sys.stdout
     results.to_csv(str(outfile), index=False)
@@ -200,4 +228,9 @@ def main(input, outfile, uas=True, sex=False):
 
 
 if __name__ == "__main__":
-    main(snakemake.input, snakemake.output, uas=snakemake.params.uas, sex=snakemake.params.sex)
+    main(
+        snakemake.input,
+        snakemake.output,
+        a_software=snakemake.params.a_software,
+        sex=snakemake.params.sex,
+    )
