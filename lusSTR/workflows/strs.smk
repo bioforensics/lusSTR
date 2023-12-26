@@ -26,7 +26,7 @@ def get_sample_IDs(input, a_software, output, software, separate):
     elif os.path.exists(format_out):
         ID_list = get_existing_IDs(format_out, ",")
     else:
-        file_ext = ".xlsx" if a_software == "uas" is True else ".txt"
+        file_ext = ".xlsx" if a_software == "uas" else ".txt"
         if a_software == "uas":
             if os.path.isdir(input):
                 files = glob.glob(os.path.join(input, f"[!~]*{file_ext}"))
