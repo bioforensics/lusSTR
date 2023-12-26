@@ -1431,7 +1431,7 @@ class STRMarker_Y_GATA_H4(STRMarker):
     def canonical(self):
         """Canonical STR allele designation"""
         n = self.repeat_size
-        if self.uas:
+        if self.software == "uas":
             nsubout = self.data["BasesToSubtract"]
         elif self.kit == "forenseq":
             nsubout = self.data["BasesToSubtract"] - 12
@@ -1453,7 +1453,7 @@ class STRMarker_DYS390(STRMarker):
     def canonical(self):
         """Canonical STR allele designation"""
         n = self.repeat_size
-        if self.uas or self.kit == "powerseq":
+        if self.software == "uas" or self.kit == "powerseq":
             nsubout = self.data["BasesToSubtract"]
         else:
             nsubout = self.data["BasesToSubtract"] - 3
@@ -1472,7 +1472,7 @@ class STRMarker_DYS390(STRMarker):
         lus, sec, ter = None, None, None
         lus = repeat_copy_number(self.convert, self.data["LUS"])
         sec = repeat_copy_number(self.convert, self.data["Sec"])
-        if self.uas or self.kit == "powerseq":
+        if self.software == "uas" or self.kit == "powerseq":
             ter = repeat_copy_number(self.convert, self.data["Tert"])
         else:
             if self.convert[-1] == "G":
@@ -1493,7 +1493,7 @@ class STRMarker_DYS385(STRMarker):
     def canonical(self):
         """Canonical STR allele designation"""
         n = self.repeat_size
-        if self.uas or self.kit == "forenseq":
+        if self.software == "uas" or self.kit == "forenseq":
             nsubout = self.data["BasesToSubtract"]
         else:
             nsubout = self.data["BasesToSubtract"] - 4
