@@ -85,7 +85,8 @@ def test_sr_all(tmp_path):
         "--input",
         str(inputdb),
         "--snps",
-        "--straitrazor",
+        "--analysis-software",
+        "straitrazor",
     ]
     lusSTR.cli.main(lusSTR.cli.get_parser().parse_args(arglist))
     format_arglist = ["snps", "format", "-w", str(tmp_path)]
@@ -113,7 +114,8 @@ def test_sr_type(type, lines, full_lines, tmp_path):
         "--input",
         str(inputdb),
         "--snps",
-        "--straitrazor",
+        "--analysis-software",
+        "straitrazor",
         "--snp-type",
         type,
     ]

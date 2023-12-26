@@ -29,7 +29,7 @@ def kintelligence_filtering(input):
     return input
 
 
-def create_output_table(sample_df, orientation, separate, output_type, uas):
+def create_output_table(sample_df, orientation, separate, output_type, software):
     allele_des = {"A": "1", "C": "2", "G": "3", "T": "4"}
     if orientation == "uas":
         allele_col = "UAS_Allele"
@@ -41,7 +41,7 @@ def create_output_table(sample_df, orientation, separate, output_type, uas):
             (sample_df["SampleID"] == sample) & (sample_df["Issues"] != "Contains untyped allele")
         ]
         compiled_table = create_sample_df(indiv_df, output_type, allele_col)
-        if not uas:
+        if software != "uas":
             compiled_table = check_allele_calls(compiled_table, output_type)
         compiled_table = compiled_table.replace(allele_des)
         compiled_table.insert(0, "Sample Name", sample)
@@ -142,11 +142,11 @@ def straitrazor_filtering(sr_df, thresh):
     return sr_df
 
 
-def main(input, output, kit, strand, separate, refs, uas, thresh):
+def main(input, output, kit, strand, separate, refs, software, thresh):
     input = str(input)
     output_name = os.path.splitext(output)[0]
     input_file = pd.read_csv(input, sep="\t")
-    if uas:
+    if software == "uas":
         results = input_file
     else:
         results = straitrazor_filtering(input_file, thresh)
@@ -163,11 +163,11 @@ def main(input, output, kit, strand, separate, refs, uas, thresh):
         ref_ids = [refs]
         ref_samples = results[results["SampleID"].isin([refs])]
     if len(ref_samples) > 0:
-        ref_table = create_output_table(ref_samples, strand, separate, "reference", uas)
+        ref_table = create_output_table(ref_samples, strand, separate, "reference", software)
         ref_table.to_csv(f"{output_name}_snp_reference.csv", index=False, sep="\t")
     evid_samples = results[~results.SampleID.isin(ref_ids)]
     if len(evid_samples) > 0:
-        evid_table = create_output_table(evid_samples, strand, separate, "evidence", uas)
+        evid_table = create_output_table(evid_samples, strand, separate, "evidence", software)
         evid_table.to_csv(f"{output}_snp_evidence.csv", index=False, sep="\t")
 
 
@@ -179,6 +179,6 @@ if __name__ == "__main__":
         strand=snakemake.params.strand,
         separate=snakemake.params.separate,
         refs=snakemake.params.refs,
-        uas=snakemake.params.uas,
+        software=snakemake.params.software,
         thresh=snakemake.params.thresh,
     )

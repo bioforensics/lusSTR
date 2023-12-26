@@ -539,11 +539,11 @@ def snp_call_exception(seq, expected_size, metadata, base):
         return base, flag
 
 
-def main(input, output, kit, uas, snptypes, nofilter):
+def main(input, output, kit, software, snptypes, nofilter):
     output = str(output)
     input = str(input)
     output_name = os.path.splitext(output)[0]
-    if uas:
+    if software == "uas":
         results = uas_format(input, snptypes, nofilter)
         results.to_csv(output, index=False, sep="\t")
     else:
@@ -557,7 +557,7 @@ if __name__ == "__main__":
         snakemake.input,
         snakemake.output,
         kit=snakemake.params.kit,
-        uas=snakemake.params.uas,
+        software=snakemake.params.software,
         snptypes=snakemake.params.types,
         nofilter=snakemake.params.nofilter,
     )

@@ -26,7 +26,7 @@ rule format:
     output:
         expand("{name}.txt", name=output_name)
     params:
-       uas=config["uas"],
+       software=config["analysis_software"],
        kit=config["kit"],
        types=config["types"],
        nofilter=config["nofilter"]
@@ -45,7 +45,7 @@ rule convert:
         kit=config["kit"],
         refs=refs,
         outputid=output_name,
-        uas=config["uas"],
+        software=config["analysis_software"],
         thresh=config["thresh"]
     script:
         lusSTR.wrapper("snps_convert")
