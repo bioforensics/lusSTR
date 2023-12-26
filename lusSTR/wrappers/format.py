@@ -201,7 +201,6 @@ def strait_razor_table(filename, analysisID, sexloci=False):
 
 def genemarker_table(filename, analysisID, sexloci=False):
     name = filename.replace(".csv", "").split(os.sep)[-1]
-    print(name)
     table = pd.read_csv(
         filename, comment="#", usecols=["Marker", "Sequence Total Count", "Sequence"]
     )
@@ -210,7 +209,6 @@ def genemarker_table(filename, analysisID, sexloci=False):
     table["Analysis"] = analysisID
     table["Sequence"] = table["Sequence"].str.upper()
     table = table.rename(columns={"Marker": "Locus", "Sequence Total Count": "Total_Reads"})
-    table
     return table[["Locus", "Total_Reads", "Sequence", "SampleID", "Project", "Analysis"]]
 
 
