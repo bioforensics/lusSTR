@@ -31,7 +31,7 @@ with open(get_str_metadata_file(), "r") as fh:
     str_marker_data = json.load(fh)
 
 
-def format_table(input, a_software, kit="forenseq"):
+def format_table(input, software, kit="forenseq"):
     """
     Function to format final output table and the flanking report (if necessary).
     """
@@ -68,7 +68,7 @@ def format_table(input, a_software, kit="forenseq"):
         else:
             remove_5p = metadata["Power_5"]
             remove_3p = metadata["Power_3"]
-        if len(sequence) <= (remove_5p + remove_3p) and not uas:
+        if len(sequence) <= (remove_5p + remove_3p) and software != "uas":
             flank_summary = [
                 sampleid,
                 project,
@@ -105,7 +105,7 @@ def format_table(input, a_software, kit="forenseq"):
         summary = [sampleid, project, analysis, locus] + marker.summary + [reads]
         list_of_lists.append(summary)
 
-        if not uas:
+        if software != "uas":
             flank_summary = [
                 sampleid,
                 project,
@@ -139,7 +139,7 @@ def format_table(input, a_software, kit="forenseq"):
         final_output = pd.DataFrame(list_of_lists, columns=columns)
     else:
         final_output = sort_table(pd.DataFrame(list_of_lists, columns=columns))
-    if not uas:
+    if software != "uas":
         flanks_columns = [
             "SampleID",
             "Project",
@@ -217,17 +217,17 @@ def make_plot(df, id, sex=False, sameyaxis=True):
         )
 
 
-def main(input, out, kit, a_software, sex, nocombine):
+def main(input, out, kit, software, sex, nocombine):
     input = str(input)
     out = str(out)
     output_name = os.path.splitext(out)[0]
     input_name = os.path.splitext(input)[0]
-    autosomal_final_table, autosomal_flank_table, columns = format_table(input, a_software, kit)
+    autosomal_final_table, autosomal_flank_table, columns = format_table(input, software, kit)
     if sex:
         sex_final_table, sex_flank_table, columns = format_table(
-            f"{input_name}_sexloci.csv", a_software, kit
+            f"{input_name}_sexloci.csv", software, kit
         )
-        if a_software != "uas":
+        if software != "uas":
             if not sex_final_table.empty:
                 sex_flank_table.to_csv(f"{output_name}_sexloci_flanks.txt", sep="\t", index=False)
                 if nocombine:
@@ -239,7 +239,7 @@ def main(input, out, kit, a_software, sex, nocombine):
         else:
             sex_final_table.to_csv(f"{output_name}_sexloci.txt", sep="\t", index=False)
         marker_plots(sex_final_table, output_name, sex=True)
-    if a_software != "uas":
+    if software != "uas":
         if not autosomal_final_table.empty:
             autosomal_flank_table.to_csv(f"{output_name}_flanks.txt", sep="\t", index=False)
             if nocombine:
@@ -258,7 +258,7 @@ if __name__ == "__main__":
         snakemake.input,
         snakemake.output,
         kit=snakemake.params.kit,
-        uas=snakemake.params.a_software,
+        software=snakemake.params.a_software,
         sex=snakemake.params.sex,
         nocombine=snakemake.params.nocombine,
     )

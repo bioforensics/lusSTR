@@ -74,7 +74,12 @@ class STRMarker:
         elif self.kit == "forenseq":
             return self.data["Foren_5"], self.data["Foren_3"]
         elif self.kit == "powerseq":
-            return self.data["Power_5"], self.data["Power_3"]
+            if self.locus == "D16S539" and self.software == "genemarker":
+                return self.data["Power_5"], (self.data["Power_3"] - 3)
+            elif self.locus == "D8S1179" and self.software == "genemarker":
+                return (self.data["Power_5"] - 5), (self.data["Power_3"] - 5)
+            else:
+                return self.data["Power_5"], self.data["Power_3"]
         else:
             raise UnsupportedKitError(self.kit)
 
@@ -86,7 +91,7 @@ class STRMarker:
         back to the UAS region. If the sequence has already been run through UAS, no trimming is
         required.
         """
-        if self.uas:
+        if self.software == "uas":
             return self.sequence
         front, back = self._uas_bases_to_trim()
         if back == 0:
@@ -107,7 +112,7 @@ class STRMarker:
 
     @property
     def flankseq_5p(self):
-        if self.uas:
+        if self.software == "uas":
             return None
         front, back = self._uas_bases_to_trim()
         if front == 0:
@@ -116,7 +121,7 @@ class STRMarker:
 
     @property
     def flank_5p(self):
-        if self.uas or self.flankseq_5p == "":
+        if self.software == "uas" or self.flankseq_5p == "":
             return None
         elif (
             self.kit == "powerseq"
@@ -136,7 +141,7 @@ class STRMarker:
 
     @property
     def flankseq_3p(self):
-        if self.uas:
+        if self.software == "uas":
             return None
         front, back = self._uas_bases_to_trim()
         if back == 0:
@@ -145,7 +150,7 @@ class STRMarker:
 
     @property
     def flank_3p(self):
-        if self.uas or self.flankseq_3p == "":
+        if self.software == "uas" or self.flankseq_3p == "":
             return None
         elif (
             self.kit == "powerseq"
@@ -376,7 +381,13 @@ class STRMarker_D13S317(STRMarker):
             bracketed_form = collapse_repeats_by_length(self.uas_sequence, 4)
         else:
             for m in re.finditer("GGGCTGCCTA", self.uas_sequence):
+                print(m)
                 break_point = m.end()
+            try:
+                break_point
+            except NameError:
+                for m in re.finditer("TTTT", self.uas_sequence):
+                    break_point = m.end() + 10
             bracketed_form = (
                 f"{collapse_repeats_by_length(self.uas_sequence[:break_point], 4)} "
                 f"{collapse_repeats_by_length(self.uas_sequence[break_point:], 4)}"
@@ -1658,6 +1669,6 @@ def STRMarkerObject(locus, sequence, software, kit="forenseq"):
     }
     if locus in constructors:
         constructor = constructors[locus]
-        return constructor(locus, sequence, uas=uas, kit=kit)
+        return constructor(locus, sequence, software=software, kit=kit)
     else:
-        return STRMarker(locus, sequence, uas=uas, kit=kit)
+        return STRMarker(locus, sequence, software=software, kit=kit)
