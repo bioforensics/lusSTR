@@ -381,7 +381,6 @@ class STRMarker_D13S317(STRMarker):
             bracketed_form = collapse_repeats_by_length(self.uas_sequence, 4)
         else:
             for m in re.finditer("GGGCTGCCTA", self.uas_sequence):
-                print(m)
                 break_point = m.end()
             try:
                 break_point
