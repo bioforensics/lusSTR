@@ -42,7 +42,7 @@ setup(
     install_requires=[
         "pandas>=1.0,<2.0",
         "openpyxl>=3.0.6",
-        "snakemake>=7.32.4",
+        "snakemake>=7.22,<8.0",
         "pyyaml>=6.0",
         "matplotlib>=3.8",
     ],
