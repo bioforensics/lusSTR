@@ -25,6 +25,7 @@ from lusSTR.scripts.repeat import sequence_to_bracketed_form, split_by_n
 from lusSTR.scripts.repeat import reverse_complement, reverse_complement_bracketed
 from matplotlib.backends.backend_pdf import PdfPages
 from pathlib import Path
+import sys
 
 
 with open(get_str_metadata_file(), "r") as fh:
@@ -109,9 +110,9 @@ def format_table(input, uas=False, kit="forenseq"):
                 if check_sr > 10:
                     msg = (
                         "Multiple microvariants identified at D12 locus. "
-                        "Please check STRait Razor version!!"
+                        "Please check STRait Razor version!!\n"
                     )
-                    print(msg)
+                    sys.stderr.write(msg)
         summary = [sampleid, project, analysis, locus] + marker.summary + [reads]
         list_of_lists.append(summary)
 
