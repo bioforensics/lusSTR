@@ -886,14 +886,14 @@ def test_strobj_DYS389II(sequence, bracketed, conc, lus, sec, tert):
         (
             "AGGCTGCAGTGAGCCATGTTCATGCCACTGCACTTCACTCTGAGTGACAAATTGAGACCTTGTCTCAGAAAGAAAGAAAGAAAGAAAG"
             "AAAGAAAGAAAGAAAGAAAGAAAGAAAGAAAGAAAGAAAGAAAGAAAGAAAAAGAGAGAGGAAAGAAAGAGAAAAAGAAAAGAAATAG"
-            "TAGCAACTGTTATTG",
+            "TAGCAACTGTTATTGTA",
             "[AGAA]18 AAAG AGAG AG",
             "18",
             "1",
             None,
             "A GGCT GCAG TGAG CCAT GTTC "
             "ATGC CACT GCAC TTCA CTCT GAGT GACA AATT GAGA CCTT G TCTC",
-            "GA [AAGA]2 GAAA AAGA AAAG " "AAAT AGTA GCA A ACTG TTAT TG",
+            "GA [AAGA]2 GAAA AAGA AAAG " "AAAT AGTA GCA A ACTG TTAT TGTA",
             "powerseq",
         ),
     ],
@@ -937,6 +937,18 @@ def test_strobj_D18S51(sequence, bracketed, lus, sec, tert, flank_5, flank_3, ki
             "",
         ),
         (
+            "D12S391",
+            "CAATGGATGCATAGGTAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGACAGACAGACAGACAGAC"
+            "AGATGAGAGGG",
+            "[AGAT]12 [AGAC]5 AGAT",
+            "18",
+            "12",
+            "5",
+            "0",
+            "CAAT GGAT GCAT AGGT",
+            "GAGA GGG",
+        ),
+        (
             "D13S317",
             "TTCTTTAGTGGGCATCCGTGACTCTCTGGACTCTGACCCATCTAACGCCTATCTGTATTTACAAATACATTATCTA"
             "TCTATCTATCTATCTATCTATCTATCTATCAATCAATCATCTATCTATCTTTCTGTCTGTCTTTTTGGGCTGCCTATGGCTCAACCCA"
@@ -964,6 +976,19 @@ def test_strobj_D18S51(sequence, bracketed, lus, sec, tert, flank_5, flank_3, ki
             "AAAG AAGA ATCC AG AAAA CCAC AGTT CCCA TTTT TATA TGGG AG [CAAA]2 GGCA GATC CCAA G CTCT TC"
             " CTCT T CCCT AGAT CAAT [ACAG]4 GTG",
             "TCAT",
+        ),
+        (
+            "D18S51",
+            "AGGCTGCAGTGAGCCATGTTCATGCCACTGCACTTCACTCTGAGTGACAAATTGAGACCTTGTCTCAGAAAGAAAGAAAGAAAG"
+            "AAAGAAAGAAAGAAAGAAAGAAAGAAAGAAAGAAAAAGAGAGAGGAAAGAAAGAGAAAAAGAAAAGAAATAGTAGCAACTGTTA"
+            "TTGTA",
+            "[AGAA]13 AAAG AGAG AG",
+            "13",
+            "13",
+            "1",
+            None,
+            "A GGCT GCAG TGAG CCAT GTTC ATGC CACT GCAC TTCA CTCT GAGT GACA AATT GAGA CCTT G TCTC",
+            "GA [AAGA]2 GAAA AAGA AAAG AAAT AGTA GCA A ACTG TTAT TGTA",
         ),
         (
             "D19S433",
@@ -1142,7 +1167,7 @@ def test_strobj_D18S51(sequence, bracketed, lus, sec, tert, flank_5, flank_3, ki
             "TPOX",
             "CACTGGCCTGTGGGTCCCCCCATAGATCGTAAGCCCAGGAGGAAGGGCTGTGTTTCAGGGCTGTGATCACTAGCACCCAG"
             "AACCGTCGACTGGCACAGAACAGGCACTTAGGGAACCCTCACTGAATGAATGAATGAATGAATGAATGAATGAATGAATGAATGAATG"
-            "TTTGGGCAAATAAA",
+            "TTTGGGCAAATAAACGCT",
             "[AATG]11",
             "11",
             "11",
@@ -1151,7 +1176,7 @@ def test_strobj_D18S51(sequence, bracketed, lus, sec, tert, flank_5, flank_3, ki
             "CAC TGGC CTGT GGGT C CCCC CAT AGAT"
             " CG TAAG CCCA GGAG GAAG GGCT GTGT TTCA GGGC TGTG ATCA CTA GC ACCC AGAA CCGT CGAC TGGC "
             "ACAG AACA GGCA CTTA GGGA ACCC TCAC TG",
-            "TTTG G GCAA ATAA A",
+            "TTTG G GCAA ATAA ACGC T",
         ),
         (
             "VWA",

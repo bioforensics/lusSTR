@@ -39,6 +39,7 @@ def format_table(input, software, kit="forenseq"):
     data.iloc[:, 3] = data.iloc[:, 3].astype(str)
     list_of_lists = []
     flanks_list = []
+    check_sr = 0
     for i, row in data.iterrows():
         locus = data.iloc[i, 0].upper()
         reads = data.iloc[i, 1]
@@ -102,6 +103,15 @@ def format_table(input, software, kit="forenseq"):
             continue
 
         marker = STRMarkerObject(locus, sequence, software, kit=kit)
+        if locus == "D12S391" and kit == "powerseq":
+            if "." in str(marker.canonical):
+                check_sr += 1
+                if check_sr > 10:
+                    msg = (
+                        "Multiple microvariants identified at D12 locus. "
+                        "Please check STRait Razor version!!"
+                    )
+                    print(msg)
         summary = [sampleid, project, analysis, locus] + marker.summary + [reads]
         list_of_lists.append(summary)
 

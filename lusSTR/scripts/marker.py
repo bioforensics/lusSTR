@@ -1521,7 +1521,9 @@ class STRMarker_DYS448(STRMarker):
             if match:
                 length = int(match.group(1))
                 match_list.append(length)
-        if len(match_list) == 1:
+        if len(match_list) == 0:
+            lus, sec, ter = 0, 0, 0
+        elif len(match_list) == 1:
             lus = match_list[0]
             sec = 0
         else:
