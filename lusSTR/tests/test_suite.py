@@ -41,7 +41,7 @@ def test_split_sequence_into_two_strings():
     "infile, len_sum, len_uncom, xy_len_sum, xy_len_uncom, pwrseq",
     [
         ("testformat_sr", 897, 913, 9701, 16108, False),
-        ("powerseq", 353, 441, 256, 303, True),
+        ("powerseq", 359, 441, 256, 303, True),
     ],
 )
 def test_convert_full_nocombine(

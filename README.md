@@ -23,6 +23,8 @@ This Python package has been written for use with either:
   
 The package accomodates either the Sample Details Report/Phenotype Report/Sample Report from the ForenSeq Universal Analysis Software (UAS) or STRait Razor output. If STRait Razor output is provided, sequences are filtered to the UAS sequence region for conversion.
 
+**It is important to note: the most recent lusSTR version (version 0.9) utilizes the most recent STRait Razor configuration files as of December 2023 (```ForenSeqv1.27.config``` and ```PowerSeqv2.31.config```). If using STRait Razor data as input, please ensure you are using these config file versions when running STRait Razor v3s.**
+
 
 ## Installation
 
