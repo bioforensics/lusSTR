@@ -40,6 +40,10 @@ class InvalidSequenceError(ValueError):
     pass
 
 
+class UnsupportedSoftwareError(ValueError):
+    pass
+
+
 class STRMarker:
     def __init__(self, locus, sequence, software, kit="forenseq"):
         self.locus = locus
@@ -47,6 +51,8 @@ class STRMarker:
         if locus not in str_marker_data:
             raise InvalidLocusError(locus)
         self.data = str_marker_data[locus]
+        if software.lower() not in ("uas", "straitrazor", "genemarker"):
+            raise UnsupportedSoftwareError(software)
         self.software = software
         if kit.lower() not in ("forenseq", "powerseq"):
             raise UnsupportedKitError(kit)
@@ -380,13 +386,17 @@ class STRMarker_D13S317(STRMarker):
         if len(self.uas_sequence) < 110:
             bracketed_form = collapse_repeats_by_length(self.uas_sequence, 4)
         else:
-            for m in re.finditer("GGGCTGCCTA", self.uas_sequence):
-                break_point = m.end()
-            try:
-                break_point
-            except NameError:
-                for m in re.finditer("TTTT", self.uas_sequence):
-                    break_point = m.end() + 10
+            if "GGGCTGCCTA" in self.uas_sequence:
+                break_point = self.uas_sequence.index("GGGCTGCCTA") + 10
+            else:
+                break_point = self.uas_sequence.index("TTTT") + 14
+            # for m in re.finditer("GGGCTGCCTA", self.uas_sequence):
+            #    break_point = m.end()
+            # try:
+            #    break_point
+            # except NameError:
+            #    for m in re.finditer("TTTT", self.uas_sequence):
+            #        break_point = m.end() + 10
             bracketed_form = (
                 f"{collapse_repeats_by_length(self.uas_sequence[:break_point], 4)} "
                 f"{collapse_repeats_by_length(self.uas_sequence[break_point:], 4)}"
