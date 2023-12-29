@@ -111,8 +111,8 @@ def process_strs(dict_loc, datatype, seq_col):
             fill_value=None,
         )
         filtered_df = filters(data_order, locus, total_reads, datatype, brack_col)
-        final_df = final_df.append(filtered_df)
-        flags_df = flags_df.append(flags(filtered_df, datatype))
+        final_df = pd.concat([final_df, filtered_df])
+        flags_df = pd.concat([flags_df, flags(filtered_df, datatype)])
     if datatype == "ce" or datatype == "ngs":
         final_df = final_df.astype({"CE_Allele": "float64", "Reads": "int"})
     return final_df, flags_df
@@ -270,7 +270,7 @@ def strmix_ce_processing(profile):
         slope = metadata["Slope"]
         intercept = metadata["Intercept"]
         data["Size"] = data["CE_Allele"] * slope + intercept
-        locus_df = locus_df.append(data)
+        locus_df = pd.concat([locus_df, data])
     locus_df.rename({"CE_Allele": "Allele", "Reads": "Height"}, axis=1, inplace=True)
     return locus_df
 

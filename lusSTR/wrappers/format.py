@@ -166,7 +166,6 @@ def nonuas_load(inpath, software, sexloci=False):
             if sexloci is True:
                 sex_strs = pd.concat([sex_strs, table[table.Locus.isin(sex_locus_list)]])
     else:
-        print(software)
         if software == "straitrazor":
             table = strait_razor_table(inpath, "NA", sexloci)
         elif software == "genemarker":

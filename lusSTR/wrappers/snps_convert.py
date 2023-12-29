@@ -157,7 +157,7 @@ def main(input, output, kit, strand, separate, refs, software, thresh):
         ref_samples = pd.DataFrame()
         for ref in refs.split(","):
             ref = ref.strip()
-            ref_samples = ref_samples.append(results[results["SampleID"].isin([ref])])
+            ref_samples = pd.concat([ref_samples, results[results["SampleID"].isin([ref])]])
             ref_ids.append(ref)
     else:
         ref_ids = [refs]
