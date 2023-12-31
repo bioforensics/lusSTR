@@ -341,3 +341,30 @@ def test_marker_plots(sex, tmp_path):
     assert os.path.exists(exp_output) is True
     if sex:
         assert os.path.exists(sex_exp) is True
+
+
+def test_genemarker(tmp_path):
+    input = data_file("genemarker/2800M_strresults_filtered.csv")
+    # exp_output = data_file(f"genemarker/{file}")
+    # obs_output = str(tmp_path / file)
+    arglist = [
+        "config",
+        "-w",
+        str(tmp_path),
+        "--out",
+        "genemarker_test",
+        "--input",
+        str(input),
+        "--sex",
+        "--analysis-software",
+        "genemarker",
+        "--powerseq",
+    ]
+    lusSTR.cli.main(lusSTR.cli.get_parser().parse_args(arglist))
+    snakemake_arglist = ["strs", "convert", "-w", str(tmp_path)]
+    lusSTR.cli.main(lusSTR.cli.get_parser().parse_args(snakemake_arglist))
+    for ext in [".csv", ".txt", "_flanks.txt", "_sexloci.csv", "_sexloci_flanks.txt"]:
+        exp_output = data_file(f"genemarker/genemarker_test{ext}")
+        print(exp_output)
+        obs_output = str(tmp_path / f"genemarker_test{ext}")
+        assert filecmp.cmp(exp_output, obs_output) is True
