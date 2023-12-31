@@ -21,7 +21,7 @@ This Python package has been written for use with either:
   * 22 autosomal STR loci
   * 22 Y-chromosome loci
   
-The package accomodates either the Sample Details Report/Phenotype Report/Sample Report from the ForenSeq Universal Analysis Software (UAS) or STRait Razor output. If STRait Razor output is provided, sequences are filtered to the UAS sequence region for conversion.
+The package accomodates either the Sample Details Report/Phenotype Report/Sample Report from the ForenSeq Universal Analysis Software (UAS), STRait Razor v3 output, or GeneMarker v2.6 (```*_strresults_filtered.csv``` output file; PowerSeq sequences only). If STRait Razor or GeneMarker output is provided, sequences are filtered to the UAS sequence region for conversion.
 
 **It is important to note: the most recent lusSTR version (version 0.9) utilizes the most recent STRait Razor configuration files as of December 2023 (```ForenSeqv1.27.config``` and ```PowerSeqv2.31.config```). If using STRait Razor data as input, please ensure you are using these config file versions when running STRait Razor v3s.**
 
@@ -42,10 +42,11 @@ make devenv
 
 ## Usage
 
-lusSTR accomodates three different input formats:  
+lusSTR accomodates four different input formats:  
 (1) UAS Sample Details Report, UAS Sample Report, and UAS Phenotype Report (for SNP processing) in .xlsx format (a single file or directory containing multiple files)  
-(2) STRait Razor output with one sample per file (a single file or directory containing multiple files)  
-(3) Sample(s) sequences in CSV format; first four columns must be Locus, NumReads, Sequence, SampleID; Optional last two columns can be Project and Analysis IDs.  
+(2) STRait Razor v3 output with one sample per file (a single file or directory containing multiple files)  
+(3) GeneMarker v2.6 output (```*_strresults_filtered.csv```; a single file or directory containing multiple files)   
+(4) Sample(s) sequences in CSV format; first four columns must be Locus, NumReads, Sequence, SampleID; Optional last two columns can be Project and Analysis IDs.  
 
 *These individual sample files or directory of files must be specified in the config file (see below).*
 
@@ -57,7 +58,7 @@ ___
 Running ```lusstr config``` creates a config file containing the default settings for the lusSTR STR analysis pipeline. The settings can be changed with command line arguments (see below) or by manually editing the config file. The default settings, along with their descriptions, are as follows:
 
 ### general settings
-uas: ```True``` (True/False); if ran through UAS (invoke ```--straitrazor``` flag if STRait Razor was used)  
+analysis_software: ```uas``` (```uas/straitrazor/genemarker```); indicates the analysis software used prior to lusSTR
 sex: ```False``` (True/False); include sex-chromosome STRs (invoke ```--sex``` flag)  
 samp_input: ```/path/to/input/directory/or/samples``` input directory or sample; if not provided, will be current working directory (indicate using ```--input path/to/dir``` )  
 output: ```lusstr_output``` output file/directory name (indicate using ```--out dir/sampleid e.g. --out test_030923```)
@@ -117,7 +118,7 @@ lusstr strs convert -w lusstr_files/
 
 ### Formatting input for STR loci sequences
 
-If inputting data from either the UAS Sample Details Report or STRait Razor output, the user must first invoke the ```format``` step to extract necessary information and format for the ```convert``` step.
+If inputting data from either the UAS Sample Details Report, STRait Razor or GeneMarker output, the user must first invoke the ```format``` step to extract necessary information and format for the ```convert``` step.
 
 The ```format``` command removes unnecessary rows/columns and outputs a table in CSV format containing the following columns:
 *  Locus
@@ -150,7 +151,7 @@ The ```convert``` step produces a tab-delineated table with the following column
 If including the sex chromosome loci as specified in the config file, a second table with the above columns for the sex chromosome loci will be outputted as well.
 
 
-If STRait Razor data is specified, several additional processes occur with the ```convert``` step:
+If STRait Razor or GeneMarker data is specified, several additional processes occur with the ```convert``` step:
 *  The full sequences are filtered to the UAS region before the translation step. The number of bases to remove is determined based on the specified kit.
 *  Once the sequences are filtered to the UAS region, any duplicated sequences are removed and their reads are summed in with the remaining sequence ```Reads``` column. NOTE: This step can be skipped with the ```nocombine``` setting in the config file.
   
@@ -206,7 +207,7 @@ Running ```lusstr config --snps``` creates a config file containing the default 
 
 
 ### general settings  
-uas: ```True```  (True/False); if ran through UAS  (invoke ```--straitrazor``` flag if STRait Razor was used)  
+analysis_software: ```uas``` (```uas/straitrazor```); indicates the analysis software used prior to lusSTR
 samp_input: ```/path/to/input/directory/or/samples``` input directory or sample; if not provided, will be current working directory (indicate using ```--input path/to/dir```)  
 output: ```lusstr_output``` output file/directory name; (indicate using ```--out dir/sampleid e.g. --out test_030923```)   
 kit: ```sigprep``` (sigprep/kintelligence) (invoke using the ```--kintelligence``` flag if using Kintelligence data)  
