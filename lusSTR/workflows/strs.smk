@@ -16,7 +16,7 @@ data = config["data_type"]
 separate = config["separate"]
 
 
-def get_sample_IDs(input, uas, output, software, separate):
+def get_sample_IDs(input, a_software, output, software, separate):
     convert_out = f"{output}.txt"
     format_out = f"{output}.csv"
     if (software == "efm" or software == "mpsproto") and separate is False:
@@ -26,8 +26,8 @@ def get_sample_IDs(input, uas, output, software, separate):
     elif os.path.exists(format_out):
         ID_list = get_existing_IDs(format_out, ",")
     else:
-        file_ext = ".xlsx" if uas is True else ".txt"
-        if uas is True:
+        file_ext = ".xlsx" if a_software == "uas" else ".txt"
+        if a_software == "uas":
             if os.path.isdir(input):
                 files = glob.glob(os.path.join(input, f"[!~]*{file_ext}"))
             else:
@@ -77,7 +77,7 @@ rule all:
         expand("{name}.txt", name=output_name),
         expand(
             "{outdir}/{samplename}_{prof_t}_{data_t}.csv", outdir=output_name,
-            samplename=get_sample_IDs(input_name, config["uas"], output_name, software, 
+            samplename=get_sample_IDs(input_name, config["analysis_software"], output_name, software, 
             separate), prof_t=prof, data_t=data
         )
 
@@ -88,7 +88,7 @@ rule format:
     output:
         expand("{name}.csv", name=output_name)
     params:
-       uas=config["uas"],
+       a_software=config["analysis_software"],
        sex=config["sex"]
     script:
         lusSTR.wrapper("format")
@@ -100,7 +100,7 @@ rule convert:
     output:
         expand("{name}.txt", name=output_name)
     params:
-        uas=config["uas"],
+        a_software=config["analysis_software"],
         sex=config["sex"],
         nocombine=config["nocombine"],
         kit=config["kit"]
@@ -114,7 +114,7 @@ rule filter:
     output:
         expand(
             "{outdir}/{samplename}_{prof_t}_{data_t}.csv", outdir=output_name,
-            samplename=get_sample_IDs(input_name, config["uas"], output_name, software, 
+            samplename=get_sample_IDs(input_name, config["analysis_software"], output_name, software, 
             separate), prof_t=prof, data_t=data
         )
     params:

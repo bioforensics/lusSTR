@@ -2,8 +2,8 @@
 ---
 
 ## general settings
-uas: True  ## True/False; if ran through UAS
-sex: False   ## True/False; include sex-chromosome STRs
+analysis_software: uas #uas/straitrazor/genemarker; analysis software used prior to lusSTR
+sex: False ## True/False; include sex-chromosome STRs
 samp_input: "/path/to/input/directory/or/samples" ## input directory or sample; if not provided, will be cwd
 output: "lusstr_output" ## output file/directory name; Example: "test_030923"
 

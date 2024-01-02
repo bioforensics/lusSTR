@@ -93,7 +93,7 @@ def uas_load(input, nofilter, type="i"):
             if "Phenotype" in filename or "Sample" in filename:
                 snps = uas_types(filename, type, nofilter)
             if snps is not None:
-                snp_final_output = snp_final_output.append(snps)
+                snp_final_output = pd.concat([snp_final_output, pd.DataFrame(snps)])
             else:
                 continue
     return snp_final_output
@@ -141,7 +141,7 @@ def parse_snp_table_from_sheet(infile, sheet, snp_type_arg, nofilter):
             filtered_data = data_typed[data_typed["Locus"].isin(filtered_dict)].reset_index(
                 drop=True
             )
-            concat_df = concat_df.append(filtered_data)
+            concat_df = pd.concat([concat_df, filtered_data])
     sampleid = table.iloc[2, 1]
     projectid = table.iloc[3, 1]
     analysisid = table.iloc[4, 1]
@@ -195,7 +195,7 @@ def process_kin(input, nofilter):
             data_typed = data
         else:
             data_typed = data[data["Typed Allele?"] == "Yes"]
-        data_filt = data_filt.append(data_typed).reset_index(drop=True)
+        data_filt = pd.concat([data_filt, data_typed]).reset_index(drop=True)
     sampid = table.iloc[2, 1]
     projid = table.iloc[3, 1]
     analyid = table.iloc[4, 1]
@@ -358,7 +358,7 @@ def strait_razor_concat(input, snp_type_arg):
         all_snps = pd.DataFrame()
         for filename in sorted(files):
             snps = read_straitrazor_data(filename, snp_type_arg, analysisID)
-            all_snps = all_snps.append(snps)
+            all_snps = pd.concat([all_snps, snps])
     else:
         all_snps = read_straitrazor_data(input, snp_type_arg, None)
     all_snps.columns = [
@@ -389,7 +389,7 @@ def read_straitrazor_data(filename, snp_type_arg, analysisid):
     row = process_straitrazor_data(table, snp_type_arg, name, analysisid)
     snps = pd.DataFrame()
     if row is not None:
-        snps = snps.append(row)
+        snps = pd.concat([snps, row])
     return snps
 
 
@@ -407,7 +407,7 @@ def process_straitrazor_data(table, snp_type_arg, name, analysisid):
                 row = compile_row_of_snp_data(snps_only, snpid, j, snp_type_arg, name, analysisid)
             except KeyError:
                 row = None
-            snp_df = snp_df.append(row)
+            snp_df = pd.concat([snp_df, row])
     except:
         print(
             f"Error found with {name}. Will bypass and continue. Please check file"
@@ -431,11 +431,11 @@ def compile_row_of_snp_data(infile, snp, table_loc, type, name, analysis):
             snp_id = locus_data["SNPs"][k]
             row_tmp = collect_snp_info(infile, snp_id, table_loc, type, name, analysis)
             if row_tmp is not None:
-                snp_df = snp_df.append(row_tmp)
+                snp_df = pd.concat([snp_df, pd.DataFrame(row_tmp)])
     else:
         row_tmp = collect_snp_info(infile, snp, table_loc, type, name, analysis)
         if row_tmp is not None:
-            snp_df = snp_df.append(row_tmp)
+            snp_df = pd.concat([snp_df, pd.DataFrame(row_tmp)])
     return snp_df
 
 
@@ -539,11 +539,11 @@ def snp_call_exception(seq, expected_size, metadata, base):
         return base, flag
 
 
-def main(input, output, kit, uas, snptypes, nofilter):
+def main(input, output, kit, software, snptypes, nofilter):
     output = str(output)
     input = str(input)
     output_name = os.path.splitext(output)[0]
-    if uas:
+    if software == "uas":
         results = uas_format(input, snptypes, nofilter)
         results.to_csv(output, index=False, sep="\t")
     else:
@@ -557,7 +557,7 @@ if __name__ == "__main__":
         snakemake.input,
         snakemake.output,
         kit=snakemake.params.kit,
-        uas=snakemake.params.uas,
+        software=snakemake.params.software,
         snptypes=snakemake.params.types,
         nofilter=snakemake.params.nofilter,
     )

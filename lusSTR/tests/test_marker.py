@@ -46,7 +46,7 @@ from lusSTR.scripts.marker import STRMarkerObject
     ],
 )
 def test_D21_bracket(sequence, bracket_form):
-    marker = STRMarkerObject("D21S11", sequence, uas=True)
+    marker = STRMarkerObject("D21S11", sequence, "uas")
     assert marker.convert == bracket_form
 
 
@@ -54,13 +54,13 @@ def test_D19_convert():
     uas_sequence = (
         "AAGGAAAAGGTAGGAAGGAAGGAAGGAAGGAAGGAAGGAAGGAAGGAAGGAAGGAAGGAAGGAAGGAAGGAGAGAAGAAGAAAGAGAG"
     )
-    marker = STRMarkerObject("D19S433", uas_sequence, uas=True)
+    marker = STRMarkerObject("D19S433", uas_sequence, "uas")
     assert marker.convert == "CT CTCT TTCT TCTT CTCT [CCTT]14 CCTA CCTT TT CCTT"
 
 
 def test_D1_convert():
     uas_sequence = "TAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATGTGTATGTG"
-    marker = STRMarkerObject("D1S1656", uas_sequence, uas=True)
+    marker = STRMarkerObject("D1S1656", uas_sequence, "uas")
     assert marker.convert == "CA CATA CACA [TCTA]11"
 
 
@@ -80,7 +80,7 @@ def test_D1_convert():
     ],
 )
 def test_PentaD_convert(sequence, bracket_form):
-    marker = STRMarkerObject("PENTA D", sequence, uas=True)
+    marker = STRMarkerObject("PENTA D", sequence, "uas")
     assert marker.convert == bracket_form
 
 
@@ -90,12 +90,12 @@ def test_FGA_convert():
         "TCTTTCTTTCTTTCTTTCTTTCTTTCTTTCTTTCTTTCTTTCTTCCTTCCTTCCTTTCTTTCTTTCTCCTTCCTTCCTTCCTTCC"
     )
     convert = "[GGAA]4 GGAG [AAAG]3 [GAAG]3 [AAAG]15 [ACAG]3 [AAAG]9 AA AAAA [GAAA]4"
-    marker = STRMarkerObject("FGA", uas_sequence, uas=True)
+    marker = STRMarkerObject("FGA", uas_sequence, "uas")
     assert marker.convert == convert
 
 
 def test_THO1():
-    marker = STRMarkerObject("TH01", "AATGAATGAATGAATGAATGATGATGAATGAATGAATG", uas=True)
+    marker = STRMarkerObject("TH01", "AATGAATGAATGAATGAATGATGATGAATGAATGAATG", "uas")
     assert marker.convert == "[AATG]5 ATG ATG [AATG]3"
 
 
@@ -133,7 +133,7 @@ def test_THO1():
     ],
 )
 def test_D21_convert(sequence, lus_allele, sec_allele, tert_allele):
-    marker = STRMarkerObject("D21S11", sequence, uas=True)
+    marker = STRMarkerObject("D21S11", sequence, "uas")
     lus, sec, tert = marker.designation
     assert str(lus) == lus_allele
     assert str(sec) == sec_allele
@@ -145,7 +145,7 @@ def test_D21_lus_sec():
         "TCTATCTATCTATCTATCTGTCTGTCTGTCTGTCTGTCTGTCTATCTATCTATATCTATCTATCTATCATCTATCTATCCATATCTATC"
         "TATCTATCTATCTATCTATCTATCTATCTATCTA"
     )
-    marker = STRMarkerObject("D21S11", sequence, uas=True)
+    marker = STRMarkerObject("D21S11", sequence, "uas")
     lus, sec, tert = marker.designation
     assert str(lus) == "10"
     assert str(sec) == "4"
@@ -209,7 +209,7 @@ def test_D21_lus_sec():
     ],
 )
 def test_convert_and_lus(locus, sequence, forward_bracket, lus, sec, tert):
-    marker = STRMarkerObject(locus, sequence, uas=True)
+    marker = STRMarkerObject(locus, sequence, "uas")
     assert marker.convert == forward_bracket
     lus_out, sec_out, tert_out = marker.designation
     assert str(lus_out) == lus
@@ -234,7 +234,7 @@ def test_convert_and_lus(locus, sequence, forward_bracket, lus, sec, tert):
     ],
 )
 def test_strobj_DYS389II(sequence, bracketed, conc, lus, sec, tert):
-    marker = STRMarkerObject("DYS389II", sequence, uas=False, kit="forenseq")
+    marker = STRMarkerObject("DYS389II", sequence, "straitrazor", kit="forenseq")
     assert marker.convert == bracketed
     assert marker.canonical == conc
     assert marker.designation == (lus, sec, tert)
@@ -244,7 +244,7 @@ def test_strobj_CSF1PO():
     marker = STRMarkerObject(
         "CSF1PO",
         "CTTCCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTAATCTATCTATCTT",
-        uas=False,
+        "straitrazor",
         kit="forenseq",
     )
     assert marker.uas_sequence == "AGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGAT"
@@ -261,7 +261,7 @@ def test_strobj_D10S1248():
         "D10S1248",
         "TTGAACAAATGAGTGAGTGGAAGGAAGGAAGGAAGGAAGGAAGGAAGGAAGGAAGGAAGGAAGGAAGGAAATGAAGA"
         "CAATACAACCAGAGTT",
-        uas=False,
+        "straitrazor",
         kit="forenseq",
     )
     assert marker.uas_sequence == "GGAAGGAAGGAAGGAAGGAAGGAAGGAAGGAAGGAAGGAAGGAAGGAAGGAA"
@@ -277,7 +277,7 @@ def test_strobj_D1S1656():
         "D1S1656",
         "TTCAGAGAAATAGAATCACTAGGGAACCAAATATATATACATACAATTAAACACACACACACCTATCTATCTATCTAT"
         "CTATCTATCTATCTATCTATCTATCTATCTA",
-        uas=False,
+        "straitrazor",
         kit="forenseq",
     )
     assert marker.uas_sequence == "TAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGGTGTGTGTGTG"
@@ -292,7 +292,7 @@ def test_strobj_D5S818():
     marker = STRMarkerObject(
         "D5S818",
         "TATTTATACCTCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTTCAAAAT",
-        uas=False,
+        "straitrazor",
         kit="forenseq",
     )
     assert marker.uas_sequence == "AGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGAG"
@@ -308,7 +308,7 @@ def test_strobj_D16S539():
         "D16S539",
         "TCCTCTTCCCTAGATCAATACAGACAGACAGACAGGTGGATAGATAGATAGATTGATTGATAGATAGATAGATAGATA"
         "TCATTGAAAGACAAAACAGAGATGGATGATAGATAC",
-        uas=False,
+        "straitrazor",
         kit="forenseq",
     )
     assert marker.uas_sequence == "GATAGATAGATAGATTGATTGATAGATAGATAGATAGATA"
@@ -323,7 +323,7 @@ def test_strobj_D7S820():
         "D7S820",
         "TATTTAGTGAGATAAAAAAAAAACTATCAATCTGTCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCGTT"
         "AGTTCGTTCTAAACTAT",
-        uas=False,
+        "straitrazor",
         kit="forenseq",
     )
     assert marker.uas_sequence == "GATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGACAGATTGATAGTTTT"
@@ -335,7 +335,7 @@ def test_strobj_D7S820():
 
 def test_strobj_D3S1358():
     sequence = "TCTATCTGTCTGTCTATCTATCTATCTATCTATCTATCTATCTATCTAACTAACTATCTATCTA"
-    marker = STRMarkerObject("D3S1358", sequence, uas=True, kit="forenseq")
+    marker = STRMarkerObject("D3S1358", sequence, "uas", kit="forenseq")
     assert marker.forward_sequence == sequence
     assert marker.uas_sequence == sequence
     assert marker.convert == "TCTA [TCTG]2 [TCTA]9 [ACTA]2 [TCTA]2"
@@ -346,7 +346,7 @@ def test_strobj_D19S433_newformat():
         "D19S433",
         "AATAAAAATCTTCTCTCTTTCTTCCTCTCTCCTTCCTTCCTTCCTTCCTTCCTTCCTTCCTTCCTTCCTTCCTTCCTTCCTACCT"
         "TCCTTCCTTCAACAGAATCTTATTCTGTTGCCCAGGCTGGAGTCCAGTGTTACAATTATAGCT",
-        uas=False,
+        "straitrazor",
         kit="forenseq",
     )
     assert marker.convert == "CT CTCT TTCT TCCT CTCT [CCTT]12 CCTA [CCTT]3"
@@ -358,7 +358,7 @@ def test_strobj_D21S11_newformat():
         "AAATATGTGAGTCAATTCCCCAAGTGAATTGCCTTCTATCTATCTATCTATCTATCTGTCTGTCTGTCTGTCTGTCTGTCTATCT"
         "ATCTATATCTATCTATCTATCATCTATCTATCCATATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATATCT"
         "ACTATCTAT",
-        uas=False,
+        "straitrazor",
         kit="forenseq",
     )
     assert marker.convert == ("[TCTA]5 [TCTG]6 [TCTA]3 TA [TCTA]3 TCA [TCTA]2 TCCA TA [TCTA]11 TA")
@@ -366,7 +366,7 @@ def test_strobj_D21S11_newformat():
 
 def test_strobj_FGA_newformat():
     marker = STRMarkerObject(
-        "FGA", "CCAGCAAAAAAGAAAGAAAGAGAAAAAAGAAAGAAAGAAA", uas=False, kit="forenseq"
+        "FGA", "CCAGCAAAAAAGAAAGAAAGAGAAAAAAGAAAGAAAGAAA", "straitrazor", kit="forenseq"
     )
     assert marker.convert == "AAAA [AGAA]3 A"
 
@@ -376,7 +376,7 @@ def test_strobj_DYS643_foren():
         "DYS643",
         "TGATTTTTGCAGGTGTTCACTGCAAGCCATGCCTGGTTAAACTACTGTGCCTTTTCTTTTCTTTTCTTTTCTTTTCTT"
         "TTCTTTTCTTTTCTTTTCTTTTCTTTCTTTTTAAAACTT",
-        uas=False,
+        "straitrazor",
         kit="forenseq",
     )
     assert marker.convert == "[CTTTT]10 CTTTC TTTT"
@@ -390,7 +390,7 @@ def test_strobj_DYS635_foren():
         "DYS635",
         "ATCAATCAATGAATGGATAAAGAAAATGTGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAG"
         "ATACATACATAGATAGATACATACATAGATAGATAGATAGAGATTCTATGCAAAGTGAGAAGCCA",
-        uas=False,
+        "straitrazor",
         kit="forenseq",
     )
     assert marker.convert == "[TAGA]12 [TACA]2 [TAGA]2 [TACA]2 [TAGA]4"
@@ -404,7 +404,7 @@ def test_strobj_DYS612():
         "DYS612",
         "TTTCACACAGGTTCAGAGGTTTGCCTCCTCCTCCTCCTCTTTCTTCTTCTTCTCCTTCTTCTTCTTCTTCTTCTTCTT"
         "CTTCTTCTTCTTCTTCTTCTTCTTCTTCTTCTTCTTCTTCTTCTTCTTCTGTCACTTTTCCAAATTATTTTCTTTT",
-        uas=False,
+        "straitrazor",
         kit="forenseq",
     )
     assert marker.convert == "[CCT]5 CTT [TCT]4 CCT [TCT]24"
@@ -418,7 +418,7 @@ def test_strobj_DYS576_foren():
         "DYS576",
         "AAAGAAAGAAAGAAAGAAAGAAAGAAAGAAAGAAAGAAAGAAAGAAAGAAAGAAAGAAAGAAAGAAAGAAAAAGCCAA"
         "GACAAATACGCTTATTACTCCCATCTCCT",
-        uas=False,
+        "straitrazor",
         kit="forenseq",
     )
     assert marker.convert == "[AAAG]17"
@@ -432,7 +432,7 @@ def test_strobj_DYS549_foren():
         "DYS549",
         "TAATAAGGTAGACATAGCAATTAGGTAGGTAAAGAGGAAGATGATAGATGATTAGAAAGATGATAGATAGATAGATAG"
         "ATAGATAGATAGATAGATAGATAGATAGATAGATAGAAAAAATCTACATAAACAAAATCACAAATGGAAAAGGGGACATTACCA",
-        uas=False,
+        "straitrazor",
         kit="forenseq",
     )
     assert marker.convert == "[GATA]13"
@@ -448,7 +448,7 @@ def test_strobj_DYS533():
         "DYS533",
         "TAACTATATAACTATGTATTATCTATCAATCTTCTACCTATCATCTTTCTAGCTAGCTATCATCTATCTATCTATCTA"
         "TCTATCTATCTATCTATCTATCTATCTATCTATCTATCATCTATCATCTTCTATTGTTT",
-        uas=False,
+        "straitrazor",
         kit="forenseq",
     )
     assert marker.convert == "[TATC]13"
@@ -463,7 +463,7 @@ def test_strobj_DYS522():
         "AGTTAGAGAGAGAGATGATGGATAGATAAATAGATAGATGATAGATGAATAGATAGGCGGGTAATAGATTTTATATAG"
         "ATAGATGATAGCTAGATAATGGATAGACATAGGTGACAGATGATAAATACATAGATAAATAGATGATAGATAGATAGATAGATAGATA"
         "GATAGATAGATAGATAGATAGATAGACAGATGTCCACCATGAGGTTC",
-        uas=False,
+        "straitrazor",
         kit="forenseq",
     )
     assert marker.convert == "ATA GATG [ATAG]12"
@@ -496,7 +496,7 @@ def test_strobj_DYS522():
     ],
 )
 def test_strobj_DYS439(sequence, bracketed, conc, lus, sec, tert, kit):
-    marker = STRMarkerObject("DYS439", sequence, uas=False, kit=kit)
+    marker = STRMarkerObject("DYS439", sequence, "straitrazor", kit=kit)
     assert marker.convert == bracketed
     assert str(marker.canonical) == conc
     assert marker.designation == (lus, sec, tert)
@@ -508,7 +508,7 @@ def test_strobj_DYS437_foren():
         "ATGCCCATCCGGTCTATCTATCTATCTATCTATCTATCTATCTATCTATCTGTCTGTCTGTCTATCTATCTATCTATC"
         "ATCTATCATCTGTGAATGATGTCTATCTACTTATCTATGAATGATATTTATCTGTGGTTATCTATCTATCTATATCATCTGTGAATGA"
         "CAGGGTCTTCCTCTG",
-        uas=False,
+        "straitrazor",
         kit="forenseq",
     )
     assert marker.convert == "[TCTA]9 [TCTG]3 [TCTA]4"
@@ -526,7 +526,7 @@ def test_strobj_DYS392_foren():
         "TTAAACCTACCAATCCCATTCCTTAGTAAATAATAATAATAATAATAATAATAATAATAATAATAATAAATAAATGGT"
         "GATACAAGAAAAAAATTTGTTTTCCTTCTTGGCTTTTAAATAACAAACACTTGAAATCAAATTAGTTGTTTTTAAAAGCTAGATTAAT"
         "GAAGAA",
-        uas=False,
+        "straitrazor",
         kit="forenseq",
     )
     assert marker.convert == "[ATA]13"
@@ -543,7 +543,7 @@ def test_strobj_DYS391_foren():
         "DYS391",
         "ATATCTGTCTGTCTGTCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTGCCTATCT"
         "GCCTGCCTACCTATCCCTCTAT",
-        uas=False,
+        "straitrazor",
         kit="forenseq",
     )
     assert marker.convert == "[TCTG]3 [TCTA]13 TCTG"
@@ -558,7 +558,7 @@ def test_strobj_DYS19_foren():
         "TGGTCAATCTCTGCACCTGGAAATAGTGGCTGGGGCACCAGGAGTAATACTTCGGGCCATGGCCATGTAGTGAGGACAA"
         "GGAGTCCATCTGGGTTAAGGAGAGTGTCACTATATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTACCTATCTATC"
         "TATCTA",
-        uas=False,
+        "straitrazor",
         kit="forenseq",
     )
     assert marker.convert == "[TCTA]11 CCTA [TCTA]3"
@@ -572,7 +572,7 @@ def test_strobj_HPRTB():
         "HPRTB",
         "CTAGAACTTATCTTCTGTAAATCTGTCTCTATTTCCATCTCTGTCTCCATCTTTGTCTCTATCTCTATCTGTCTATCTCTATCTATCT"
         "ATCTATCTATCTATCTATCTATCTATCTATCTATCTATCTAAAGCAAATTCATGCCCTTCTCCTATTT",
-        uas=False,
+        "straitrazor",
         kit="forenseq",
     )
     assert marker.convert == "[ATCT]12"
@@ -590,7 +590,7 @@ def test_strobj_DXS8378():
         "AGTGAGCTGAGATGGTGCCACTGAACTCCAGCCTGGGCGACAAGAGCGAAACTCCAACTCAAAAAATAAATAAATAAAATATAGATAG"
         "ATAGATAGATAGATAGATAGATAGATAGATAGATAGTGACCTGCCAGGAGCAGGGGACCACCGGGTTGCCTAAGGAGGGGTGAACTGT"
         "CCCAGGATGGAAATGAAACA",
-        uas=False,
+        "straitrazor",
         kit="forenseq",
     )
     assert marker.convert == "[ATAG]11"
@@ -611,7 +611,7 @@ def test_strobj_DXS7132():
         "DXS7132",
         "TCCAGAGAAACAGAACCAATAGGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGATAGACAGTCAGATAGA"
         "TGAGAGGGGATTTATTATGAAAATGGGCTCACACTATTAAGGAGGCTAAGAAGTTCCACAGTAT",
-        uas=False,
+        "straitrazor",
         kit="forenseq",
     )
     assert marker.convert == "[TAGA]13"
@@ -649,7 +649,7 @@ def test_strobj_DXS7132():
     ],
 )
 def test_strobj_DXS10135(sequence, bracketed, conc, lus, sec, tert):
-    marker = STRMarkerObject("DXS10135", sequence, uas=False, kit="forenseq")
+    marker = STRMarkerObject("DXS10135", sequence, "straitrazor", kit="forenseq")
     assert marker.convert == bracketed
     assert str(marker.canonical) == conc
     assert marker.designation == (lus, sec, tert)
@@ -687,7 +687,7 @@ def test_strobj_DXS10135(sequence, bracketed, conc, lus, sec, tert):
     ],
 )
 def test_strobj_DXS10074(sequence, bracketed, conc, lus, sec, tert, flank_5p, flank_3p):
-    marker = STRMarkerObject("DXS10074", sequence, uas=False, kit="forenseq")
+    marker = STRMarkerObject("DXS10074", sequence, "straitrazor", kit="forenseq")
     assert marker.convert == bracketed
     assert str(marker.canonical) == conc
     assert marker.designation == (lus, sec, tert)
@@ -700,7 +700,7 @@ def test_strobj_Y_GATA_H4():
         "Y-GATA-H4",
         "CTATCTATCTATCTATTCATCCATCTAATCTATCCATTCTATCTATCTATCTATCTATCTATCTATCTATCTATC"
         "TATCTACCTACCTACCTATCTATCTATAGATCTATCTATCTATCT",
-        uas=False,
+        "straitrazor",
         kit="forenseq",
     )
     assert marker.convert == (
@@ -740,7 +740,7 @@ def test_strobj_Y_GATA_H4():
     ],
 )
 def test_strobj_DYS390(sequence, bracketed, conc, lus, sec, tert, flank_5p, kit):
-    marker = STRMarkerObject("DYS390", sequence, uas=False, kit=kit)
+    marker = STRMarkerObject("DYS390", sequence, "straitrazor", kit=kit)
     assert marker.convert == bracketed
     assert str(marker.canonical) == conc
     assert marker.designation == (lus, sec, tert)
@@ -778,7 +778,7 @@ def test_strobj_DYS390(sequence, bracketed, conc, lus, sec, tert, flank_5p, kit)
     ],
 )
 def test_strobj_DYS385(sequence, bracketed, conc, lus, sec, tert, kit):
-    marker = STRMarkerObject("DYS385A-B", sequence, uas=False, kit=kit)
+    marker = STRMarkerObject("DYS385A-B", sequence, "straitrazor", kit=kit)
     assert marker.convert == bracketed
     assert str(marker.canonical) == conc
     assert marker.designation == (lus, sec, tert)
@@ -810,7 +810,7 @@ def test_strobj_DYS385(sequence, bracketed, conc, lus, sec, tert, kit):
     ],
 )
 def test_strobj_DYS448(sequence, bracketed, conc, lus, sec, tert):
-    marker = STRMarkerObject("DYS448", sequence, uas=False, kit="forenseq")
+    marker = STRMarkerObject("DYS448", sequence, "straitrazor", kit="forenseq")
     assert marker.convert == bracketed
     assert marker.canonical == conc
     assert marker.designation == (lus, sec, tert)
@@ -840,7 +840,7 @@ def test_strobj_DYS448(sequence, bracketed, conc, lus, sec, tert):
     ],
 )
 def test_strobj_DXS10103(sequence, bracketed, conc, lus, sec, tert):
-    marker = STRMarkerObject("DXS10103", sequence, uas=False, kit="forenseq")
+    marker = STRMarkerObject("DXS10103", sequence, "straitrazor", kit="forenseq")
     assert marker.convert == bracketed
     assert marker.canonical == conc
     assert marker.designation == (lus, sec, tert)
@@ -863,7 +863,7 @@ def test_strobj_DXS10103(sequence, bracketed, conc, lus, sec, tert):
     ],
 )
 def test_strobj_DYS389II(sequence, bracketed, conc, lus, sec, tert):
-    marker = STRMarkerObject("DYS389II", sequence, uas=False, kit="forenseq")
+    marker = STRMarkerObject("DYS389II", sequence, "straitrazor", kit="forenseq")
     assert marker.convert == bracketed
     assert marker.canonical == conc
     assert marker.designation == (lus, sec, tert)
@@ -899,7 +899,7 @@ def test_strobj_DYS389II(sequence, bracketed, conc, lus, sec, tert):
     ],
 )
 def test_strobj_D18S51(sequence, bracketed, lus, sec, tert, flank_5, flank_3, kit):
-    marker = STRMarkerObject("D18S51", sequence, uas=False, kit=kit)
+    marker = STRMarkerObject("D18S51", sequence, "straitrazor", kit=kit)
     assert marker.convert == bracketed
     assert marker.designation == (lus, sec, tert)
     assert marker.flank_5p == flank_5
@@ -1461,7 +1461,7 @@ def test_strobj_D18S51(sequence, bracketed, lus, sec, tert, flank_5, flank_3, ki
     ],
 )
 def test_new_power_config(locus, sequence, bracketed, conc, lus, sec, tert, flank_5, flank_3):
-    marker = STRMarkerObject(locus, sequence, uas=False, kit="powerseq")
+    marker = STRMarkerObject(locus, sequence, "straitrazor", kit="powerseq")
     assert marker.convert == bracketed
     assert str(marker.canonical) == conc
     assert marker.designation == (lus, sec, tert)

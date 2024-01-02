@@ -40,18 +40,24 @@ class InvalidSequenceError(ValueError):
     pass
 
 
+class UnsupportedSoftwareError(ValueError):
+    pass
+
+
 class STRMarker:
-    def __init__(self, locus, sequence, uas=False, kit="forenseq"):
+    def __init__(self, locus, sequence, software, kit="forenseq"):
         self.locus = locus
         self.sequence = sequence
         if locus not in str_marker_data:
             raise InvalidLocusError(locus)
         self.data = str_marker_data[locus]
-        self.uas = uas
+        if software.lower() not in ("uas", "straitrazor", "genemarker"):
+            raise UnsupportedSoftwareError(software)
+        self.software = software
         if kit.lower() not in ("forenseq", "powerseq"):
             raise UnsupportedKitError(kit)
         self.kit = kit.lower()
-        if uas and self.data["ReverseCompNeeded"] == "Yes":
+        if software == "uas" and self.data["ReverseCompNeeded"] == "Yes":
             self.sequence = reverse_complement(sequence)
 
     @property
@@ -69,12 +75,17 @@ class STRMarker:
         function determines the number of bases that need to be trimmed from the full amplicon
         sequence to recover the UAS core sequence.
         """
-        if self.uas:
+        if self.software == "uas":
             return 0, 0
         elif self.kit == "forenseq":
             return self.data["Foren_5"], self.data["Foren_3"]
         elif self.kit == "powerseq":
-            return self.data["Power_5"], self.data["Power_3"]
+            if self.locus == "D16S539" and self.software == "genemarker":
+                return self.data["Power_5"], (self.data["Power_3"] - 3)
+            elif self.locus == "D8S1179" and self.software == "genemarker":
+                return (self.data["Power_5"] - 5), (self.data["Power_3"] - 5)
+            else:
+                return self.data["Power_5"], self.data["Power_3"]
         else:
             raise UnsupportedKitError(self.kit)
 
@@ -86,7 +97,7 @@ class STRMarker:
         back to the UAS region. If the sequence has already been run through UAS, no trimming is
         required.
         """
-        if self.uas:
+        if self.software == "uas":
             return self.sequence
         front, back = self._uas_bases_to_trim()
         if back == 0:
@@ -107,7 +118,7 @@ class STRMarker:
 
     @property
     def flankseq_5p(self):
-        if self.uas:
+        if self.software == "uas":
             return None
         front, back = self._uas_bases_to_trim()
         if front == 0:
@@ -116,7 +127,7 @@ class STRMarker:
 
     @property
     def flank_5p(self):
-        if self.uas or self.flankseq_5p == "":
+        if self.software == "uas" or self.flankseq_5p == "":
             return None
         elif (
             self.kit == "powerseq"
@@ -136,7 +147,7 @@ class STRMarker:
 
     @property
     def flankseq_3p(self):
-        if self.uas:
+        if self.software == "uas":
             return None
         front, back = self._uas_bases_to_trim()
         if back == 0:
@@ -145,7 +156,7 @@ class STRMarker:
 
     @property
     def flank_3p(self):
-        if self.uas or self.flankseq_3p == "":
+        if self.software == "uas" or self.flankseq_3p == "":
             return None
         elif (
             self.kit == "powerseq"
@@ -375,8 +386,10 @@ class STRMarker_D13S317(STRMarker):
         if len(self.uas_sequence) < 110:
             bracketed_form = collapse_repeats_by_length(self.uas_sequence, 4)
         else:
-            for m in re.finditer("GGGCTGCCTA", self.uas_sequence):
-                break_point = m.end()
+            if "GGGCTGCCTA" in self.uas_sequence:
+                break_point = self.uas_sequence.index("GGGCTGCCTA") + 10
+            else:
+                break_point = self.uas_sequence.index("TTTT") + 14
             bracketed_form = (
                 f"{collapse_repeats_by_length(self.uas_sequence[:break_point], 4)} "
                 f"{collapse_repeats_by_length(self.uas_sequence[break_point:], 4)}"
@@ -1420,7 +1433,7 @@ class STRMarker_Y_GATA_H4(STRMarker):
     def canonical(self):
         """Canonical STR allele designation"""
         n = self.repeat_size
-        if self.uas:
+        if self.software == "uas":
             nsubout = self.data["BasesToSubtract"]
         elif self.kit == "forenseq":
             nsubout = self.data["BasesToSubtract"] - 12
@@ -1442,7 +1455,7 @@ class STRMarker_DYS390(STRMarker):
     def canonical(self):
         """Canonical STR allele designation"""
         n = self.repeat_size
-        if self.uas or self.kit == "powerseq":
+        if self.software == "uas" or self.kit == "powerseq":
             nsubout = self.data["BasesToSubtract"]
         else:
             nsubout = self.data["BasesToSubtract"] - 3
@@ -1461,7 +1474,7 @@ class STRMarker_DYS390(STRMarker):
         lus, sec, ter = None, None, None
         lus = repeat_copy_number(self.convert, self.data["LUS"])
         sec = repeat_copy_number(self.convert, self.data["Sec"])
-        if self.uas or self.kit == "powerseq":
+        if self.software == "uas" or self.kit == "powerseq":
             ter = repeat_copy_number(self.convert, self.data["Tert"])
         else:
             if self.convert[-1] == "G":
@@ -1482,7 +1495,7 @@ class STRMarker_DYS385(STRMarker):
     def canonical(self):
         """Canonical STR allele designation"""
         n = self.repeat_size
-        if self.uas or self.kit == "forenseq":
+        if self.software == "uas" or self.kit == "forenseq":
             nsubout = self.data["BasesToSubtract"]
         else:
             nsubout = self.data["BasesToSubtract"] - 4
@@ -1610,7 +1623,7 @@ class STRMarker_DYS389II(STRMarker):
         return flank
 
 
-def STRMarkerObject(locus, sequence, uas=False, kit="forenseq"):
+def STRMarkerObject(locus, sequence, software, kit="forenseq"):
     constructors = {
         "D8S1179": STRMarker_D8S1179,
         "D13S317": STRMarker_D13S317,
@@ -1660,6 +1673,6 @@ def STRMarkerObject(locus, sequence, uas=False, kit="forenseq"):
     }
     if locus in constructors:
         constructor = constructors[locus]
-        return constructor(locus, sequence, uas=uas, kit=kit)
+        return constructor(locus, sequence, software=software, kit=kit)
     else:
-        return STRMarker(locus, sequence, uas=uas, kit=kit)
+        return STRMarker(locus, sequence, software=software, kit=kit)

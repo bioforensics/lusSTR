@@ -2,7 +2,7 @@
 ---
 
 ## general settings
-uas: True  ## True/False; if ran through UAS
+analysis_software: "uas" ## uas/straitrazor; analysis software used
 samp_input: "/path/to/input/directory/or/samples" ## input directory or sample; if not provided, will be cwd
 output: "lusstr_output" ## output file/directory name; Example: "test_030923"
 kit: "sigprep" ## sigprep/kintelligence 

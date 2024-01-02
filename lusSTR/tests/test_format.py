@@ -43,7 +43,15 @@ def test_format_straitrazor(input, testoutput, tmp_path):
     exp_output = data_file(testoutput)
     obs_output = str(tmp_path / "lusstr_output.csv")
     str_path = str(tmp_path)
-    config_arglist = ["config", "--input", str(input_file), "-w", str_path, "--straitrazor"]
+    config_arglist = [
+        "config",
+        "--input",
+        str(input_file),
+        "-w",
+        str_path,
+        "--analysis-software",
+        "straitrazor",
+    ]
     lusSTR.cli.main(lusSTR.cli.get_parser().parse_args(config_arglist))
     format_arglist = ["strs", "format", "-w", str_path]
     lusSTR.cli.main(lusSTR.cli.get_parser().parse_args(format_arglist))
@@ -67,7 +75,16 @@ def test_format_sex_loci_straitrazor(tmp_path):
     exp_output = data_file("testformat_sr_sexloci.csv")
     obs_output = str(tmp_path / "lusstr_output_sexloci.csv")
     str_path = str(tmp_path)
-    config_arglist = ["config", "--input", str(inputdb), "-w", str_path, "--straitrazor", "--sex"]
+    config_arglist = [
+        "config",
+        "--input",
+        str(inputdb),
+        "-w",
+        str_path,
+        "--analysis-software",
+        "straitrazor",
+        "--sex",
+    ]
     lusSTR.cli.main(lusSTR.cli.get_parser().parse_args(config_arglist))
     format_arglist = ["strs", "format", "-w", str_path]
     lusSTR.cli.main(lusSTR.cli.get_parser().parse_args(format_arglist))

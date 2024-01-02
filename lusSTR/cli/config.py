@@ -35,8 +35,8 @@ def main(args):
 def edit_snp_config(config, args):
     with open(config, "r") as file:
         data = yaml.safe_load(file)
-        if args.straitrazor:
-            data["uas"] = False
+        if args.asoftware:
+            data["analysis_software"] = args.asoftware
         if args.input:
             data["samp_input"] = args.input
         if args.out:
@@ -65,8 +65,8 @@ def edit_snp_config(config, args):
 def edit_str_config(config, args):
     with open(config, "r") as file:
         data = yaml.safe_load(file)
-    if args.straitrazor:
-        data["uas"] = False
+    if args.asoftware:
+        data["analysis_software"] = args.asoftware
     if args.powerseq:
         data["kit"] = "powerseq"
     if args.input:
@@ -102,8 +102,9 @@ def subparser(subparsers):
         "-w", "--workdir", metavar="W", default=".",
         help="directory to add config file; default is current working directory")
     p.add_argument(
-        "--straitrazor", action="store_true",
-        help="Use if sequences have been previously run through STRait Razor."
+        "-a", "--analysis-software", choices=["uas", "straitrazor", "genemarker"], default="uas",
+        dest="asoftware", help="Analysis software program used prior to lusSTR. Choices are uas, "
+        "straitrazor or genemarker. Default is uas."
     )
     p.add_argument("--input", help="Input file or directory")
     p.add_argument("--out", "-o", help="Output file/directory name")

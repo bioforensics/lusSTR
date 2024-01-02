@@ -57,7 +57,8 @@ def test_convert_full_nocombine(
             "config",
             "-w",
             str_path,
-            "--straitrazor",
+            "--analysis-software",
+            "straitrazor",
             "--nocombine",
             "--sex",
             "-o",
@@ -70,7 +71,8 @@ def test_convert_full_nocombine(
             "config",
             "-w",
             str_path,
-            "--straitrazor",
+            "--analysis-software",
+            "straitrazor",
             "--nocombine",
             "--sex",
             "-o",
@@ -99,7 +101,17 @@ def test_flanks(tmp_path):
     exp_out = data_file("testflanks_flanks.txt")
     str_path = str(tmp_path / "WD")
     obs_out = str(tmp_path / "WD/testflanks_flanks.txt")
-    arglist = ["config", "-w", str_path, "-o", "testflanks", "--straitrazor", "--input", "WD"]
+    arglist = [
+        "config",
+        "-w",
+        str_path,
+        "-o",
+        "testflanks",
+        "--analysis-software",
+        "straitrazor",
+        "--input",
+        "WD",
+    ]
     lusSTR.cli.main(lusSTR.cli.get_parser().parse_args(arglist))
     shutil.copyfile(inputfile, os.path.join(str_path, "testflanks.csv"))
     convert_arglist = ["strs", "convert", "-w", str_path]
@@ -114,7 +126,17 @@ def test_convert_combine(input, exp_length, tmp_path):
     inputfile = data_file(input)
     str_path = str(tmp_path / "WD")
     obs_out = str(tmp_path / "WD/testflanks.txt")
-    arglist = ["config", "-w", str_path, "-o", "testflanks", "--straitrazor", "--input", "WD"]
+    arglist = [
+        "config",
+        "-w",
+        str_path,
+        "-o",
+        "testflanks",
+        "--analysis-software",
+        "straitrazor",
+        "--input",
+        "WD",
+    ]
     lusSTR.cli.main(lusSTR.cli.get_parser().parse_args(arglist))
     shutil.copyfile(inputfile, os.path.join(str_path, "testflanks.csv"))
     convert_arglist = ["strs", "convert", "-w", str_path]
@@ -124,26 +146,26 @@ def test_convert_combine(input, exp_length, tmp_path):
 
 
 @pytest.mark.parametrize(
-    "locus, sequence, uas, kit, output",
+    "locus, sequence, software, kit, output",
     [
         (
             "CSF1PO",
             "CTTCCTATCTATCTATCTATCTAATCTATCTATCTT",
-            False,
+            "straitrazor",
             "forenseq",
             "Possible indel or partial sequence",
         ),
         (
             "DYS393",
             "AGATAGATAGATAGATAGATAGATAGATAGATAGATAGATATGTATGTCTTTTCTATGAGACATACC",
-            False,
+            "straitrazor",
             "powerseq",
             "UAS region indicates entire sequence; Possible indel or partial sequence",
         ),
     ],
 )
-def test_indel_flag(locus, sequence, uas, kit, output):
-    marker = STRMarkerObject(locus, sequence, uas=uas, kit=kit)
+def test_indel_flag(locus, sequence, software, kit, output):
+    marker = STRMarkerObject(locus, sequence, software, kit=kit)
     assert marker.indel_flag == output
 
 
@@ -158,7 +180,8 @@ def test_powerseq_flanks(tmp_path):
         str_path,
         "-o",
         "powerseq",
-        "--straitrazor",
+        "--analysis-software",
+        "straitrazor",
         "--input",
         "WD",
         "--powerseq",
@@ -220,7 +243,8 @@ def test_convert_sr_sexloci(input, testoutput, flank_output, kit, tmp_path):
             "--sex",
             "--input",
             "WD",
-            "--straitrazor",
+            "--analysis-software",
+            "straitrazor",
         ]
     else:
         arglist = [
@@ -232,7 +256,8 @@ def test_convert_sr_sexloci(input, testoutput, flank_output, kit, tmp_path):
             "--sex",
             "--input",
             "WD",
-            "--straitrazor",
+            "--analysis-software",
+            "straitrazor",
             "--powerseq",
         ]
     lusSTR.cli.main(lusSTR.cli.get_parser().parse_args(arglist))
@@ -254,11 +279,20 @@ def test_config(tmp_path):
 
 def test_config_settings(tmp_path):
     obs_config = str(tmp_path / "config.yaml")
-    arglist = ["config", "-w", str(tmp_path), "--straitrazor", "--reference", "--str-type", "ce"]
+    arglist = [
+        "config",
+        "-w",
+        str(tmp_path),
+        "--analysis-software",
+        "straitrazor",
+        "--reference",
+        "--str-type",
+        "ce",
+    ]
     lusSTR.cli.main(lusSTR.cli.get_parser().parse_args(arglist))
     with open(obs_config, "r") as file:
         data = yaml.safe_load(file)
-    assert data["uas"] is False
+    assert data["analysis_software"] == "straitrazor"
     assert data["data_type"] == "ce"
     assert data["profile_type"] == "reference"
 
@@ -307,3 +341,28 @@ def test_marker_plots(sex, tmp_path):
     assert os.path.exists(exp_output) is True
     if sex:
         assert os.path.exists(sex_exp) is True
+
+
+def test_genemarker(tmp_path):
+    input = data_file("genemarker/2800M_strresults_filtered.csv")
+    arglist = [
+        "config",
+        "-w",
+        str(tmp_path),
+        "--out",
+        "genemarker_test",
+        "--input",
+        str(input),
+        "--sex",
+        "--analysis-software",
+        "genemarker",
+        "--powerseq",
+    ]
+    lusSTR.cli.main(lusSTR.cli.get_parser().parse_args(arglist))
+    snakemake_arglist = ["strs", "convert", "-w", str(tmp_path)]
+    lusSTR.cli.main(lusSTR.cli.get_parser().parse_args(snakemake_arglist))
+    for ext in [".csv", ".txt", "_flanks.txt", "_sexloci.csv", "_sexloci_flanks.txt"]:
+        exp_output = data_file(f"genemarker/genemarker_test{ext}")
+        print(exp_output)
+        obs_output = str(tmp_path / f"genemarker_test{ext}")
+        assert filecmp.cmp(exp_output, obs_output) is True

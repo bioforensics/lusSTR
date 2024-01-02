@@ -503,9 +503,9 @@ def check_D7(allele_df, datatype):
 
 def flags(allele_df, datatype):
     flags_df = pd.DataFrame(columns=["SampleID", "Locus", "Flags"])
-    flags_df = flags_df.append(allele_counts(allele_df))
-    flags_df = flags_df.append(allele_imbalance_check(allele_df))
-    flags_df = flags_df.append(check_D7(allele_df, datatype))
+    flags_df = pd.concat([flags_df, allele_counts(allele_df)])
+    flags_df = pd.concat([flags_df, allele_imbalance_check(allele_df)])
+    flags_df = pd.concat([flags_df, check_D7(allele_df, datatype)])
     return flags_df
 
 
@@ -522,14 +522,14 @@ def same_size_filter(df, metadata, datatype):
         )
         if len(df_filt) > 1:
             high_reads = df_filt.loc[0, "Reads"]
-            final_df = final_df.append(df_filt.loc[0, :])
+            final_df = pd.concat([final_df, pd.DataFrame([df_filt.loc[0, :]])])
             for i in range(1, len(df_filt)):
                 size_thresh = metadata["SameSizeThresholdDynamicPercent"]
                 size_thresh_reads = high_reads * size_thresh
                 if df_filt.loc[i, "Reads"] >= size_thresh_reads:
-                    final_df = final_df.append(df_filt.loc[i, :])
+                    final_df = pd.concat([final_df, pd.DataFrame([df_filt.loc[i, :]])])
         else:
-            final_df = final_df.append(df_filt)
+            final_df = pd.concat([final_df, df_filt])
     final_df = final_df.reset_index(drop=True)
     if datatype == "lusplus":
         final_df = final_df.drop("CE_Allele", axis=1)
