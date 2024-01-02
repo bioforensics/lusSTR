@@ -345,8 +345,6 @@ def test_marker_plots(sex, tmp_path):
 
 def test_genemarker(tmp_path):
     input = data_file("genemarker/2800M_strresults_filtered.csv")
-    # exp_output = data_file(f"genemarker/{file}")
-    # obs_output = str(tmp_path / file)
     arglist = [
         "config",
         "-w",
