@@ -16,6 +16,9 @@ import importlib.resources
 import json
 import lusSTR
 from lusSTR.scripts.filter_settings import filters, flags
+import math
+from matplotlib.backends.backend_pdf import PdfPages
+import matplotlib.pyplot as plt
 import numpy as np
 import os
 import pandas as pd
@@ -322,6 +325,68 @@ def format_ref_table(new_rows, sample_data, datatype):
     return sort_df
 
 
+def marker_plots(df, output_name, sex=False):
+    Path("MarkerPlots").mkdir(parents=True, exist_ok=True)
+    df["CE_Allele"] = df["CE_Allele"].astype(float)
+    filt_df = df[df["allele_type"] == "real_allele"]
+    for id in df["SampleID"].unique():
+        sample_id = f"{id}_sexchr" if sex else id
+        with PdfPages(f"MarkerPlots/{output_name}_{sample_id}_marker_plots.pdf") as pdf:
+            make_plot(filt_df, id, sex, filters=True)
+            pdf.savefig()
+            make_plot(df, id, sex)
+            pdf.savefig()
+            make_plot(df, id, sex, sameyaxis=True)
+            pdf.savefig()
+
+
+def make_plot(df, id, sex=False, sameyaxis=False, filters=False):
+    sample_df = df[df["SampleID"] == id]
+    sample_id = f"{id}_sexchr" if sex else id
+    sample_df["Type"] = sample_df["allele_type"]
+    conditions = [
+        sample_df["allele_type"].str.contains("real"),
+        sample_df["allele_type"].str.contains("BelowAT"),
+        sample_df["allele_type"].str.contains("stutter"),
+    ]
+    values = ["Real", "BelowAT", "Stutter"]
+    sample_df["Type"] = np.select(conditions, values)
+    max_reads = max(sample_df["Reads"])
+    n = 100 if max_reads > 1000 else 10
+    max_yvalue = int(math.ceil(max_reads / n)) * n
+    increase_value = int(math.ceil((max_yvalue / 5)) / n) * n
+    fig = plt.figure(figsize=(31, 31)) if sex is True else plt.figure(figsize=(30, 30))
+    n = 0
+    for marker in sample_df["Locus"].unique():
+        n += 1
+        colors = {"Real": "g", "Stutter": "b", "BelowAT": "r"}
+        marker_df = sample_df[sample_df["Locus"] == marker].sort_values(by="CE_Allele")
+        ax = fig.add_subplot(6, 6, n) if sex is True else fig.add_subplot(6, 5, n)
+        ax.bar(
+            marker_df["CE_Allele"],
+            marker_df["Reads"],
+            edgecolor="k",
+            color=[colors[i] for i in marker_df["Type"]],
+        )
+        labels = marker_df["Type"].unique()
+        handles = [plt.Rectangle((0, 0), 1, 1, color=colors[l]) for l in labels]
+        if not filters:
+            plt.legend(handles, labels, title="Allele Type")
+        if sameyaxis:
+            ax.set_yticks(np.arange(0, max_yvalue, increase_value))
+        ax.set_xticks(
+            np.arange(min(marker_df["CE_Allele"]) - 1, max(marker_df["CE_Allele"]) + 2, 1.0)
+        )
+        ax.title.set_text(marker)
+    if sameyaxis:
+        title = "Marker Plots for All Alleles With Same Y-Axis Scale"
+    elif filters:
+        title = "Marker Plots for True Alleles With Custom Y-Axis Scale"
+    else:
+        title = "Marker Plots for All Alleles With Custom Y-Axis Scale"
+    plt.text(0.4, 0.95, title, transform=fig.transFigure, size=24)
+
+
 def main(
     input, output_type, profile_type, data_type, output_dir, info, separate, nofilters, strand
 ):
@@ -350,6 +415,7 @@ def main(
     else:
         dict_loc = {k: v for k, v in full_df.groupby(["SampleID", "Locus"])}
         final_df, flags_df = process_strs(dict_loc, data_type, seq_col)
+        marker_plots(final_df, outpath, sex=False)
         if output_type == "efm" or output_type == "mpsproto":
             EFM_output(final_df, outpath, profile_type, data_type, brack_col, separate)
         else:
