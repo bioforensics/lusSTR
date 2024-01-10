@@ -386,7 +386,6 @@ class STRMarker_D13S317(STRMarker):
         if len(self.uas_sequence) < 110:
             bracketed_form = collapse_repeats_by_length(self.uas_sequence, 4)
         else:
-            print(self.uas_sequence)
             if "GGGCTGCCTA" in self.uas_sequence:
                 break_point = self.uas_sequence.index("GGGCTGCCTA") + 10
                 bracketed_form = (
