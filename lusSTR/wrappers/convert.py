@@ -99,7 +99,7 @@ def format_table(input, software, kit="forenseq"):
             flanks_list.append(flank_summary)
             continue
         marker = STRMarkerObject(locus, sequence, software, kit=kit)
-        if locus == "D12S391" and kit == "powerseq":
+        if locus == "D12S391" and kit == "powerseq" and software == "straitrazor":
             if "." in str(marker.canonical):
                 check_sr += 1
                 if check_sr > 10:
