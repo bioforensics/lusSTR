@@ -531,6 +531,6 @@ def same_size_filter(df, metadata, datatype):
         else:
             final_df = pd.concat([final_df, df_filt])
     final_df = final_df.reset_index(drop=True)
-    if datatype == "lusplus":
-        final_df = final_df.drop("CE_Allele", axis=1)
+    # if datatype == "lusplus":
+    #    final_df = final_df.drop("CE_Allele", axis=1)
     return final_df

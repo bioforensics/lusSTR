@@ -361,7 +361,6 @@ def make_plot(df, sample_id, sameyaxis=False, filters=False, at=True):
         n += 1
         colors = {"Typed": "g", "Stutter": "b", "BelowAT": "r"}
         marker_df = sample_df[sample_df["Locus"] == marker].sort_values(by="CE_Allele")
-        # print(marker_df)
         ax = fig.add_subplot(6, 5, n)
         ax.bar(
             marker_df["CE_Allele"],
@@ -386,7 +385,7 @@ def make_plot(df, sample_id, sameyaxis=False, filters=False, at=True):
     if sameyaxis:
         title = "Marker Plots for All Alleles With Same Y-Axis Scale"
     elif filters:
-        title = "Marker Plots for True Alleles With Custom Y-Axis Scale"
+        title = "Marker Plots for Typed Alleles With Custom Y-Axis Scale"
     else:
         title = "Marker Plots for All Alleles With Custom Y-Axis Scale"
     plt.text(0.4, 0.95, title, transform=fig.transFigure, size=24)
