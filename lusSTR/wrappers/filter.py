@@ -341,16 +341,15 @@ def marker_plots(df, output_name):
 
 
 def make_plot(df, sample_id, sameyaxis=False, filters=False, at=True):
-    sample_df = df[df["SampleID"] == sample_id]
+    sample_df = df[df["SampleID"] == sample_id].copy()
     # sample_id = f"{id}_sexchr" if sex else id
-    sample_df["Type"] = sample_df["allele_type"]
     conditions = [
         sample_df["allele_type"].str.contains("real"),
         sample_df["allele_type"].str.contains("BelowAT"),
         sample_df["allele_type"].str.contains("stutter"),
     ]
     values = ["Typed", "BelowAT", "Stutter"]
-    sample_df["Type"] = np.select(conditions, values)
+    sample_df.loc[:, "Type"] = np.select(conditions, values)
     max_reads = max(sample_df["Reads"])
     n = 100 if max_reads > 1000 else 10
     max_yvalue = int(math.ceil(max_reads / n)) * n
