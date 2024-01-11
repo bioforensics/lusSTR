@@ -325,49 +325,54 @@ def format_ref_table(new_rows, sample_data, datatype):
     return sort_df
 
 
-def marker_plots(df, output_name, sex=False):
+def marker_plots(df, output_name):
     Path("MarkerPlots").mkdir(parents=True, exist_ok=True)
     df["CE_Allele"] = df["CE_Allele"].astype(float)
     filt_df = df[df["allele_type"] == "real_allele"]
-    for id in df["SampleID"].unique():
-        sample_id = f"{id}_sexchr" if sex else id
+    for sample_id in df["SampleID"].unique():
+        # sample_id = f"{id}_sexchr" if sex else id
         with PdfPages(f"MarkerPlots/{output_name}_{sample_id}_marker_plots.pdf") as pdf:
-            make_plot(filt_df, id, sex, filters=True)
+            make_plot(filt_df, sample_id, filters=True, at=False)
             pdf.savefig()
-            make_plot(df, id, sex)
+            make_plot(df, sample_id)
             pdf.savefig()
-            make_plot(df, id, sex, sameyaxis=True)
+            make_plot(df, sample_id, sameyaxis=True)
             pdf.savefig()
 
 
-def make_plot(df, id, sex=False, sameyaxis=False, filters=False):
-    sample_df = df[df["SampleID"] == id]
-    sample_id = f"{id}_sexchr" if sex else id
+def make_plot(df, sample_id, sameyaxis=False, filters=False, at=True):
+    sample_df = df[df["SampleID"] == sample_id]
+    # sample_id = f"{id}_sexchr" if sex else id
     sample_df["Type"] = sample_df["allele_type"]
     conditions = [
         sample_df["allele_type"].str.contains("real"),
         sample_df["allele_type"].str.contains("BelowAT"),
         sample_df["allele_type"].str.contains("stutter"),
     ]
-    values = ["Real", "BelowAT", "Stutter"]
+    values = ["Typed", "BelowAT", "Stutter"]
     sample_df["Type"] = np.select(conditions, values)
     max_reads = max(sample_df["Reads"])
     n = 100 if max_reads > 1000 else 10
     max_yvalue = int(math.ceil(max_reads / n)) * n
     increase_value = int(math.ceil((max_yvalue / 5)) / n) * n
-    fig = plt.figure(figsize=(31, 31)) if sex is True else plt.figure(figsize=(30, 30))
+    fig = plt.figure(figsize=(30, 30))
     n = 0
     for marker in sample_df["Locus"].unique():
         n += 1
-        colors = {"Real": "g", "Stutter": "b", "BelowAT": "r"}
+        colors = {"Typed": "g", "Stutter": "b", "BelowAT": "r"}
         marker_df = sample_df[sample_df["Locus"] == marker].sort_values(by="CE_Allele")
-        ax = fig.add_subplot(6, 6, n) if sex is True else fig.add_subplot(6, 5, n)
+        # print(marker_df)
+        ax = fig.add_subplot(6, 5, n)
         ax.bar(
             marker_df["CE_Allele"],
             marker_df["Reads"],
             edgecolor="k",
             color=[colors[i] for i in marker_df["Type"]],
         )
+        if at:
+            at = get_at(marker_df, marker)
+            ax.axhline(at, linestyle="--", color="k")
+            ax.text(min(marker_df["CE_Allele"]) - 0.9, at + (at * 0.1), f"AT", size=12)
         labels = marker_df["Type"].unique()
         handles = [plt.Rectangle((0, 0), 1, 1, color=colors[l]) for l in labels]
         if not filters:
@@ -385,6 +390,23 @@ def make_plot(df, id, sex=False, sameyaxis=False, filters=False):
     else:
         title = "Marker Plots for All Alleles With Custom Y-Axis Scale"
     plt.text(0.4, 0.95, title, transform=fig.transFigure, size=24)
+
+
+def get_at(df, locus):
+    metadata = filter_marker_data[locus]
+    thresh_use = metadata["AnalyticalThresholdUse"]
+    at_st = float(metadata["AnalyticalThresholdStaticCount"])
+    at_dy = metadata["AnalyticalThresholdDynamicPercent"]
+    at_dy_num = df["Reads"].sum() * float(at_dy)
+    if thresh_use.lower() == "both":
+        at = at_st if at_st > at_dy_num else at_dy_num
+    elif thresh_use.lower() == "static":
+        at = at_st
+    elif thresh_use.lower() == "dynamic":
+        at = at_dy_num
+    else:
+        raise ValueError("Incorrect AT specified in filters.json. Please check and re-run.")
+    return at
 
 
 def main(
@@ -408,6 +430,7 @@ def main(
     )
     if nofilters:
         full_df["allele_type"] = "real_allele"
+        marker_plots(full_df, outpath)
         if output_type == "efm" or output_type == "mpsproto":
             EFM_output(full_df, outpath, profile_type, data_type, brack_col, separate)
         else:
@@ -415,7 +438,7 @@ def main(
     else:
         dict_loc = {k: v for k, v in full_df.groupby(["SampleID", "Locus"])}
         final_df, flags_df = process_strs(dict_loc, data_type, seq_col)
-        marker_plots(final_df, outpath, sex=False)
+        marker_plots(final_df, outpath)
         if output_type == "efm" or output_type == "mpsproto":
             EFM_output(final_df, outpath, profile_type, data_type, brack_col, separate)
         else:
