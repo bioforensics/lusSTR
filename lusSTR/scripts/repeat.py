@@ -163,16 +163,17 @@ def repeat_copy_number(bf, repeat):
     The input is a sequence string collapsed to bracketed sequence form.
     """
     longest = 0
-    if bf != "":
-        for block in bf.split(" "):
-            if block == repeat:
-                if 1 > longest:
-                    longest = 1
-            match = re.match(r"\[" + repeat + r"\](\d+)", block)
-            if match:
-                length = int(match.group(1))
-                if length > longest:
-                    longest = length
+    if bf == "":
+        return 0
+    for block in bf.split(" "):
+        if block == repeat:
+            if 1 > longest:
+                longest = 1
+        match = re.match(r"\[" + repeat + r"\](\d+)", block)
+        if match:
+            length = int(match.group(1))
+            if length > longest:
+                longest = length
     return str(longest)
 
 
