@@ -163,6 +163,8 @@ def repeat_copy_number(bf, repeat):
     The input is a sequence string collapsed to bracketed sequence form.
     """
     longest = 0
+    if bf == "":
+        return 0
     for block in bf.split(" "):
         if block == repeat:
             if 1 > longest:

@@ -388,12 +388,18 @@ class STRMarker_D13S317(STRMarker):
         else:
             if "GGGCTGCCTA" in self.uas_sequence:
                 break_point = self.uas_sequence.index("GGGCTGCCTA") + 10
-            else:
+                bracketed_form = (
+                    f"{collapse_repeats_by_length(self.uas_sequence[:break_point], 4)} "
+                    f"{collapse_repeats_by_length(self.uas_sequence[break_point:], 4)}"
+                )
+            elif "TTTT" in self.uas_sequence:
                 break_point = self.uas_sequence.index("TTTT") + 14
-            bracketed_form = (
-                f"{collapse_repeats_by_length(self.uas_sequence[:break_point], 4)} "
-                f"{collapse_repeats_by_length(self.uas_sequence[break_point:], 4)}"
-            )
+                bracketed_form = (
+                    f"{collapse_repeats_by_length(self.uas_sequence[:break_point], 4)} "
+                    f"{collapse_repeats_by_length(self.uas_sequence[break_point:], 4)}"
+                )
+            else:
+                bracketed_form = ""
         return bracketed_form
 
 

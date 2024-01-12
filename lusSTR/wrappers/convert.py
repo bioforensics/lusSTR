@@ -12,8 +12,6 @@
 
 import csv
 import json
-import math
-import matplotlib.pyplot as plt
 import numpy as np
 import os
 import pandas as pd
@@ -23,7 +21,6 @@ from lusSTR.scripts.marker import get_str_metadata_file, STRMarkerObject
 from lusSTR.scripts.repeat import collapse_all_repeats, collapse_repeats_by_length
 from lusSTR.scripts.repeat import sequence_to_bracketed_form, split_by_n
 from lusSTR.scripts.repeat import reverse_complement, reverse_complement_bracketed
-from matplotlib.backends.backend_pdf import PdfPages
 from pathlib import Path
 
 
@@ -101,9 +98,8 @@ def format_table(input, software, kit="forenseq"):
             ]
             flanks_list.append(flank_summary)
             continue
-
         marker = STRMarkerObject(locus, sequence, software, kit=kit)
-        if locus == "D12S391" and kit == "powerseq":
+        if locus == "D12S391" and kit == "powerseq" and software == "straitrazor":
             if "." in str(marker.canonical):
                 check_sr += 1
                 if check_sr > 10:
@@ -185,48 +181,6 @@ def sort_table(table):
     return sorted_table
 
 
-def marker_plots(df, output_name, sex=False):
-    Path("MarkerPlots").mkdir(parents=True, exist_ok=True)
-    df["CE_Allele"] = df["CE_Allele"].astype(float)
-    for id in df["SampleID"].unique():
-        sample_id = f"{id}_sexchr" if sex else id
-        with PdfPages(f"MarkerPlots/{output_name}_{sample_id}_marker_plots.pdf") as pdf:
-            make_plot(df, id, sex, sameyaxis=False)
-            pdf.savefig()
-            make_plot(df, id, sex)
-            pdf.savefig()
-
-
-def make_plot(df, id, sex=False, sameyaxis=True):
-    sample_df = df[df["SampleID"] == id]
-    sample_id = f"{id}_sexchr" if sex else id
-    max_reads = max(sample_df["Reads"])
-    n = 100 if max_reads > 1000 else 10
-    max_yvalue = int(math.ceil(max_reads / n)) * n
-    increase_value = int(math.ceil((max_yvalue / 5)) / n) * n
-    fig = plt.figure(figsize=(31, 31)) if sex is True else plt.figure(figsize=(30, 30))
-    n = 0
-    for marker in sample_df["Locus"].unique():
-        n += 1
-        marker_df = sample_df[sample_df["Locus"] == marker].sort_values(by="CE_Allele")
-        ax = fig.add_subplot(6, 6, n) if sex is True else fig.add_subplot(6, 5, n)
-        ax.bar(marker_df["CE_Allele"], marker_df["Reads"])
-        if sameyaxis:
-            ax.set_yticks(np.arange(0, max_yvalue, increase_value))
-        ax.set_xticks(
-            np.arange(min(marker_df["CE_Allele"]) - 1, max(marker_df["CE_Allele"]) + 2, 1.0)
-        )
-        ax.title.set_text(marker)
-    if sameyaxis:
-        plt.text(
-            0.4, 0.95, "Marker Plots With Same Y-Axis Scale", transform=fig.transFigure, size=24
-        )
-    else:
-        plt.text(
-            0.4, 0.95, "Marker Plots With Custom Y-Axis Scale", transform=fig.transFigure, size=24
-        )
-
-
 def main(input, out, kit, software, sex, nocombine):
     input = str(input)
     out = str(out)
@@ -248,7 +202,6 @@ def main(input, out, kit, software, sex, nocombine):
                 sex_final_table.to_csv(f"{output_name}_sexloci.txt", sep="\t", index=False)
         else:
             sex_final_table.to_csv(f"{output_name}_sexloci.txt", sep="\t", index=False)
-        marker_plots(sex_final_table, output_name, sex=True)
     if software != "uas":
         if not autosomal_final_table.empty:
             autosomal_flank_table.to_csv(f"{output_name}_flanks.txt", sep="\t", index=False)
@@ -260,7 +213,6 @@ def main(input, out, kit, software, sex, nocombine):
             autosomal_final_table.to_csv(out, sep="\t", index=False)
     else:
         autosomal_final_table.to_csv(out, sep="\t", index=False)
-    marker_plots(autosomal_final_table, output_name)
 
 
 if __name__ == "__main__":
