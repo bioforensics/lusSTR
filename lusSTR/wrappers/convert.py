@@ -108,9 +108,31 @@ def format_table(input, software, kit="forenseq"):
                         "Please check STRait Razor version!!"
                     )
                     print(msg)
+        if (
+            locus == "PENTA D"
+            and kit == "powerseq"
+            and marker.indel_flag == "Possible indel or partial sequence"
+        ):
+            marker = check_pentad(marker, sequence, software)
+            indel_flag = "Possible indel or partial sequence"
+        elif (
+            locus == "D7S820"
+            and kit == "powerseq"
+            and marker.indel_flag == "Possible indel or partial sequence"
+        ):
+            marker = check_D7(marker, sequence, software)
+            indel_flag = "Possible indel or partial sequence"
+        elif (
+            locus == "VWA"
+            and kit == "powerseq"
+            and marker.indel_flag == "Possible indel or partial sequence"
+        ):
+            marker = check_vwa(marker, sequence, software)
+            indel_flag = "Possible indel or partial sequence"
+        else:
+            indel_flag = marker.indel_flag
         summary = [sampleid, project, analysis, locus] + marker.summary + [reads]
         list_of_lists.append(summary)
-
         if software != "uas":
             flank_summary = [
                 sampleid,
@@ -123,7 +145,7 @@ def format_table(input, software, kit="forenseq"):
                 marker.flank_5p,
                 marker.convert,
                 marker.flank_3p,
-                marker.indel_flag,
+                indel_flag,
             ]
             flanks_list.append(flank_summary)
 
@@ -166,6 +188,37 @@ def format_table(input, software, kit="forenseq"):
     else:
         final_flank_output = ""
     return final_output, final_flank_output, columns
+
+
+def check_pentad(marker, sequence, software):
+    new_marker = marker
+    if marker.summary[1][:4] == "AAAG" and marker.flank_5p[-5:] == "GAAAA":
+        new_sequence = f"{sequence[:66]}-{sequence[66:]}"
+        new_marker = STRMarkerObject("PENTA D", new_sequence, software, kit="powerseq")
+    elif marker.summary[1][-4:] == "AAAG" and marker.flank_3p[:7] == "AAAAA A":
+        new_sequence = f"{sequence}-"
+        new_marker = STRMarkerObject("PENTA D", new_sequence, software, kit="powerseq")
+    else:
+        return marker
+    return new_marker
+
+
+def check_D7(marker, sequence, software):
+    if marker.summary[1][:3] == "AAC" and marker.flank_5p[-8:] == "T AAAAAA":
+        new_sequence = f"{sequence[:60]}-{sequence[60:]}"
+        new_marker = STRMarkerObject("D7S820", new_sequence, software, kit="powerseq")
+    else:
+        return marker
+    return new_marker
+
+
+def check_vwa(marker, sequence, software):
+    if sequence[:4] == "GATA":
+        new_sequence = f"{sequence[:1]}-{sequence[1:]}"
+        new_marker = STRMarkerObject("VWA", new_sequence, software, kit="powerseq")
+    else:
+        return marker
+    return new_marker
 
 
 def combine_reads(table, columns):
