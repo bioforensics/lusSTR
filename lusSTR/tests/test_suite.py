@@ -357,3 +357,26 @@ def test_genemarker(tmp_path):
         print(exp_output)
         obs_output = str(tmp_path / f"genemarker_test{ext}")
         assert filecmp.cmp(exp_output, obs_output) is True
+
+
+def test_deletions(tmp_path):
+    input = data_file("test_indels.csv")
+    exp_output = data_file("test_indels.txt")
+    obs_output = str(tmp_path / "test_indels.txt")
+    arglist = [
+        "config",
+        "-w",
+        str(tmp_path),
+        "--out",
+        "test_indels",
+        "--input",
+        str(input),
+        "--analysis-software",
+        "genemarker",
+        "--powerseq",
+    ]
+    lusSTR.cli.main(lusSTR.cli.get_parser().parse_args(arglist))
+    shutil.copyfile(input, os.path.join(str(tmp_path), "test_indels.csv"))
+    snakemake_arglist = ["strs", "convert", "-w", str(tmp_path)]
+    lusSTR.cli.main(lusSTR.cli.get_parser().parse_args(snakemake_arglist))
+    assert filecmp.cmp(exp_output, obs_output) is True
