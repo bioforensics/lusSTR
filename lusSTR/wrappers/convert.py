@@ -22,6 +22,7 @@ from lusSTR.scripts.repeat import collapse_all_repeats, collapse_repeats_by_leng
 from lusSTR.scripts.repeat import sequence_to_bracketed_form, split_by_n
 from lusSTR.scripts.repeat import reverse_complement, reverse_complement_bracketed
 from pathlib import Path
+from warnings import warn
 
 
 with open(get_str_metadata_file(), "r") as fh:
@@ -107,30 +108,15 @@ def format_table(input, software, kit="forenseq"):
                         "Multiple microvariants identified at D12 locus. "
                         "Please check STRait Razor version!!"
                     )
-                    print(msg)
-        if (
-            locus == "PENTA D"
-            and kit == "powerseq"
-            and marker.indel_flag == "Possible indel or partial sequence"
-        ):
-            marker = check_pentad(marker, sequence, software)
-            indel_flag = "Possible indel or partial sequence"
-        elif (
-            locus == "D7S820"
-            and kit == "powerseq"
-            and marker.indel_flag == "Possible indel or partial sequence"
-        ):
-            marker = check_D7(marker, sequence, software)
-            indel_flag = "Possible indel or partial sequence"
-        elif (
-            locus == "VWA"
-            and kit == "powerseq"
-            and marker.indel_flag == "Possible indel or partial sequence"
-        ):
-            marker = check_vwa(marker, sequence, software)
-            indel_flag = "Possible indel or partial sequence"
-        else:
-            indel_flag = marker.indel_flag
+                    warn(msg)
+        indel_flag = marker.indel_flag
+        if indel_flag == "Possible indel or partial sequence":
+            if locus == "PENTA D" and kit == "powerseq":
+                marker = check_pentad(marker, sequence, software)
+            elif locus == "D7S820" and kit == "powerseq":
+                marker = check_D7(marker, sequence, software)
+            elif locus == "VWA" and kit == "powerseq":
+                marker = check_vwa(marker, sequence, software)
         summary = [sampleid, project, analysis, locus] + marker.summary + [reads]
         list_of_lists.append(summary)
         if software != "uas":
