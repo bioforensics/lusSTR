@@ -34,6 +34,7 @@ setup(
             "lusSTR/tests/data/lusstr_output/*",
             "lusSTR/tests/data/LUSPlus_stutter_test/*",
             "lusSTR/tests/data/MPSproto_test/*",
+            "lusSTR/tests/data/genemarker/*",
             "lusSTR/workflows/*",
             "lusSTR/wrappers/*",
         ]
