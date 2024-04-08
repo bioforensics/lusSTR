@@ -49,12 +49,12 @@ def create_output_table(sample_df, orientation, separate, output_type, software)
             if output_type == "evidence":
                 separated_table = bin_snps(compiled_table, output_type, sample)
                 separated_table.to_csv(
-                    f"evidence_samples/{sample}_snpsetscombined_evidence.csv",
+                    f"evidence_samples/{sample}_snpsetscombined_evidence.txt",
                     index=False,
                     sep="\t",
                 )
             compiled_table.to_csv(
-                f"{output_type}_samples/{sample}_snp_{output_type}.csv", index=False, sep="\t"
+                f"{output_type}_samples/{sample}_snp_{output_type}.txt", index=False, sep="\t"
             )
     return all_samples_df
 
@@ -75,10 +75,10 @@ def bin_snps(sample_file, output_type, sample):
             bin_df = sorted_file.iloc[
                 start : len(sorted_file),
             ].reset_index(drop=True)
-        bin_df["Sample Name"] = bin_df["Sample Name"] + "_set" + str(snp_num)
+        bin_df["Sample Name"] = bin_df["Sample Name"] + "_set" + str((snp_num + 1))
         compiled_table = pd.concat([compiled_table, bin_df])
         bin_df.to_csv(
-            f"{output_type}_samples/{sample}_set{snp_num}.csv",
+            f"{output_type}_samples/{sample}_set{snp_num+1}.txt",
             index=False,
             sep="\t",
         )
@@ -120,11 +120,9 @@ def create_sample_df(indiv_df, output_type, all_col):
             if len(compiled_table[compiled_table["Allele 4"].notna()]) > 0:
                 compiled_table = compiled_table.drop(compiled_table.columns[[4, 8]], axis=1)
         if len(compiled_table[compiled_table["Allele 3"].notna()]) > 0:
-            print(compiled_table)
             compiled_table = compiled_table.drop(compiled_table.columns[[3, 6]], axis=1)
     if output_type == "reference":
         for i, row in compiled_table.iterrows():
-            print(compiled_table.loc[i, "Height 2"])
             if pd.isnull(compiled_table.loc[i, "Height 2"]):
                 compiled_table.loc[i, "Allele 2"] = compiled_table.loc[i, "Allele 1"]
         compiled_table = compiled_table[["Marker", "Allele 1", "Allele 2"]]
