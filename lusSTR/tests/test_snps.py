@@ -239,7 +239,7 @@ def test_snp_bins(tmp_path):
         print(fh.read(), end="")
     assert filecmp.cmp(exp_out, obs_out) is True
     for snp_set in range(0, 10):
-        path = tmp_path / f"evidence_samples/Kin_pos_1ng_snp_evidence_set{snp_set}.csv"
+        path = tmp_path / f"evidence_samples/Kin_pos_1ng_set{snp_set}.csv"
         assert path.is_file()
 
 

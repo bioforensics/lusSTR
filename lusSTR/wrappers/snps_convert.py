@@ -37,9 +37,7 @@ def create_output_table(sample_df, orientation, separate, output_type, software)
         allele_col = "Forward_Strand_Allele"
     all_samples_df = pd.DataFrame()
     for sample in sample_df["SampleID"].unique():
-        indiv_df = sample_df[
-            (sample_df["SampleID"] == sample) & (sample_df["Issues"] != "Contains untyped allele")
-        ]
+        indiv_df = sample_df[sample_df["SampleID"] == sample]
         compiled_table = create_sample_df(indiv_df, output_type, allele_col)
         if software != "uas":
             compiled_table = check_allele_calls(compiled_table, output_type)
@@ -80,7 +78,7 @@ def bin_snps(sample_file, output_type, sample):
         bin_df["Sample Name"] = bin_df["Sample Name"] + "_set" + str(snp_num)
         compiled_table = pd.concat([compiled_table, bin_df])
         bin_df.to_csv(
-            f"{output_type}_samples/{sample}_snp_{output_type}_set{snp_num}.csv",
+            f"{output_type}_samples/{sample}_set{snp_num}.csv",
             index=False,
             sep="\t",
         )
@@ -97,9 +95,36 @@ def create_sample_df(indiv_df, output_type, all_col):
     try:
         compiled_table.columns = ["Marker", "Allele 1", "Allele 2", "Height 1", "Height 2"]
     except ValueError:
-        print("Too many alleles!")
+        try:
+            compiled_table.columns = [
+                "Marker",
+                "Allele 1",
+                "Allele 2",
+                "Allele 3",
+                "Height 1",
+                "Height 2",
+                "Height 3",
+            ]
+        except ValueError:
+            compiled_table.columns = [
+                "Marker",
+                "Allele 1",
+                "Allele 2",
+                "Allele 3",
+                "Allele 4",
+                "Height 1",
+                "Height 2",
+                "Height 3",
+                "Height 4",
+            ]
+            if len(compiled_table[compiled_table["Allele 4"].notna()]) > 0:
+                compiled_table = compiled_table.drop(compiled_table.columns[[4, 8]], axis=1)
+        if len(compiled_table[compiled_table["Allele 3"].notna()]) > 0:
+            print(compiled_table)
+            compiled_table = compiled_table.drop(compiled_table.columns[[3, 6]], axis=1)
     if output_type == "reference":
         for i, row in compiled_table.iterrows():
+            print(compiled_table.loc[i, "Height 2"])
             if pd.isnull(compiled_table.loc[i, "Height 2"]):
                 compiled_table.loc[i, "Allele 2"] = compiled_table.loc[i, "Allele 1"]
         compiled_table = compiled_table[["Marker", "Allele 1", "Allele 2"]]
