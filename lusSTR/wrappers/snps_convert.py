@@ -49,12 +49,12 @@ def create_output_table(sample_df, orientation, separate, output_type, software)
             if output_type == "evidence":
                 separated_table = bin_snps(compiled_table, output_type, sample)
                 separated_table.to_csv(
-                    f"evidence_samples/{sample}_snpsetscombined_evidence.txt",
+                    f"evidence_samples/{sample}_snpsetscombined_evidence.tsv",
                     index=False,
                     sep="\t",
                 )
             compiled_table.to_csv(
-                f"{output_type}_samples/{sample}_snp_{output_type}.txt", index=False, sep="\t"
+                f"{output_type}_samples/{sample}_snp_{output_type}.tsv", index=False, sep="\t"
             )
     return all_samples_df
 
@@ -78,7 +78,7 @@ def bin_snps(sample_file, output_type, sample):
         bin_df["Sample Name"] = bin_df["Sample Name"] + "_set" + str((snp_num + 1))
         compiled_table = pd.concat([compiled_table, bin_df])
         bin_df.to_csv(
-            f"{output_type}_samples/{sample}_set{snp_num+1}.txt",
+            f"{output_type}_samples/{sample}_set{snp_num+1}.tsv",
             index=False,
             sep="\t",
         )
