@@ -218,8 +218,8 @@ def test_multiple_reference_profiles(tmp_path):
 
 def test_snp_bins(tmp_path):
     input_sample = data_file("kinsnps/Kin_pos_1ng Sample Report 2023_07_11_13_16_31.xlsx")
-    exp_out = data_file("kinsnps/Kin_pos_1ng_snpsetscombined_evidence.csv")
-    obs_out = str(tmp_path / "evidence_samples/Kin_pos_1ng_snpsetscombined_evidence.csv")
+    exp_out = data_file("kinsnps/Kin_pos_1ng_snpsetscombined_evidence.tsv")
+    obs_out = str(tmp_path / "evidence_samples/Kin_pos_1ng_snpsetscombined_evidence.tsv")
     arglist = [
         "config",
         "-w",
@@ -235,11 +235,9 @@ def test_snp_bins(tmp_path):
     lusSTR.cli.main(lusSTR.cli.get_parser().parse_args(arglist))
     all_arglist = ["snps", "all", "-w", str(tmp_path)]
     lusSTR.cli.main(lusSTR.cli.get_parser().parse_args(all_arglist))
-    with open(obs_out, "r") as fh:
-        print(fh.read(), end="")
     assert filecmp.cmp(exp_out, obs_out) is True
-    for snp_set in range(0, 10):
-        path = tmp_path / f"evidence_samples/Kin_pos_1ng_set{snp_set}.csv"
+    for snp_set in range(1, 10):
+        path = tmp_path / f"evidence_samples/Kin_pos_1ng_set{snp_set}.tsv"
         assert path.is_file()
 
 
