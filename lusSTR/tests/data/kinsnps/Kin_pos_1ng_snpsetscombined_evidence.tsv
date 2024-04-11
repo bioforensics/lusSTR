@@ -1,4 +1,4 @@
-Sample Name	Marker	Allele 1	Allele 2	Height 1	Height 2	Total_Reads
+Sample.Name	Marker	Allele.1	Allele.2	Height.1	Height.2	Total_Reads
 Kin_pos_1ng_set1	rs10740993	2		21.0		21.0
 Kin_pos_1ng_set1	rs1878173	1		21.0		21.0
 Kin_pos_1ng_set1	rs2961285	2		21.0		21.0

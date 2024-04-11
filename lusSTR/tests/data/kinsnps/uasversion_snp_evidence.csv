@@ -1,4 +1,4 @@
-Sample Name	Marker	Allele 1	Allele 2	Height 1	Height 2
+Sample.Name	Marker	Allele.1	Allele.2	Height.1	Height.2
 NA24385	rs1000022	2	4	598.0	361.0
 NA24385	rs1000137	4	2	204.0	60.0
 NA24385	rs10002268	4		1316.0	
