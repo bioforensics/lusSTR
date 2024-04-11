@@ -42,7 +42,7 @@ def create_output_table(sample_df, orientation, separate, output_type, software)
         if software != "uas":
             compiled_table = check_allele_calls(compiled_table, output_type)
         compiled_table = compiled_table.replace(allele_des)
-        compiled_table.insert(0, "Sample Name", sample)
+        compiled_table.insert(0, "Sample.Name", sample)
         all_samples_df = pd.concat([all_samples_df, compiled_table])
         if separate:
             Path(f"{output_type}_samples").mkdir(parents=True, exist_ok=True)
@@ -75,7 +75,7 @@ def bin_snps(sample_file, output_type, sample):
             bin_df = sorted_file.iloc[
                 start : len(sorted_file),
             ].reset_index(drop=True)
-        bin_df["Sample Name"] = bin_df["Sample Name"] + "_set" + str((snp_num + 1))
+        bin_df["Sample.Name"] = bin_df["Sample.Name"] + "_set" + str((snp_num + 1))
         compiled_table = pd.concat([compiled_table, bin_df])
         bin_df.to_csv(
             f"{output_type}_samples/{sample}_set{snp_num+1}.tsv",
@@ -93,39 +93,39 @@ def create_sample_df(indiv_df, output_type, all_col):
         .reset_index()
     )
     try:
-        compiled_table.columns = ["Marker", "Allele 1", "Allele 2", "Height 1", "Height 2"]
+        compiled_table.columns = ["Marker", "Allele.1", "Allele.2", "Height.1", "Height.2"]
     except ValueError:
         try:
             compiled_table.columns = [
                 "Marker",
-                "Allele 1",
-                "Allele 2",
-                "Allele 3",
-                "Height 1",
-                "Height 2",
-                "Height 3",
+                "Allele.1",
+                "Allele.2",
+                "Allele.3",
+                "Height.1",
+                "Height.2",
+                "Height.3",
             ]
         except ValueError:
             compiled_table.columns = [
                 "Marker",
-                "Allele 1",
-                "Allele 2",
-                "Allele 3",
-                "Allele 4",
-                "Height 1",
-                "Height 2",
-                "Height 3",
-                "Height 4",
+                "Allele.1",
+                "Allele.2",
+                "Allele.3",
+                "Allele.4",
+                "Height.1",
+                "Height.2",
+                "Height.3",
+                "Height.4",
             ]
-            if len(compiled_table[compiled_table["Allele 4"].notna()]) > 0:
+            if len(compiled_table[compiled_table["Allele.4"].notna()]) > 0:
                 compiled_table = compiled_table.drop(compiled_table.columns[[4, 8]], axis=1)
-        if len(compiled_table[compiled_table["Allele 3"].notna()]) > 0:
+        if len(compiled_table[compiled_table["Allele.3"].notna()]) > 0:
             compiled_table = compiled_table.drop(compiled_table.columns[[3, 6]], axis=1)
     if output_type == "reference":
         for i, row in compiled_table.iterrows():
-            if pd.isnull(compiled_table.loc[i, "Height 2"]):
-                compiled_table.loc[i, "Allele 2"] = compiled_table.loc[i, "Allele 1"]
-        compiled_table = compiled_table[["Marker", "Allele 1", "Allele 2"]]
+            if pd.isnull(compiled_table.loc[i, "Height.2"]):
+                compiled_table.loc[i, "Allele.2"] = compiled_table.loc[i, "Allele.1"]
+        compiled_table = compiled_table[["Marker", "Allele.1", "Allele.2"]]
     return compiled_table
 
 
@@ -134,17 +134,17 @@ def check_allele_calls(df, output_type):
         snpid = df.loc[i, "Marker"]
         marker_info = snp_marker_data[snpid]
         real_alleles = marker_info["Alleles"]
-        if pd.isnull(df.loc[i, "Allele 2"]):
+        if pd.isnull(df.loc[i, "Allele.2"]):
             if output_type == "evidence":
-                if df.loc[i, "Allele 1"] == real_alleles[0]:
-                    df.loc[i, "Allele 2"] = real_alleles[1]
-                elif df.loc[i, "Allele 1"] == real_alleles[1]:
-                    df.loc[i, "Allele 2"] = real_alleles[0]
+                if df.loc[i, "Allele.1"] == real_alleles[0]:
+                    df.loc[i, "Allele.2"] = real_alleles[1]
+                elif df.loc[i, "Allele.1"] == real_alleles[1]:
+                    df.loc[i, "Allele.2"] = real_alleles[0]
                 else:
                     print(f"{snpid} does not contain the correct alleles!")
-                df.loc[i, "Height 2"] = 0
+                df.loc[i, "Height.2"] = 0
             else:
-                df.loc[i, "Allele 2"] = df.loc[i, "Allele 1"]
+                df.loc[i, "Allele.2"] = df.loc[i, "Allele.1"]
     return df
 
 
