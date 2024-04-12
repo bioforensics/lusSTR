@@ -24,7 +24,7 @@ rule format:
     input:
        expand("{samp_input}", samp_input=input_name)
     output:
-        expand("{name}.txt", name=output_name)
+        expand("{name}.tsv", name=output_name)
     params:
        software=config["analysis_software"],
        kit=config["kit"],

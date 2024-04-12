@@ -21,12 +21,12 @@ from tempfile import NamedTemporaryFile
 
 
 @pytest.mark.parametrize(
-    "input, filtering", [("snps_uas_all.txt", False), ("snps_uas_filtered.txt", True)]
+    "input, filtering", [("snps_uas_all.tsv", False), ("snps_uas_filtered.tsv", True)]
 )
 def test_uas_all(input, filtering, tmp_path):
     inputdb = data_file("snps")
     exp_out = data_file(input)
-    obs_out = str(tmp_path / "uas.txt")
+    obs_out = str(tmp_path / "uas.tsv")
     if filtering:
         arglist = ["config", "-w", str(tmp_path), "-o", "uas", "--input", str(inputdb), "--snps"]
     else:
@@ -50,7 +50,7 @@ def test_uas_all(input, filtering, tmp_path):
 @pytest.mark.parametrize("type, lines", [("i", 131), ("p", 30), ("a", 69), ("p, a", 95)])
 def test_uas_type(type, lines, tmp_path):
     inputdb = data_file("snps")
-    obs_out = str(tmp_path / "uas.txt")
+    obs_out = str(tmp_path / "uas.tsv")
     arglist = [
         "config",
         "-w",
@@ -72,10 +72,10 @@ def test_uas_type(type, lines, tmp_path):
 
 def test_sr_all(tmp_path):
     inputdb = data_file("snps")
-    exp_out = data_file("snps_sr_all.txt")
-    exp_out_full = data_file("snps_sr_all_full_output.txt")
-    obs_out = str(tmp_path / "sr.txt")
-    obs_out_full = str(tmp_path / "sr_full_output.txt")
+    exp_out = data_file("snps_sr_all.tsv")
+    exp_out_full = data_file("snps_sr_all_full_output.tsv")
+    obs_out = str(tmp_path / "sr.tsv")
+    obs_out_full = str(tmp_path / "sr_full_output.tsv")
     arglist = [
         "config",
         "-w",
@@ -101,10 +101,10 @@ def test_sr_all(tmp_path):
 )
 def test_sr_type(type, lines, full_lines, tmp_path):
     inputdb = data_file("snps")
-    exp_out = data_file("snps_sr_all.txt")
-    exp_out_full = data_file("snps_sr_all_full_output.txt")
-    obs_out = str(tmp_path / "sr.txt")
-    obs_out_full = str(tmp_path / "sr_full_output.txt")
+    exp_out = data_file("snps_sr_all.tsv")
+    exp_out_full = data_file("snps_sr_all_full_output.tsv")
+    obs_out = str(tmp_path / "sr.tsv")
+    obs_out_full = str(tmp_path / "sr_full_output.tsv")
     arglist = [
         "config",
         "-w",
@@ -130,12 +130,12 @@ def test_sr_type(type, lines, full_lines, tmp_path):
 
 @pytest.mark.parametrize(
     "output, filtering",
-    [("kinsnps/snps_kin_all.txt", False), ("kinsnps/snps_kin_filtered.txt", True)],
+    [("kinsnps/snps_kin_all.tsv", False), ("kinsnps/snps_kin_filtered.tsv", True)],
 )
 def test_kintelligence(output, filtering, tmp_path):
     inputdb = data_file("kinsnps/Kin_pos_1ng_reference Sample Report 2023_07_11_13_16_31.xlsx")
     exp_out = data_file(output)
-    obs_out = str(tmp_path / "kin.txt")
+    obs_out = str(tmp_path / "kin.tsv")
     if filtering:
         arglist = [
             "config",
