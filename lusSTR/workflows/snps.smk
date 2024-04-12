@@ -38,7 +38,7 @@ rule convert:
     input:
         rules.format.output
     output:
-        expand("{name}.csv", name=format_filename(output_name, refs))
+        expand("{name}.tsv", name=format_filename(output_name, refs))
     params:
         strand=config["strand"],
         separate=config["separate"],
