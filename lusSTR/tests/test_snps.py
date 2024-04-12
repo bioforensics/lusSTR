@@ -169,10 +169,10 @@ def test_kintelligence(output, filtering, tmp_path):
 
 def test_kintelligence_all(tmp_path):
     inputdb = data_file("kinsnps/")
-    evid_exp_output = data_file("kinsnps/evidence.csv")
-    ref_exp_output = data_file("kinsnps/reference.csv")
-    evid_obs_output = f"{str(tmp_path)}/kin_snp_evidence.csv"
-    ref_obs_output = f"{str(tmp_path)}/kin_snp_reference.csv"
+    evid_exp_output = data_file("kinsnps/evidence.tsv")
+    ref_exp_output = data_file("kinsnps/reference.tsv")
+    evid_obs_output = f"{str(tmp_path)}/kin_snp_evidence.tsv"
+    ref_obs_output = f"{str(tmp_path)}/kin_snp_reference.tsv"
     arglist = [
         "config",
         "-w",
@@ -195,8 +195,8 @@ def test_kintelligence_all(tmp_path):
 
 def test_multiple_reference_profiles(tmp_path):
     inputdb = data_file("kinsnps/")
-    exp_out = data_file("kinsnps/multiplerefs.csv")
-    obs_out = str(tmp_path / "kin_snp_reference.csv")
+    exp_out = data_file("kinsnps/multiplerefs.tsv")
+    obs_out = str(tmp_path / "kin_snp_reference.tsv")
     arglist = [
         "config",
         "-w",
@@ -243,8 +243,8 @@ def test_snp_bins(tmp_path):
 
 def test_uas_version5(tmp_path):
     input_sample = data_file("NA24385 Sample Report 2023_09_07_15_11_11.xlsx")
-    exp_out = data_file("kinsnps/uasversion_snp_evidence.csv")
-    obs_out = str(tmp_path / "kin_v5_snp_evidence.csv")
+    exp_out = data_file("kinsnps/uasversion_snp_evidence.tsv")
+    obs_out = str(tmp_path / "kin_v5_snp_evidence.tsv")
     arglist = [
         "config",
         "-w",
