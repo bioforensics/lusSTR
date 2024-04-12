@@ -549,7 +549,7 @@ def main(input, output, kit, software, snptypes, nofilter):
     else:
         results, results_combined = strait_razor_format(input, snptypes)
         results_combined.to_csv(output, index=False, sep="\t")
-        results.to_csv(f"{output_name}_full_output.txt", index=False, sep="\t")
+        results.to_csv(f"{output_name}_full_output.tsv", index=False, sep="\t")
 
 
 if __name__ == "__main__":

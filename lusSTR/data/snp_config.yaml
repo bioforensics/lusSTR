@@ -12,7 +12,9 @@ types: "all" ## choices are "all", "i" (identity SNPs only), "p" (phenotype only
 nofilter: False ## True/False if no filtering is desired; if False, will remove any allele designated as Not Typed
 
 ## convert settings
-strand: "forward" ## forward/uas; indicates which oritentation to report the alleles for the ForenSeq SNPs; uas indicates the orientation as reported by the UAS or the forward strand
+strand: "forward" ## forward/uas; strand orientation to report
 references: "" ## list IDs of the samples to be run as references in EFM
 separate: false ## True/False; if want to separate samples into individual files for use in EFM
 thresh: 0.03 ## Analytical threshold value
+
+
