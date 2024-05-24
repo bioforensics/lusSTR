@@ -1,12 +1,12 @@
 import argparse
-import os
-import subprocess
+import importlib.resources
+import streamlit.web.cli as stcli
+import sys
 import lusSTR
 from lusSTR.cli import config
 from lusSTR.cli import strs
 from lusSTR.cli import snps
 from lusSTR.cli import gui
-import snakemake
 
 mains = {
     "config": config.main,
@@ -27,13 +27,10 @@ def main(args=None):
         args = get_parser().parse_args()
     if args.subcmd is None:
         get_parser().parse_args(["-h"])
-    elif args.subcmd == "gui":  
-        # Get the directory containing the script (cli folder)
-        script_dir = os.path.dirname(os.path.realpath(__file__))
-        # Construct the path to gui.py relative to the script directory
-        gui_path = os.path.join(script_dir, "gui.py")
-        # Call streamlit run command
-        subprocess.run(["streamlit", "run", gui_path])
+    elif args.subcmd == "gui":
+        gui_path = importlib.resources.files("lusSTR") / "cli" / "gui.py"
+        sys.argv = ["streamlit", "run", str(gui_path)]
+        sys.exit(stcli.main())
     else:
         mainmethod = mains[args.subcmd]
         result = mainmethod(args)
