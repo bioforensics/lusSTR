@@ -45,7 +45,7 @@ class UnsupportedSoftwareError(ValueError):
 
 
 class STRMarker:
-    def __init__(self, locus, sequence, software, kit="forenseq"):
+    def __init__(self, locus, sequence, software, custom=False, kit="forenseq"):
         self.locus = locus
         self.sequence = sequence
         if locus not in str_marker_data:
@@ -59,6 +59,7 @@ class STRMarker:
         self.kit = kit.lower()
         if software == "uas" and self.data["ReverseCompNeeded"] == "Yes":
             self.sequence = reverse_complement(sequence)
+        self.custom = custom
 
     @property
     def repeat_size(self):
@@ -115,6 +116,21 @@ class STRMarker:
         if self.data["ReverseCompNeeded"] == "Yes":
             return reverse_complement(self.forward_sequence)
         return self.forward_sequence
+
+    @property
+    def custom_sequence(self):
+        """Custom range for sequences; PowerSeq sequences only"""
+        if self.custom:
+            front, back = self._uas_bases_to_trim()
+            custom_front = front + self.data["Custom_5"]
+            custom_back = back + self.data["Custom_3"]
+            if custom_back == 0:
+                custom_back = None
+            else:
+                custom_back *= -1
+            return self.sequence[custom_front:custom_back]
+        else:
+            return None
 
     @property
     def flankseq_5p(self):
@@ -319,6 +335,7 @@ class STRMarker:
         return [
             self.uas_sequence,
             self.forward_sequence,
+            self.custom_sequence,
             self.convert_uas,
             self.convert,
             canon,
@@ -1629,7 +1646,7 @@ class STRMarker_DYS389II(STRMarker):
         return flank
 
 
-def STRMarkerObject(locus, sequence, software, kit="forenseq"):
+def STRMarkerObject(locus, sequence, software, custom=False, kit="forenseq"):
     constructors = {
         "D8S1179": STRMarker_D8S1179,
         "D13S317": STRMarker_D13S317,
@@ -1679,6 +1696,6 @@ def STRMarkerObject(locus, sequence, software, kit="forenseq"):
     }
     if locus in constructors:
         constructor = constructors[locus]
-        return constructor(locus, sequence, software=software, kit=kit)
+        return constructor(locus, sequence, software=software, custom=custom, kit=kit)
     else:
-        return STRMarker(locus, sequence, software=software, kit=kit)
+        return STRMarker(locus, sequence, software=software, custom=custom, kit=kit)

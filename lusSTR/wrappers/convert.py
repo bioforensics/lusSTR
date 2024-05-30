@@ -29,7 +29,7 @@ with open(get_str_metadata_file(), "r") as fh:
     str_marker_data = json.load(fh)
 
 
-def format_table(input, software, kit="forenseq"):
+def format_table(input, software, kit="forenseq", custom=False):
     """
     Function to format final output table and the flanking report (if necessary).
     """
@@ -99,7 +99,7 @@ def format_table(input, software, kit="forenseq"):
             ]
             flanks_list.append(flank_summary)
             continue
-        marker = STRMarkerObject(locus, sequence, software, kit=kit)
+        marker = STRMarkerObject(locus, sequence, software, custom=custom, kit=kit)
         if locus == "D12S391" and kit == "powerseq" and software == "straitrazor":
             if "." in str(marker.canonical):
                 check_sr += 1
@@ -112,11 +112,11 @@ def format_table(input, software, kit="forenseq"):
         indel_flag = marker.indel_flag
         if indel_flag == "Possible indel or partial sequence":
             if locus == "PENTA D" and kit == "powerseq":
-                marker = check_pentad(marker, sequence, software)
+                marker = check_pentad(marker, sequence, software, custom)
             elif locus == "D7S820" and kit == "powerseq":
-                marker = check_D7(marker, sequence, software)
+                marker = check_D7(marker, sequence, software, custom)
             elif locus == "VWA" and kit == "powerseq":
-                marker = check_vwa(marker, sequence, software)
+                marker = check_vwa(marker, sequence, software, custom)
         summary = [sampleid, project, analysis, locus] + marker.summary + [reads]
         list_of_lists.append(summary)
         if software != "uas":
@@ -134,7 +134,6 @@ def format_table(input, software, kit="forenseq"):
                 indel_flag,
             ]
             flanks_list.append(flank_summary)
-
     columns = [
         "SampleID",
         "Project",
@@ -142,6 +141,7 @@ def format_table(input, software, kit="forenseq"):
         "Locus",
         "UAS_Output_Sequence",
         "Forward_Strand_Sequence",
+        "Custom_Range_Sequence",
         "UAS_Output_Bracketed_Notation",
         "Forward_Strand_Bracketed_Notation",
         "CE_Allele",
@@ -173,35 +173,43 @@ def format_table(input, software, kit="forenseq"):
             final_flank_output = sort_table(pd.DataFrame(flanks_list, columns=flanks_columns))
     else:
         final_flank_output = ""
+    if not custom:
+        final_output = final_output.drop("Custom_Range_Sequence", axis=1)
     return final_output, final_flank_output, columns
 
 
-def check_pentad(marker, sequence, software):
+def check_pentad(marker, sequence, software, custom):
     new_marker = marker
     if marker.summary[1][:4] == "AAAG" and marker.flank_5p[-5:] == "GAAAA":
         new_sequence = f"{sequence[:66]}-{sequence[66:]}"
-        new_marker = STRMarkerObject("PENTA D", new_sequence, software, kit="powerseq")
+        new_marker = STRMarkerObject(
+            "PENTA D", new_sequence, software, custom=custom, kit="powerseq"
+        )
     elif marker.summary[1][-4:] == "AAAG" and marker.flank_3p[:7] == "AAAAA A":
         new_sequence = f"{sequence}-"
-        new_marker = STRMarkerObject("PENTA D", new_sequence, software, kit="powerseq")
+        new_marker = STRMarkerObject(
+            "PENTA D", new_sequence, software, custom=custom, kit="powerseq"
+        )
     else:
         return marker
     return new_marker
 
 
-def check_D7(marker, sequence, software):
+def check_D7(marker, sequence, software, custom):
     if marker.summary[1][:3] == "AAC" and marker.flank_5p[-8:] == "T AAAAAA":
         new_sequence = f"{sequence[:60]}-{sequence[60:]}"
-        new_marker = STRMarkerObject("D7S820", new_sequence, software, kit="powerseq")
+        new_marker = STRMarkerObject(
+            "D7S820", new_sequence, software, custom=custom, kit="powerseq"
+        )
     else:
         return marker
     return new_marker
 
 
-def check_vwa(marker, sequence, software):
+def check_vwa(marker, sequence, software, custom):
     if sequence[:4] == "GATA":
         new_sequence = f"{sequence[:1]}-{sequence[1:]}"
-        new_marker = STRMarkerObject("VWA", new_sequence, software, kit="powerseq")
+        new_marker = STRMarkerObject("VWA", new_sequence, software, custom=custom, kit="powerseq")
     else:
         return marker
     return new_marker
@@ -220,15 +228,17 @@ def sort_table(table):
     return sorted_table
 
 
-def main(input, out, kit, software, sex, nocombine):
+def main(input, out, kit, software, sex, nocombine, custom):
     input = str(input)
     out = str(out)
     output_name = os.path.splitext(out)[0]
     input_name = os.path.splitext(input)[0]
-    autosomal_final_table, autosomal_flank_table, columns = format_table(input, software, kit)
+    autosomal_final_table, autosomal_flank_table, columns = format_table(
+        input, software, kit, custom
+    )
     if sex:
         sex_final_table, sex_flank_table, columns = format_table(
-            f"{input_name}_sexloci.csv", software, kit
+            f"{input_name}_sexloci.csv", software, kit, custom
         )
         if software != "uas":
             if not sex_final_table.empty:
@@ -262,4 +272,5 @@ if __name__ == "__main__":
         software=snakemake.params.a_software,
         sex=snakemake.params.sex,
         nocombine=snakemake.params.nocombine,
+        custom=snakemake.params.custom,
     )
