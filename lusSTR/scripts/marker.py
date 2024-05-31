@@ -122,8 +122,8 @@ class STRMarker:
         """Custom range for sequences; PowerSeq sequences only"""
         if self.custom:
             front, back = self._uas_bases_to_trim()
-            custom_front = front + self.data["Custom_5"]
-            custom_back = back + self.data["Custom_3"]
+            custom_front = front - self.data["Custom_5"]
+            custom_back = back - self.data["Custom_3"]
             if custom_back == 0:
                 custom_back = None
             else:

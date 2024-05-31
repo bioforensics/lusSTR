@@ -215,10 +215,18 @@ def check_vwa(marker, sequence, software, custom):
     return new_marker
 
 
-def combine_reads(table, columns):
-    comb_table = table.groupby(columns[:-1], as_index=False)["Reads"].sum()
+def combine_reads(table, columns, custom):
+    if custom:
+        comb_table = custom_range_combine_reads(table, columns)
+    else:
+        comb_table = table.groupby(columns[:-1], as_index=False)["Reads"].sum()
     sorted = sort_table(comb_table)
     return sorted
+
+
+def custom_range_combine_reads(table, columns):
+    comb_table = table.groupby(columns[:-1], as_index=False)["Reads"].sum()
+    return comb_table
 
 
 def sort_table(table):
@@ -247,7 +255,7 @@ def main(input, out, kit, software, sex, nocombine, custom):
                     sex_final_table.to_csv(
                         f"{output_name}_sexloci_no_combined_reads.txt", index=False
                     )
-                sex_final_table = combine_reads(sex_final_table, columns)
+                sex_final_table = combine_reads(sex_final_table, columns, custom)
                 sex_final_table.to_csv(f"{output_name}_sexloci.txt", sep="\t", index=False)
         else:
             sex_final_table.to_csv(f"{output_name}_sexloci.txt", sep="\t", index=False)
@@ -258,7 +266,7 @@ def main(input, out, kit, software, sex, nocombine, custom):
                 autosomal_final_table.to_csv(
                     f"{output_name}_no_combined_reads.txt", sep="\t", index=False
                 )
-            autosomal_final_table = combine_reads(autosomal_final_table, columns)
+            autosomal_final_table = combine_reads(autosomal_final_table, columns, custom)
             autosomal_final_table.to_csv(out, sep="\t", index=False)
     else:
         autosomal_final_table.to_csv(out, sep="\t", index=False)
