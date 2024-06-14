@@ -144,6 +144,7 @@ def format_table(input, software, kit="forenseq", custom=False):
         "Custom_Range_Sequence",
         "UAS_Output_Bracketed_Notation",
         "Forward_Strand_Bracketed_Notation",
+        "Custom_Bracketed_Notation",
         "CE_Allele",
         "LUS",
         "LUS_Plus",
@@ -174,7 +175,9 @@ def format_table(input, software, kit="forenseq", custom=False):
     else:
         final_flank_output = ""
     if not custom:
-        final_output = final_output.drop("Custom_Range_Sequence", axis=1)
+        final_output = final_output.drop(
+            ["Custom_Range_Sequence", "Custom_Bracketed_Notation"], axis=1
+        )
     return final_output, final_flank_output, columns
 
 
@@ -215,18 +218,10 @@ def check_vwa(marker, sequence, software, custom):
     return new_marker
 
 
-def combine_reads(table, columns, custom):
-    if custom:
-        comb_table = custom_range_combine_reads(table, columns)
-    else:
-        comb_table = table.groupby(columns[:-1], as_index=False)["Reads"].sum()
+def combine_reads(table, columns):
+    comb_table = table.groupby(columns[:-1], as_index=False)["Reads"].sum()
     sorted = sort_table(comb_table)
     return sorted
-
-
-def custom_range_combine_reads(table, columns):
-    comb_table = table.groupby(columns[:-1], as_index=False)["Reads"].sum()
-    return comb_table
 
 
 def sort_table(table):
@@ -266,7 +261,24 @@ def main(input, out, kit, software, sex, nocombine, custom):
                 autosomal_final_table.to_csv(
                     f"{output_name}_no_combined_reads.txt", sep="\t", index=False
                 )
-            autosomal_final_table = combine_reads(autosomal_final_table, columns, custom)
+            if custom:
+                custom_columns = [
+                    "SampleID",
+                    "Project",
+                    "Analysis",
+                    "Locus",
+                    "Custom_Range_Sequence",
+                    "Custom_Bracketed_Notation",
+                    "CE_Allele",
+                    "LUS",
+                    "LUS_Plus",
+                    "Reads",
+                ]
+                custom_table = autosomal_final_table[custom_columns]
+                custom_table_comb = combine_reads(custom_table, custom_columns)
+                custom_table_comb.to_csv(f"{output_name}_custom_range.txt", sep="\t", index=False)
+            else:
+                autosomal_final_table = combine_reads(autosomal_final_table, columns)
             autosomal_final_table.to_csv(out, sep="\t", index=False)
     else:
         autosomal_final_table.to_csv(out, sep="\t", index=False)

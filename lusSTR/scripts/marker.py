@@ -311,6 +311,10 @@ class STRMarker:
         return self.convert
 
     @property
+    def custom_brack(self):
+        return self.convert
+
+    @property
     def designation(self):
         lus, sec, ter = None, None, None
         lus = repeat_copy_number(self.convert, self.data["LUS"])
@@ -338,6 +342,7 @@ class STRMarker:
             self.custom_sequence,
             self.convert_uas,
             self.convert,
+            self.custom_brack,
             canon,
             lus_final_output,
             lus_plus,
