@@ -626,6 +626,13 @@ class STRMarker_D1S1656(STRMarker):
         final_string = re.sub(r" +", " ", final_string)
         return final_string
 
+    @property
+    def custom_brack(self):
+        filt_seq = self.forward_sequence[10:]
+        final = sequence_to_bracketed_form(filt_seq, 4, self.repeats)
+        final_string = re.sub(r" +", " ", final)
+        return final_string
+
 
 class STRMarker_PentaD(STRMarker):
     @property
@@ -679,6 +686,13 @@ class STRMarker_PentaD(STRMarker):
             result = re.sub(r" +", " ", result)
             return result
 
+    @property
+    def custom_brack(self):
+        filt_seq = self.forward_sequence[5:]
+        final = sequence_to_bracketed_form(filt_seq, 5, self.repeats)
+        final_string = re.sub(r" +", " ", final)
+        return final_string
+
 
 class STRMarker_PentaE(STRMarker):
     @property
@@ -724,6 +738,13 @@ class STRMarker_vWA(STRMarker):
         else:
             flank = collapse_repeats_by_length(flank_seq, 4)
         return flank
+
+    @property
+    def custom_brack(self):
+        filt_seq = self.forward_sequence[8:]
+        final = sequence_to_bracketed_form(filt_seq, 4, self.repeats)
+        final_string = re.sub(r" +", " ", final)
+        return final_string
 
 
 class STRMarker_D10S1248(STRMarker):
