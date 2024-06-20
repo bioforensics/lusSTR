@@ -277,6 +277,21 @@ def main(input, out, kit, software, sex, nocombine, custom):
                 custom_table = autosomal_final_table[custom_columns]
                 custom_table_comb = combine_reads(custom_table, custom_columns)
                 custom_table_comb.to_csv(out, sep="\t", index=False)
+            else:
+                columns = [
+                    "SampleID",
+                    "Project",
+                    "Analysis",
+                    "Locus",
+                    "UAS_Output_Sequence",
+                    "Forward_Strand_Sequence",
+                    "UAS_Output_Bracketed_Notation",
+                    "Forward_Strand_Bracketed_Notation",
+                    "CE_Allele",
+                    "LUS",
+                    "LUS_Plus",
+                    "Reads",
+                ]
             autosomal_final_table = combine_reads(autosomal_final_table, columns)
             full_table_name = re.sub(r"_custom_range", "", output_name)
             autosomal_final_table.to_csv(f"{full_table_name}.txt", sep="\t", index=False)

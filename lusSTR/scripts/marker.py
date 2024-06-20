@@ -129,8 +129,7 @@ class STRMarker:
             else:
                 custom_back *= -1
             return self.sequence[custom_front:custom_back]
-        else:
-            return None
+        return None
 
     @property
     def flankseq_5p(self):
@@ -312,7 +311,9 @@ class STRMarker:
 
     @property
     def custom_brack(self):
-        return self.convert
+        if self.custom:
+            return self.convert
+        return None
 
     @property
     def designation(self):
@@ -426,9 +427,11 @@ class STRMarker_D13S317(STRMarker):
 
     @property
     def custom_brack(self):
-        final = sequence_to_bracketed_form(self.custom_sequence, 4, self.repeats)
-        final_string = re.sub(r" +", " ", final)
-        return final_string
+        if self.custom:
+            final = sequence_to_bracketed_form(self.custom_sequence, 4, self.repeats)
+            final_string = re.sub(r" +", " ", final)
+            return final_string
+        return None
 
 
 class STRMarker_D20S482(STRMarker):
@@ -465,9 +468,11 @@ class STRMarker_D2S441(STRMarker):
 
     @property
     def custom_brack(self):
-        final = sequence_to_bracketed_form(self.custom_sequence, 4, self.repeats)
-        final_string = re.sub(r" +", " ", final)
-        return final_string
+        if self.custom:
+            final = sequence_to_bracketed_form(self.custom_sequence, 4, self.repeats)
+            final_string = re.sub(r" +", " ", final)
+            return final_string
+        return None
 
 
 class STRMarker_D5S818(STRMarker):
@@ -487,9 +492,11 @@ class STRMarker_D5S818(STRMarker):
 
     @property
     def custom_brack(self):
-        final = sequence_to_bracketed_form(self.custom_sequence, 4, self.repeats)
-        final_string = re.sub(r" +", " ", final)
-        return final_string
+        if self.custom:
+            final = sequence_to_bracketed_form(self.custom_sequence, 4, self.repeats)
+            final_string = re.sub(r" +", " ", final)
+            return final_string
+        return None
 
 
 class STRMarker_D7S820(STRMarker):
@@ -561,9 +568,11 @@ class STRMarker_D7S820(STRMarker):
 
     @property
     def custom_brack(self):
-        final = sequence_to_bracketed_form(self.custom_sequence, 4, self.repeats)
-        final_string = re.sub(r" +", " ", final)
-        return final_string
+        if self.custom:
+            final = sequence_to_bracketed_form(self.custom_sequence, 4, self.repeats)
+            final_string = re.sub(r" +", " ", final)
+            return final_string
+        return None
 
 
 class STRMarker_D16S539(STRMarker):
@@ -652,10 +661,12 @@ class STRMarker_D1S1656(STRMarker):
 
     @property
     def custom_brack(self):
-        filt_seq = self.forward_sequence[10:]
-        final = sequence_to_bracketed_form(filt_seq, 4, self.repeats)
-        final_string = re.sub(r" +", " ", final)
-        return final_string
+        if self.custom:
+            filt_seq = self.forward_sequence[10:]
+            final = sequence_to_bracketed_form(filt_seq, 4, self.repeats)
+            final_string = re.sub(r" +", " ", final)
+            return final_string
+        return None
 
 
 class STRMarker_PentaD(STRMarker):
@@ -712,10 +723,12 @@ class STRMarker_PentaD(STRMarker):
 
     @property
     def custom_brack(self):
-        filt_seq = self.forward_sequence[5:]
-        final = sequence_to_bracketed_form(filt_seq, 5, self.repeats)
-        final_string = re.sub(r" +", " ", final)
-        return final_string
+        if self.custom:
+            filt_seq = self.forward_sequence[5:]
+            final = sequence_to_bracketed_form(filt_seq, 5, self.repeats)
+            final_string = re.sub(r" +", " ", final)
+            return final_string
+        return None
 
 
 class STRMarker_PentaE(STRMarker):
@@ -765,10 +778,12 @@ class STRMarker_vWA(STRMarker):
 
     @property
     def custom_brack(self):
-        filt_seq = self.forward_sequence[8:]
-        final = sequence_to_bracketed_form(filt_seq, 4, self.repeats)
-        final_string = re.sub(r" +", " ", final)
-        return final_string
+        if self.custom:
+            filt_seq = self.forward_sequence[8:]
+            final = sequence_to_bracketed_form(filt_seq, 4, self.repeats)
+            final_string = re.sub(r" +", " ", final)
+            return final_string
+        return None
 
 
 class STRMarker_D10S1248(STRMarker):
@@ -809,9 +824,11 @@ class STRMarker_D22S1045(STRMarker):
 
     @property
     def custom_brack(self):
-        final = sequence_to_bracketed_form(self.custom_sequence, 3, self.repeats)
-        final_string = re.sub(r" +", " ", final)
-        return final_string
+        if self.custom:
+            final = sequence_to_bracketed_form(self.custom_sequence, 3, self.repeats)
+            final_string = re.sub(r" +", " ", final)
+            return final_string
+        return None
 
 
 class STRMarker_D2S1338(STRMarker):
@@ -927,9 +944,11 @@ class STRMarker_CSF1PO(STRMarker):
 
     @property
     def custom_brack(self):
-        final = sequence_to_bracketed_form(self.custom_sequence, 4, self.repeats)
-        final_string = re.sub(r" +", " ", final)
-        return final_string
+        if self.custom:
+            final = sequence_to_bracketed_form(self.custom_sequence, 4, self.repeats)
+            final_string = re.sub(r" +", " ", final)
+            return final_string
+        return None
 
 
 class STRMarker_D18S51(STRMarker):
@@ -959,9 +978,11 @@ class STRMarker_D18S51(STRMarker):
 
     @property
     def custom_brack(self):
-        final = sequence_to_bracketed_form(self.custom_sequence, 4, self.repeats)
-        final_string = re.sub(r" +", " ", final)
-        return final_string
+        if self.custom:
+            final = sequence_to_bracketed_form(self.custom_sequence, 4, self.repeats)
+            final_string = re.sub(r" +", " ", final)
+            return final_string
+        return None
 
 
 class STRMarker_D21S11(STRMarker):
@@ -1088,9 +1109,11 @@ class STRMarker_D21S11(STRMarker):
 
     @property
     def custom_brack(self):
-        final = sequence_to_bracketed_form(self.custom_sequence, 4, self.repeats)
-        final_string = re.sub(r" +", " ", final)
-        return final_string
+        if self.custom:
+            final = sequence_to_bracketed_form(self.custom_sequence, 4, self.repeats)
+            final_string = re.sub(r" +", " ", final)
+            return final_string
+        return None
 
 
 class STRMarker_TH01(STRMarker):
@@ -1130,9 +1153,11 @@ class STRMarker_TH01(STRMarker):
 
     @property
     def custom_brack(self):
-        final = sequence_to_bracketed_form(self.custom_sequence, 4, self.repeats)
-        final_string = re.sub(r" +", " ", final)
-        return final_string
+        if self.custom:
+            final = sequence_to_bracketed_form(self.custom_sequence, 4, self.repeats)
+            final_string = re.sub(r" +", " ", final)
+            return final_string
+        return None
 
 
 class STRMarker_TPOX(STRMarker):
@@ -1211,25 +1236,31 @@ class STRMarker_D19S433(STRMarker):
 
     @property
     def custom_brack(self):
-        final = sequence_to_bracketed_form(self.custom_sequence, 4, self.repeats)
-        final_string = re.sub(r" +", " ", final)
-        return final_string
+        if self.custom:
+            final = sequence_to_bracketed_form(self.custom_sequence, 4, self.repeats)
+            final_string = re.sub(r" +", " ", final)
+            return final_string
+        return None
 
 
 class STRMarker_D3S1358(STRMarker):
     @property
     def custom_brack(self):
-        final = sequence_to_bracketed_form(self.custom_sequence, 4, self.repeats)
-        final_string = re.sub(r" +", " ", final)
-        return final_string
+        if self.custom:
+            final = sequence_to_bracketed_form(self.custom_sequence, 4, self.repeats)
+            final_string = re.sub(r" +", " ", final)
+            return final_string
+        return None
 
 
 class STRMarker_D12S391(STRMarker):
     @property
     def custom_brack(self):
-        final = sequence_to_bracketed_form(self.custom_sequence, 4, self.repeats)
-        final_string = re.sub(r" +", " ", final)
-        return final_string
+        if self.custom:
+            final = sequence_to_bracketed_form(self.custom_sequence, 4, self.repeats)
+            final_string = re.sub(r" +", " ", final)
+            return final_string
+        return None
 
 
 class STRMarker_DYS643(STRMarker):
