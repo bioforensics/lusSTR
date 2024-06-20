@@ -277,8 +277,7 @@ def main(input, out, kit, software, sex, nocombine, custom):
                 custom_table = autosomal_final_table[custom_columns]
                 custom_table_comb = combine_reads(custom_table, custom_columns)
                 custom_table_comb.to_csv(f"{output_name}_custom_range.txt", sep="\t", index=False)
-            else:
-                autosomal_final_table = combine_reads(autosomal_final_table, columns)
+            autosomal_final_table = combine_reads(autosomal_final_table, columns)
             autosomal_final_table.to_csv(out, sep="\t", index=False)
     else:
         autosomal_final_table.to_csv(out, sep="\t", index=False)
