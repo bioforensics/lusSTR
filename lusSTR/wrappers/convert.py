@@ -175,9 +175,9 @@ def format_table(input, software, kit="forenseq", custom=False):
     else:
         final_flank_output = ""
     if not custom:
-        final_output = final_output.drop(
-            ["Custom_Range_Sequence", "Custom_Bracketed_Notation"], axis=1
-        )
+        remove_list = ["Custom_Range_Sequence", "Custom_Bracketed_Notation"]
+        final_output = final_output.drop(remove_list, axis=1)
+        columns = remove_columns(columns, remove_list)
     return final_output, final_flank_output, columns
 
 
@@ -231,6 +231,12 @@ def sort_table(table):
     return sorted_table
 
 
+def remove_columns(column_list, remove_list):
+    for col in remove_list:
+        column_list.remove(col)
+    return column_list
+
+
 def main(input, out, kit, software, sex, nocombine, custom):
     input = str(input)
     out = str(out)
@@ -250,7 +256,7 @@ def main(input, out, kit, software, sex, nocombine, custom):
                     sex_final_table.to_csv(
                         f"{output_name}_sexloci_no_combined_reads.txt", index=False
                     )
-                sex_final_table = combine_reads(sex_final_table, columns, custom)
+                sex_final_table = combine_reads(sex_final_table, columns)
                 sex_final_table.to_csv(f"{output_name}_sexloci.txt", sep="\t", index=False)
         else:
             sex_final_table.to_csv(f"{output_name}_sexloci.txt", sep="\t", index=False)
@@ -262,36 +268,16 @@ def main(input, out, kit, software, sex, nocombine, custom):
                     f"{output_name}_no_combined_reads.txt", sep="\t", index=False
                 )
             if custom:
-                custom_columns = [
-                    "SampleID",
-                    "Project",
-                    "Analysis",
-                    "Locus",
-                    "Custom_Range_Sequence",
-                    "Custom_Bracketed_Notation",
-                    "CE_Allele",
-                    "LUS",
-                    "LUS_Plus",
-                    "Reads",
-                ]
-                custom_table = autosomal_final_table[custom_columns]
-                custom_table_comb = combine_reads(custom_table, custom_columns)
-                custom_table_comb.to_csv(out, sep="\t", index=False)
-            else:
-                columns = [
-                    "SampleID",
-                    "Project",
-                    "Analysis",
-                    "Locus",
+                remove_list = [
                     "UAS_Output_Sequence",
                     "Forward_Strand_Sequence",
                     "UAS_Output_Bracketed_Notation",
                     "Forward_Strand_Bracketed_Notation",
-                    "CE_Allele",
-                    "LUS",
-                    "LUS_Plus",
-                    "Reads",
                 ]
+                custom_columns = remove_columns(columns, remove_list)
+                custom_table = autosomal_final_table[custom_columns]
+                custom_table_comb = combine_reads(custom_table, custom_columns)
+                custom_table_comb.to_csv(out, sep="\t", index=False)
             autosomal_final_table = combine_reads(autosomal_final_table, columns)
             full_table_name = re.sub(r"_custom_range", "", output_name)
             autosomal_final_table.to_csv(f"{full_table_name}.txt", sep="\t", index=False)
