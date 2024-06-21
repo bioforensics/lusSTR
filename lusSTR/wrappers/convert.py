@@ -267,6 +267,9 @@ def main(input, out, kit, software, sex, nocombine, custom):
                 autosomal_final_table.to_csv(
                     f"{output_name}_no_combined_reads.txt", sep="\t", index=False
                 )
+            autosomal_final_table = combine_reads(autosomal_final_table, columns)
+            full_table_name = re.sub(r"_custom_range", "", output_name)
+            autosomal_final_table.to_csv(f"{full_table_name}.txt", sep="\t", index=False)
             if custom:
                 remove_list = [
                     "UAS_Output_Sequence",
@@ -278,9 +281,6 @@ def main(input, out, kit, software, sex, nocombine, custom):
                 custom_table = autosomal_final_table[custom_columns]
                 custom_table_comb = combine_reads(custom_table, custom_columns)
                 custom_table_comb.to_csv(out, sep="\t", index=False)
-            autosomal_final_table = combine_reads(autosomal_final_table, columns)
-            full_table_name = re.sub(r"_custom_range", "", output_name)
-            autosomal_final_table.to_csv(f"{full_table_name}.txt", sep="\t", index=False)
     else:
         autosomal_final_table.to_csv(out, sep="\t", index=False)
 
