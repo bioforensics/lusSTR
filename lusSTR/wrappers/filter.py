@@ -442,7 +442,9 @@ def main(
     else:
         seq_col = "UAS_Output_Sequence" if strand == "uas" else "Forward_Strand_Sequence"
         brack_col = (
-            "UAS_Output_Bracketed_Notation" if strand == "uas" else "Forward_Strand_Bracketed_Form"
+            "UAS_Output_Bracketed_Notation"
+            if strand == "uas"
+            else "Forward_Strand_Bracketed_Notation"
         )
     if nofilters:
         full_df["allele_type"] = "real_allele"
