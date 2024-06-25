@@ -430,6 +430,29 @@ class STRMarker_D13S317(STRMarker):
                 bracketed_form = ""
         return bracketed_form
 
+    @property
+    def custom_brack(self):
+        if self.custom:
+            if len(self.uas_sequence) < 110:
+                bracketed_form = collapse_repeats_by_length(self.custom_sequence, 4)
+            else:
+                if "GGGCTGCCTA" in self.custom_sequence:
+                    break_point = self.custom_sequence.index("GGGCTGCCTA") + 10
+                    bracketed_form = (
+                        f"{collapse_repeats_by_length(self.custom_sequence[:break_point], 4)} "
+                        f"{collapse_repeats_by_length(self.custom_sequence[break_point:], 4)}"
+                    )
+                elif "TTTT" in self.uas_sequence:
+                    break_point = self.uas_sequence.index("TTTT") + 18
+                    bracketed_form = (
+                        f"{collapse_repeats_by_length(self.custom_sequence[:break_point], 4)} "
+                        f"{collapse_repeats_by_length(self.custom_sequence[break_point:], 4)}"
+                    )
+                else:
+                    bracketed_form = collapse_repeats_by_length(self.custom_sequence, 4)
+            return bracketed_form
+        return None
+
 
 class STRMarker_D20S482(STRMarker):
     @property
@@ -513,6 +536,8 @@ class STRMarker_D7S820(STRMarker):
         added in order to bracket the sequence correctly.
         """
         sequence = self.forward_sequence
+        # if self.canonical == 12:
+        #    print(self.sequence)
         if type(self.canonical) == int:
             forward_strand_brack_form = sequence_to_bracketed_form(
                 sequence, self.repeat_size, self.repeats
@@ -906,6 +931,17 @@ class STRMarker_D18S51(STRMarker):
         elif isinstance(self.canonical, int):
             return collapse_repeats_by_length(self.uas_sequence, self.repeat_size)
 
+    @property
+    def custom_brack(self):
+        if self.custom:
+            if isinstance(self.canonical, str):
+                return sequence_to_bracketed_form(
+                    self.custom_sequence, self.repeat_size, self.repeats
+                )
+            elif isinstance(self.canonical, int):
+                return collapse_repeats_by_length(self.custom_sequence, self.repeat_size)
+        return None
+
 
 class STRMarker_D21S11(STRMarker):
     @property
@@ -1029,6 +1065,18 @@ class STRMarker_D21S11(STRMarker):
                 count = count
         return lus_allele, sec_allele, finalcount
 
+    @property
+    def custom_brack(self):
+        if self.custom:
+            custom_front = self.custom_sequence[: self.data["Custom_5"]]
+            custom_back = self.custom_sequence[-self.data["Custom_3"] :]
+            uas_bracket = self.convert
+            final_string = (
+                f"{custom_front} {uas_bracket} {collapse_repeats_by_length(custom_back, 4)}"
+            )
+            return final_string
+        return None
+
 
 class STRMarker_TH01(STRMarker):
     @property
@@ -1064,6 +1112,16 @@ class STRMarker_TH01(STRMarker):
         else:
             flank = collapse_repeats_by_length(flank_seq, 4)
         return flank
+
+    @property
+    def custom_brack(self):
+        if self.custom:
+            custom_front = self.custom_sequence[: self.data["Custom_5"]]
+            custom_back = self.custom_sequence[-self.data["Custom_3"] :]
+            uas_bracket = self.convert
+            final_string = f"{collapse_repeats_by_length(custom_front, 4)} {uas_bracket} {collapse_repeats_by_length(custom_back, 4)}"
+            return final_string
+        return None
 
 
 class STRMarker_TPOX(STRMarker):
@@ -1139,6 +1197,16 @@ class STRMarker_D19S433(STRMarker):
                 final.append(collapse_repeats_by_length(second_string, 4))
         final_string = " ".join(final)
         return re.sub(r" +", " ", final_string)
+
+    @property
+    def custom_brack(self):
+        if self.custom:
+            custom_front = self.custom_sequence[: self.data["Custom_5"]]
+            custom_back = self.custom_sequence[-self.data["Custom_3"] :]
+            uas_bracket = self.convert
+            final_string = f"{custom_front[:3]} {custom_front[3:5]}{uas_bracket} {custom_back[-5:-1]} {custom_back[-1:]}"
+            return final_string
+        return None
 
 
 class STRMarker_DYS643(STRMarker):
