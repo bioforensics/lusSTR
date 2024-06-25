@@ -536,8 +536,6 @@ class STRMarker_D7S820(STRMarker):
         added in order to bracket the sequence correctly.
         """
         sequence = self.forward_sequence
-        # if self.canonical == 12:
-        #    print(self.sequence)
         if type(self.canonical) == int:
             forward_strand_brack_form = sequence_to_bracketed_form(
                 sequence, self.repeat_size, self.repeats
