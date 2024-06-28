@@ -571,6 +571,7 @@
             "TCTA"
         ],
         "ReverseCompNeeded": "Yes",
+        "NumBasesToSeparate": 4,
         "LUS": "TCTA",
         "Sec": "",
         "Tert": "",
@@ -579,7 +580,7 @@
         "Power_5": 0,
         "Power_3": 113,
         "Custom_5": 0,
-        "Custom_3": -35,
+        "Custom_3": -39,
         "Alleles": ["10", "11", "12", "13"]
     },
     "DYS643": {
@@ -589,6 +590,7 @@
             "CTTTT"
         ],
         "ReverseCompNeeded": "No",
+        "NumBasesToSeparate": 5,
         "LUS": "CTTTT",
         "Sec": "",
         "Tert": "",
@@ -608,6 +610,7 @@
             "TAGA"
         ],
         "ReverseCompNeeded": "Yes",
+        "NumBasesToSeparate": 4,
         "LUS": "TAGA",
         "Sec": "",
         "Tert": "",
@@ -626,6 +629,7 @@
             "TCT"
         ],
         "ReverseCompNeeded": "No",
+        "NumBasesToSeparate": 3,
         "LUS": "TCT",
         "Sec": "TCT",
         "Tert": "",
@@ -643,6 +647,7 @@
             "AAAG"
         ],
         "ReverseCompNeeded": "No",
+        "NumBasesToSeparate": 4,
         "LUS": "AAAG",
         "Sec": "",
         "Tert": "",
@@ -661,6 +666,7 @@
             "TTTC"
         ],
         "ReverseCompNeeded": "No",
+        "NumBasesToSeparate": 4,
         "LUS": "TTTC",
         "Sec": "",
         "Tert": "",
@@ -679,6 +685,7 @@
             "GATA"
         ],
         "ReverseCompNeeded": "No",
+        "NumBasesToSeparate": 4,
         "LUS": "GATA",
         "Sec": "",
         "Tert": "",
@@ -697,6 +704,7 @@
             "TATC"
         ],
         "ReverseCompNeeded": "No",
+        "NumBasesToSeparate": 4,
         "LUS": "TATC",
         "Sec": "",
         "Tert": "",
@@ -715,6 +723,7 @@
             "ATAG"
         ],
         "ReverseCompNeeded": "No",
+        "NumBasesToSeparate": 4,
         "LUS": "ATAG",
         "Sec": "",
         "Tert": "",
@@ -729,6 +738,7 @@
             "TCCT"
         ],
         "ReverseCompNeeded": "No",
+        "NumBasesToSeparate": 4,
         "LUS": "TCCT",
         "Sec": "",
         "Tert": "",
@@ -743,6 +753,7 @@
             "CTT"
         ],
         "ReverseCompNeeded": "No",
+        "NumBasesToSeparate": 3,
         "LUS": "CTT",
         "Sec": "",
         "Tert": "",
@@ -761,6 +772,7 @@
             "CTAT"
         ],
         "ReverseCompNeeded": "Yes",
+        "NumBasesToSeparate": 4,
         "LUS": "CTAT",
         "Sec": "",
         "Tert": "",
@@ -775,6 +787,7 @@
             "GAAA"
         ],
         "ReverseCompNeeded": "No",
+        "NumBasesToSeparate": 4,
         "LUS": "GAAA",
         "Sec": "",
         "Tert": "",
@@ -791,6 +804,7 @@
             "AGAT"
         ],
         "ReverseCompNeeded": "No",
+        "NumBasesToSeparate": 4,
         "LUS": "AGAT",
         "Sec": "",
         "Tert": "",
@@ -807,6 +821,7 @@
             "AGAGAT"
         ],
         "ReverseCompNeeded": "No",
+        "NumBasesToSeparate": 6,
         "LUS": "AGAGAT",
         "Sec": "AGAGAT",
         "Tert": "",
@@ -825,6 +840,7 @@
             "GATA"
         ],
         "ReverseCompNeeded": "No",
+        "NumBasesToSeparate": 4,
         "LUS": "GATA",
         "Sec": "",
         "Tert": "",
@@ -843,6 +859,7 @@
             "TTTTC"
         ],
         "ReverseCompNeeded": "No",
+        "NumBasesToSeparate": 5,
         "LUS": "TTTTC",
         "Sec": "",
         "Tert": "",
@@ -861,6 +878,7 @@
             "TCTA"
         ],
         "ReverseCompNeeded": "No",
+        "NumBasesToSeparate": 4,
         "LUS": "TCTA",
         "Sec": "",
         "Tert": "",
@@ -879,6 +897,7 @@
             "AGAT"
         ],
         "ReverseCompNeeded": "No",
+        "NumBasesToSeparate": 4,
         "LUS": "AGAT",
         "Sec": "",
         "Tert": "",
@@ -895,6 +914,7 @@
             "ATA"
         ],
         "ReverseCompNeeded": "Yes",
+        "NumBasesToSeparate": 3,
         "LUS": "ATA",
         "Sec": "",
         "Tert": "",
@@ -913,6 +933,7 @@
             "TCTA"
         ],
         "ReverseCompNeeded": "No",
+        "NumBasesToSeparate": 4,
         "LUS": "TCTA",
         "Sec": "",
         "Tert": "",
@@ -933,6 +954,7 @@
             "GAGA"
         ],
         "ReverseCompNeeded": "Yes",
+        "NumBasesToSeparate": 4,
         "LUS": "TAGA",
         "Sec": "CAGA",
         "Tert": "GAGA",
@@ -952,6 +974,7 @@
             "CAGG"
         ],
         "ReverseCompNeeded": "Yes",
+        "NumBasesToSeparate": 4,
         "LUS": "TAGA",
         "Sec": "TAGA",
         "Tert": "CAGG",
@@ -970,6 +993,7 @@
             "TAGA"
         ],
         "ReverseCompNeeded": "Yes",
+        "NumBasesToSeparate": 4,
         "LUS": "TAGA",
         "Sec": "",
         "Tert": "",
@@ -988,6 +1012,7 @@
             "TTTC"
         ],
         "ReverseCompNeeded": "Yes",
+        "NumBasesToSeparate": 4,
         "LUS": "TTTC",
         "Sec": "",
         "Tert": "",
@@ -1006,6 +1031,7 @@
             "TCTA"
         ],
         "ReverseCompNeeded": "Yes",
+        "NumBasesToSeparate": 4,
         "LUS": "TCTA",
         "Sec": "",
         "Tert": "",
@@ -1025,6 +1051,7 @@
             "GAAG"
         ],
         "ReverseCompNeeded": "No",
+        "NumBasesToSeparate": 4,
         "LUS": "AAAG",
         "Sec": "GAAG",
         "Tert": "",
@@ -1039,6 +1066,7 @@
             "ATCT"
         ],
         "ReverseCompNeeded": "Yes",
+        "NumBasesToSeparate": 4,
         "LUS": "ATCT",
         "Sec": "",
         "Tert": "",
@@ -1053,6 +1081,7 @@
             "ATAG"
         ],
         "ReverseCompNeeded": "Yes",
+        "NumBasesToSeparate": 4,
         "LUS": "ATAG",
         "Sec": "",
         "Tert": "",
@@ -1067,6 +1096,7 @@
             "TGGA"
         ],
         "ReverseCompNeeded": "Yes",
+        "NumBasesToSeparate": 4,
         "LUS": "TGGA",
         "Sec": "",
         "Tert": "",
@@ -1081,6 +1111,7 @@
             "TAGA"
         ],
         "ReverseCompNeeded": "No",
+        "NumBasesToSeparate": 4,
         "LUS": "TAGA",
         "Sec": "",
         "Tert": "",
@@ -1096,6 +1127,7 @@
             "AAGG"
         ],
         "ReverseCompNeeded": "No",
+        "NumBasesToSeparate": 4,
         "LUS": "AAGA",
         "Sec": "AAGG",
         "Tert": "",
@@ -1116,6 +1148,7 @@
             "AAAA"
         ],
         "ReverseCompNeeded": "No",
+        "NumBasesToSeparate": 4,
         "LUS": "AAGA",
         "Sec": "AAAA",
         "Tert": "",
@@ -1133,6 +1166,7 @@
             "TAGA"
         ],
         "ReverseCompNeeded": "No",
+        "NumBasesToSeparate": 4,
         "LUS": "TAGA",
         "Sec": "TAGA",
         "Tert": "",

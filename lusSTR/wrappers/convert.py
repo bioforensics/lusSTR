@@ -237,16 +237,30 @@ def remove_columns(column_list, remove_list):
     return column_list
 
 
+def create_custom_outputtable(columns, table):
+    remove_list = [
+        "UAS_Output_Sequence",
+        "Forward_Strand_Sequence",
+        "UAS_Output_Bracketed_Notation",
+        "Forward_Strand_Bracketed_Notation",
+    ]
+    custom_columns = remove_columns(columns, remove_list)
+    custom_table = table[custom_columns]
+    custom_table_comb = combine_reads(custom_table, custom_columns)
+    return custom_table_comb
+
+
 def main(input, out, kit, software, sex, nocombine, custom):
     input = str(input)
     out = str(out)
     output_name = os.path.splitext(out)[0]
     input_name = os.path.splitext(input)[0]
+    full_table_name = re.sub(r"_custom_range", "", output_name)
     autosomal_final_table, autosomal_flank_table, columns = format_table(
         input, software, kit, custom
     )
     if sex:
-        sex_final_table, sex_flank_table, columns = format_table(
+        sex_final_table, sex_flank_table, sex_columns = format_table(
             f"{input_name}_sexloci.csv", software, kit, custom
         )
         if software != "uas":
@@ -256,8 +270,11 @@ def main(input, out, kit, software, sex, nocombine, custom):
                     sex_final_table.to_csv(
                         f"{output_name}_sexloci_no_combined_reads.txt", index=False
                     )
-                sex_final_table = combine_reads(sex_final_table, columns)
-                sex_final_table.to_csv(f"{output_name}_sexloci.txt", sep="\t", index=False)
+                sex_final_table = combine_reads(sex_final_table, sex_columns)
+                sex_final_table.to_csv(f"{full_table_name}_sexloci.txt", sep="\t", index=False)
+                if custom:
+                    sex_table_custom = create_custom_outputtable(sex_columns, sex_final_table)
+                    sex_table_custom.to_csv(f"{output_name}.txt", index=False, sep="\t")
         else:
             sex_final_table.to_csv(f"{output_name}_sexloci.txt", sep="\t", index=False)
     if software != "uas":
@@ -268,18 +285,9 @@ def main(input, out, kit, software, sex, nocombine, custom):
                     f"{output_name}_no_combined_reads.txt", sep="\t", index=False
                 )
             autosomal_final_table = combine_reads(autosomal_final_table, columns)
-            full_table_name = re.sub(r"_custom_range", "", output_name)
             autosomal_final_table.to_csv(f"{full_table_name}.txt", sep="\t", index=False)
             if custom:
-                remove_list = [
-                    "UAS_Output_Sequence",
-                    "Forward_Strand_Sequence",
-                    "UAS_Output_Bracketed_Notation",
-                    "Forward_Strand_Bracketed_Notation",
-                ]
-                custom_columns = remove_columns(columns, remove_list)
-                custom_table = autosomal_final_table[custom_columns]
-                custom_table_comb = combine_reads(custom_table, custom_columns)
+                custom_table_comb = create_custom_outputtable(columns, autosomal_final_table)
                 custom_table_comb.to_csv(out, sep="\t", index=False)
     else:
         autosomal_final_table.to_csv(out, sep="\t", index=False)

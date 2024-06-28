@@ -1411,10 +1411,13 @@ class STRMarker_DYS391(STRMarker):
     def convert(self):
         sequence = self.forward_sequence
         if self.kit == "powerseq":
-            final_seq = (
-                f"{collapse_repeats_by_length_flanks(sequence[:6], 4)} "
-                f"{collapse_repeats_by_length(sequence[6:], 4)}"
-            )
+            if len(sequence) < 6:
+                final_seq = sequence
+            else:
+                final_seq = (
+                    f"{collapse_repeats_by_length_flanks(sequence[:6], 4)} "
+                    f"{collapse_repeats_by_length(sequence[6:], 4)}"
+                )
         elif len(sequence) % 4 != 0:
             final_seq = sequence_to_bracketed_form(sequence, self.repeat_size, self.repeats)
         else:
@@ -1445,6 +1448,17 @@ class STRMarker_DYS458(STRMarker):
             f"{collapse_repeats_by_length(sequence[14:], 4)}"
         )
         return final_string
+
+    @property
+    def custom_brack(self):
+        if self.custom:
+            sequence = self.custom_sequence
+            final_string = (
+                f"{collapse_repeats_by_length(sequence[:14], 4)} "
+                f"{collapse_repeats_by_length(sequence[14:], 4)}"
+            )
+            return final_string
+        return None
 
 
 class STRMarker_HPRTB(STRMarker):
