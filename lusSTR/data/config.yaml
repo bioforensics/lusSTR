@@ -9,6 +9,7 @@ output: "lusstr_output" ## output file/directory name; Example: "test_030923"
 
 ##convert settings
 kit: "forenseq" ## forenseq/powerseq
+custom_ranges: False ## True/False; use custom ranges, for PowerSeq sequences only
 nocombine: False ## True/False; do not combine identical sequences (if using STRait Razor data)
 
 ##filter settings

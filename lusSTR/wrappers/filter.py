@@ -66,14 +66,9 @@ with open(get_filter_metadata_file(), "r") as fh:
     filter_marker_data = json.load(fh)
 
 
-def process_strs(dict_loc, datatype, seq_col):
+def process_strs(dict_loc, datatype, seq_col, brack_col):
     final_df = pd.DataFrame()
     flags_df = pd.DataFrame()
-    brack_col = (
-        "UAS_Output_Bracketed_Notation"
-        if seq_col == "UAS_Output_Sequence"
-        else "Forward_Strand_Bracketed_Notation"
-    )
     for key, value in dict_loc.items():
         data = dict_loc[key].reset_index(drop=True)
         if datatype == "ce":
@@ -418,7 +413,16 @@ def get_at(df, locus):
 
 
 def main(
-    input, output_type, profile_type, data_type, output_dir, info, separate, nofilters, strand
+    input,
+    output_type,
+    profile_type,
+    data_type,
+    output_dir,
+    info,
+    separate,
+    nofilters,
+    strand,
+    custom,
 ):
     input = str(input)
     if profile_type not in ("evidence", "reference"):
@@ -432,10 +436,16 @@ def main(
         raise ValueError("No output specified using --out.")
     else:
         outpath = output_dir
-    seq_col = "UAS_Output_Sequence" if strand == "uas" else "Forward_Strand_Sequence"
-    brack_col = (
-        "UAS_Output_Bracketed_Notation" if strand == "uas" else "Forward_Strand_Bracketed_Form"
-    )
+    if custom:
+        seq_col = "Custom_Range_Sequence"
+        brack_col = "Custom_Bracketed_Notation"
+    else:
+        seq_col = "UAS_Output_Sequence" if strand == "uas" else "Forward_Strand_Sequence"
+        brack_col = (
+            "UAS_Output_Bracketed_Notation"
+            if strand == "uas"
+            else "Forward_Strand_Bracketed_Notation"
+        )
     if nofilters:
         full_df["allele_type"] = "real_allele"
         marker_plots(full_df, outpath)
@@ -445,7 +455,7 @@ def main(
             STRmix_output(full_df, outpath, profile_type, data_type, seq_col)
     else:
         dict_loc = {k: v for k, v in full_df.groupby(["SampleID", "Locus"])}
-        final_df, flags_df = process_strs(dict_loc, data_type, seq_col)
+        final_df, flags_df = process_strs(dict_loc, data_type, seq_col, brack_col)
         marker_plots(final_df, outpath)
         if output_type == "efm" or output_type == "mpsproto":
             EFM_output(final_df, outpath, profile_type, data_type, brack_col, separate)
@@ -469,4 +479,5 @@ if __name__ == "__main__":
         separate=snakemake.params.separate,
         nofilters=snakemake.params.filters,
         strand=snakemake.params.strand,
+        custom=snakemake.params.custom,
     )

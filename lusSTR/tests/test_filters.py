@@ -223,6 +223,25 @@ def test_STRmixoutput_format(outputdir, datatype, tmp_path):
     assert filecmp.cmp(exp_info_out, obs_info_out) is True
 
 
+def test_STRmixoutput_customranges(tmp_path):
+    str_path = str(tmp_path / "WD")
+    inputfile = data_file("NGS_stutter_test/custom/test_stutter_custom_range.txt")
+    exp_out = data_file("NGS_stutter_test/custom/Sample1_evidence_ngs.csv")
+    exp_info_out = data_file("NGS_stutter_test/custom/test_stutter_sequence_info.csv")
+    obs_out = str(tmp_path / f"WD/test_stutter/Sample1_evidence_ngs.csv")
+    obs_info_out = str(tmp_path / f"WD/test_stutter/test_stutter_sequence_info.csv")
+    arglist = ["config", "-w", str_path, "--input", "WD", "-o", "test_stutter", "--custom"]
+    lusSTR.cli.main(lusSTR.cli.get_parser().parse_args(arglist))
+    shutil.copyfile(inputfile, os.path.join(str_path, "test_stutter.csv"))
+    shutil.copyfile(inputfile, os.path.join(str_path, "test_stutter.txt"))
+    shutil.copyfile(inputfile, os.path.join(str_path, "test_stutter_custom_range.csv"))
+    shutil.copyfile(inputfile, os.path.join(str_path, "test_stutter_custom_range.txt"))
+    all_arglist = ["strs", "all", "-w", str_path]
+    lusSTR.cli.main(lusSTR.cli.get_parser().parse_args(all_arglist))
+    assert filecmp.cmp(exp_out, obs_out) is True
+    assert filecmp.cmp(exp_info_out, obs_info_out) is True
+
+
 def test_nofilters(tmp_path):
     str_path = str(tmp_path / "WD")
     inputfile = data_file("test_stutter.txt")

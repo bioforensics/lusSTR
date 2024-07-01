@@ -93,6 +93,8 @@ def edit_str_config(config, args):
         data["output_type"] = args.software
     if args.strand:
         data["strand"] = args.strand
+    if args.custom:
+        data["custom_ranges"] = args.custom
     return data
 
 
@@ -174,4 +176,8 @@ def subparser(subparsers):
         "--strand", choices=["uas", "forward"],
         help="Specify the strand orientation for the final output files. UAS orientation is "
         "default for STRs; forward strand is default for SNPs."
+    )
+    p.add_argument(
+        "--custom", action="store_true",
+        help="Specifying custom sequence ranges."
     )
