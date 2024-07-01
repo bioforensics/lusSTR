@@ -13,6 +13,7 @@
 #              Importing Necessary Packages                     #
 #################################################################
 
+import json
 import importlib.resources
 import streamlit as st
 from streamlit_option_menu import option_menu
@@ -51,14 +52,36 @@ def generate_config_file(config_data, working_directory, workflow_type):
 # ------------ Function for folder selection ------------------ #
 
 def folder_picker_dialog():
-    folder_path = filedialog.askdirectory(master=root)
-    return folder_path
+    script_path = importlib.resources.files("lusSTR") / "scripts" / "folder_selector.py"
+    result = subprocess.run(["python", script_path], capture_output=True, text=True)
+    if result.returncode == 0:
+        folder_data = json.loads(result.stdout)
+        folder_path = folder_data.get("folder_path")
+        if folder_path:
+            st.success(f"Selected Folder: {folder_path}")
+            return folder_path
+
+        else:
+            st.error("No folder selected")
+    else:
+        st.error("Error selecting folder")
 
 # ------- Function for individual file selection -------------- #
 
 def file_picker_dialog():
-    file_path = filedialog.askopenfilename(master=root)
-    return file_path
+    script_path = importlib.resources.files("lusSTR") / "scripts" / "file_selector.py"
+    result = subprocess.run(["python", script_path], capture_output=True, text=True)
+    if result.returncode == 0:
+        file_data = json.loads(result.stdout)
+        file_path = file_data.get("file_path")
+        if file_path:
+            st.success(f"Selected File: {file_path}")
+            return file_path
+
+        else:
+            st.error("No folder selected")
+    else:
+        st.error("Error selecting folder")
 
 # ---- Function to validate prefix for output folder ---------- #
 
@@ -102,6 +125,7 @@ def main():
 
     elif selected == "Contact":
         show_contact_page()
+
 
 #####################################################################
 #                     lusSTR Home Page                              #
