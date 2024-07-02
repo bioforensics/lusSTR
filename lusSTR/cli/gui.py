@@ -111,7 +111,7 @@ def main():
 
     selected = option_menu(
         menu_title=None,
-        options=["Home", "STR", "SNP", "How to Use", "Contact"],
+        options=["Home", "STRs", "SNPs", "How to Use", "Contact"],
         icons=["house", "gear", "gear-fill", "book", "envelope"],
         menu_icon="cast",
         default_index=0,
@@ -121,10 +121,10 @@ def main():
     if selected == "Home":
         show_home_page()
 
-    elif selected == "STR":
+    elif selected == "STRs":
         show_STR_page()
 
-    elif selected == "SNP":
+    elif selected == "SNPs":
         show_SNP_page()
 
     elif selected == "How to Use":
@@ -206,15 +206,13 @@ def show_STR_page():
     # Logic for Path Picker based on user's input option
 
     if input_option == "Folder with Multiple Files":
-        st.write("Please select a folder:")
-        clicked = st.button("Folder Picker")
+        clicked = st.button("Please Select a Folder")
         if clicked:
             dirname = folder_picker_dialog()
             st.session_state.samp_input = dirname
 
     else:
-        st.write("Please select a file:")
-        clicked_file = st.button("File Picker")
+        clicked_file = st.button("Please Select a File")
         if clicked_file:
             filename = file_picker_dialog()
             st.session_state.samp_input = filename
@@ -327,7 +325,7 @@ def show_STR_page():
     #     STR: Specify Working Directory                                #
     #####################################################################
 
-    st.subheader("Set Output Folder")
+    st.subheader("Output Folder Selection")
 
     col1, col2, col3, col4, col5 = st.columns(5)
 
@@ -447,16 +445,14 @@ def show_SNP_page():
     # Logic for Path Picker based on user's input option
 
     if input_option == "Folder with Multiple Files":
-        st.write("Please select a folder:")
-        clicked = st.button("Folder Picker")
+        clicked = st.button("Please Select a Folder")
         if clicked:
             dirname = folder_picker_dialog()
             # st.text_input('You Selected The Following folder:', dirname)
             st.session_state.samp_input = dirname
 
     else:
-        st.write("Please select a file:")
-        clicked_file = st.button("File Picker")
+        clicked_file = st.button("Please Select a File")
         if clicked_file:
             filename = file_picker_dialog()
             # st.text_input('You Selected The Following file:', filename)

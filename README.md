@@ -52,7 +52,7 @@ Once lusSTR has been installed, the GUI can be started with the command:
 ```
 lusstr gui
 ```
-All lusSTR settings for either the STR pipeline or the SNP pipeline can be specified through the GUI.
+All lusSTR settings for either the STR pipeline or the SNP pipeline can be specified after selecting the desired pipeline tab.
 ____
 
 ## *Command line interface*
