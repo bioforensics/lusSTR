@@ -269,7 +269,7 @@ def show_STR_page():
     )
 
     #####################################################################
-    #     STP: Filter Settings to Generate Config File                  #
+    #     STR: Filter Settings to Generate Config File                  #
     #####################################################################
 
     st.subheader("Filter Settings")
@@ -316,10 +316,10 @@ def show_STR_page():
         help="Will not perform filtering; will still create EFM/MPSproto/STRmix output files",
     )
 
-    strand = {"UAS": "uas", "Forward Strand": "forward"}[
+    strand = {"UAS Orientation": "uas", "Forward Strand": "forward"}[
         col4.selectbox(
             "Strand Orientation",
-            options=["UAS", "Forward Strand"],
+            options=["UAS Orientation", "Forward Strand"],
             help="Indicates the strand orientation in which to report the sequence in the final output table; for STRmix NGS only.",
         )
     ]
@@ -435,10 +435,10 @@ def show_SNP_page():
 
     # Ask user if submitting a directory or individual file
     st.info(
-        "Please Indicate If You Are Providing An Individual Input File or a Directory Containing Multiple Input Files"
+        "Please Indicate If You Are Providing An Individual Input File or a Folder Containing Multiple Input Files"
     )
     input_option = st.radio(
-        "Select Input Option:", ("Individual File", "Directory with Multiple Files")
+        "Select Input Option:", ("Individual File", "Folder with Multiple Files")
     )
 
     # Initialize session state if not already initialized
@@ -447,7 +447,7 @@ def show_SNP_page():
 
     # Logic for Path Picker based on user's input option
 
-    if input_option == "Directory with Multiple Files":
+    if input_option == "Folder with Multiple Files":
         st.write("Please select a folder:")
         clicked = st.button("Folder Picker")
         if clicked:
@@ -474,43 +474,45 @@ def show_SNP_page():
     #      SNP: General Software Settings to Generate Config File       #
     #####################################################################
 
-    st.subheader("General Software")
+    st.subheader("General Settings")
+
+    col1, col2, col3, col4, col5 = st.columns(5)
 
     analysis_software = {"UAS": "uas", "STRait Razor v3": "straitrazor"}[
-        st.selectbox(
+        col1.selectbox(
             "Analysis Software",
             options=["UAS", "STRait Razor v3"],
             help="Indicate the analysis software used prior to lusSTR sex.",
         )
     ]
 
-    output = st.text_input(
-        "Please Specify a prefix for generated output files or leave as default",
-        "lusstr_output",
-        help="Be sure to see requirements in How to Use tab.",
+    output = col2.text_input(
+        "Output File Name", "lusstr_output", help="Please specify a name for the created files."
     )
 
     kit = {"Signature Prep": "sigprep", "Kintelligence": "kintelligence"}[
-        st.selectbox("Library Preparation Kit", options=["Signature Prep", "Kintelligence"])
+        col3.selectbox("Library Preparation Kit", options=["Signature Prep", "Kintelligence"])
     ]
 
     #####################################################################
     #     SNP: Format Settings to Generate Config File                  #
     #####################################################################
 
-    st.subheader("Format Settings")
+    st.subheader("Convert Settings")
+
+    col1, col2, col3, col4, col5 = st.columns(5)
 
     # -- Select Type (Unique to SNP Workflow)
     types_mapping = {
-        "Identify SNPs Only": "i",
-        "Phenotype Only": "p",
-        "Ancestry Only": "a",
-        "All": "all",
+        "Identify SNPs": "i",
+        "Phenotype SNPs": "p",
+        "Ancestry SNPs": "a",
+        "All SNPs": "all",
     }
-    selected_types = st.multiselect(
-        "Select Types:",
+    selected_types = col1.multiselect(
+        "Select SNP Types:",
         options=types_mapping.keys(),
-        help="Please Select a Choice or any Combination",
+        help="Select the SNP types to process; can select one or more options",
     )
     types_string = (
         "all"
@@ -518,81 +520,66 @@ def show_SNP_page():
         else ", ".join(types_mapping.get(t, t) for t in selected_types)
     )
 
-    # if selected_types:
-    #    st.text_input("You Selected:", types_string)
-
     # -- Filter
     nofilters = st.checkbox(
         "Skip all filtering steps",
-        help="If no filtering is desired at the format step; if False, will remove any allele designated as Not Typed",
+        help="Specify for no filtering",
     )
 
     #####################################################################
     #     SNP: Convert Settings to Generate Config File                 #
     #####################################################################
 
-    st.subheader("Convert Settings")
-
     separate = st.checkbox(
         "Create Separate Files for Samples",
         help="If want to separate samples into individual files for use in EFM",
     )
 
-    strand = {"UAS": "uas", "Forward": "forward"}[
-        st.selectbox(
+    strand = {"UAS Orientation": "uas", "Forward Strand": "forward"}[
+        col2.selectbox(
             "Strand Orientation",
-            options=["UAS", "Forward"],
+            options=["UAS Orientation", "Forward Strand"],
             help="Indicate which orientation to report the alleles for the SigPrep SNPs.",
         )
     ]
 
     # Analytical threshold value
-    thresh = st.number_input("Analytical threshold value:", value=0.03, step=0.01, min_value=0.0)
+    thresh = col3.number_input("Analytical threshold value:", value=0.03, step=0.01, min_value=0.0)
 
     #####################################################################
     #     SNP: Specify a Reference File if User Has One                 #
     #####################################################################
 
-    st.subheader("Specify a Reference File (Optional)")
+    col1, col2, col3 = st.columns(3)
 
     if "reference" not in st.session_state:
         st.session_state.reference = None
 
-    clicked_ref = st.button(
-        "Please Specify Your Reference File If You Have One",
+    reference = col1.text_input(
+        "Please Specify Your Reference Sample IDs",
         help="List IDs of the samples to be run as references in EFM; default is no reference samples",
     )
-    if clicked_ref:
-        ref = file_picker_dialog()
-        st.session_state.reference = ref
-
-    # Display Path to Selected Reference File
-    if st.session_state.reference:
-        st.text_input("Your Specified Reference File:", st.session_state.reference)
-
-    # Store Selected Path to Reference in Config
-    reference = st.session_state.reference
 
     #####################################################################
     #     SNP: Specify Working Directory                                #
     #####################################################################
 
-    st.subheader("Set Working Directory")
+    st.subheader("Set Output Folder")
+
+    col1, col2, col3, col4, col5 = st.columns(5)
 
     # Initialize session state if not already initialized
     if "wd_dirname" not in st.session_state:
         st.session_state.wd_dirname = None
 
-    clicked_wd = st.button(
-        "Please Specify A Working Directory Where You Would Like For All Output Results To Be Saved"
-    )
+    clicked_wd = col1.button("Please Select An Output Folder")
     if clicked_wd:
         wd = folder_picker_dialog()
         st.session_state.wd_dirname = wd
 
     # Display selected path
     if st.session_state.wd_dirname:
-        st.text_input("Your Specified Working Directory:", st.session_state.wd_dirname)
+        st.text_input("Your Specified Output Folder:", st.session_state.wd_dirname)
 
     # Store Selected Path to Reference in Config
     wd_dirname = st.session_state.wd_dirname
@@ -685,18 +672,16 @@ def show_how_to_use_page():
         "The purpose of specifying the output prefix is for lusSTR to create result files and folders with that prefix in your working directory. Please ensure that you are following proper file naming formatting and rules when specifying this prefix. Avoid using characters such as '/', '', '.', and others. Note: To avoid potential errors, you can simply use the default placeholder for output."
     )
 
-    st.code(
-        "Incorrect: 'working_directory/subfolder/subfolder'\nCorrect: working_directory/output # or just output, since you will likely already be in the working directory when specifying it before submitting."
-    )
+    st.code("Incorrect: 'working_directory/subfolder/subfolder'\nCorrect: output")
 
     st.write(
         "Note that some result files may be saved directly in the working directory with the specified prefix, while others will be populated in a folder labeled with the prefix in your working directory."
     )
     st.write("Be aware of this behavior when checking for output files.")
 
-    st.header("3. Specifying Working Directory")
+    st.header("3. Specifying Output Folder")
     st.write(
-        "Please Ensure That You Properly Specify a Working Directory. This is where all lusSTR output files will be saved. To avoid potential errors, specifying a working directory is required."
+        "Please Ensure That You Properly Specify an Output Folder. This is where all lusSTR output files will be saved. To avoid potential errors, specifying a working directory is required."
     )
 
     st.title("About lusSTR")
