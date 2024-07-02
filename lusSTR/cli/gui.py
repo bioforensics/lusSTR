@@ -28,12 +28,13 @@ import tkinter as tk
 from tkinter import filedialog
 
 
-if os.environ.get('DISPLAY','') == '':
-    os.environ.__setitem__('DISPLAY', ':1.0')
 
 # Create a global Tkinter root window
-root = tk.Tk()
-root.withdraw()  # Hide the root window
+try:
+    root = tk.Tk()
+    root.withdraw()  # Hide the root window
+except _tkinter.TclError:
+    print("No GUI available!")
 
 #################################################################
 #                        Functions                              #
