@@ -29,8 +29,7 @@ from tkinter import filedialog
 
 
 if os.environ.get('DISPLAY','') == '':
-    print('no display found. Using :0.0')
-    os.environ.__setitem__('DISPLAY', ':0.0')
+    os.environ.__setitem__('DISPLAY', ':1.0')
 
 # Create a global Tkinter root window
 root = tk.Tk()
