@@ -14,7 +14,7 @@ style:
 
 ## format:    auto-reformat code with Black
 format:
-	black --line-length=99 *.py lusSTR/scripts/*.py lusSTR/wrappers/*.py lusSTR/tests/test_*.py
+	black --line-length=99 *.py lusSTR/cli/gui.py lusSTR/scripts/*.py lusSTR/wrappers/*.py lusSTR/tests/test_*.py
 
 ## devenv:    configure a development environment
 devenv:
