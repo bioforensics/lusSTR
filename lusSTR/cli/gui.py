@@ -251,14 +251,17 @@ def show_STR_page():
 
     kit = {"ForenSeq Signature Prep": "forenseq", "PowerSeq 46GY": "powerseq"}[
         col2.selectbox(
-            "Library Preparation Kit", options=["ForenSeq Signature Prep", "PowerSeq 46GY"], help="Specify the library preparation kit used to generate the sequences."
+            "Library Preparation Kit",
+            options=["ForenSeq Signature Prep", "PowerSeq 46GY"],
+            help="Specify the library preparation kit used to generate the sequences.",
         )
     ]
 
     output = col3.text_input(
-        "Output File Name", "lusstr_output", help="Please specify a name for the created files. It can only contain alphanumeric characters, underscores and hyphens. No spaces allowed."
+        "Output File Name",
+        "lusstr_output",
+        help="Please specify a name for the created files. It can only contain alphanumeric characters, underscores and hyphens. No spaces allowed.",
     )
-
 
     nocombine = st.checkbox(
         "Do Not Combine Identical Sequences",
@@ -309,15 +312,15 @@ def show_STR_page():
     )
 
     nofilters = st.checkbox(
-        "Skip all filtering steps",
-        help="Will not perform filtering; will still create EFM/MPSproto/STRmix output files",
+        "Skip All Filtering Steps",
+        help="Filtering will not be performed but will still create EFM/MPSproto/STRmix output files containing all sequences.",
     )
 
     strand = {"UAS Orientation": "uas", "Forward Strand": "forward"}[
         col4.selectbox(
             "Strand Orientation",
-            options=["UAS Orientation", "Forward Strand"],
-            help="Indicates the strand orientation in which to report the sequence in the final output table; for STRmix NGS only.",
+            options=["Forward Strand", "UAS Orientation"],
+            help="Indicates the strand orientation in which to report the sequence in the final output table as some markers are reported in the UAS on the reverse strand. Selecting the UAS Orientation will report those markers on the reverse strand while the remaining will be reported on the forward strand. Selecting the Forward Strand will report all markers on the forward strand orientation. This applies to STRmix NGS only.",
         )
     ]
 
