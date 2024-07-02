@@ -210,7 +210,6 @@ def show_STR_page():
         clicked = st.button("Folder Picker")
         if clicked:
             dirname = folder_picker_dialog()
-            # st.text_input('You Selected The Following folder:', dirname)
             st.session_state.samp_input = dirname
 
     else:
@@ -218,7 +217,6 @@ def show_STR_page():
         clicked_file = st.button("File Picker")
         if clicked_file:
             filename = file_picker_dialog()
-            # st.text_input('You Selected The Following file:', filename)
             st.session_state.samp_input = filename
 
     # Display The Selected Path
@@ -253,15 +251,16 @@ def show_STR_page():
         help="Check the box to include X- and Y-STRs, otherwise leave unchecked.",
     )
 
-    output = col2.text_input(
-        "Output File Name", "lusstr_output", help="Please specify a name for the created files."
-    )
-
     kit = {"ForenSeq Signature Prep": "forenseq", "PowerSeq 46GY": "powerseq"}[
-        col3.selectbox(
-            "Library Preparation Kit", options=["ForenSeq Signature Prep", "PowerSeq 46GY"]
+        col2.selectbox(
+            "Library Preparation Kit", options=["ForenSeq Signature Prep", "PowerSeq 46GY"], help="Specify the library preparation kit used to generate the sequences."
         )
     ]
+
+    output = col3.text_input(
+        "Output File Name", "lusstr_output", help="Please specify a name for the created files. It can only contain alphanumeric characters, underscores and hyphens. No spaces allowed."
+    )
+
 
     nocombine = st.checkbox(
         "Do Not Combine Identical Sequences",
