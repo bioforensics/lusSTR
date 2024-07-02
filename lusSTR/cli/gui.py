@@ -33,7 +33,7 @@ from tkinter import filedialog
 try:
     root = tk.Tk()
     root.withdraw()  # Hide the root window
-except _tkinter.TclError:
+except:
     print("No GUI available!")
 
 #################################################################
