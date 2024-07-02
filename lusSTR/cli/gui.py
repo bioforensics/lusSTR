@@ -58,9 +58,7 @@ def folder_picker_dialog():
         folder_data = json.loads(result.stdout)
         folder_path = folder_data.get("folder_path")
         if folder_path:
-            st.success(f"Selected Folder: {folder_path}")
             return folder_path
-
         else:
             st.error("No folder selected")
     else:
@@ -75,9 +73,7 @@ def file_picker_dialog():
         file_data = json.loads(result.stdout)
         file_path = file_data.get("file_path")
         if file_path:
-            st.success(f"Selected File: {file_path}")
             return file_path
-
         else:
             st.error("No folder selected")
     else:
@@ -154,8 +150,8 @@ def show_home_page():
 # -- Welcome Message Stuff
 
     st.markdown("""
-        lusSTR is a tool written in Python to convert Next Generation Sequencing (NGS) data of forensic STR loci to different sequence representations (sequence bracketed form) and allele designations (CE allele, LUS/LUS+ alleles) for ease in downstream analyses.
-        For more information on LusSTR, visit our [GitHub page](https://github.com/bioforensics/lusSTR/tree/master).
+        lusSTR is an end-to-end workflow for processing human forensic data (STRs and SNPs) derived from Next Generation Sequencing (NGS) data for use in probabilistic genotyping software.
+        For more information on lusSTR, visit our [GitHub page](https://github.com/bioforensics/lusSTR).
         """, unsafe_allow_html=True)
 
     st.info('Please Select One of the Tabs Above to Get Started on Processing Your Data!')
@@ -171,14 +167,14 @@ def show_home_page():
 def show_STR_page():
 
     st.title("STR Workflow")
-    st.info('Please Select STR Settings Below for LusSTR! For Information Regarding the Settings, See the How to Use Tab.')
+    st.info('Please Select STR Settings Below for lusSTR! For Information Regarding the Settings, See the How to Use Tab.')
 
     # Input File Specification
     st.subheader("Input Files Selection")
 
     # Ask user if submitting a directory or individual file
-    st.info("Please Indicate If You Are Providing An Individual Input File or a Directory Containing Multiple Input Files")
-    input_option = st.radio("Select Input Option:", ("Individual File", "Directory with Multiple Files"))
+    st.info("Please Indicate If You Are Providing An Individual Input File or a Folder Containing Multiple Input Files")
+    input_option = st.radio("Select Input Option:", ("Individual File", "Folder with Multiple Files"))
 
     # Initialize session state if not already initialized
     if 'samp_input' not in st.session_state:
@@ -186,7 +182,7 @@ def show_STR_page():
 
     # Logic for Path Picker based on user's input option
 
-    if input_option == "Directory with Multiple Files":
+    if input_option == "Folder with Multiple Files":
         st.write('Please select a folder:')
         clicked = st.button('Folder Picker')
         if clicked:
@@ -213,23 +209,19 @@ def show_STR_page():
 #      STR: General Software Settings to Generate Config File       #
 #####################################################################
 
-    st.subheader("General Software")
+    st.subheader("General Settings")
 
-    analysis_software = {'UAS': 'uas', 'STRait Razor v3': 'straitrazor', 'GeneMarker HTS': 'genemarker'}[st.selectbox("Analysis Software", options=["UAS", "STRait Razor v3", "GeneMarker HTS"], help="Indicate the analysis software used prior to lusSTR sex.")]
+    col1, col2, col3, col4, col5 = st.columns(5)
 
-    sex = st.checkbox("Include sex-chromosome STRs", help = "Check the box if yes, otherwise leave unchecked.")
+    analysis_software = {'UAS': 'uas', 'STRait Razor v3': 'straitrazor', 'GeneMarker HTS': 'genemarker'}[col1.selectbox("Analysis Software", options=["UAS", "STRait Razor v3", "GeneMarker HTS"], help="Indicate the analysis software used prior to lusSTR.")]
 
-    output = st.text_input("Please Specify a prefix for generated output files or leave as default", "lusstr_output", help = "Be sure to see requirements in How to Use tab.")
+    sex = st.checkbox("Include X- and Y-STRs", help = "Check the box to include X- and Y-STRs, otherwise leave unchecked.")
 
-#####################################################################
-#     STR: Convert Settings to Generate Config File                 #
-#####################################################################
+    output = col2.text_input("Output File Name", "lusstr_output", help = "Please specify a name for the created files.")
 
-    st.subheader("Convert Settings")
+    kit = {'ForenSeq Signature Prep': 'forenseq', 'PowerSeq 46GY': 'powerseq'}[col3.selectbox("Library Preparation Kit", options=["ForenSeq Signature Prep", "PowerSeq 46GY"])]
 
-    kit = {'ForenSeq Signature Prep': 'forenseq', 'PowerSeq 46GY': 'powerseq'}[st.selectbox("Library Preparation Kit", options=["ForenSeq Signature Prep", "PowerSeq 46GY"])]
-
-    nocombine = st.checkbox("Do Not Combine Identical Sequences")
+    nocombine = st.checkbox("Do Not Combine Identical Sequences", help = "If using STRait Razor data, by default, identical sequences (after removing flanking sequences) are combined and reads are summed. Checking this will not combine identical sequences.")
 
 #####################################################################
 #     STP: Filter Settings to Generate Config File                  #
@@ -237,38 +229,42 @@ def show_STR_page():
 
     st.subheader("Filter Settings")
 
-    output_type = {'STRmix': 'strmix', 'EuroForMix': 'efm', 'MPSproto': 'mpsproto'}[st.selectbox("Output Type", options=["STRmix", "EuroForMix", "MPSproto"])]
+    col1, col2, col3, col4, col5 = st.columns(5)
 
-    profile_type = {'Evidence': 'evidence', 'Reference': 'reference'}[st.selectbox("Profile Type", options=["Evidence", "Reference"])]
+    output_type = {'STRmix': 'strmix', 'EuroForMix': 'efm', 'MPSproto': 'mpsproto'}[col1.selectbox("Probabilistic Genotyping Software", options=["STRmix", "EuroForMix", "MPSproto"], help="Select which probabilistic genotyping software files to create")]
 
-    data_type = {'Sequence': 'ngs', 'CE allele': 'ce', 'LUS+ allele': 'lusplus'}[st.selectbox("Data Type", options=["Sequence", "CE allele", "LUS+ allele"])]
+    profile_type = {'Evidence': 'evidence', 'Reference': 'reference'}[col2.selectbox("Profile Type", options=["Evidence", "Reference"], help="Select the file type (format) to create for the probabilistic genotyping software.")]
 
-    info = st.checkbox("Create Allele Information File")
+    data_type = {'Sequence': 'ngs', 'CE allele': 'ce', 'LUS+ allele': 'lusplus'}[col3.selectbox("Data Type", options=["Sequence", "CE allele", "LUS+ allele"], help="Select the allele type used to determine sequence type (belowAT, stutter or typed) and used in the final output file.")]
 
-    separate = st.checkbox("Create Separate Files for Samples", help = "If True, Will Create Individual Files for Samples; If False, Will Create One File with all Samples.")
+    info = st.checkbox("Create Allele Information File", value=True, help="Create file containing information about each sequence, including sequence type (belowAT, stutter or typed), stuttering sequence information and metrics involving stutter and noise.")
 
-    nofilters = st.checkbox("Skip all filtering steps", help = "Skip all Filtering Steps; Will Still Create EFM/MPSproto/STRmix Output Files")
+    separate = st.checkbox("Create Separate Files for Samples", help = "If checked, will create individual files for samples; If unchecked, will create one file with all samples.")
 
-    strand = {'UAS': 'uas', 'Forward': 'forward'}[st.selectbox("Strand Orientation", options=["UAS", "Forward"], help="Indicates the Strand Orientation in which to Report the Sequence in the Final Output Table for STRmix NGS only.")]
+    nofilters = st.checkbox("Skip all filtering steps", help = "Will not perform filtering; will still create EFM/MPSproto/STRmix output files")
+
+    strand = {'UAS': 'uas', 'Forward Strand': 'forward'}[col4.selectbox("Strand Orientation", options=["UAS", "Forward Strand"], help="Indicates the strand orientation in which to report the sequence in the final output table; for STRmix NGS only.")]
 
 #####################################################################
 #     STR: Specify Working Directory                                #
 #####################################################################
 
-    st.subheader("Set Working Directory")
+    st.subheader("Set Output Folder")
+
+    col1, col2, col3, col4, col5 = st.columns(5)
 
     # Initialize session state if not already initialized
     if 'wd_dirname' not in st.session_state:
         st.session_state.wd_dirname = None
 
-    clicked_wd = st.button('Please Specify A Working Directory Where You Would Like For All Output Results To Be Saved')
+    clicked_wd = col1.button('Please Select An Output Folder')
     if clicked_wd:
         wd = folder_picker_dialog()
         st.session_state.wd_dirname = wd
 
     # Display selected path
     if st.session_state.wd_dirname:
-        st.text_input("Your Specified Working Directory:", st.session_state.wd_dirname)
+        st.text_input("Your Specified Output Folder:", st.session_state.wd_dirname)
 
     # Store Selected Path to Reference in Config
     wd_dirname = st.session_state.wd_dirname
