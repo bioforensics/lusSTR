@@ -66,13 +66,9 @@ def bin_snps(sample_file, output_type, sample):
         start = snp_num * 1000
         if snp_num != 9:
             end = start + 1000
-            bin_df = sorted_file.iloc[
-                start:end,
-            ].reset_index(drop=True)
+            bin_df = sorted_file.iloc[start:end,].reset_index(drop=True)
         else:
-            bin_df = sorted_file.iloc[
-                start : len(sorted_file),
-            ].reset_index(drop=True)
+            bin_df = sorted_file.iloc[start : len(sorted_file),].reset_index(drop=True)
         bin_df["Sample.Name"] = bin_df["Sample.Name"] + "_set" + str((snp_num + 1))
         compiled_table = pd.concat([compiled_table, bin_df])
         bin_df.to_csv(

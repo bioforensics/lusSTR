@@ -22,19 +22,6 @@ import subprocess
 import os
 import re
 
-# ------ Packages For File/Folder Directory Selection --------- #
-
-import tkinter as tk
-from tkinter import filedialog
-
-
-
-# Create a global Tkinter root window
-try:
-    root = tk.Tk()
-    root.withdraw()  # Hide the root window
-except:
-    print("No GUI available!")
 
 #################################################################
 #                        Functions                              #
