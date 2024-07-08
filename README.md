@@ -5,6 +5,10 @@ lusSTR is a tool written in Python to convert NGS sequence data of forensic STR 
 Further, lusSTR can perform filtering and stutter identification using the CE allele, the LUS+ allele, or the bracketed sequence form for autosomal loci and create files for direct input into three probabilistic genotyping software packages, EuroForMix (CE and LUS+), MPSproto (NGS), and STRmix (CE and NGS). 
 
 lusSTR also processes SNP data from the Verogen ForenSeq and Kintelligence panels and create evidence and/or reference files for use in EFM. See the below section ```SNP Data Processing``` for more information.
+____
+
+**lusSTR is available as a command line tool or as a GUI.**
+____
 
 This Python package has been written for use with either:  
 * ForenSeq Signature Prep panel
@@ -41,6 +45,17 @@ make devenv
 ```
 
 ## Usage
+
+## *GUI*
+
+Once lusSTR has been installed, the GUI can be started with the command: 
+```
+lusstr gui
+```
+All lusSTR settings for either the STR pipeline or the SNP pipeline can be specified after selecting the desired pipeline tab.
+____
+
+## *Command line interface*
 
 lusSTR accomodates four different input formats:  
 (1) UAS Sample Details Report, UAS Sample Report, and UAS Phenotype Report (for SNP processing) in .xlsx format (a single file or directory containing multiple files)  
