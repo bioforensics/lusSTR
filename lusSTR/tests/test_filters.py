@@ -183,7 +183,7 @@ def test_EFMoutput_format(outputdir, datatype, software, tmp_path):
         "--str-type",
         datatype,
         "--input",
-        "WD",
+        str(inputfile),
     ]
     lusSTR.cli.main(lusSTR.cli.get_parser().parse_args(arglist))
     shutil.copyfile(inputfile, os.path.join(str_path, "test_output.csv"))
@@ -208,7 +208,7 @@ def test_STRmixoutput_format(outputdir, datatype, tmp_path):
         "-w",
         str_path,
         "--input",
-        "WD",
+        str(inputfile),
         "-o",
         "STRmix_Files",
         "--str-type",
@@ -230,7 +230,16 @@ def test_STRmixoutput_customranges(tmp_path):
     exp_info_out = data_file("NGS_stutter_test/custom/test_stutter_sequence_info.csv")
     obs_out = str(tmp_path / f"WD/test_stutter/Sample1_evidence_ngs.csv")
     obs_info_out = str(tmp_path / f"WD/test_stutter/test_stutter_sequence_info.csv")
-    arglist = ["config", "-w", str_path, "--input", "WD", "-o", "test_stutter", "--custom"]
+    arglist = [
+        "config",
+        "-w",
+        str_path,
+        "--input",
+        str(inputfile),
+        "-o",
+        "test_stutter",
+        "--custom",
+    ]
     lusSTR.cli.main(lusSTR.cli.get_parser().parse_args(arglist))
     shutil.copyfile(inputfile, os.path.join(str_path, "test_stutter.csv"))
     shutil.copyfile(inputfile, os.path.join(str_path, "test_stutter.txt"))
@@ -247,7 +256,7 @@ def test_nofilters(tmp_path):
     inputfile = data_file("test_stutter.txt")
     exp_out = data_file("NGS_stutter_test/Sample1_nofilter.csv")
     obs_out = str(tmp_path / "WD/lusstr_output/Sample1_evidence_ngs.csv")
-    arglist = ["config", "-w", str_path, "--input", "WD", "--nofilter"]
+    arglist = ["config", "-w", str_path, "--input", str(inputfile), "--nofilter"]
     lusSTR.cli.main(lusSTR.cli.get_parser().parse_args(arglist))
     shutil.copyfile(inputfile, os.path.join(str_path, "lusstr_output.csv"))
     shutil.copyfile(inputfile, os.path.join(str_path, "lusstr_output.txt"))
@@ -261,7 +270,7 @@ def test_flags(tmp_path):
     inputfile = data_file("test_stutter.txt")
     exp_out = data_file("RU_stutter_test/Flagged_Loci.csv")
     obs_out = str(tmp_path / "WD/lusstr_output/lusstr_output_Flagged_Loci.csv")
-    arglist = ["config", "-w", str_path, "--input", "WD"]
+    arglist = ["config", "-w", str_path, "--input", str(inputfile)]
     lusSTR.cli.main(lusSTR.cli.get_parser().parse_args(arglist))
     shutil.copyfile(inputfile, os.path.join(str_path, "lusstr_output.csv"))
     shutil.copyfile(inputfile, os.path.join(str_path, "lusstr_output.txt"))
@@ -288,7 +297,7 @@ def test_efm_reference(outputdir, datatype, software, tmp_path):
         "-w",
         str_path,
         "--input",
-        "WD",
+        str(inputfile),
         "--software",
         software,
         "--reference",
@@ -316,7 +325,7 @@ def test_strmix_reference(outputdir, datatype, tmp_path):
         "-w",
         str_path,
         "--input",
-        "WD",
+        str(inputfile),
         "-o",
         "STRmix_Files",
         "--reference",
@@ -336,7 +345,7 @@ def test_D7(tmp_path):
     inputfile = data_file("test_D7.txt")
     exp_out = data_file("D7_microvariant_flagged.csv")
     obs_out = str(tmp_path / "WD/test/test_Flagged_Loci.csv")
-    arglist = ["config", "-w", str_path, "--input", "WD", "-o", "test"]
+    arglist = ["config", "-w", str_path, "--input", str(inputfile), "-o", "test"]
     lusSTR.cli.main(lusSTR.cli.get_parser().parse_args(arglist))
     shutil.copyfile(inputfile, os.path.join(str_path, "test.csv"))
     shutil.copyfile(inputfile, os.path.join(str_path, "test.txt"))
@@ -392,7 +401,7 @@ def test_forward_strand_orientation(tmp_path):
         "-w",
         str_path,
         "--input",
-        "WD",
+        str(inputfile),
         "-o",
         "STRmix_Files",
         "--strand",
@@ -416,7 +425,7 @@ def test_lusplus_sequence_info(tmp_path):
         "-w",
         str_path,
         "--input",
-        "WD",
+        str(inputfile),
         "-o",
         "LUSPlus",
         "--strand",

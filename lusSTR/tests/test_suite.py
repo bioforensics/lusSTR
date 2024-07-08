@@ -64,7 +64,7 @@ def test_convert_full_nocombine(
             "-o",
             infile,
             "--input",
-            "WD",
+            str(inputfile),
         ]
     else:
         arglist = [
@@ -78,7 +78,7 @@ def test_convert_full_nocombine(
             "-o",
             infile,
             "--input",
-            "WD",
+            str(inputfile),
             "--powerseq",
         ]
     lusSTR.cli.main(lusSTR.cli.get_parser().parse_args(arglist))
@@ -110,7 +110,7 @@ def test_flanks(tmp_path):
         "--analysis-software",
         "straitrazor",
         "--input",
-        "WD",
+        str(inputfile),
     ]
     lusSTR.cli.main(lusSTR.cli.get_parser().parse_args(arglist))
     shutil.copyfile(inputfile, os.path.join(str_path, "testflanks.csv"))
@@ -135,7 +135,7 @@ def test_convert_combine(input, exp_length, tmp_path):
         "--analysis-software",
         "straitrazor",
         "--input",
-        "WD",
+        str(inputfile),
     ]
     lusSTR.cli.main(lusSTR.cli.get_parser().parse_args(arglist))
     shutil.copyfile(inputfile, os.path.join(str_path, "testflanks.csv"))
@@ -183,7 +183,7 @@ def test_powerseq_flanks(tmp_path):
         "--analysis-software",
         "straitrazor",
         "--input",
-        "WD",
+        str(inputfile),
         "--powerseq",
     ]
     lusSTR.cli.main(lusSTR.cli.get_parser().parse_args(arglist))
@@ -199,7 +199,7 @@ def test_convert_uas_sexloci(tmp_path):
     inputfile_sex = data_file("testformat_uas_sexloci.csv")
     exp_sex_out = data_file("testformat_uas_sexloci.txt")
     obs_sex_out = str(tmp_path / "WD/testformatuas_sexloci.txt")
-    arglist = ["config", "-w", str_path, "-o", "testformatuas", "--sex", "--input", "WD"]
+    arglist = ["config", "-w", str_path, "-o", "testformatuas", "--sex", "--input", str(inputfile)]
     lusSTR.cli.main(lusSTR.cli.get_parser().parse_args(arglist))
     shutil.copyfile(inputfile_sex, os.path.join(str_path, "testformatuas_sexloci.csv"))
     shutil.copyfile(inputfile, os.path.join(str_path, "testformatuas.csv"))
@@ -242,7 +242,7 @@ def test_convert_sr_sexloci(input, testoutput, flank_output, kit, tmp_path):
             "testformatsr",
             "--sex",
             "--input",
-            "WD",
+            str(inputfile),
             "--analysis-software",
             "straitrazor",
         ]
@@ -255,7 +255,7 @@ def test_convert_sr_sexloci(input, testoutput, flank_output, kit, tmp_path):
             "testformatsr",
             "--sex",
             "--input",
-            "WD",
+            str(inputfile),
             "--analysis-software",
             "straitrazor",
             "--powerseq",
