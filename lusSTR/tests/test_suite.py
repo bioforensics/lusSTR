@@ -380,3 +380,17 @@ def test_deletions(tmp_path):
     snakemake_arglist = ["strs", "convert", "-w", str(tmp_path)]
     lusSTR.cli.main(lusSTR.cli.get_parser().parse_args(snakemake_arglist))
     assert filecmp.cmp(exp_output, obs_output) is True
+
+
+def test_log(tmp_path):
+    config = str(tmp_path / "config.yaml")
+    inputfile = data_file("UAS_bulk_input/Positive Control Sample Details Report 2315.xlsx")
+    arglist = ["config", "-w", str(tmp_path), "--input", str(inputfile)]
+    lusSTR.cli.main(lusSTR.cli.get_parser().parse_args(arglist))
+    snakemake_arglist = ["strs", "format", "-w", str(tmp_path)]
+    lusSTR.cli.main(lusSTR.cli.get_parser().parse_args(snakemake_arglist))
+    for dir in os.listdir(str(tmp_path / "logs/")):
+        assert os.path.exists(str(tmp_path / f"logs/{dir}/config.yaml"))
+        assert os.path.exists(
+            str(tmp_path / f"logs/{dir}/input/Positive Control Sample Details Report 2315.xlsx")
+        )

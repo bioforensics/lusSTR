@@ -15,6 +15,7 @@ software = config["output_type"]
 prof = config["profile_type"]
 data = config["data_type"]
 separate = config["separate"]
+custom = config["custom_ranges"]
 
 
 def get_sample_IDs(input, a_software, output, software, separate):
@@ -84,6 +85,14 @@ def create_log(log):
     shell("cp config.yaml logs/{dt}/")
 
 
+def get_output():
+    if custom:
+        outname = expand("{name}_custom_range.txt", name=output_name)
+    else:
+        outname = expand("{name}.txt", name=output_name)
+    return outname
+
+
 rule all:
     input:
         expand("{name}.csv", name=output_name),
@@ -111,12 +120,13 @@ rule convert:
     input:
         rules.format.output
     output:
-        expand("{name}.txt", name=output_name)
+        get_output()
     params:
         a_software=config["analysis_software"],
         sex=config["sex"],
         nocombine=config["nocombine"],
-        kit=config["kit"]
+        kit=config["kit"],
+        custom=config["custom_ranges"]
     script:
         lusSTR.wrapper("convert") 
 
@@ -138,7 +148,8 @@ rule filter:
         info=config["info"],
         separate=config["separate"],
         filters=config["nofilters"],
-        strand=config["strand"]
+        strand=config["strand"],
+        custom=config["custom_ranges"]
     script:
         lusSTR.wrapper("filter")
 

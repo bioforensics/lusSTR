@@ -46,6 +46,7 @@ setup(
         "snakemake>=7.22,<8.0",
         "pyyaml>=6.0",
         "matplotlib>=3.8",
+        "numpy==1.26.4",
     ],
     entry_points={"console_scripts": ["lusstr = lusSTR.cli:main"]},
     scripts=glob.glob("lusSTR/scripts/*"),
