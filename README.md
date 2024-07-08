@@ -62,6 +62,7 @@ analysis_software: ```uas``` (```uas/straitrazor/genemarker```); indicates the a
 sex: ```False``` (True/False); include sex-chromosome STRs (invoke ```--sex``` flag)  
 samp_input: ```/path/to/input/directory/or/samples``` input directory or sample; if not provided, will be current working directory (indicate using ```--input path/to/dir``` )  
 output: ```lusstr_output``` output file/directory name (indicate using ```--out dir/sampleid e.g. --out test_030923```)
+custom: ```False``` (True/False); use custom sequence ranges as defined in the STR markers json file (```str_markers.json```).
 
 ### convert settings  
 kit: ```forenseq``` (forenseq/powerseq) (invoke the ```--powerseq``` flag if using PowerSeq data)  

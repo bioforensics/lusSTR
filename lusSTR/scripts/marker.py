@@ -45,7 +45,7 @@ class UnsupportedSoftwareError(ValueError):
 
 
 class STRMarker:
-    def __init__(self, locus, sequence, software, kit="forenseq"):
+    def __init__(self, locus, sequence, software, custom=False, kit="forenseq"):
         self.locus = locus
         self.sequence = sequence
         if locus not in str_marker_data:
@@ -59,6 +59,7 @@ class STRMarker:
         self.kit = kit.lower()
         if software == "uas" and self.data["ReverseCompNeeded"] == "Yes":
             self.sequence = reverse_complement(sequence)
+        self.custom = custom
 
     @property
     def repeat_size(self):
@@ -115,6 +116,20 @@ class STRMarker:
         if self.data["ReverseCompNeeded"] == "Yes":
             return reverse_complement(self.forward_sequence)
         return self.forward_sequence
+
+    @property
+    def custom_sequence(self):
+        """Custom range for sequences; PowerSeq sequences only"""
+        if self.custom:
+            front, back = self._uas_bases_to_trim()
+            custom_front = front - self.data["Custom_5"]
+            custom_back = back - self.data["Custom_3"]
+            if custom_back == 0:
+                custom_back = None
+            else:
+                custom_back *= -1
+            return self.sequence[custom_front:custom_back]
+        return None
 
     @property
     def flankseq_5p(self):
@@ -295,6 +310,17 @@ class STRMarker:
         return self.convert
 
     @property
+    def custom_brack(self):
+        if self.custom and self.data["Custom_5"] == 0 and self.data["Custom_3"] == 0:
+            return self.convert
+        elif self.custom:
+            bases = 4 if self.locus == "CSF1PO" else self.data["NumBasesToSeparate"]
+            final = sequence_to_bracketed_form(self.custom_sequence, bases, self.repeats)
+            final_string = re.sub(r" +", " ", final)
+            return final_string
+        return None
+
+    @property
     def designation(self):
         lus, sec, ter = None, None, None
         lus = repeat_copy_number(self.convert, self.data["LUS"])
@@ -319,8 +345,10 @@ class STRMarker:
         return [
             self.uas_sequence,
             self.forward_sequence,
+            self.custom_sequence,
             self.convert_uas,
             self.convert,
+            self.custom_brack,
             canon,
             lus_final_output,
             lus_plus,
@@ -401,6 +429,29 @@ class STRMarker_D13S317(STRMarker):
             else:
                 bracketed_form = ""
         return bracketed_form
+
+    @property
+    def custom_brack(self):
+        if self.custom:
+            if len(self.uas_sequence) < 110:
+                bracketed_form = collapse_repeats_by_length(self.custom_sequence, 4)
+            else:
+                if "GGGCTGCCTA" in self.custom_sequence:
+                    break_point = self.custom_sequence.index("GGGCTGCCTA") + 10
+                    bracketed_form = (
+                        f"{collapse_repeats_by_length(self.custom_sequence[:break_point], 4)} "
+                        f"{collapse_repeats_by_length(self.custom_sequence[break_point:], 4)}"
+                    )
+                elif "TTTT" in self.uas_sequence:
+                    break_point = self.uas_sequence.index("TTTT") + 18
+                    bracketed_form = (
+                        f"{collapse_repeats_by_length(self.custom_sequence[:break_point], 4)} "
+                        f"{collapse_repeats_by_length(self.custom_sequence[break_point:], 4)}"
+                    )
+                else:
+                    bracketed_form = collapse_repeats_by_length(self.custom_sequence, 4)
+            return bracketed_form
+        return None
 
 
 class STRMarker_D20S482(STRMarker):
@@ -878,6 +929,17 @@ class STRMarker_D18S51(STRMarker):
         elif isinstance(self.canonical, int):
             return collapse_repeats_by_length(self.uas_sequence, self.repeat_size)
 
+    @property
+    def custom_brack(self):
+        if self.custom:
+            if isinstance(self.canonical, str):
+                return sequence_to_bracketed_form(
+                    self.custom_sequence, self.repeat_size, self.repeats
+                )
+            elif isinstance(self.canonical, int):
+                return collapse_repeats_by_length(self.custom_sequence, self.repeat_size)
+        return None
+
 
 class STRMarker_D21S11(STRMarker):
     @property
@@ -1001,6 +1063,18 @@ class STRMarker_D21S11(STRMarker):
                 count = count
         return lus_allele, sec_allele, finalcount
 
+    @property
+    def custom_brack(self):
+        if self.custom:
+            custom_front = self.custom_sequence[: self.data["Custom_5"]]
+            custom_back = self.custom_sequence[-self.data["Custom_3"] :]
+            uas_bracket = self.convert
+            final_string = (
+                f"{custom_front} {uas_bracket} {collapse_repeats_by_length(custom_back, 4)}"
+            )
+            return final_string
+        return None
+
 
 class STRMarker_TH01(STRMarker):
     @property
@@ -1036,6 +1110,16 @@ class STRMarker_TH01(STRMarker):
         else:
             flank = collapse_repeats_by_length(flank_seq, 4)
         return flank
+
+    @property
+    def custom_brack(self):
+        if self.custom:
+            custom_front = self.custom_sequence[: self.data["Custom_5"]]
+            custom_back = self.custom_sequence[-self.data["Custom_3"] :]
+            uas_bracket = self.convert
+            final_string = f"{collapse_repeats_by_length(custom_front, 4)} {uas_bracket} {collapse_repeats_by_length(custom_back, 4)}"
+            return final_string
+        return None
 
 
 class STRMarker_TPOX(STRMarker):
@@ -1111,6 +1195,16 @@ class STRMarker_D19S433(STRMarker):
                 final.append(collapse_repeats_by_length(second_string, 4))
         final_string = " ".join(final)
         return re.sub(r" +", " ", final_string)
+
+    @property
+    def custom_brack(self):
+        if self.custom:
+            custom_front = self.custom_sequence[: self.data["Custom_5"]]
+            custom_back = self.custom_sequence[-self.data["Custom_3"] :]
+            uas_bracket = self.convert
+            final_string = f"{custom_front[:3]} {custom_front[3:5]}{uas_bracket} {custom_back[-5:-1]} {custom_back[-1:]}"
+            return final_string
+        return None
 
 
 class STRMarker_DYS643(STRMarker):
@@ -1317,10 +1411,13 @@ class STRMarker_DYS391(STRMarker):
     def convert(self):
         sequence = self.forward_sequence
         if self.kit == "powerseq":
-            final_seq = (
-                f"{collapse_repeats_by_length_flanks(sequence[:6], 4)} "
-                f"{collapse_repeats_by_length(sequence[6:], 4)}"
-            )
+            if len(sequence) < 6:
+                final_seq = sequence
+            else:
+                final_seq = (
+                    f"{collapse_repeats_by_length_flanks(sequence[:6], 4)} "
+                    f"{collapse_repeats_by_length(sequence[6:], 4)}"
+                )
         elif len(sequence) % 4 != 0:
             final_seq = sequence_to_bracketed_form(sequence, self.repeat_size, self.repeats)
         else:
@@ -1351,6 +1448,17 @@ class STRMarker_DYS458(STRMarker):
             f"{collapse_repeats_by_length(sequence[14:], 4)}"
         )
         return final_string
+
+    @property
+    def custom_brack(self):
+        if self.custom:
+            sequence = self.custom_sequence
+            final_string = (
+                f"{collapse_repeats_by_length(sequence[:14], 4)} "
+                f"{collapse_repeats_by_length(sequence[14:], 4)}"
+            )
+            return final_string
+        return None
 
 
 class STRMarker_HPRTB(STRMarker):
@@ -1629,7 +1737,7 @@ class STRMarker_DYS389II(STRMarker):
         return flank
 
 
-def STRMarkerObject(locus, sequence, software, kit="forenseq"):
+def STRMarkerObject(locus, sequence, software, custom=False, kit="forenseq"):
     constructors = {
         "D8S1179": STRMarker_D8S1179,
         "D13S317": STRMarker_D13S317,
@@ -1679,6 +1787,6 @@ def STRMarkerObject(locus, sequence, software, kit="forenseq"):
     }
     if locus in constructors:
         constructor = constructors[locus]
-        return constructor(locus, sequence, software=software, kit=kit)
+        return constructor(locus, sequence, software=software, custom=custom, kit=kit)
     else:
-        return STRMarker(locus, sequence, software=software, kit=kit)
+        return STRMarker(locus, sequence, software=software, custom=custom, kit=kit)
