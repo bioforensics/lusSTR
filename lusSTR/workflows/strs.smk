@@ -1,3 +1,4 @@
+from datetime import datetime
 import glob
 import lusSTR
 import openpyxl
@@ -72,6 +73,18 @@ def parse_sample_details(filename):
     return sampleID
 
 
+def create_log(log):
+    now = datetime.now()
+    dt = now.strftime("%m%d%Y_%H_%M_%S")
+    shell("mkdir -p logs/{dt}/input/")
+    shell("cp {log} logs/{dt}/strs.log")
+    if os.path.isdir(input_name):
+        shell("cp {input_name}/* logs/{dt}/input/")
+    else:
+        shell("cp '{input_name}' logs/{dt}/input/")
+    shell("cp config.yaml logs/{dt}/")
+
+
 def get_output():
     if custom:
         outname = expand("{name}_custom_range.txt", name=output_name)
@@ -115,7 +128,7 @@ rule convert:
         kit=config["kit"],
         custom=config["custom_ranges"]
     script:
-        lusSTR.wrapper("convert")
+        lusSTR.wrapper("convert") 
 
 
 rule filter:
@@ -139,4 +152,11 @@ rule filter:
         custom=config["custom_ranges"]
     script:
         lusSTR.wrapper("filter")
+
+
+onsuccess:
+    create_log(log)
+
+onerror:
+    create_log(log)
     

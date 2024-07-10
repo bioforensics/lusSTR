@@ -260,3 +260,27 @@ def test_uas_version5(tmp_path):
     all_arglist = ["snps", "all", "-w", str(tmp_path)]
     lusSTR.cli.main(lusSTR.cli.get_parser().parse_args(all_arglist))
     assert filecmp.cmp(exp_out, obs_out) is True
+
+
+def test_snp_logs(tmp_path):
+    inputdb = data_file("snps")
+    arglist = [
+        "config",
+        "-w",
+        str(tmp_path),
+        "-o",
+        "sr",
+        "--input",
+        str(inputdb),
+        "--snps",
+        "--analysis-software",
+        "straitrazor",
+    ]
+    lusSTR.cli.main(lusSTR.cli.get_parser().parse_args(arglist))
+    format_arglist = ["snps", "format", "-w", str(tmp_path)]
+    lusSTR.cli.main(lusSTR.cli.get_parser().parse_args(format_arglist))
+    for dir in os.listdir(str(tmp_path / "logs/")):
+        assert os.path.exists(str(tmp_path / f"logs/{dir}/snp_config.yaml"))
+        assert os.path.exists(
+            str(tmp_path / f"logs/{dir}/input/Positive Control Sample Details Report 2315.xlsx")
+        )
