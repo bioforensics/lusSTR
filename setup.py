@@ -30,6 +30,7 @@ setup(
             "lusSTR/tests/data/snps/*",
             "lusSTR/tests/data/RU_stutter_test/*",
             "lusSTR/tests/data/NGS_stutter_test/*",
+            "lusSTR/tests/data/NGS_stutter_test/custom/*",
             "lusSTR/tests/data/kinsnps/*",
             "lusSTR/tests/data/lusstr_output/*",
             "lusSTR/tests/data/LUSPlus_stutter_test/*",
