@@ -423,6 +423,7 @@ def main(
     nofilters,
     strand,
     custom,
+    sex,
 ):
     input = str(input)
     if profile_type not in ("evidence", "reference"):
@@ -480,4 +481,5 @@ if __name__ == "__main__":
         nofilters=snakemake.params.filters,
         strand=snakemake.params.strand,
         custom=snakemake.params.custom,
+        sex=snakemake.params.sex,
     )
