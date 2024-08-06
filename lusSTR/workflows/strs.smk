@@ -79,7 +79,7 @@ def create_log(log):
     shell("mkdir -p logs/{dt}/input/")
     shell("cp {log} logs/{dt}/strs.log")
     if os.path.isdir(input_name):
-        shell("cp {input_name}/* logs/{dt}/input/")
+        shell("cp {input_name}/*.* logs/{dt}/input/")
     else:
         shell("cp '{input_name}' logs/{dt}/input/")
     shell("cp config.yaml logs/{dt}/")
