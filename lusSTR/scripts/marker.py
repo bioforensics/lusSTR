@@ -1453,10 +1453,13 @@ class STRMarker_DYS458(STRMarker):
     def custom_brack(self):
         if self.custom:
             sequence = self.custom_sequence
-            final_string = (
-                f"{collapse_repeats_by_length(sequence[:14], 4)} "
-                f"{collapse_repeats_by_length(sequence[14:], 4)}"
-            )
+            if len(sequence) > 14:
+                final_string = (
+                    f"{collapse_repeats_by_length(sequence[:14], 4)} "
+                    f"{collapse_repeats_by_length(sequence[14:], 4)}"
+                )
+            else:
+                final_string = collapse_repeats_by_length(sequence, 4)
             return final_string
         return None
 

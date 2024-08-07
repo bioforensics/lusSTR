@@ -55,6 +55,27 @@ strs = [
     "TH01",
     "TPOX",
     "VWA",
+    "DYS19",
+    "DYS385A-B",
+    "DYS389II",
+    "DYS390",
+    "DYS391",
+    "DYS392",
+    "DYS393",
+    "DYS437",
+    "DYS438",
+    "DYS439",
+    "DYS448",
+    "DYS456",
+    "DYS458",
+    "DYS481",
+    "DYS533",
+    "DYS549",
+    "DYS570",
+    "DYS576",
+    "DYS635",
+    "DYS643",
+    "Y-GATA-H4",
 ]
 
 
@@ -320,12 +341,12 @@ def format_ref_table(new_rows, sample_data, datatype):
     return sort_df
 
 
-def marker_plots(df, output_name):
+def marker_plots(df, output_name, sex):
     Path("MarkerPlots").mkdir(parents=True, exist_ok=True)
     df["CE_Allele"] = df["CE_Allele"].astype(float)
     filt_df = df[df["allele_type"] == "real_allele"]
     for sample_id in df["SampleID"].unique():
-        # sample_id = f"{id}_sexchr" if sex else id
+        # sample_id = f"{id}_ystrs" if sex else id
         with PdfPages(f"MarkerPlots/{output_name}_{sample_id}_marker_plots.pdf") as pdf:
             make_plot(filt_df, sample_id, filters=True, at=False)
             pdf.savefig()
@@ -412,30 +433,19 @@ def get_at(df, locus):
     return at
 
 
-def main(
-    input,
-    output_type,
+def process_input(
+    input_name,
+    outpath,
     profile_type,
     data_type,
-    output_dir,
-    info,
-    separate,
+    output_type,
     nofilters,
-    strand,
+    separate,
     custom,
+    sex,
+    info,
 ):
-    input = str(input)
-    if profile_type not in ("evidence", "reference"):
-        raise ValueError(f"unknown profile type '{profile_type}'")
-    if data_type not in ("ce", "ngs", "lusplus"):
-        raise ValueError(f"unknown data type '{data_type}'")
-    if output_type not in ("efm", "strmix", "mpsproto"):
-        raise ValueError(f"unknown output type '{output_type}'")
-    full_df = pd.read_csv(input, sep="\t")
-    if output_dir is None:
-        raise ValueError("No output specified using --out.")
-    else:
-        outpath = output_dir
+    full_df = pd.read_csv(f"{input_name}.txt", sep="\t")
     if custom:
         seq_col = "Custom_Range_Sequence"
         brack_col = "Custom_Bracketed_Notation"
@@ -448,7 +458,7 @@ def main(
         )
     if nofilters:
         full_df["allele_type"] = "real_allele"
-        marker_plots(full_df, outpath)
+        marker_plots(full_df, input_name, sex)
         if output_type == "efm" or output_type == "mpsproto":
             EFM_output(full_df, outpath, profile_type, data_type, brack_col, separate)
         else:
@@ -456,16 +466,69 @@ def main(
     else:
         dict_loc = {k: v for k, v in full_df.groupby(["SampleID", "Locus"])}
         final_df, flags_df = process_strs(dict_loc, data_type, seq_col, brack_col)
-        marker_plots(final_df, outpath)
+        marker_plots(final_df, input_name, sex)
         if output_type == "efm" or output_type == "mpsproto":
             EFM_output(final_df, outpath, profile_type, data_type, brack_col, separate)
         else:
             STRmix_output(final_df, outpath, profile_type, data_type, seq_col)
         if info:
             name = os.path.basename(outpath)
-            final_df.to_csv(f"{outpath}/{name}_sequence_info.csv", index=False)
+            final_df.to_csv(f"{outpath}/{input_name}_sequence_info.csv", index=False)
             if not flags_df.empty:
-                flags_df.to_csv(f"{outpath}/{name}_Flagged_Loci.csv", index=False)
+                flags_df.to_csv(f"{outpath}/{input_name}_Flagged_Loci.csv", index=False)
+
+
+def main(
+    input,
+    output_type,
+    profile_type,
+    data_type,
+    output_dir,
+    info,
+    separate,
+    nofilters,
+    strand,
+    custom,
+    sex,
+):
+    input = str(input)
+    if profile_type not in ("evidence", "reference"):
+        raise ValueError(f"unknown profile type '{profile_type}'")
+    if data_type not in ("ce", "ngs", "lusplus"):
+        raise ValueError(f"unknown data type '{data_type}'")
+    if output_type not in ("efm", "strmix", "mpsproto"):
+        raise ValueError(f"unknown output type '{output_type}'")
+    if output_dir is None:
+        raise ValueError("No output specified using --out.")
+    if sex:
+        outpath_sex = f"{output_dir}/ystrs/"
+        input_name_sex = f"{os.path.splitext(input)[0]}_sexloci"
+        process_input(
+            input_name_sex,
+            outpath_sex,
+            profile_type,
+            data_type,
+            output_type,
+            nofilters,
+            separate,
+            custom,
+            sex,
+            info,
+        )
+    input_name = os.path.splitext(input)[0]
+    outpath = output_dir
+    process_input(
+        input_name,
+        outpath,
+        profile_type,
+        data_type,
+        output_type,
+        separate,
+        nofilters,
+        custom,
+        sex,
+        info,
+    )
 
 
 if __name__ == "__main__":
@@ -480,4 +543,5 @@ if __name__ == "__main__":
         nofilters=snakemake.params.filters,
         strand=snakemake.params.strand,
         custom=snakemake.params.custom,
+        sex=snakemake.params.sex,
     )

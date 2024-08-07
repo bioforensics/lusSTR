@@ -149,7 +149,8 @@ rule filter:
         separate=config["separate"],
         filters=config["nofilters"],
         strand=config["strand"],
-        custom=config["custom_ranges"]
+        custom=config["custom_ranges"],
+        sex=config["sex"]
     script:
         lusSTR.wrapper("filter")
 
