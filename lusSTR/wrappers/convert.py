@@ -40,6 +40,7 @@ def format_table(input, software, kit="forenseq", custom=False):
     check_sr = 0
     for i, row in data.iterrows():
         locus = data.iloc[i, 0].upper()
+        print(locus)
         reads = data.iloc[i, 1]
         sequence = data.iloc[i, 2]
         sampleid = re.sub(" ", "_", data.iloc[i, 3])
@@ -274,7 +275,7 @@ def main(input, out, kit, software, sex, nocombine, custom):
                 sex_final_table.to_csv(f"{full_table_name}_sexloci.txt", sep="\t", index=False)
                 if custom:
                     sex_table_custom = create_custom_outputtable(sex_columns, sex_final_table)
-                    sex_table_custom.to_csv(f"{output_name}.txt", index=False, sep="\t")
+                    sex_table_custom.to_csv(f"{output_name}_sexloci.txt", index=False, sep="\t")
         else:
             sex_final_table.to_csv(f"{output_name}_sexloci.txt", sep="\t", index=False)
     if software != "uas":
