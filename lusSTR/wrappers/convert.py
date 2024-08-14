@@ -40,7 +40,6 @@ def format_table(input, software, kit="forenseq", custom=False):
     check_sr = 0
     for i, row in data.iterrows():
         locus = data.iloc[i, 0].upper()
-        print(locus)
         reads = data.iloc[i, 1]
         sequence = data.iloc[i, 2]
         sampleid = re.sub(" ", "_", data.iloc[i, 3])

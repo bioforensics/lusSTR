@@ -55,6 +55,9 @@ strs = [
     "TH01",
     "TPOX",
     "VWA",
+]
+
+ystrs = [
     "DYS19",
     "DYS385A-B",
     "DYS389II",
@@ -87,7 +90,7 @@ with open(get_filter_metadata_file(), "r") as fh:
     filter_marker_data = json.load(fh)
 
 
-def process_strs(dict_loc, datatype, seq_col, brack_col):
+def process_strs(dict_loc, datatype, seq_col, brack_col, sex):
     final_df = pd.DataFrame()
     flags_df = pd.DataFrame()
     for key, value in dict_loc.items():
@@ -129,27 +132,28 @@ def process_strs(dict_loc, datatype, seq_col, brack_col):
             ],
             fill_value=None,
         )
-        filtered_df = filters(data_order, locus, total_reads, datatype, brack_col)
-        final_df = pd.concat([final_df, filtered_df])
-        flags_df = pd.concat([flags_df, flags(filtered_df, datatype)])
+        if locus in strs or locus in ystrs:
+            filtered_df = filters(data_order, locus, total_reads, datatype, brack_col)
+            final_df = pd.concat([final_df, filtered_df])
+            flags_df = pd.concat([flags_df, flags(filtered_df, datatype)])
     if datatype == "ce" or datatype == "ngs":
         final_df = final_df.astype({"CE_Allele": "float64", "Reads": "int"})
     return final_df, flags_df
 
 
-def EFM_output(profile, outfile, profile_type, data_type, col, separate=False):
+def EFM_output(profile, outfile, profile_type, data_type, col, sex, separate=False):
     if profile_type == "reference":
         profile = profile[profile.allele_type == "real_allele"]
     else:
         profile = profile[profile.allele_type != "BelowAT"]
-    efm_profile = populate_efm_profile(profile, data_type, col)
+    efm_profile = populate_efm_profile(profile, data_type, col, sex)
     if separate:
         write_sample_specific_efm_profiles(efm_profile, profile_type, data_type, outfile)
     else:
         write_aggregate_efm_profile(efm_profile, profile_type, data_type, outfile)
 
 
-def populate_efm_profile(profile, data_type, colname):
+def populate_efm_profile(profile, data_type, colname, sex):
     if data_type == "ce":
         prof_col = "CE_Allele"
     elif data_type == "lusplus":
@@ -184,7 +188,8 @@ def populate_efm_profile(profile, data_type, colname):
             entry = [sampleid, locusid] + allele_list + height_list
             reformatted_profile.append(entry)
     for sampleid in allele_heights:
-        for locusid in strs:
+        str_list = ystrs if sex else strs
+        for locusid in str_list:
             if locusid not in allele_heights[sampleid]:
                 entry = [sampleid, locusid] + ([None] * max_num_alleles * 2)
                 reformatted_profile.append(entry)
@@ -439,12 +444,14 @@ def process_input(
     profile_type,
     data_type,
     output_type,
+    strand,
     nofilters,
     separate,
     custom,
     sex,
     info,
 ):
+    print(nofilters)
     full_df = pd.read_csv(f"{input_name}.txt", sep="\t")
     if custom:
         seq_col = "Custom_Range_Sequence"
@@ -460,15 +467,15 @@ def process_input(
         full_df["allele_type"] = "real_allele"
         marker_plots(full_df, input_name, sex)
         if output_type == "efm" or output_type == "mpsproto":
-            EFM_output(full_df, outpath, profile_type, data_type, brack_col, separate)
+            EFM_output(full_df, outpath, profile_type, data_type, brack_col, sex, separate)
         else:
             STRmix_output(full_df, outpath, profile_type, data_type, seq_col)
     else:
         dict_loc = {k: v for k, v in full_df.groupby(["SampleID", "Locus"])}
-        final_df, flags_df = process_strs(dict_loc, data_type, seq_col, brack_col)
+        final_df, flags_df = process_strs(dict_loc, data_type, seq_col, brack_col, sex)
         marker_plots(final_df, input_name, sex)
         if output_type == "efm" or output_type == "mpsproto":
-            EFM_output(final_df, outpath, profile_type, data_type, brack_col, separate)
+            EFM_output(final_df, outpath, profile_type, data_type, brack_col, sex, separate)
         else:
             STRmix_output(final_df, outpath, profile_type, data_type, seq_col)
         if info:
@@ -501,6 +508,7 @@ def main(
     if output_dir is None:
         raise ValueError("No output specified using --out.")
     if sex:
+        print(nofilters)
         outpath_sex = f"{output_dir}/ystrs/"
         input_name_sex = f"{os.path.splitext(input)[0]}_sexloci"
         process_input(
@@ -509,6 +517,7 @@ def main(
             profile_type,
             data_type,
             output_type,
+            strand,
             nofilters,
             separate,
             custom,
@@ -517,12 +526,14 @@ def main(
         )
     input_name = os.path.splitext(input)[0]
     outpath = output_dir
+    print(nofilters)
     process_input(
         input_name,
         outpath,
         profile_type,
         data_type,
         output_type,
+        strand,
         separate,
         nofilters,
         custom,

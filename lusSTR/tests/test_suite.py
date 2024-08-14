@@ -326,12 +326,13 @@ def test_snakemake(command, output, format_out, convert_out, all_out, tmp_path):
 def test_marker_plots(tmp_path):
     inputfile = data_file("UAS_bulk_input/Positive Control Sample Details Report 2315.xlsx")
     exp_output = str(tmp_path / "MarkerPlots/lusstr_output_Positive_Control_marker_plots.pdf")
-    sex_exp = str(tmp_path / "MarkerPlots/lusstr_output_Positive_Control_sexchr_marker_plots.pdf")
-    arglist = ["config", "-w", str(tmp_path), "--input", str(inputfile)]
+    sex_exp = str(tmp_path / "MarkerPlots/lusstr_output_sexloci_Positive_Control_marker_plots.pdf")
+    arglist = ["config", "-w", str(tmp_path), "--input", str(inputfile), "--sex"]
     lusSTR.cli.main(lusSTR.cli.get_parser().parse_args(arglist))
     snakemake_arglist = ["strs", "all", "-w", str(tmp_path)]
     lusSTR.cli.main(lusSTR.cli.get_parser().parse_args(snakemake_arglist))
     assert os.path.exists(exp_output) is True
+    assert os.path.exists(sex_exp) is True
 
 
 def test_genemarker(tmp_path):

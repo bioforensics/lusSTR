@@ -229,7 +229,7 @@ def test_STRmixoutput_customranges(tmp_path):
     exp_out = data_file("NGS_stutter_test/custom/Sample1_evidence_ngs.csv")
     exp_info_out = data_file("NGS_stutter_test/custom/test_stutter_sequence_info.csv")
     obs_out = str(tmp_path / f"WD/test_stutter/Sample1_evidence_ngs.csv")
-    obs_info_out = str(tmp_path / f"WD/test_stutter/test_stutter_sequence_info.csv")
+    obs_info_out = str(tmp_path / f"WD/test_stutter/test_stutter_custom_range_sequence_info.csv")
     arglist = [
         "config",
         "-w",
