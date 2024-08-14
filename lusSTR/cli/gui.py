@@ -236,6 +236,11 @@ def show_STR_page():
         )
     ]
 
+    custom_ranges = st.checkbox(
+        "Use Custom Sequence Ranges",
+        help="Check the box to use the specified custom sequence ranges as defined in the str_markers.json file."
+    )
+
     sex = st.checkbox(
         "Include X- and Y-STRs",
         help="Check the box to include X- and Y-STRs, otherwise leave unchecked.",
@@ -364,6 +369,7 @@ def show_STR_page():
 
                 config_data = {
                     "analysis_software": analysis_software,
+                    "custom_ranges": custom_ranges,
                     "sex": sex,
                     "samp_input": samp_input,
                     "output": output,
