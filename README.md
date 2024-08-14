@@ -73,24 +73,24 @@ ___
 Running ```lusstr config``` creates a config file containing the default settings for the lusSTR STR analysis pipeline. The settings can be changed with command line arguments (see below) or by manually editing the config file. The default settings, along with their descriptions, are as follows:
 
 ### general settings
-analysis_software: ```uas``` (```uas/straitrazor/genemarker```); indicates the analysis software used prior to lusSTR
-sex: ```False``` (True/False); include sex-chromosome STRs (invoke ```--sex``` flag)  
-samp_input: ```/path/to/input/directory/or/samples``` input directory or sample; if not provided, will be current working directory (indicate using ```--input path/to/dir``` )  
-output: ```lusstr_output``` output file/directory name (indicate using ```--out dir/sampleid e.g. --out test_030923```)
-custom: ```False``` (True/False); use custom sequence ranges as defined in the STR markers json file (```str_markers.json```).
+**analysis_software**: ```uas``` (```uas/straitrazor/genemarker```); indicates the analysis software used prior to lusSTR  
+**sex**: ```False``` (True/False); include sex-chromosome STRs (invoke ```--sex``` flag)  
+**samp_input**: ```/path/to/input/directory/or/samples``` input directory or sample; if not provided, will be current working directory (indicate using ```--input path/to/dir``` )  
+**output**: ```lusstr_output``` output file/directory name (indicate using ```--out dir/sampleid e.g. --out test_030923```)  
+**custom**: ```False``` (True/False); use custom sequence ranges as defined in the STR markers json file (```str_markers.json```).
 
 ### convert settings  
-kit: ```forenseq``` (forenseq/powerseq) (invoke the ```--powerseq``` flag if using PowerSeq data)  
-nocombine: ```False``` (True/False); do not combine identical sequences during the ```convert``` step, if using STRait Razor data. (invoke the ```--nocombine``` flag)  
+**kit**: ```forenseq``` (forenseq/powerseq) (invoke the ```--powerseq``` flag if using PowerSeq data)  
+**nocombine**: ```False``` (True/False); do not combine identical sequences during the ```convert``` step, if using STRait Razor data. (invoke the ```--nocombine``` flag)  
 
 ### filter settings  
-output_type: ```strmix``` (strmix/efm/mpsproto) (indicate using the ```--software``` flag)  
-profile_type: ```evidence``` (evidence/reference) (invoke ```--reference``` flag if creating a reference output file)  
-data_type: ```ngs``` (ce/ngs/lusplus) (indicate using the ```--str-type```)  
-info: ```True``` (True/False); create allele information file (invoke ```--noinfo``` flag to not create the allele information file)  
-separate: ```False``` (True/False); for EFM/MPSproto only, if True will create individual files for samples; if False, will create one file with all samples (invoke ```--separate``` flag to separate EFM/MPSproto output files)  
-nofilters: ```False``` (True/False); skip all filtering steps but still creates EFM/MPSproto/STRmix output files (invoke ```--nofilters``` flag)  
-strand: ```uas``` (uas/forward); indicates the strand orientation in which to report the sequence in the final output table for STRmix NGS only (indicate using ```--strand```)
+**output_type**: ```strmix``` (strmix/efm/mpsproto) (indicate using the ```--software``` flag)  
+**profile_type**: ```evidence``` (evidence/reference) (invoke ```--reference``` flag if creating a reference output file)  
+**data_type**: ```ngs``` (ce/ngs/lusplus) (indicate using the ```--str-type```)  
+**info**: ```True``` (True/False); create allele information file (invoke ```--noinfo``` flag to not create the allele information file)  
+**separate**: ```False``` (True/False); for EFM/MPSproto only, if True will create individual files for samples; if False, will create one file with all samples (invoke ```--separate``` flag to separate EFM/MPSproto output files)  
+**nofilters**: ```False``` (True/False); skip all filtering steps but still creates EFM/MPSproto/STRmix output files (invoke ```--nofilters``` flag)  
+**strand**: ```uas``` (uas/forward); indicates the strand orientation in which to report the sequence in the final output table for STRmix NGS only (indicate using ```--strand```)
 
 One additional argument can be provided with ```lusstr config```:  
 ```-w```/```-workdir``` sets the working directory (e.g. ```-w lusstr_files/```) and all created files are stored in that directory.
@@ -223,20 +223,20 @@ Running ```lusstr config --snps``` creates a config file containing the default 
 
 
 ### general settings  
-analysis_software: ```uas``` (```uas/straitrazor```); indicates the analysis software used prior to lusSTR
-samp_input: ```/path/to/input/directory/or/samples``` input directory or sample; if not provided, will be current working directory (indicate using ```--input path/to/dir```)  
-output: ```lusstr_output``` output file/directory name; (indicate using ```--out dir/sampleid e.g. --out test_030923```)   
-kit: ```sigprep``` (sigprep/kintelligence) (invoke using the ```--kintelligence``` flag if using Kintelligence data)  
+**analysis_software**: ```uas``` (```uas/straitrazor```); indicates the analysis software used prior to lusSTR
+**samp_input**: ```/path/to/input/directory/or/samples``` input directory or sample; if not provided, will be current working directory (indicate using ```--input path/to/dir```)  
+**output**: ```lusstr_output``` output file/directory name; (indicate using ```--out dir/sampleid e.g. --out test_030923```)   
+**kit**: ```sigprep``` (sigprep/kintelligence) (invoke using the ```--kintelligence``` flag if using Kintelligence data)  
 
 ### format settings  
-types: ```all``` choices are "all", "i" (identity SNPs only), "p" (phenotype only), "a" (ancestry only) or any combination (indicate using the ```--snp-type e.g. --snp-type i, p```)  
-nofilter: ```False``` (True/False); if no filtering is desired at the format step; if False, will remove any allele designated as Not Typed (invoke using the ```--nofiltering```)  
+**types**: ```all``` choices are "all", "i" (identity SNPs only), "p" (phenotype only), "a" (ancestry only) or any combination (indicate using the ```--snp-type e.g. --snp-type i, p```)  
+**nofilter**: ```False``` (True/False); if no filtering is desired at the format step; if False, will remove any allele designated as Not Typed (invoke using the ```--nofiltering```)  
 
 ### convert settings  
-strand: ```forward``` (forward/uas); indicates which orientation to report the alleles for the SigPrep SNPs; uas indicates the orientation as reported by the UAS or the forward strand  
-references: ```None```; list IDs of the samples to be run as references in EFM; default is no reference samples  
-separate: ```False``` (True/False); if want to separate samples into individual files for use in EFM  
-thresh: ```0.03```; Analytical threshold value    
+**strand**: ```forward``` (forward/uas); indicates which orientation to report the alleles for the SigPrep SNPs; uas indicates the orientation as reported by the UAS or the forward strand  
+**references**: ```None```; list IDs of the samples to be run as references in EFM; default is no reference samples  
+**separate**: ```False``` (True/False); if want to separate samples into individual files for use in EFM  
+**thresh**: ```0.03```; Analytical threshold value    
 
 
 One additional argument can be provided with ```lusstr config --snps```:  
