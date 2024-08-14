@@ -378,40 +378,43 @@ def make_plot(df, sample_id, sameyaxis=False, filters=False, at=True):
     fig = plt.figure(figsize=(30, 30))
     n = 0
     for marker in sample_df["Locus"].unique():
-        n += 1
-        colors = {"Typed": "g", "Stutter": "b", "BelowAT": "r"}
-        marker_df = sample_df[sample_df["Locus"] == marker].sort_values(by="CE_Allele")
-        ax = fig.add_subplot(6, 5, n)
-        p = ax.bar(
-            marker_df["CE_Allele"],
-            marker_df["Reads"],
-            edgecolor="k",
-            color=[colors[i] for i in marker_df["Type"]],
-        )
-        if at:
-            at = get_at(marker_df, marker)
-            ax.axhline(at, linestyle="--", color="k")
-            ax.text(round(min(marker_df["CE_Allele"])) - 0.9, at + (at * 0.1), f"AT", size=12)
-        labels = marker_df["Type"].unique()
-        handles = [plt.Rectangle((0, 0), 1, 1, color=colors[l]) for l in labels]
-        if not filters:
-            plt.legend(handles, labels, title="Allele Type")
-        else:
-            for i, row in marker_df.iterrows():
-                marker_df.loc[i, "Label"] = (
-                    str(int(marker_df.loc[i, "CE_Allele"]))
-                    if ".0" in str(marker_df.loc[i, "CE_Allele"])
-                    else str(marker_df.loc[i, "CE_Allele"])
-                )
-            ax.bar_label(p, labels=marker_df["Label"])
-        if sameyaxis:
-            ax.set_yticks(np.arange(0, max_yvalue, increase_value))
-        ax.set_xticks(
-            np.arange(
-                round(min(marker_df["CE_Allele"]) - 1), round(max(marker_df["CE_Allele"])) + 2, 1.0
+        if marker in strs or marker in ystrs:
+            n += 1
+            colors = {"Typed": "g", "Stutter": "b", "BelowAT": "r"}
+            marker_df = sample_df[sample_df["Locus"] == marker].sort_values(by="CE_Allele")
+            ax = fig.add_subplot(6, 5, n)
+            p = ax.bar(
+                marker_df["CE_Allele"],
+                marker_df["Reads"],
+                edgecolor="k",
+                color=[colors[i] for i in marker_df["Type"]],
             )
-        )
-        ax.title.set_text(marker)
+            if at:
+                at = get_at(marker_df, marker)
+                ax.axhline(at, linestyle="--", color="k")
+                ax.text(round(min(marker_df["CE_Allele"])) - 0.9, at + (at * 0.1), f"AT", size=12)
+            labels = marker_df["Type"].unique()
+            handles = [plt.Rectangle((0, 0), 1, 1, color=colors[l]) for l in labels]
+            if not filters:
+                plt.legend(handles, labels, title="Allele Type")
+            else:
+                for i, row in marker_df.iterrows():
+                    marker_df.loc[i, "Label"] = (
+                        str(int(marker_df.loc[i, "CE_Allele"]))
+                        if ".0" in str(marker_df.loc[i, "CE_Allele"])
+                        else str(marker_df.loc[i, "CE_Allele"])
+                    )
+                ax.bar_label(p, labels=marker_df["Label"])
+            if sameyaxis:
+                ax.set_yticks(np.arange(0, max_yvalue, increase_value))
+            ax.set_xticks(
+                np.arange(
+                    round(min(marker_df["CE_Allele"]) - 1),
+                    round(max(marker_df["CE_Allele"])) + 2,
+                    1.0,
+                )
+            )
+            ax.title.set_text(marker)
     if sameyaxis:
         title = "Marker Plots for All Alleles With Same Y-Axis Scale"
     elif filters:
