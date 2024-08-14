@@ -445,13 +445,12 @@ def process_input(
     data_type,
     output_type,
     strand,
-    nofilters,
+    nofiltering,
     separate,
     custom,
     sex,
     info,
 ):
-    print(nofilters)
     full_df = pd.read_csv(f"{input_name}.txt", sep="\t")
     if custom:
         seq_col = "Custom_Range_Sequence"
@@ -463,7 +462,7 @@ def process_input(
             if strand == "uas"
             else "Forward_Strand_Bracketed_Notation"
         )
-    if nofilters:
+    if nofiltering:
         full_df["allele_type"] = "real_allele"
         marker_plots(full_df, input_name, sex)
         if output_type == "efm" or output_type == "mpsproto":
@@ -508,7 +507,6 @@ def main(
     if output_dir is None:
         raise ValueError("No output specified using --out.")
     if sex:
-        print(nofilters)
         outpath_sex = f"{output_dir}/ystrs/"
         input_name_sex = f"{os.path.splitext(input)[0]}_sexloci"
         process_input(
@@ -526,7 +524,6 @@ def main(
         )
     input_name = os.path.splitext(input)[0]
     outpath = output_dir
-    print(nofilters)
     process_input(
         input_name,
         outpath,
@@ -534,8 +531,8 @@ def main(
         data_type,
         output_type,
         strand,
-        separate,
         nofilters,
+        separate,
         custom,
         sex,
         info,
