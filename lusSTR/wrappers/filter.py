@@ -137,7 +137,10 @@ def process_strs(dict_loc, datatype, seq_col, brack_col, sex):
             final_df = pd.concat([final_df, filtered_df])
             flags_df = pd.concat([flags_df, flags(filtered_df, datatype)])
     if datatype == "ce" or datatype == "ngs":
-        final_df = final_df.astype({"CE_Allele": "float64", "Reads": "int"})
+        try:
+            final_df = final_df.astype({"CE_Allele": "float64", "Reads": "int"})
+        except KeyError:
+            final_df = None
     return final_df, flags_df
 
 
@@ -475,16 +478,19 @@ def process_input(
     else:
         dict_loc = {k: v for k, v in full_df.groupby(["SampleID", "Locus"])}
         final_df, flags_df = process_strs(dict_loc, data_type, seq_col, brack_col, sex)
-        marker_plots(final_df, input_name, sex)
-        if output_type == "efm" or output_type == "mpsproto":
-            EFM_output(final_df, outpath, profile_type, data_type, brack_col, sex, separate)
+        if final_df is not None:
+            marker_plots(final_df, input_name, sex)
+            if output_type == "efm" or output_type == "mpsproto":
+                EFM_output(final_df, outpath, profile_type, data_type, brack_col, sex, separate)
+            else:
+                STRmix_output(final_df, outpath, profile_type, data_type, seq_col)
+            if info:
+                name = os.path.basename(outpath)
+                final_df.to_csv(f"{outpath}/{input_name}_sequence_info.csv", index=False)
+                if not flags_df.empty:
+                    flags_df.to_csv(f"{outpath}/{input_name}_Flagged_Loci.csv", index=False)
         else:
-            STRmix_output(final_df, outpath, profile_type, data_type, seq_col)
-        if info:
-            name = os.path.basename(outpath)
-            final_df.to_csv(f"{outpath}/{input_name}_sequence_info.csv", index=False)
-            if not flags_df.empty:
-                flags_df.to_csv(f"{outpath}/{input_name}_Flagged_Loci.csv", index=False)
+            print(f"{input_name} does not have any sequences! Continuing on.")
 
 
 def main(
