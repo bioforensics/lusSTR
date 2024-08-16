@@ -450,12 +450,12 @@ def process_input(
     profile_type,
     data_type,
     output_type,
-    strand,
-    nofiltering,
-    separate,
-    custom,
-    sex,
-    info,
+    strand="forward",
+    nofiltering=False,
+    separate=False,
+    custom=False,
+    sex=False,
+    info=True,
 ):
     full_df = pd.read_csv(f"{input_name}.txt", sep="\t")
     if custom:
@@ -524,12 +524,12 @@ def main(
             profile_type,
             data_type,
             output_type,
-            strand,
-            nofilters,
-            separate,
-            custom,
-            sex,
-            info,
+            strand=strand,
+            nofiltering=nofilters,
+            separate=separate,
+            custom=custom,
+            sex=sex,
+            info=info,
         )
     input_name = os.path.splitext(input)[0]
     outpath = output_dir
@@ -539,12 +539,12 @@ def main(
         profile_type,
         data_type,
         output_type,
-        strand,
-        nofilters,
-        separate,
-        custom,
-        sex,
-        info,
+        strand=strand,
+        nofiltering=nofilters,
+        separate=separate,
+        custom=custom,
+        sex=sex,
+        info=info,
     )
 
 

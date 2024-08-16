@@ -238,7 +238,7 @@ def show_STR_page():
 
     custom_ranges = st.checkbox(
         "Use Custom Sequence Ranges",
-        help="Check the box to use the specified custom sequence ranges as defined in the str_markers.json file."
+        help="Check the box to use the specified custom sequence ranges as defined in the str_markers.json file.",
     )
 
     sex = st.checkbox(
