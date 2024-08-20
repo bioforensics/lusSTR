@@ -90,7 +90,7 @@ with open(get_filter_metadata_file(), "r") as fh:
     filter_marker_data = json.load(fh)
 
 
-def process_strs(dict_loc, datatype, seq_col, brack_col, sex):
+def process_strs(dict_loc, datatype, seq_col, brack_col):
     final_df = pd.DataFrame()
     flags_df = pd.DataFrame()
     for key, value in dict_loc.items():
@@ -477,7 +477,7 @@ def process_input(
             STRmix_output(full_df, outpath, profile_type, data_type, seq_col)
     else:
         dict_loc = {k: v for k, v in full_df.groupby(["SampleID", "Locus"])}
-        final_df, flags_df = process_strs(dict_loc, data_type, seq_col, brack_col, sex)
+        final_df, flags_df = process_strs(dict_loc, data_type, seq_col, brack_col)
         if final_df is not None:
             marker_plots(final_df, input_name, sex)
             if output_type == "efm" or output_type == "mpsproto":
