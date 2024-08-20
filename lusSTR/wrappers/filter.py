@@ -57,6 +57,30 @@ strs = [
     "VWA",
 ]
 
+ystrs = [
+    "DYS19",
+    "DYS385A-B",
+    "DYS389II",
+    "DYS390",
+    "DYS391",
+    "DYS392",
+    "DYS393",
+    "DYS437",
+    "DYS438",
+    "DYS439",
+    "DYS448",
+    "DYS456",
+    "DYS458",
+    "DYS481",
+    "DYS533",
+    "DYS549",
+    "DYS570",
+    "DYS576",
+    "DYS635",
+    "DYS643",
+    "Y-GATA-H4",
+]
+
 
 def get_filter_metadata_file():
     return importlib.resources.files("lusSTR") / "data/filters.json"
@@ -108,27 +132,31 @@ def process_strs(dict_loc, datatype, seq_col, brack_col):
             ],
             fill_value=None,
         )
-        filtered_df = filters(data_order, locus, total_reads, datatype, brack_col)
-        final_df = pd.concat([final_df, filtered_df])
-        flags_df = pd.concat([flags_df, flags(filtered_df, datatype)])
+        if locus in strs or locus in ystrs:
+            filtered_df = filters(data_order, locus, total_reads, datatype, brack_col)
+            final_df = pd.concat([final_df, filtered_df])
+            flags_df = pd.concat([flags_df, flags(filtered_df, datatype)])
     if datatype == "ce" or datatype == "ngs":
-        final_df = final_df.astype({"CE_Allele": "float64", "Reads": "int"})
+        try:
+            final_df = final_df.astype({"CE_Allele": "float64", "Reads": "int"})
+        except KeyError:
+            final_df = None
     return final_df, flags_df
 
 
-def EFM_output(profile, outfile, profile_type, data_type, col, separate=False):
+def EFM_output(profile, outfile, profile_type, data_type, col, sex, separate=False):
     if profile_type == "reference":
         profile = profile[profile.allele_type == "real_allele"]
     else:
         profile = profile[profile.allele_type != "BelowAT"]
-    efm_profile = populate_efm_profile(profile, data_type, col)
+    efm_profile = populate_efm_profile(profile, data_type, col, sex)
     if separate:
         write_sample_specific_efm_profiles(efm_profile, profile_type, data_type, outfile)
     else:
         write_aggregate_efm_profile(efm_profile, profile_type, data_type, outfile)
 
 
-def populate_efm_profile(profile, data_type, colname):
+def populate_efm_profile(profile, data_type, colname, sex):
     if data_type == "ce":
         prof_col = "CE_Allele"
     elif data_type == "lusplus":
@@ -163,7 +191,8 @@ def populate_efm_profile(profile, data_type, colname):
             entry = [sampleid, locusid] + allele_list + height_list
             reformatted_profile.append(entry)
     for sampleid in allele_heights:
-        for locusid in strs:
+        str_list = ystrs if sex else strs
+        for locusid in str_list:
             if locusid not in allele_heights[sampleid]:
                 entry = [sampleid, locusid] + ([None] * max_num_alleles * 2)
                 reformatted_profile.append(entry)
@@ -320,12 +349,12 @@ def format_ref_table(new_rows, sample_data, datatype):
     return sort_df
 
 
-def marker_plots(df, output_name):
+def marker_plots(df, output_name, sex):
     Path("MarkerPlots").mkdir(parents=True, exist_ok=True)
     df["CE_Allele"] = df["CE_Allele"].astype(float)
     filt_df = df[df["allele_type"] == "real_allele"]
     for sample_id in df["SampleID"].unique():
-        # sample_id = f"{id}_sexchr" if sex else id
+        # sample_id = f"{id}_ystrs" if sex else id
         with PdfPages(f"MarkerPlots/{output_name}_{sample_id}_marker_plots.pdf") as pdf:
             make_plot(filt_df, sample_id, filters=True, at=False)
             pdf.savefig()
@@ -352,40 +381,43 @@ def make_plot(df, sample_id, sameyaxis=False, filters=False, at=True):
     fig = plt.figure(figsize=(30, 30))
     n = 0
     for marker in sample_df["Locus"].unique():
-        n += 1
-        colors = {"Typed": "g", "Stutter": "b", "BelowAT": "r"}
-        marker_df = sample_df[sample_df["Locus"] == marker].sort_values(by="CE_Allele")
-        ax = fig.add_subplot(6, 5, n)
-        p = ax.bar(
-            marker_df["CE_Allele"],
-            marker_df["Reads"],
-            edgecolor="k",
-            color=[colors[i] for i in marker_df["Type"]],
-        )
-        if at:
-            at = get_at(marker_df, marker)
-            ax.axhline(at, linestyle="--", color="k")
-            ax.text(round(min(marker_df["CE_Allele"])) - 0.9, at + (at * 0.1), f"AT", size=12)
-        labels = marker_df["Type"].unique()
-        handles = [plt.Rectangle((0, 0), 1, 1, color=colors[l]) for l in labels]
-        if not filters:
-            plt.legend(handles, labels, title="Allele Type")
-        else:
-            for i, row in marker_df.iterrows():
-                marker_df.loc[i, "Label"] = (
-                    str(int(marker_df.loc[i, "CE_Allele"]))
-                    if ".0" in str(marker_df.loc[i, "CE_Allele"])
-                    else str(marker_df.loc[i, "CE_Allele"])
-                )
-            ax.bar_label(p, labels=marker_df["Label"])
-        if sameyaxis:
-            ax.set_yticks(np.arange(0, max_yvalue, increase_value))
-        ax.set_xticks(
-            np.arange(
-                round(min(marker_df["CE_Allele"]) - 1), round(max(marker_df["CE_Allele"])) + 2, 1.0
+        if marker in strs or marker in ystrs:
+            n += 1
+            colors = {"Typed": "g", "Stutter": "b", "BelowAT": "r"}
+            marker_df = sample_df[sample_df["Locus"] == marker].sort_values(by="CE_Allele")
+            ax = fig.add_subplot(6, 5, n)
+            p = ax.bar(
+                marker_df["CE_Allele"],
+                marker_df["Reads"],
+                edgecolor="k",
+                color=[colors[i] for i in marker_df["Type"]],
             )
-        )
-        ax.title.set_text(marker)
+            if at:
+                at = get_at(marker_df, marker)
+                ax.axhline(at, linestyle="--", color="k")
+                ax.text(round(min(marker_df["CE_Allele"])) - 0.9, at + (at * 0.1), f"AT", size=12)
+            labels = marker_df["Type"].unique()
+            handles = [plt.Rectangle((0, 0), 1, 1, color=colors[l]) for l in labels]
+            if not filters:
+                plt.legend(handles, labels, title="Allele Type")
+            else:
+                for i, row in marker_df.iterrows():
+                    marker_df.loc[i, "Label"] = (
+                        str(int(marker_df.loc[i, "CE_Allele"]))
+                        if ".0" in str(marker_df.loc[i, "CE_Allele"])
+                        else str(marker_df.loc[i, "CE_Allele"])
+                    )
+                ax.bar_label(p, labels=marker_df["Label"])
+            if sameyaxis:
+                ax.set_yticks(np.arange(0, max_yvalue, increase_value))
+            ax.set_xticks(
+                np.arange(
+                    round(min(marker_df["CE_Allele"]) - 1),
+                    round(max(marker_df["CE_Allele"])) + 2,
+                    1.0,
+                )
+            )
+            ax.title.set_text(marker)
     if sameyaxis:
         title = "Marker Plots for All Alleles With Same Y-Axis Scale"
     elif filters:
@@ -412,6 +444,55 @@ def get_at(df, locus):
     return at
 
 
+def process_input(
+    input_name,
+    outpath,
+    profile_type,
+    data_type,
+    output_type,
+    strand="forward",
+    nofiltering=False,
+    separate=False,
+    custom=False,
+    sex=False,
+    info=True,
+):
+    full_df = pd.read_csv(f"{input_name}.txt", sep="\t")
+    if custom:
+        seq_col = "Custom_Range_Sequence"
+        brack_col = "Custom_Bracketed_Notation"
+    else:
+        seq_col = "UAS_Output_Sequence" if strand == "uas" else "Forward_Strand_Sequence"
+        brack_col = (
+            "UAS_Output_Bracketed_Notation"
+            if strand == "uas"
+            else "Forward_Strand_Bracketed_Notation"
+        )
+    if nofiltering:
+        full_df["allele_type"] = "real_allele"
+        marker_plots(full_df, input_name, sex)
+        if output_type == "efm" or output_type == "mpsproto":
+            EFM_output(full_df, outpath, profile_type, data_type, brack_col, sex, separate)
+        else:
+            STRmix_output(full_df, outpath, profile_type, data_type, seq_col)
+    else:
+        dict_loc = {k: v for k, v in full_df.groupby(["SampleID", "Locus"])}
+        final_df, flags_df = process_strs(dict_loc, data_type, seq_col, brack_col)
+        if final_df is not None:
+            marker_plots(final_df, input_name, sex)
+            if output_type == "efm" or output_type == "mpsproto":
+                EFM_output(final_df, outpath, profile_type, data_type, brack_col, sex, separate)
+            else:
+                STRmix_output(final_df, outpath, profile_type, data_type, seq_col)
+            if info:
+                name = os.path.basename(outpath)
+                final_df.to_csv(f"{outpath}/{input_name}_sequence_info.csv", index=False)
+                if not flags_df.empty:
+                    flags_df.to_csv(f"{outpath}/{input_name}_Flagged_Loci.csv", index=False)
+        else:
+            print(f"{input_name} does not have any sequences! Continuing on.")
+
+
 def main(
     input,
     output_type,
@@ -423,6 +504,7 @@ def main(
     nofilters,
     strand,
     custom,
+    sex,
 ):
     input = str(input)
     if profile_type not in ("evidence", "reference"):
@@ -431,41 +513,39 @@ def main(
         raise ValueError(f"unknown data type '{data_type}'")
     if output_type not in ("efm", "strmix", "mpsproto"):
         raise ValueError(f"unknown output type '{output_type}'")
-    full_df = pd.read_csv(input, sep="\t")
     if output_dir is None:
         raise ValueError("No output specified using --out.")
-    else:
-        outpath = output_dir
-    if custom:
-        seq_col = "Custom_Range_Sequence"
-        brack_col = "Custom_Bracketed_Notation"
-    else:
-        seq_col = "UAS_Output_Sequence" if strand == "uas" else "Forward_Strand_Sequence"
-        brack_col = (
-            "UAS_Output_Bracketed_Notation"
-            if strand == "uas"
-            else "Forward_Strand_Bracketed_Notation"
+    if sex:
+        outpath_sex = f"{output_dir}/ystrs/"
+        input_name_sex = f"{os.path.splitext(input)[0]}_sexloci"
+        process_input(
+            input_name_sex,
+            outpath_sex,
+            profile_type,
+            data_type,
+            output_type,
+            strand=strand,
+            nofiltering=nofilters,
+            separate=separate,
+            custom=custom,
+            sex=sex,
+            info=info,
         )
-    if nofilters:
-        full_df["allele_type"] = "real_allele"
-        marker_plots(full_df, outpath)
-        if output_type == "efm" or output_type == "mpsproto":
-            EFM_output(full_df, outpath, profile_type, data_type, brack_col, separate)
-        else:
-            STRmix_output(full_df, outpath, profile_type, data_type, seq_col)
-    else:
-        dict_loc = {k: v for k, v in full_df.groupby(["SampleID", "Locus"])}
-        final_df, flags_df = process_strs(dict_loc, data_type, seq_col, brack_col)
-        marker_plots(final_df, outpath)
-        if output_type == "efm" or output_type == "mpsproto":
-            EFM_output(final_df, outpath, profile_type, data_type, brack_col, separate)
-        else:
-            STRmix_output(final_df, outpath, profile_type, data_type, seq_col)
-        if info:
-            name = os.path.basename(outpath)
-            final_df.to_csv(f"{outpath}/{name}_sequence_info.csv", index=False)
-            if not flags_df.empty:
-                flags_df.to_csv(f"{outpath}/{name}_Flagged_Loci.csv", index=False)
+    input_name = os.path.splitext(input)[0]
+    outpath = output_dir
+    process_input(
+        input_name,
+        outpath,
+        profile_type,
+        data_type,
+        output_type,
+        strand=strand,
+        nofiltering=nofilters,
+        separate=separate,
+        custom=custom,
+        sex=sex,
+        info=info,
+    )
 
 
 if __name__ == "__main__":
@@ -480,4 +560,5 @@ if __name__ == "__main__":
         nofilters=snakemake.params.filters,
         strand=snakemake.params.strand,
         custom=snakemake.params.custom,
+        sex=snakemake.params.sex,
     )

@@ -229,7 +229,7 @@ def test_STRmixoutput_customranges(tmp_path):
     exp_out = data_file("NGS_stutter_test/custom/Sample1_evidence_ngs.csv")
     exp_info_out = data_file("NGS_stutter_test/custom/test_stutter_sequence_info.csv")
     obs_out = str(tmp_path / f"WD/test_stutter/Sample1_evidence_ngs.csv")
-    obs_info_out = str(tmp_path / f"WD/test_stutter/test_stutter_sequence_info.csv")
+    obs_info_out = str(tmp_path / f"WD/test_stutter/test_stutter_custom_range_sequence_info.csv")
     arglist = [
         "config",
         "-w",
@@ -441,3 +441,33 @@ def test_lusplus_sequence_info(tmp_path):
     all_arglist = ["strs", "all", "-w", str_path]
     lusSTR.cli.main(lusSTR.cli.get_parser().parse_args(all_arglist))
     assert filecmp.cmp(exp_out, obs_out) is True
+
+
+def test_filtering_ystrs(tmp_path):
+    str_path = str(tmp_path / "WD")
+    inputfile = data_file("powerseq_flanking_convert_test.csv")
+    inputfile_sex = data_file("powerseq_flanking_convert_test_sexloci.csv")
+    exp_out = data_file("powerseq_example_evidence_ngs.csv")
+    exp_info_out = data_file("powerseq_example_sexloci_sequence_info.csv")
+    obs_out = str(tmp_path / f"WD/lusstr_output/ystrs/powerseq_example_evidence_ngs.csv")
+    obs_info_out = str(
+        tmp_path / f"WD/lusstr_output/ystrs/lusstr_output_sexloci_sequence_info.csv"
+    )
+    arglist = [
+        "config",
+        "-w",
+        str_path,
+        "--input",
+        str(inputfile),
+        "--sex",
+        "--analysis-software",
+        "straitrazor",
+        "--powerseq",
+    ]
+    lusSTR.cli.main(lusSTR.cli.get_parser().parse_args(arglist))
+    shutil.copyfile(inputfile, os.path.join(str_path, "lusstr_output.csv"))
+    shutil.copyfile(inputfile_sex, os.path.join(str_path, "lusstr_output_sexloci.csv"))
+    all_arglist = ["strs", "all", "-w", str_path]
+    lusSTR.cli.main(lusSTR.cli.get_parser().parse_args(all_arglist))
+    assert filecmp.cmp(exp_out, obs_out) is True
+    assert filecmp.cmp(exp_info_out, obs_info_out) is True
