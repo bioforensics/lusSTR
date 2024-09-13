@@ -19,11 +19,13 @@ from lusSTR.scripts.filter_settings import filters, flags
 import math
 from matplotlib.backends.backend_pdf import PdfPages
 import matplotlib.pyplot as plt
+import mpld3
 import numpy as np
 import os
 import pandas as pd
 from pathlib import Path
 import re
+import streamlit.components.v1 as components
 import sys
 
 
@@ -425,6 +427,8 @@ def make_plot(df, sample_id, sameyaxis=False, filters=False, at=True):
     else:
         title = "Marker Plots for All Alleles With Custom Y-Axis Scale"
     plt.text(0.4, 0.95, title, transform=fig.transFigure, size=24)
+    fig_html = mpld3.fig_to_html(fig)
+    components.html(fig_html, height=600)
 
 
 def get_at(df, locus):

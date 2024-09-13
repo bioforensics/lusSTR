@@ -101,83 +101,102 @@ def edit_str_config(config, args):
 def subparser(subparsers):
     p = subparsers.add_parser("config", description="Create config file for running STR pipeline")
     p.add_argument(
-        "-w", "--workdir", metavar="W", default=".",
-        help="directory to add config file; default is current working directory")
+        "-w",
+        "--workdir",
+        metavar="W",
+        default=".",
+        help="directory to add config file; default is current working directory",
+    )
     p.add_argument(
-        "-a", "--analysis-software", choices=["uas", "straitrazor", "genemarker"], default="uas",
-        dest="asoftware", help="Analysis software program used prior to lusSTR. Choices are uas, "
-        "straitrazor or genemarker. Default is uas."
+        "-a",
+        "--analysis-software",
+        choices=["uas", "straitrazor", "genemarker"],
+        default="uas",
+        dest="asoftware",
+        help="Analysis software program used prior to lusSTR. Choices are uas, "
+        "straitrazor or genemarker. Default is uas.",
     )
     p.add_argument("--input", help="Input file or directory")
     p.add_argument("--out", "-o", help="Output file/directory name")
     p.add_argument(
-        "--powerseq", action="store_true",
-        help="Use to indicate sequences were created using the PowerSeq Kit."
+        "--powerseq",
+        action="store_true",
+        help="Use to indicate sequences were created using the PowerSeq Kit.",
     )
     p.add_argument(
-        "--sex", action="store_true",
+        "--sex",
+        action="store_true",
         help="Use if including the X and Y STR markers. Separate reports for these markers "
         "will be created.",
     )
     p.add_argument(
-        "--nocombine", action="store_true",
+        "--nocombine",
+        action="store_true",
         help="Do not combine read counts for duplicate sequences within the UAS region "
         "during the 'convert' step. By default, read counts are combined for sequences "
         "not run through the UAS.",
     )
     p.add_argument(
-        "--reference", action="store_true", 
-        help="Use for creating Reference profiles for STR workflow"
+        "--reference",
+        action="store_true",
+        help="Use for creating Reference profiles for STR workflow",
     )
     p.add_argument(
-        "--software", choices=["efm", "mpsproto", "strmix"], default="strmix",
+        "--software",
+        choices=["efm", "mpsproto", "strmix"],
+        default="strmix",
         help="Specify the probabilistic genotyping software package of choice. The final output"
-        " files will be in the correct format for direct use. Default is strmix."
+        " files will be in the correct format for direct use. Default is strmix.",
     )
     p.add_argument(
-        "--str-type", choices=["ce", "ngs", "lusplus"], default="ngs",
-        dest="datatype", help="Data type for STRs. Options are: CE allele ('ce'), sequence "
+        "--str-type",
+        choices=["ce", "ngs", "lusplus"],
+        default="ngs",
+        dest="datatype",
+        help="Data type for STRs. Options are: CE allele ('ce'), sequence "
         "or bracketed sequence form('ngs'), or LUS+ allele ('lusplus'). Default is 'ngs'.",
     )
     p.add_argument(
-        "--noinfo", action="store_true", 
-        help="Use to not create the Sequence Information File in the 'filter' step"
+        "--noinfo",
+        action="store_true",
+        help="Use to not create the Sequence Information File in the 'filter' step",
     )
     p.add_argument(
-        "--separate", action="store_true", 
+        "--separate",
+        action="store_true",
         help="Use to separate EFM profiles in the 'filter' step. If specifying for SNPs, "
-        "each sample will also be separated into 10 different bins for mixture deconvolution."
+        "each sample will also be separated into 10 different bins for mixture deconvolution.",
     )
     p.add_argument(
-        "--nofiltering", action="store_true", 
+        "--nofiltering",
+        action="store_true",
         help="For STRs, use to perform no filtering during the 'filter' step. For SNPs, "
-        "only alleles specified as 'Typed' by the UAS will be included at the 'format' step."
+        "only alleles specified as 'Typed' by the UAS will be included at the 'format' step.",
     )
     p.add_argument(
-        "--snps", action="store_true",
-        help="Use to create a config file for the SNP workflow"
+        "--snps", action="store_true", help="Use to create a config file for the SNP workflow"
     )
     p.add_argument(
-        "--snp-type", default="all", dest="snptype",
+        "--snp-type",
+        default="all",
+        dest="snptype",
         help="Specify the type of SNPs to include in the final report. 'p' will include only the "
         "Phenotype SNPs; 'a' will include only the Ancestry SNPs; 'i' will include only the "
         "Identity SNPs; and 'all' will include all SNPs. More than one type can be specified (e.g. "
-        " 'p, a'). Default is all."
+        " 'p, a'). Default is all.",
     )
     p.add_argument(
-        "--kintelligence", action="store_true",
-        help="Use if processing Kintelligence SNPs within a Kintellience Report(s)"
+        "--kintelligence",
+        action="store_true",
+        help="Use if processing Kintelligence SNPs within a Kintellience Report(s)",
     )
     p.add_argument(
-        "--snp-reference", dest="ref",
-        help="Specify any references for SNP data for use in EFM."
+        "--snp-reference", dest="ref", help="Specify any references for SNP data for use in EFM."
     )
     p.add_argument(
-        "--strand", choices=["uas", "forward"],
+        "--strand",
+        choices=["uas", "forward"],
         help="Specify the strand orientation for the final output files. UAS orientation is "
-        "default for STRs; forward strand is default for SNPs."
+        "default for STRs; forward strand is default for SNPs.",
     )
-    p.add_argument(
-        "--custom", action="store_true",
-        help="Specifying custom sequence ranges."
-    )
+    p.add_argument("--custom", action="store_true", help="Specifying custom sequence ranges.")
