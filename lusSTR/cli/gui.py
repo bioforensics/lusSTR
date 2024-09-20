@@ -15,6 +15,10 @@
 
 import json
 import importlib.resources
+from lusSTR.wrappers.filter import get_at
+import matplotlib.pyplot as plt
+import pandas as pd
+import plotly.express as px
 import streamlit as st
 from streamlit_option_menu import option_menu
 import yaml
@@ -26,6 +30,15 @@ import re
 #################################################################
 #                        Functions                              #
 #################################################################
+
+
+def get_filter_metadata_file():
+    return importlib.resources.files("lusSTR") / "data/filters.json"
+
+
+with open(get_filter_metadata_file(), "r") as fh:
+    filter_marker_data = json.load(fh)
+
 
 # ------------ Function to Generate config.yaml File ---------- #
 
@@ -162,6 +175,43 @@ def show_home_page():
     )
 
     st.info("Please Select One of the Tabs Above to Get Started on Processing Your Data!")
+
+
+def df_on_change(locus):
+    state = st.session_state[f"{locus}_edited"]
+    for index, updates in state["edited_rows"].items():
+        st.session_state[locus].loc[st.session_state[locus].index == index, "edited"] = True
+        for key, value in updates.items():
+            st.session_state[locus].loc[st.session_state[locus].index == index, key] = value
+
+
+def interactive_plots(df, locus):
+    at = get_at(df, locus)
+    plot = px.bar(df, x="CE_Allele", y="Reads", color="allele_type", title=locus)
+    plot.add_hline(y=at, line_width=3, line_dash="dash", line_color="green")
+    st.plotly_chart(plot)
+
+    
+def interactive_setup(df1, wd, output):
+    num_loci = len(df1["Locus"].unique())
+    combined_df = pd.DataFrame()
+    locus = st.selectbox("Select Marker:", options=df1["Locus"].unique())
+    #for str in df1["Locus"].unique():
+    if locus not in st.session_state:
+        st.session_state[locus] = df1[df1["Locus"]==locus]
+    Type = ["real_allele", "-1_stutter", "-2_stutter", "BelowAT", "-1_stutter/+1_stutter", "+1_stutter"]
+    interactive_plots(st.session_state[locus], locus)
+    st.data_editor(
+        data=st.session_state[locus], disabled=(
+            "SampleID", "Locus", "UAS_Output_Sequence", "CE_Allele",
+            "UAS_Output_Bracketed_Notation", "Reads",
+            "parent_allele1", "parent_allele2", "allele1_ref_reads",
+            "allele2_ref_reads", "perc_noise", "perc_stutter"
+        ), column_config = {'allele_type' : st.column_config.SelectboxColumn('allele_type', options=Type)}, key=f"{locus}_edited", on_change = df_on_change, args=(locus, )
+    )
+    combined_df = pd.concat([combined_df, st.session_state[locus]])
+    combined_df.to_csv(f"{wd}/{output}/{output}_sequence_info_edited.csv", index=False)
+    
 
 
 #####################################################################
@@ -410,6 +460,13 @@ def show_STR_page():
             st.warning(
                 "Please make sure to fill out all required fields (Analysis Software, Input Directory or File, Prefix for Output, and Specification of Working Directory) before submitting."
             )
+    #if st.button("See Interactive Plots"):
+    interactive = True
+    try:
+        sequence_info = pd.read_csv(f"{wd_dirname}/{output}/{output}_sequence_info.csv")
+        interactive_setup(sequence_info, wd_dirname, output)
+    except FileNotFoundError:
+        print("Waiting for lusSTR to complete before loading plots")
 
 
 #####################################################################
