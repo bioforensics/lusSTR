@@ -13,11 +13,13 @@
 #              Importing Necessary Packages                     #
 #################################################################
 
+from datetime import datetime
 import json
 import importlib.resources
-from lusSTR.wrappers.filter import get_at
+from lusSTR.wrappers.filter import get_at, EFM_output, STRmix_output
 import numpy as np
 import pandas as pd
+from pathlib import Path
 import plotly.express as px
 import streamlit as st
 from streamlit_option_menu import option_menu
@@ -210,34 +212,65 @@ def interactive_plots(df, locus):
                 tickvals = np.arange(min_x, max_x, 1)))
     st.plotly_chart(plot)
 
-    
-def interactive_setup(df1, wd, output):
-    num_loci = len(df1["Locus"].unique())
-    combined_df = pd.DataFrame()
-    sample = st.selectbox("Select Marker:", options=df1["SampleID"].unique())
-    sample_df = df1[df1["SampleID"]==sample].reset_index(drop=True)
-    for locus in sample_df["Locus"].unique():
-        locus_key = f"{sample}_{locus}"
-        if locus_key not in st.session_state:
-            st.session_state[locus_key] = sample_df[sample_df["Locus"]==locus].reset_index(drop=True)
-        Type = ["real_allele", "-1_stutter", "-2_stutter", "BelowAT", "-1_stutter/+1_stutter", "+1_stutter"]
-        interactive_plots(st.session_state[locus_key], locus)
-        st.data_editor(
-            data=st.session_state[locus_key], disabled=(
-                "SampleID", "Locus", "UAS_Output_Sequence", "CE_Allele",
-                "UAS_Output_Bracketed_Notation", "Reads",
-                "parent_allele1", "parent_allele2", "allele1_ref_reads",
-                "allele2_ref_reads", "perc_noise", "perc_stutter"
-            ), column_config = {'allele_type' : st.column_config.SelectboxColumn('allele_type', options=Type)}, hide_index=True, key=f"{locus_key}_edited", on_change = df_on_change, args=(locus_key, )
+
+def remake_final_files(full_df, outpath):
+    if st.session_state.custom_ranges:
+        seq_col = "Custom_Range_Sequence"
+        brack_col = "Custom_Bracketed_Notation"
+    else:
+        seq_col = "UAS_Output_Sequence" if st.session_state.strand == "uas" else "Forward_Strand_Sequence"
+        brack_col = (
+            "UAS_Output_Bracketed_Notation"
+            if st.session_state.strand == "uas"
+            else "Forward_Strand_Bracketed_Notation"
         )
+    if  st.session_state.nofilters:
+        full_df["allele_type"] = "real_allele"
+    if st.session_state.output_type == "efm" or st.session_state.output_type == "mpsproto":
+        EFM_output(full_df, outpath, st.session_state.profile_type, st.session_state.data_type, brack_col, st.session_state.sex, st.session_state.separate)
+    else:
+        STRmix_output(full_df, outpath, st.session_state.profile_type, st.session_state.data_type, seq_col)
+
+    
+def interactive_setup(df1):
+    col1, col2, col3, col4, col5 = st.columns(5)
+    num_loci = len(df1["Locus"].unique())
+    sample = col1.selectbox("Select Sample:", options=df1["SampleID"].unique())
+    sample_df = df1[df1["SampleID"]==sample].reset_index(drop=True)
+    locus = col2.selectbox("Select Marker:", options=df1["Locus"].unique())
+    locus_key = f"{sample}_{locus}"
+    if locus_key not in st.session_state:
+        st.session_state[locus_key] = sample_df[sample_df["Locus"]==locus].reset_index(drop=True)
+    Type = ["real_allele", "-1_stutter", "-2_stutter", "BelowAT", "-1_stutter/+1_stutter", "+1_stutter"]
+    interactive_plots(st.session_state[locus_key], locus)
+    st.data_editor(
+        data=st.session_state[locus_key], disabled=(
+            "SampleID", "Locus", "UAS_Output_Sequence", "CE_Allele",
+            "UAS_Output_Bracketed_Notation", "Reads",
+            "parent_allele1", "parent_allele2", "allele1_ref_reads",
+            "allele2_ref_reads", "perc_noise", "perc_stutter"
+        ), column_config = {'allele_type' : st.column_config.SelectboxColumn('allele_type', options=Type)}, hide_index=True, key=f"{locus_key}_edited", on_change = df_on_change, args=(locus_key, )
+    )
         
     if st.button("Save Edits"):
+        combined_df = pd.DataFrame()
         for sample in df1["SampleID"].unique():
             sample_df = df1[df1["SampleID"]==sample].reset_index(drop=True)
             for locus in sample_df["Locus"].unique():
                 locus_key = f"{sample}_{locus}"
-                combined_df = pd.concat([combined_df, st.session_state[locus_key]])
-        combined_df.to_csv(f"{wd}/{output}/{output}_sequence_info_edited.csv", index=False)
+                try:
+                    combined_df = pd.concat([combined_df, st.session_state[locus_key]])
+                except KeyError:
+                    combined_df = pd.concat([combined_df, sample_df[sample_df["Locus"]==locus].reset_index(drop=True)])
+        now = datetime.now()
+        dt = now.strftime("%m%d%Y_%H_%M_%S")
+        del combined_df["Label"]
+        Path(f"{st.session_state.wd_dirname}/{st.session_state.output}/edited_{dt}").mkdir(parents=True, exist_ok=True)
+        outpath = f"{st.session_state.wd_dirname}/{st.session_state.output}/edited_{dt}/"
+        combined_df.to_csv(f"{st.session_state.wd_dirname}/{st.session_state.output}/edited_{dt}/{st.session_state.output}_sequence_info_edited_{dt}.csv", index=False)
+        st.write(f"Changes saved to {st.session_state.wd_dirname}/{st.session_state.output}/edited_{dt}/{st.session_state.output}_sequence_info_edited_{dt}.csv")
+        remake_final_files(combined_df, outpath)
+        st.write(f"New {st.session_state.output_type} files created in {st.session_state.wd_dirname}/{st.session_state.output}/edited_{dt}/ folder")
     
 
 
@@ -275,13 +308,13 @@ def show_STR_page():
     # Logic for Path Picker based on user's input option
 
     if input_option == "Folder with Multiple Files":
-        clicked = st.button("Please Select a Folder")
+        clicked = st.button("Select a Folder")
         if clicked:
             dirname = folder_picker_dialog()
             st.session_state.samp_input = dirname
 
     else:
-        clicked_file = st.button("Please Select a File")
+        clicked_file = st.button("Select a File")
         if clicked_file:
             filename = file_picker_dialog()
             st.session_state.samp_input = filename
@@ -292,111 +325,6 @@ def show_STR_page():
 
     # Store the Selected Path to Reference in Config
     samp_input = st.session_state.samp_input
-
-    #####################################################################
-    #      STR: General Software Settings to Generate Config File       #
-    #####################################################################
-
-    st.subheader("General Settings")
-
-    col1, col2, col3, col4, col5 = st.columns(5)
-
-    analysis_software = {
-        "UAS": "uas",
-        "STRait Razor v3": "straitrazor",
-        "GeneMarker HTS": "genemarker",
-    }[
-        col1.selectbox(
-            "Analysis Software",
-            options=["UAS", "STRait Razor v3", "GeneMarker HTS"],
-            help="Indicate the analysis software used prior to lusSTR.",
-        )
-    ]
-
-    custom_ranges = st.checkbox(
-        "Use Custom Sequence Ranges",
-        help="Check the box to use the specified custom sequence ranges as defined in the str_markers.json file.",
-    )
-
-    sex = st.checkbox(
-        "Include X- and Y-STRs",
-        help="Check the box to include X- and Y-STRs, otherwise leave unchecked.",
-    )
-
-    kit = {"ForenSeq Signature Prep": "forenseq", "PowerSeq 46GY": "powerseq"}[
-        col2.selectbox(
-            "Library Preparation Kit",
-            options=["ForenSeq Signature Prep", "PowerSeq 46GY"],
-            help="Specify the library preparation kit used to generate the sequences.",
-        )
-    ]
-
-    output = col3.text_input(
-        "Output File Name",
-        "lusstr_output",
-        help="Please specify a name for the created files. It can only contain alphanumeric characters, underscores and hyphens. No spaces allowed.",
-    )
-
-    nocombine = st.checkbox(
-        "Do Not Combine Identical Sequences",
-        help="If using STRait Razor data, by default, identical sequences (after removing flanking sequences) are combined and reads are summed. Checking this will not combine identical sequences.",
-    )
-
-    #####################################################################
-    #     STR: Filter Settings to Generate Config File                  #
-    #####################################################################
-
-    st.subheader("Filter Settings")
-
-    col1, col2, col3, col4, col5 = st.columns(5)
-
-    output_type = {"STRmix": "strmix", "EuroForMix": "efm", "MPSproto": "mpsproto"}[
-        col1.selectbox(
-            "Probabilistic Genotyping Software",
-            options=["STRmix", "EuroForMix", "MPSproto"],
-            help="Select which probabilistic genotyping software files to create",
-        )
-    ]
-
-    profile_type = {"Evidence": "evidence", "Reference": "reference"}[
-        col2.selectbox(
-            "Profile Type",
-            options=["Evidence", "Reference"],
-            help="Select the file type (format) to create for the probabilistic genotyping software.",
-        )
-    ]
-
-    data_type = {"Sequence": "ngs", "CE allele": "ce", "LUS+ allele": "lusplus"}[
-        col3.selectbox(
-            "Data Type",
-            options=["Sequence", "CE allele", "LUS+ allele"],
-            help="Select the allele type used to determine sequence type (belowAT, stutter or typed) and used in the final output file.",
-        )
-    ]
-
-    info = st.checkbox(
-        "Create Allele Information File",
-        value=True,
-        help="Create file containing information about each sequence, including sequence type (belowAT, stutter or typed), stuttering sequence information and metrics involving stutter and noise.",
-    )
-
-    separate = st.checkbox(
-        "Create Separate Files for Samples",
-        help="If checked, will create individual files for samples; If unchecked, will create one file with all samples.",
-    )
-
-    nofilters = st.checkbox(
-        "Skip All Filtering Steps",
-        help="Filtering will not be performed but will still create EFM/MPSproto/STRmix output files containing all sequences.",
-    )
-
-    strand = {"UAS Orientation": "uas", "Forward Strand": "forward"}[
-        col4.selectbox(
-            "Strand Orientation",
-            options=["Forward Strand", "UAS Orientation"],
-            help="Indicates the strand orientation in which to report the sequence in the final output table as some markers are reported in the UAS on the reverse strand. Selecting the UAS Orientation will report those markers on the reverse strand while the remaining will be reported on the forward strand. Selecting the Forward Strand will report all markers on the forward strand orientation. This applies to STRmix NGS only.",
-        )
-    ]
 
     #####################################################################
     #     STR: Specify Working Directory                                #
@@ -410,7 +338,7 @@ def show_STR_page():
     if "wd_dirname" not in st.session_state:
         st.session_state.wd_dirname = None
 
-    clicked_wd = col1.button("Please Select An Output Folder")
+    clicked_wd = col1.button("Select An Output Folder")
     if clicked_wd:
         wd = folder_picker_dialog()
         st.session_state.wd_dirname = wd
@@ -423,17 +351,162 @@ def show_STR_page():
     wd_dirname = st.session_state.wd_dirname
 
     #####################################################################
+    #      STR: General Software Settings to Generate Config File       #
+    #####################################################################
+
+    st.subheader("General Settings")
+
+    col1, col2, col3, col4, col5 = st.columns(5)
+
+    if "analysis_software" not in st.session_state:
+        st.session_state.analysis_software = None
+
+    st.session_state.analysis_software = {
+        "UAS": "uas",
+        "STRait Razor v3": "straitrazor",
+        "GeneMarker HTS": "genemarker",
+    }[
+        col1.selectbox(
+            "Analysis Software",
+            options=["UAS", "STRait Razor v3", "GeneMarker HTS"],
+            help="Indicate the analysis software used prior to lusSTR.",
+        )
+    ]
+
+    if "custom_ranges" not in st.session_state:
+        st.session_state.custom_ranges = None
+    
+    st.session_state.custom_ranges = st.checkbox(
+        "Use Custom Sequence Ranges",
+        help="Check the box to use the specified custom sequence ranges as defined in the str_markers.json file.",
+    )
+
+    if "sex" not in st.session_state:
+        st.session_state.sex = None
+
+    st.session_state.sex = st.checkbox(
+        "Include X- and Y-STRs",
+        help="Check the box to include X- and Y-STRs, otherwise leave unchecked.",
+    )
+
+    if "kit" not in st.session_state:
+        st.session_state.kit = None
+
+    st.session_state.kit = {"ForenSeq Signature Prep": "forenseq", "PowerSeq 46GY": "powerseq"}[
+        col2.selectbox(
+            "Library Preparation Kit",
+            options=["ForenSeq Signature Prep", "PowerSeq 46GY"],
+            help="Specify the library preparation kit used to generate the sequences.",
+        )
+    ]
+
+    if "output" not in st.session_state:
+        st.session_state.output = None
+
+    st.session_state.output = col3.text_input(
+        "Output File Name",
+        "lusstr_output",
+        help="Please specify a name for the created files. It can only contain alphanumeric characters, underscores and hyphens. No spaces allowed.",
+    )
+
+    if "nocombine" not in st.session_state:
+        st.session_state.nocombine = None
+    
+    st.session_state.nocombine = st.checkbox(
+        "Do Not Combine Identical Sequences",
+        help="If using STRait Razor data, by default, identical sequences (after removing flanking sequences) are combined and reads are summed. Checking this will not combine identical sequences.",
+    )
+
+    #####################################################################
+    #     STR: Filter Settings to Generate Config File                  #
+    #####################################################################
+
+    st.subheader("Filter Settings")
+
+    col1, col2, col3, col4, col5 = st.columns(5)
+
+    if "output_type" not in st.session_state:
+        st.session_state.output_type = None
+    
+    st.session_state.output_type = {"STRmix": "strmix", "EuroForMix": "efm", "MPSproto": "mpsproto"}[
+        col1.selectbox(
+            "Probabilistic Genotyping Software",
+            options=["STRmix", "EuroForMix", "MPSproto"],
+            help="Select which probabilistic genotyping software files to create",
+        )
+    ]
+
+    if "profile_type" not in st.session_state:
+        st.session_state.profile_type = None
+
+    st.session_state.profile_type = {"Evidence": "evidence", "Reference": "reference"}[
+        col2.selectbox(
+            "Profile Type",
+            options=["Evidence", "Reference"],
+            help="Select the file type (format) to create for the probabilistic genotyping software.",
+        )
+    ]
+
+    if "data_type" not in st.session_state:
+        st.session_state.data_type = None
+    
+    st.session_state.data_type = {"Sequence": "ngs", "CE allele": "ce", "LUS+ allele": "lusplus"}[
+        col3.selectbox(
+            "Data Type",
+            options=["Sequence", "CE allele", "LUS+ allele"],
+            help="Select the allele type used to determine sequence type (belowAT, stutter or typed) and used in the final output file.",
+        )
+    ]
+
+    if "info" not in st.session_state:
+        st.session_state.info = None
+
+    st.session_state.info = st.checkbox(
+        "Create Allele Information File",
+        value=True,
+        help="Create file containing information about each sequence, including sequence type (belowAT, stutter or typed), stuttering sequence information and metrics involving stutter and noise.",
+    )
+
+    if "separate" not in st.session_state:
+        st.session_state.separate = None
+
+    st.session_state.separate = st.checkbox(
+        "Create Separate Files for Samples",
+        help="If checked, will create individual files for samples; If unchecked, will create one file with all samples.",
+    )
+
+    if "nofilters" not in st.session_state:
+        st.session_state.nofilters = None
+
+    st.session_state.nofilters = st.checkbox(
+        "Skip All Filtering Steps",
+        help="Filtering will not be performed but will still create EFM/MPSproto/STRmix output files containing all sequences.",
+    )
+
+    if "strand" not in st.session_state:
+        st.session_state.strand = None
+    
+    st.session_state.strand = {"UAS Orientation": "uas", "Forward Strand": "forward"}[
+        col4.selectbox(
+            "Strand Orientation",
+            options=["Forward Strand", "UAS Orientation"],
+            help="Indicates the strand orientation in which to report the sequence in the final output table as some markers are reported in the UAS on the reverse strand. Selecting the UAS Orientation will report those markers on the reverse strand while the remaining will be reported on the forward strand. Selecting the Forward Strand will report all markers on the forward strand orientation. This applies to STRmix NGS only.",
+        )
+    ]
+
+
+    #####################################################################
     #     STR: Generate Config File Based on Settings                   #
     #####################################################################
 
     # Submit Button Instance
-    if st.button("Submit"):
+    if st.button("Run lusSTR"):
 
         # Check if all required fields are filled
-        if analysis_software and samp_input and output and wd_dirname:
+        if st.session_state.analysis_software and st.session_state.samp_input and st.session_state.output and st.session_state.wd_dirname:
 
             # Validate output prefix
-            if not validate_prefix(output):
+            if not validate_prefix(st.session_state.output):
                 st.warning(
                     "Please enter a valid output prefix. Only alphanumeric characters, underscore, and hyphen are allowed."
                 )
@@ -445,31 +518,31 @@ def show_STR_page():
                 # Construct config data
 
                 config_data = {
-                    "analysis_software": analysis_software,
-                    "custom_ranges": custom_ranges,
-                    "sex": sex,
-                    "samp_input": samp_input,
-                    "output": output,
-                    "kit": kit,
-                    "nocombine": nocombine,
-                    "output_type": output_type,
-                    "profile_type": profile_type,
-                    "data_type": data_type,
-                    "info": info,
-                    "separate": separate,
-                    "nofilters": nofilters,
-                    "strand": strand,
+                    "analysis_software": st.session_state.analysis_software,
+                    "custom_ranges": st.session_state.custom_ranges,
+                    "sex": st.session_state.sex,
+                    "samp_input": st.session_state.samp_input,
+                    "output": st.session_state.output,
+                    "kit": st.session_state.kit,
+                    "nocombine": st.session_state.nocombine,
+                    "output_type": st.session_state.output_type,
+                    "profile_type": st.session_state.profile_type,
+                    "data_type": st.session_state.data_type,
+                    "info": st.session_state.info,
+                    "separate": st.session_state.separate,
+                    "nofilters": st.session_state.nofilters,
+                    "strand": st.session_state.strand,
                 }
 
                 # Generate YAML config file
-                generate_config_file(config_data, wd_dirname, "STR")
+                generate_config_file(config_data, st.session_state.wd_dirname, "STR")
 
                 # Subprocess lusSTR commands
                 command = ["lusstr", "strs", "all"]
 
                 # Specify WD to lusSTR
                 if wd_dirname:
-                    command.extend(["-w", wd_dirname + "/"])
+                    command.extend(["-w", st.session_state.wd_dirname + "/"])
 
                 # Run lusSTR command in terminal
                 try:
@@ -487,13 +560,18 @@ def show_STR_page():
             st.warning(
                 "Please make sure to fill out all required fields (Analysis Software, Input Directory or File, Prefix for Output, and Specification of Working Directory) before submitting."
             )
-    #if st.button("See Interactive Plots"):
-    interactive = True
-    try:
-        sequence_info = pd.read_csv(f"{wd_dirname}/{output}/{output}_sequence_info.csv")
-        interactive_setup(sequence_info, wd_dirname, output)
-    except FileNotFoundError:
-        print("Waiting for lusSTR to complete before loading plots")
+    st.write("---")
+    st.write("After running lusSTR, or if lusSTR has been run previously, the user may view and edit the individual STR marker plots and data.")
+    st.write("If using previously run lusSTR data, only the folder containing the output must be selected using the above ```Output Folder Selection```.")
+    if "interactive" not in st.session_state:
+        st.session_state.interactive = None
+    if st.button("See Individual Marker Plots & Data") or st.session_state.interactive:
+        st.session_state.interactive = True
+        try:
+            sequence_info = pd.read_csv(f"{wd_dirname}/{st.session_state.output}/{st.session_state.output}_sequence_info.csv")
+            interactive_setup(sequence_info)
+        except FileNotFoundError:
+            print(f"{wd_dirname}/{st.session_state.output}/{st.session_state.output}_sequence_info.csv not found. Please check output folder specification.")
 
 
 #####################################################################
@@ -661,8 +739,6 @@ def show_SNP_page():
     if st.session_state.wd_dirname:
         st.text_input("Your Specified Output Folder:", st.session_state.wd_dirname)
 
-    # Store Selected Path to Reference in Config
-    wd_dirname = st.session_state.wd_dirname
 
     #####################################################################
     #     SNP: Generate Config File Based on Settings                   #
@@ -701,17 +777,17 @@ def show_SNP_page():
 
                 # If a reference file was specified, add to config
                 if reference:
-                    config_data["references"] = reference
+                    config_data["references"] = st.session_state.reference
 
                 # Generate YAML config file
-                generate_config_file(config_data, wd_dirname, "SNP")
+                generate_config_file(config_data, st.session_state.wd_dirname, "SNP")
 
                 # Subprocess lusSTR commands
                 command = ["lusstr", "snps", "all"]
 
                 # Specify WD to lusSTR
                 if wd_dirname:
-                    command.extend(["-w", wd_dirname + "/"])
+                    command.extend(["-w", st.session_state.wd_dirname + "/"])
 
                 # Run lusSTR command in terminal
                 try:
