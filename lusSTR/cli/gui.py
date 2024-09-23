@@ -16,7 +16,7 @@
 import json
 import importlib.resources
 from lusSTR.wrappers.filter import get_at
-import matplotlib.pyplot as plt
+import numpy as np
 import pandas as pd
 import plotly.express as px
 import streamlit as st
@@ -187,30 +187,57 @@ def df_on_change(locus):
 
 def interactive_plots(df, locus):
     at = get_at(df, locus)
-    plot = px.bar(df, x="CE_Allele", y="Reads", color="allele_type", title=locus)
-    plot.add_hline(y=at, line_width=3, line_dash="dash", line_color="green")
+    for i, row in df.iterrows():
+        if df.loc[i, "allele_type"] == "real_allele":
+            df.loc[i, "Label"] = "Typed"
+        elif df.loc[i, "allele_type"] == "BelowAT":
+            df.loc[i, "Label"] = "BelowAT"
+        else:
+            df.loc[i, "Label"] = "Stutter"
+    min_x = round(min(df["CE_Allele"]) - 1)
+    max_x = round(max(df["CE_Allele"]) + 1)
+    plot = px.bar(df, x="CE_Allele", y="Reads", color="Label", color_discrete_map={
+        "Typed": "green",
+        "BelowAT": "red",
+        "Stutter": "blue"
+    }, title=locus)
+    plot.add_hline(y=at, line_width=3, line_dash="dot", line_color="gray")
+    plot.add_annotation(
+        text=f"AT", x=min_x+0.1, y=at, showarrow=False, yshift=10)
+    plot.update_layout(xaxis = dict(
+                range = [min_x, max_x],
+                tickmode = 'array',
+                tickvals = np.arange(min_x, max_x, 1)))
     st.plotly_chart(plot)
 
     
 def interactive_setup(df1, wd, output):
     num_loci = len(df1["Locus"].unique())
     combined_df = pd.DataFrame()
-    #locus = st.selectbox("Select Marker:", options=df1["Locus"].unique())
-    for locus in df1["Locus"].unique():
-        if locus not in st.session_state:
-            st.session_state[locus] = df1[df1["Locus"]==locus].reset_index(drop=True)
+    sample = st.selectbox("Select Marker:", options=df1["SampleID"].unique())
+    sample_df = df1[df1["SampleID"]==sample].reset_index(drop=True)
+    for locus in sample_df["Locus"].unique():
+        locus_key = f"{sample}_{locus}"
+        if locus_key not in st.session_state:
+            st.session_state[locus_key] = sample_df[sample_df["Locus"]==locus].reset_index(drop=True)
         Type = ["real_allele", "-1_stutter", "-2_stutter", "BelowAT", "-1_stutter/+1_stutter", "+1_stutter"]
-        interactive_plots(st.session_state[locus], locus)
+        interactive_plots(st.session_state[locus_key], locus)
         st.data_editor(
-            data=st.session_state[locus], disabled=(
+            data=st.session_state[locus_key], disabled=(
                 "SampleID", "Locus", "UAS_Output_Sequence", "CE_Allele",
                 "UAS_Output_Bracketed_Notation", "Reads",
                 "parent_allele1", "parent_allele2", "allele1_ref_reads",
                 "allele2_ref_reads", "perc_noise", "perc_stutter"
-            ), column_config = {'allele_type' : st.column_config.SelectboxColumn('allele_type', options=Type)}, hide_index=True, key=f"{locus}_edited", on_change = df_on_change, args=(locus, )
+            ), column_config = {'allele_type' : st.column_config.SelectboxColumn('allele_type', options=Type)}, hide_index=True, key=f"{locus_key}_edited", on_change = df_on_change, args=(locus_key, )
         )
-        combined_df = pd.concat([combined_df, st.session_state[locus]])
-    combined_df.to_csv(f"{wd}/{output}/{output}_sequence_info_edited.csv", index=False)
+        
+    if st.button("Save Edits"):
+        for sample in df1["SampleID"].unique():
+            sample_df = df1[df1["SampleID"]==sample].reset_index(drop=True)
+            for locus in sample_df["Locus"].unique():
+                locus_key = f"{sample}_{locus}"
+                combined_df = pd.concat([combined_df, st.session_state[locus_key]])
+        combined_df.to_csv(f"{wd}/{output}/{output}_sequence_info_edited.csv", index=False)
     
 
 
