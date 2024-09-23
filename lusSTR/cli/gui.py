@@ -195,21 +195,21 @@ def interactive_plots(df, locus):
 def interactive_setup(df1, wd, output):
     num_loci = len(df1["Locus"].unique())
     combined_df = pd.DataFrame()
-    locus = st.selectbox("Select Marker:", options=df1["Locus"].unique())
-    #for str in df1["Locus"].unique():
-    if locus not in st.session_state:
-        st.session_state[locus] = df1[df1["Locus"]==locus]
-    Type = ["real_allele", "-1_stutter", "-2_stutter", "BelowAT", "-1_stutter/+1_stutter", "+1_stutter"]
-    interactive_plots(st.session_state[locus], locus)
-    st.data_editor(
-        data=st.session_state[locus], disabled=(
-            "SampleID", "Locus", "UAS_Output_Sequence", "CE_Allele",
-            "UAS_Output_Bracketed_Notation", "Reads",
-            "parent_allele1", "parent_allele2", "allele1_ref_reads",
-            "allele2_ref_reads", "perc_noise", "perc_stutter"
-        ), column_config = {'allele_type' : st.column_config.SelectboxColumn('allele_type', options=Type)}, key=f"{locus}_edited", on_change = df_on_change, args=(locus, )
-    )
-    combined_df = pd.concat([combined_df, st.session_state[locus]])
+    #locus = st.selectbox("Select Marker:", options=df1["Locus"].unique())
+    for locus in df1["Locus"].unique():
+        if locus not in st.session_state:
+            st.session_state[locus] = df1[df1["Locus"]==locus].reset_index(drop=True)
+        Type = ["real_allele", "-1_stutter", "-2_stutter", "BelowAT", "-1_stutter/+1_stutter", "+1_stutter"]
+        interactive_plots(st.session_state[locus], locus)
+        st.data_editor(
+            data=st.session_state[locus], disabled=(
+                "SampleID", "Locus", "UAS_Output_Sequence", "CE_Allele",
+                "UAS_Output_Bracketed_Notation", "Reads",
+                "parent_allele1", "parent_allele2", "allele1_ref_reads",
+                "allele2_ref_reads", "perc_noise", "perc_stutter"
+            ), column_config = {'allele_type' : st.column_config.SelectboxColumn('allele_type', options=Type)}, hide_index=True, key=f"{locus}_edited", on_change = df_on_change, args=(locus, )
+        )
+        combined_df = pd.concat([combined_df, st.session_state[locus]])
     combined_df.to_csv(f"{wd}/{output}/{output}_sequence_info_edited.csv", index=False)
     
 
