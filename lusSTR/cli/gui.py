@@ -701,9 +701,7 @@ def show_STR_page():
                 f"{st.session_state.output}_custom_range"
             )
         else:
-            file = (
-                f"{wd_dirname}/{st.session_state.output}/{st.session_state.output}"
-            )
+            file = f"{wd_dirname}/{st.session_state.output}/{st.session_state.output}"
         try:
             sequence_info = pd.read_csv(f"{file}_sequence_info.csv")
             interactive_setup(sequence_info, file)
