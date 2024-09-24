@@ -258,9 +258,10 @@ def interactive_setup(df1, file):
     flags = pd.read_csv(f"{file}_Flagged_Loci.csv")
     flags["key"] = flags["SampleID"] + "_" + flags["Locus"]
     sample = col1.selectbox("Select Sample:", options=df1["SampleID"].unique())
+    flags_sample = flags[flags["SampleID"] == sample].reset_index(drop=True)
     sample_df = df1[df1["SampleID"] == sample].reset_index(drop=True)
     locus_list = sample_df["Locus"].drop_duplicates()
-    for flagged_locus in flags["Locus"].unique():
+    for flagged_locus in flags_sample["Locus"].unique():
         locus_list = locus_list.str.replace(flagged_locus, f"⚠️{flagged_locus}⚠️")
     locus = col2.selectbox("Select Marker:", options=locus_list)
     if "⚠️" in locus:
@@ -702,7 +703,6 @@ def show_STR_page():
         else:
             file = (
                 f"{wd_dirname}/{st.session_state.output}/{st.session_state.output}"
-                f"/{st.session_state.output}"
             )
         try:
             sequence_info = pd.read_csv(f"{file}_sequence_info.csv")
