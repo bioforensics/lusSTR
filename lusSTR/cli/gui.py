@@ -281,6 +281,8 @@ def interactive_setup(df1, file):
             "UAS_Output_Sequence",
             "CE_Allele",
             "UAS_Output_Bracketed_Notation",
+            "Custom_Range_Sequence",
+            "Custom_Bracketed_Notation",
             "Reads",
             "parent_allele1",
             "parent_allele2",
@@ -334,6 +336,20 @@ def interactive_setup(df1, file):
             f"New {st.session_state.output_type} files created in {st.session_state.wd_dirname}"
             f"/{st.session_state.output}/edited_{dt}/ folder"
         )
+
+def create_settings():
+    if os.path.isfile(f"{st.session_state.wd_dirname}/config.yaml"):
+        st.write(f"Loading settings from {st.session_state.wd_dirname}/config.yaml")
+        with open(f"{st.session_state.wd_dirname}/config.yaml", "r") as file:
+            config_settings = yaml.safe_load(file)
+        st.session_state.output = config_settings["output"]
+        st.session_state.custom_ranges = config_settings["custom_ranges"]
+        st.session_state.profile_type = config_settings["profile_type"]
+        st.session_state.data_type = config_settings["data_type"]
+        st.session_state.sex = config_settings["sex"]
+        st.session_state.separate = config_settings["separate"]
+        st.session_state.strand = config_settings["strand"]
+        st.session_state.output_type = config_settings["output_type"]
 
 
 #####################################################################
@@ -658,17 +674,26 @@ def show_STR_page():
         "After running lusSTR, or if lusSTR has been run previously, the user may view and edit "
         "the individual STR marker plots and data."
     )
+    st.write(
+        "If lusSTR has been previously run, only the above ```Output Folder``` containing the run"
+        " files needs to be specified. Other settings will be automatically loaded from the "
+        "config.yaml file within the specified folder."
+    )
     if "interactive" not in st.session_state:
         st.session_state.interactive = None
     if st.button("See Individual Marker Plots & Data") or st.session_state.interactive:
         st.session_state.interactive = True
-        file = (
-            f"{st.session_state.wd_dirname}/{st.session_state.output}/"
-            f"{st.session_state.output}_custom_range"
-            if st.session_state.custom_ranges
-            else f"{wd_dirname}/{st.session_state.output}/{st.session_state.output}"
-            f"/{st.session_state.output}"
-        )
+        create_settings()
+        if st.session_state.custom_ranges:
+            file = (
+                f"{st.session_state.wd_dirname}/{st.session_state.output}/"
+                f"{st.session_state.output}_custom_range"
+            )
+        else: 
+            file = (
+                f"{wd_dirname}/{st.session_state.output}/{st.session_state.output}"
+                f"/{st.session_state.output}"
+            )
         try:
             sequence_info = pd.read_csv(f"{file}_sequence_info.csv")
             interactive_setup(sequence_info, file)
