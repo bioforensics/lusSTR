@@ -192,9 +192,9 @@ def df_on_change(locus):
 def interactive_plots(df, locus):
     at = get_at(df, locus)
     for i, row in df.iterrows():
-        if df.loc[i, "allele_type"] == "real_allele":
+        if df.loc[i, "allele_type"] == "Typed":
             df.loc[i, "Label"] = "Typed"
-        elif df.loc[i, "allele_type"] == "BelowAT":
+        elif df.loc[i, "allele_type"] == "BelowAT" or df.loc[i, "allele_type"] == "NotTyped":
             df.loc[i, "Label"] = "BelowAT"
         else:
             df.loc[i, "Label"] = "Stutter"
@@ -205,7 +205,11 @@ def interactive_plots(df, locus):
         x="CE_Allele",
         y="Reads",
         color="Label",
-        color_discrete_map={"Typed": "green", "BelowAT": "red", "Stutter": "blue"},
+        color_discrete_map={
+            "Typed": "green",
+            "BelowAT": "red",
+            "Stutter": "blue",
+        },
         title=locus,
     )
     plot.add_hline(y=at, line_width=3, line_dash="dot", line_color="gray")
@@ -232,7 +236,7 @@ def remake_final_files(full_df, outpath):
             else "Forward_Strand_Bracketed_Notation"
         )
     if st.session_state.nofilters:
-        full_df["allele_type"] = "real_allele"
+        full_df["allele_type"] = "Typed"
     if st.session_state.output_type == "efm" or st.session_state.output_type == "mpsproto":
         EFM_output(
             full_df,
@@ -255,12 +259,17 @@ def interactive_setup(df1, file):
     flags["key"] = flags["SampleID"] + "_" + flags["Locus"]
     sample = col1.selectbox("Select Sample:", options=df1["SampleID"].unique())
     sample_df = df1[df1["SampleID"] == sample].reset_index(drop=True)
-    locus = col2.selectbox("Select Marker:", options=df1["Locus"].unique())
+    locus_list = sample_df["Locus"].drop_duplicates()
+    for flagged_locus in flags["Locus"].unique():
+        locus_list = locus_list.str.replace(flagged_locus, f"⚠️{flagged_locus}⚠️")
+    locus = col2.selectbox("Select Marker:", options=locus_list)
+    if "⚠️" in locus:
+        locus = locus.replace("⚠️", "")
     locus_key = f"{sample}_{locus}"
     if locus_key not in st.session_state:
         st.session_state[locus_key] = sample_df[sample_df["Locus"] == locus].reset_index(drop=True)
     Type = [
-        "real_allele",
+        "Typed",
         "-1_stutter",
         "-2_stutter",
         "BelowAT",
@@ -272,7 +281,7 @@ def interactive_setup(df1, file):
     if locus_key in flags["key"].values:
         locus_flags = flags[flags["key"] == locus_key]
         for flag in locus_flags["Flags"].unique():
-            col2.write(f"⚠️ Potential issue: {flag} identified! ⚠️")
+            col2.write(f"⚠️ Potential issue: {flag} identified!")
     st.data_editor(
         data=st.session_state[locus_key],
         disabled=(
@@ -336,6 +345,7 @@ def interactive_setup(df1, file):
             f"New {st.session_state.output_type} files created in {st.session_state.wd_dirname}"
             f"/{st.session_state.output}/edited_{dt}/ folder"
         )
+
 
 def create_settings():
     if os.path.isfile(f"{st.session_state.wd_dirname}/config.yaml"):
@@ -689,7 +699,7 @@ def show_STR_page():
                 f"{st.session_state.wd_dirname}/{st.session_state.output}/"
                 f"{st.session_state.output}_custom_range"
             )
-        else: 
+        else:
             file = (
                 f"{wd_dirname}/{st.session_state.output}/{st.session_state.output}"
                 f"/{st.session_state.output}"
@@ -698,9 +708,7 @@ def show_STR_page():
             sequence_info = pd.read_csv(f"{file}_sequence_info.csv")
             interactive_setup(sequence_info, file)
         except FileNotFoundError:
-            print(
-                f"{file}_sequence_info.csv not found. Please check output folder specification."
-            )
+            print(f"{file}_sequence_info.csv not found. Please check output folder specification.")
 
 
 #####################################################################
@@ -833,9 +841,7 @@ def show_SNP_page():
     ]
 
     # Analytical threshold value
-    thresh = col3.number_input(
-        "Analytical threshold value:", value=0.03, step=0.01, min_value=0.0
-    )
+    thresh = col3.number_input("Analytical threshold value:", value=0.03, step=0.01, min_value=0.0)
 
     #####################################################################
     #     SNP: Specify a Reference File if User Has One                 #
