@@ -19,13 +19,11 @@ from lusSTR.scripts.filter_settings import filters, flags
 import math
 from matplotlib.backends.backend_pdf import PdfPages
 import matplotlib.pyplot as plt
-import mpld3
 import numpy as np
 import os
 import pandas as pd
 from pathlib import Path
 import re
-import streamlit.components.v1 as components
 import sys
 
 
@@ -148,7 +146,7 @@ def process_strs(dict_loc, datatype, seq_col, brack_col):
 
 def EFM_output(profile, outfile, profile_type, data_type, col, sex, separate=False):
     if profile_type == "reference":
-        profile = profile[profile.allele_type == "real_allele"]
+        profile = profile[profile.allele_type == "Typed"]
     else:
         profile = profile[profile.allele_type != "BelowAT"]
     efm_profile = populate_efm_profile(profile, data_type, col, sex)
@@ -256,7 +254,7 @@ def determine_max_num_alleles(allele_heights):
 def STRmix_output(profile, outdir, profile_type, data_type, seq_col):
     Path(outdir).mkdir(parents=True, exist_ok=True)
     if profile_type == "reference":
-        filtered_df = profile[profile.allele_type == "real_allele"]
+        filtered_df = profile[profile.allele_type == "Typed"]
     else:
         filtered_df = profile[profile.allele_type != "BelowAT"]
     if data_type == "ce":
@@ -354,7 +352,7 @@ def format_ref_table(new_rows, sample_data, datatype):
 def marker_plots(df, output_name, sex):
     Path("MarkerPlots").mkdir(parents=True, exist_ok=True)
     df["CE_Allele"] = df["CE_Allele"].astype(float)
-    filt_df = df[df["allele_type"] == "real_allele"]
+    filt_df = df[df["allele_type"] == "Typed"]
     for sample_id in df["SampleID"].unique():
         # sample_id = f"{id}_ystrs" if sex else id
         with PdfPages(f"MarkerPlots/{output_name}_{sample_id}_marker_plots.pdf") as pdf:
@@ -427,8 +425,6 @@ def make_plot(df, sample_id, sameyaxis=False, filters=False, at=True):
     else:
         title = "Marker Plots for All Alleles With Custom Y-Axis Scale"
     plt.text(0.4, 0.95, title, transform=fig.transFigure, size=24)
-    fig_html = mpld3.fig_to_html(fig)
-    components.html(fig_html, height=600)
 
 
 def get_at(df, locus):
@@ -473,7 +469,7 @@ def process_input(
             else "Forward_Strand_Bracketed_Notation"
         )
     if nofiltering:
-        full_df["allele_type"] = "real_allele"
+        full_df["allele_type"] = "Typed"
         marker_plots(full_df, input_name, sex)
         if output_type == "efm" or output_type == "mpsproto":
             EFM_output(full_df, outpath, profile_type, data_type, brack_col, sex, separate)
