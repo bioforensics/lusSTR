@@ -170,8 +170,10 @@ def show_home_page():
 
     st.markdown(
         """
-        lusSTR is an end-to-end workflow for processing human forensic data (STRs and SNPs) derived from Next Generation Sequencing (NGS) data for use in probabilistic genotyping software.
-        For more information on lusSTR, visit our [GitHub page](https://github.com/bioforensics/lusSTR).
+        lusSTR is an end-to-end workflow for processing human forensic data (STRs and SNPs) 
+        derived from Next Generation Sequencing (NGS) data for use in probabilistic genotyping 
+        software. For more information on lusSTR, visit our 
+        [GitHub page](https://github.com/bioforensics/lusSTR).
         """,
         unsafe_allow_html=True,
     )
@@ -198,19 +200,20 @@ def interactive_plots(df, locus):
             df.loc[i, "Label"] = "Stutter"
     min_x = round(min(df["CE_Allele"]) - 1)
     max_x = round(max(df["CE_Allele"]) + 1)
-    plot = px.bar(df, x="CE_Allele", y="Reads", color="Label", color_discrete_map={
-        "Typed": "green",
-        "BelowAT": "red",
-        "Stutter": "blue"
-    }, title=locus)
+    plot = px.bar(
+        df,
+        x="CE_Allele",
+        y="Reads",
+        color="Label",
+        color_discrete_map={"Typed": "green", "BelowAT": "red", "Stutter": "blue"},
+        title=locus,
+    )
     plot.add_hline(y=at, line_width=3, line_dash="dot", line_color="gray")
-    plot.add_annotation(
-        text=f"AT", x=min_x+0.1, y=at, showarrow=False, yshift=10)
-    plot.update_layout(xaxis = dict(
-                range = [min_x, max_x],
-                tickmode = 'array',
-                tickvals = np.arange(min_x, max_x, 1)))
-    st.plotly_chart(plot)
+    plot.add_annotation(text=f"AT", x=min_x + 0.1, y=at, showarrow=False, yshift=10)
+    plot.update_layout(
+        xaxis=dict(range=[min_x, max_x], tickmode="array", tickvals=np.arange(min_x, max_x, 1))
+    )
+    st.plotly_chart(plot, use_container_width=True)
 
 
 def remake_final_files(full_df, outpath):
@@ -218,60 +221,119 @@ def remake_final_files(full_df, outpath):
         seq_col = "Custom_Range_Sequence"
         brack_col = "Custom_Bracketed_Notation"
     else:
-        seq_col = "UAS_Output_Sequence" if st.session_state.strand == "uas" else "Forward_Strand_Sequence"
+        seq_col = (
+            "UAS_Output_Sequence"
+            if st.session_state.strand == "uas"
+            else "Forward_Strand_Sequence"
+        )
         brack_col = (
             "UAS_Output_Bracketed_Notation"
             if st.session_state.strand == "uas"
             else "Forward_Strand_Bracketed_Notation"
         )
-    if  st.session_state.nofilters:
+    if st.session_state.nofilters:
         full_df["allele_type"] = "real_allele"
     if st.session_state.output_type == "efm" or st.session_state.output_type == "mpsproto":
-        EFM_output(full_df, outpath, st.session_state.profile_type, st.session_state.data_type, brack_col, st.session_state.sex, st.session_state.separate)
+        EFM_output(
+            full_df,
+            outpath,
+            st.session_state.profile_type,
+            st.session_state.data_type,
+            brack_col,
+            st.session_state.sex,
+            st.session_state.separate,
+        )
     else:
-        STRmix_output(full_df, outpath, st.session_state.profile_type, st.session_state.data_type, seq_col)
+        STRmix_output(
+            full_df, outpath, st.session_state.profile_type, st.session_state.data_type, seq_col
+        )
 
-    
-def interactive_setup(df1):
+
+def interactive_setup(df1, file):
     col1, col2, col3, col4, col5 = st.columns(5)
-    num_loci = len(df1["Locus"].unique())
+    flags = pd.read_csv(f"{file}_Flagged_Loci.csv")
+    flags["key"] = flags["SampleID"] + "_" + flags["Locus"]
     sample = col1.selectbox("Select Sample:", options=df1["SampleID"].unique())
-    sample_df = df1[df1["SampleID"]==sample].reset_index(drop=True)
+    sample_df = df1[df1["SampleID"] == sample].reset_index(drop=True)
     locus = col2.selectbox("Select Marker:", options=df1["Locus"].unique())
     locus_key = f"{sample}_{locus}"
     if locus_key not in st.session_state:
-        st.session_state[locus_key] = sample_df[sample_df["Locus"]==locus].reset_index(drop=True)
-    Type = ["real_allele", "-1_stutter", "-2_stutter", "BelowAT", "-1_stutter/+1_stutter", "+1_stutter"]
+        st.session_state[locus_key] = sample_df[sample_df["Locus"] == locus].reset_index(drop=True)
+    Type = [
+        "real_allele",
+        "-1_stutter",
+        "-2_stutter",
+        "BelowAT",
+        "-1_stutter/+1_stutter",
+        "+1_stutter",
+    ]
     interactive_plots(st.session_state[locus_key], locus)
+    col1, col2, col3 = st.columns(3)
+    if locus_key in flags["key"].values:
+        locus_flags = flags[flags["key"] == locus_key]
+        for flag in locus_flags["Flags"].unique():
+            col2.write(f"⚠️ Potential issue: {flag} identified! ⚠️")
     st.data_editor(
-        data=st.session_state[locus_key], disabled=(
-            "SampleID", "Locus", "UAS_Output_Sequence", "CE_Allele",
-            "UAS_Output_Bracketed_Notation", "Reads",
-            "parent_allele1", "parent_allele2", "allele1_ref_reads",
-            "allele2_ref_reads", "perc_noise", "perc_stutter"
-        ), column_config = {'allele_type' : st.column_config.SelectboxColumn('allele_type', options=Type)}, hide_index=True, key=f"{locus_key}_edited", on_change = df_on_change, args=(locus_key, )
+        data=st.session_state[locus_key],
+        disabled=(
+            "SampleID",
+            "Locus",
+            "UAS_Output_Sequence",
+            "CE_Allele",
+            "UAS_Output_Bracketed_Notation",
+            "Reads",
+            "parent_allele1",
+            "parent_allele2",
+            "allele1_ref_reads",
+            "allele2_ref_reads",
+            "perc_noise",
+            "perc_stutter",
+        ),
+        column_config={
+            "allele_type": st.column_config.SelectboxColumn("allele_type", options=Type)
+        },
+        hide_index=True,
+        key=f"{locus_key}_edited",
+        on_change=df_on_change,
+        args=(locus_key,),
     )
-        
+
     if st.button("Save Edits"):
         combined_df = pd.DataFrame()
         for sample in df1["SampleID"].unique():
-            sample_df = df1[df1["SampleID"]==sample].reset_index(drop=True)
+            sample_df = df1[df1["SampleID"] == sample].reset_index(drop=True)
             for locus in sample_df["Locus"].unique():
                 locus_key = f"{sample}_{locus}"
                 try:
                     combined_df = pd.concat([combined_df, st.session_state[locus_key]])
                 except KeyError:
-                    combined_df = pd.concat([combined_df, sample_df[sample_df["Locus"]==locus].reset_index(drop=True)])
+                    combined_df = pd.concat(
+                        [
+                            combined_df,
+                            sample_df[sample_df["Locus"] == locus].reset_index(drop=True),
+                        ]
+                    )
         now = datetime.now()
         dt = now.strftime("%m%d%Y_%H_%M_%S")
         del combined_df["Label"]
-        Path(f"{st.session_state.wd_dirname}/{st.session_state.output}/edited_{dt}").mkdir(parents=True, exist_ok=True)
+        Path(f"{st.session_state.wd_dirname}/{st.session_state.output}/edited_{dt}").mkdir(
+            parents=True, exist_ok=True
+        )
         outpath = f"{st.session_state.wd_dirname}/{st.session_state.output}/edited_{dt}/"
-        combined_df.to_csv(f"{st.session_state.wd_dirname}/{st.session_state.output}/edited_{dt}/{st.session_state.output}_sequence_info_edited_{dt}.csv", index=False)
-        st.write(f"Changes saved to {st.session_state.wd_dirname}/{st.session_state.output}/edited_{dt}/{st.session_state.output}_sequence_info_edited_{dt}.csv")
+        combined_df.to_csv(
+            f"{st.session_state.wd_dirname}/{st.session_state.output}/edited_{dt}/"
+            f"{st.session_state.output}_sequence_info_edited_{dt}.csv",
+            index=False,
+        )
+        st.write(
+            f"Changes saved to {st.session_state.wd_dirname}/{st.session_state.output}"
+            f"/edited_{dt}/{st.session_state.output}_sequence_info_edited_{dt}.csv"
+        )
         remake_final_files(combined_df, outpath)
-        st.write(f"New {st.session_state.output_type} files created in {st.session_state.wd_dirname}/{st.session_state.output}/edited_{dt}/ folder")
-    
+        st.write(
+            f"New {st.session_state.output_type} files created in {st.session_state.wd_dirname}"
+            f"/{st.session_state.output}/edited_{dt}/ folder"
+        )
 
 
 #####################################################################
@@ -287,7 +349,8 @@ def show_STR_page():
 
     st.title("STR Workflow")
     st.info(
-        "Please Select STR Settings Below for lusSTR! For Information Regarding the Settings, See the How to Use Tab."
+        "Please Select STR Settings Below for lusSTR! For Information Regarding the "
+        "Settings, See the How to Use Tab."
     )
 
     # Input File Specification
@@ -295,7 +358,8 @@ def show_STR_page():
 
     # Ask user if submitting a directory or individual file
     st.info(
-        "Please Indicate If You Are Providing An Individual Input File or a Folder Containing Multiple Input Files"
+        "Please Indicate If You Are Providing An Individual Input File or a Folder Containing "
+        "Multiple Input Files"
     )
     input_option = st.radio(
         "Select Input Option:", ("Individual File", "Folder with Multiple Files")
@@ -375,10 +439,11 @@ def show_STR_page():
 
     if "custom_ranges" not in st.session_state:
         st.session_state.custom_ranges = None
-    
+
     st.session_state.custom_ranges = st.checkbox(
         "Use Custom Sequence Ranges",
-        help="Check the box to use the specified custom sequence ranges as defined in the str_markers.json file.",
+        help="Check the box to use the specified custom sequence ranges as defined in the "
+        "str_markers.json file.",
     )
 
     if "sex" not in st.session_state:
@@ -406,15 +471,18 @@ def show_STR_page():
     st.session_state.output = col3.text_input(
         "Output File Name",
         "lusstr_output",
-        help="Please specify a name for the created files. It can only contain alphanumeric characters, underscores and hyphens. No spaces allowed.",
+        help="Please specify a name for the created files. It can only contain alphanumeric "
+        "characters, underscores and hyphens. No spaces allowed.",
     )
 
     if "nocombine" not in st.session_state:
         st.session_state.nocombine = None
-    
+
     st.session_state.nocombine = st.checkbox(
         "Do Not Combine Identical Sequences",
-        help="If using STRait Razor data, by default, identical sequences (after removing flanking sequences) are combined and reads are summed. Checking this will not combine identical sequences.",
+        help="If using STRait Razor data, by default, identical sequences (after removing "
+        "flanking sequences) are combined and reads are summed. Checking this will not combine"
+        " identical sequences.",
     )
 
     #####################################################################
@@ -427,8 +495,12 @@ def show_STR_page():
 
     if "output_type" not in st.session_state:
         st.session_state.output_type = None
-    
-    st.session_state.output_type = {"STRmix": "strmix", "EuroForMix": "efm", "MPSproto": "mpsproto"}[
+
+    st.session_state.output_type = {
+        "STRmix": "strmix",
+        "EuroForMix": "efm",
+        "MPSproto": "mpsproto",
+    }[
         col1.selectbox(
             "Probabilistic Genotyping Software",
             options=["STRmix", "EuroForMix", "MPSproto"],
@@ -443,18 +515,20 @@ def show_STR_page():
         col2.selectbox(
             "Profile Type",
             options=["Evidence", "Reference"],
-            help="Select the file type (format) to create for the probabilistic genotyping software.",
+            help="Select the file type (format) to create for the probabilistic genotyping "
+            "software.",
         )
     ]
 
     if "data_type" not in st.session_state:
         st.session_state.data_type = None
-    
+
     st.session_state.data_type = {"Sequence": "ngs", "CE allele": "ce", "LUS+ allele": "lusplus"}[
         col3.selectbox(
             "Data Type",
             options=["Sequence", "CE allele", "LUS+ allele"],
-            help="Select the allele type used to determine sequence type (belowAT, stutter or typed) and used in the final output file.",
+            help="Select the allele type used to determine sequence type (belowAT, stutter or "
+            "typed) and used in the final output file.",
         )
     ]
 
@@ -464,7 +538,9 @@ def show_STR_page():
     st.session_state.info = st.checkbox(
         "Create Allele Information File",
         value=True,
-        help="Create file containing information about each sequence, including sequence type (belowAT, stutter or typed), stuttering sequence information and metrics involving stutter and noise.",
+        help="Create file containing information about each sequence, including sequence type "
+        "(belowAT, stutter or typed), stuttering sequence information and metrics involving "
+        "stutter and noise.",
     )
 
     if "separate" not in st.session_state:
@@ -472,7 +548,8 @@ def show_STR_page():
 
     st.session_state.separate = st.checkbox(
         "Create Separate Files for Samples",
-        help="If checked, will create individual files for samples; If unchecked, will create one file with all samples.",
+        help="If checked, will create individual files for samples; If unchecked, will create "
+        "one file with all samples.",
     )
 
     if "nofilters" not in st.session_state:
@@ -480,20 +557,25 @@ def show_STR_page():
 
     st.session_state.nofilters = st.checkbox(
         "Skip All Filtering Steps",
-        help="Filtering will not be performed but will still create EFM/MPSproto/STRmix output files containing all sequences.",
+        help="Filtering will not be performed but will still create EFM/MPSproto/STRmix output "
+        "files containing all sequences.",
     )
 
     if "strand" not in st.session_state:
         st.session_state.strand = None
-    
+
     st.session_state.strand = {"UAS Orientation": "uas", "Forward Strand": "forward"}[
         col4.selectbox(
             "Strand Orientation",
             options=["Forward Strand", "UAS Orientation"],
-            help="Indicates the strand orientation in which to report the sequence in the final output table as some markers are reported in the UAS on the reverse strand. Selecting the UAS Orientation will report those markers on the reverse strand while the remaining will be reported on the forward strand. Selecting the Forward Strand will report all markers on the forward strand orientation. This applies to STRmix NGS only.",
+            help="Indicates the strand orientation in which to report the sequence in the final "
+            "output table as some markers are reported in the UAS on the reverse strand. "
+            "Selecting the UAS Orientation will report those markers on the reverse strand while"
+            " the remaining will be reported on the forward strand. Selecting the Forward Strand "
+            "will report all markers on the forward strand orientation. This applies to STRmix "
+            "NGS only.",
         )
     ]
-
 
     #####################################################################
     #     STR: Generate Config File Based on Settings                   #
@@ -503,12 +585,18 @@ def show_STR_page():
     if st.button("Run lusSTR"):
 
         # Check if all required fields are filled
-        if st.session_state.analysis_software and st.session_state.samp_input and st.session_state.output and st.session_state.wd_dirname:
+        if (
+            st.session_state.analysis_software
+            and st.session_state.samp_input
+            and st.session_state.output
+            and st.session_state.wd_dirname
+        ):
 
             # Validate output prefix
             if not validate_prefix(st.session_state.output):
                 st.warning(
-                    "Please enter a valid output prefix. Only alphanumeric characters, underscore, and hyphen are allowed."
+                    "Please enter a valid output prefix. Only alphanumeric characters, "
+                    "underscore, and hyphen are allowed."
                 )
                 st.stop()  # Stop execution if prefix is invalid
 
@@ -548,30 +636,46 @@ def show_STR_page():
                 try:
                     subprocess.run(command, check=True)
                     st.success(
-                        "Config File Generated and lusSTR Executed Successfully! Output Files Have Been Saved to Your Designated Directory and Labeled with your Specified Prefix"
+                        "Config File Generated and lusSTR Executed Successfully! Output Files"
+                        "Have Been Saved to Your Designated Directory and Labeled with your "
+                        "Specified Prefix"
                     )
                 except subprocess.CalledProcessError as e:
                     st.error(f"Error: {e}")
                     st.info(
-                        "Please make sure to check the 'How to Use' tab for common error resolutions."
+                        "Please make sure to check the 'How to Use' tab for common error "
+                        "resolutions."
                     )
 
         else:
             st.warning(
-                "Please make sure to fill out all required fields (Analysis Software, Input Directory or File, Prefix for Output, and Specification of Working Directory) before submitting."
+                "Please make sure to fill out all required fields (Analysis Software, Input "
+                "Directory or File, Prefix for Output, and Specification of Working Directory) "
+                "before submitting."
             )
     st.write("---")
-    st.write("After running lusSTR, or if lusSTR has been run previously, the user may view and edit the individual STR marker plots and data.")
-    st.write("If using previously run lusSTR data, only the folder containing the output must be selected using the above ```Output Folder Selection```.")
+    st.write(
+        "After running lusSTR, or if lusSTR has been run previously, the user may view and edit "
+        "the individual STR marker plots and data."
+    )
     if "interactive" not in st.session_state:
         st.session_state.interactive = None
     if st.button("See Individual Marker Plots & Data") or st.session_state.interactive:
         st.session_state.interactive = True
+        file = (
+            f"{st.session_state.wd_dirname}/{st.session_state.output}/"
+            f"{st.session_state.output}_custom_range"
+            if st.session_state.custom_ranges
+            else f"{wd_dirname}/{st.session_state.output}/{st.session_state.output}"
+            f"/{st.session_state.output}"
+        )
         try:
-            sequence_info = pd.read_csv(f"{wd_dirname}/{st.session_state.output}/{st.session_state.output}_sequence_info.csv")
-            interactive_setup(sequence_info)
+            sequence_info = pd.read_csv(f"{file}_sequence_info.csv")
+            interactive_setup(sequence_info, file)
         except FileNotFoundError:
-            print(f"{wd_dirname}/{st.session_state.output}/{st.session_state.output}_sequence_info.csv not found. Please check output folder specification.")
+            print(
+                f"{file}_sequence_info.csv not found. Please check output folder specification."
+            )
 
 
 #####################################################################
@@ -587,7 +691,8 @@ def show_SNP_page():
 
     st.title("SNP Workflow")
     st.info(
-        "Please Select SNP Settings Below for lusSTR! For Information Regarding the Settings, See the How to Use Tab."
+        "Please Select SNP Settings Below for lusSTR! For Information Regarding the Settings,"
+        " See the How to Use Tab."
     )
 
     # Input File Specification
@@ -595,7 +700,8 @@ def show_SNP_page():
 
     # Ask user if submitting a directory or individual file
     st.info(
-        "Please Indicate If You Are Providing An Individual Input File or a Folder Containing Multiple Input Files"
+        "Please Indicate If You Are Providing An Individual Input File or a Folder Containing "
+        "Multiple Input Files"
     )
     input_option = st.radio(
         "Select Input Option:", ("Individual File", "Folder with Multiple Files")
@@ -702,7 +808,9 @@ def show_SNP_page():
     ]
 
     # Analytical threshold value
-    thresh = col3.number_input("Analytical threshold value:", value=0.03, step=0.01, min_value=0.0)
+    thresh = col3.number_input(
+        "Analytical threshold value:", value=0.03, step=0.01, min_value=0.0
+    )
 
     #####################################################################
     #     SNP: Specify a Reference File if User Has One                 #
@@ -715,7 +823,8 @@ def show_SNP_page():
 
     reference = col1.text_input(
         "Please Specify Your Reference Sample IDs",
-        help="List IDs of the samples to be run as references in EFM; default is no reference samples",
+        help="List IDs of the samples to be run as references in EFM; default is no "
+        "reference samples",
     )
 
     #####################################################################
@@ -739,7 +848,6 @@ def show_SNP_page():
     if st.session_state.wd_dirname:
         st.text_input("Your Specified Output Folder:", st.session_state.wd_dirname)
 
-
     #####################################################################
     #     SNP: Generate Config File Based on Settings                   #
     #####################################################################
@@ -753,7 +861,8 @@ def show_SNP_page():
             # Validate output prefix
             if not validate_prefix(output):
                 st.warning(
-                    "Please enter a valid output prefix. Only alphanumeric characters, underscore, and hyphen are allowed."
+                    "Please enter a valid output prefix. Only alphanumeric characters, "
+                    "underscore, and hyphen are allowed."
                 )
                 st.stop()  # Stop execution if prefix is invalid
 
@@ -793,17 +902,22 @@ def show_SNP_page():
                 try:
                     subprocess.run(command, check=True)
                     st.success(
-                        "Config File Generated and lusSTR Executed Successfully! Output Files Have Been Saved to Your Designated Directory and Labeled with your Specified Prefix"
+                        "Config File Generated and lusSTR Executed Successfully! Output Files "
+                        "Have Been Saved to Your Designated Directory and Labeled with your "
+                        "Specified Prefix"
                     )
                 except subprocess.CalledProcessError as e:
                     st.error(f"Error: {e}")
                     st.info(
-                        "Please make sure to check the 'How to Use' tab for common error resolutions."
+                        "Please make sure to check the 'How to Use' tab for common error "
+                        "resolutions."
                     )
 
         else:
             st.warning(
-                "Please make sure to fill out all required fields (Analysis Software, Input Directory or File, Prefix for Output, and Specification of Working Directory) before submitting."
+                "Please make sure to fill out all required fields (Analysis Software, Input "
+                "Directory or File, Prefix for Output, and Specification of Working Directory) "
+                "before submitting."
             )
 
 
@@ -819,25 +933,35 @@ def show_how_to_use_page():
     st.header("1. File/Folder Path Formatting")
 
     st.write(
-        "Please ensure that the displayed path accurately reflects your selection. When using the file or folder picker, navigate to the desired location and click 'OK' to confirm your selection."
+        "Please ensure that the displayed path accurately reflects your selection. When using the"
+        " file or folder picker, navigate to the desired location and click 'OK' to confirm your "
+        "selection."
     )
 
     st.header("2. Specifying Output Prefix")
 
     st.write(
-        "The purpose of specifying the output prefix is for lusSTR to create result files and folders with that prefix in your working directory. Please ensure that you are following proper file naming formatting and rules when specifying this prefix. Avoid using characters such as '/', '', '.', and others. Note: To avoid potential errors, you can simply use the default placeholder for output."
+        "The purpose of specifying the output prefix is for lusSTR to create result files and "
+        "folders with that prefix in your working directory. Please ensure that you are following"
+        " proper file naming formatting and rules when specifying this prefix. Avoid using "
+        "characters such as '/', '', '.', and others. Note: To avoid potential errors, you can "
+        "simply use the default placeholder for output."
     )
 
     st.code("Incorrect: 'working_directory/subfolder/subfolder'\nCorrect: output")
 
     st.write(
-        "Note that some result files may be saved directly in the working directory with the specified prefix, while others will be populated in a folder labeled with the prefix in your working directory."
+        "Note that some result files may be saved directly in the working directory with the "
+        "specified prefix, while others will be populated in a folder labeled with the prefix "
+        "in your working directory."
     )
     st.write("Be aware of this behavior when checking for output files.")
 
     st.header("3. Specifying Output Folder")
     st.write(
-        "Please Ensure That You Properly Specify an Output Folder. This is where all lusSTR output files will be saved. To avoid potential errors, specifying a working directory is required."
+        "Please Ensure That You Properly Specify an Output Folder. This is where all lusSTR "
+        "output files will be saved. To avoid potential errors, specifying a working directory "
+        "is required."
     )
 
     st.title("About lusSTR")
@@ -847,13 +971,16 @@ def show_how_to_use_page():
 
     **_lusSTR Accommodates Four Different Input Formats:_**
 
-    (1) UAS Sample Details Report, UAS Sample Report, and UAS Phenotype Report (for SNP processing) in .xlsx format (a single file or directory containing multiple files)
+    (1) UAS Sample Details Report, UAS Sample Report, and UAS Phenotype Report (for SNP "
+    "processing) in .xlsx format (a single file or directory containing multiple files)
 
-    (2) STRait Razor v3 output with one sample per file (a single file or directory containing multiple files)
+    (2) STRait Razor v3 output with one sample per file (a single file or directory containing"
+    " multiple files)
 
     (3) GeneMarker v2.6 output (a single file or directory containing multiple files)
 
-    (4) Sample(s) sequences in CSV format; first four columns must be Locus, NumReads, Sequence, SampleID; Optional last two columns can be Project and Analysis IDs.
+    (4) Sample(s) sequences in CSV format; first four columns must be Locus, NumReads, Sequence, "
+    "SampleID; Optional last two columns can be Project and Analysis IDs.
 
 
     """,
@@ -869,7 +996,8 @@ def show_how_to_use_page():
 def show_contact_page():
     st.title("Contact Us")
     st.write(
-        "For any questions or issues, please contact rebecca.mitchell@st.dhs.gov, daniel.standage@st.dhs.gov, or s.h.syed@email.msmary.edu"
+        "For any questions or issues, please contact rebecca.mitchell@st.dhs.gov, "
+        "daniel.standage@st.dhs.gov, or s.h.syed@email.msmary.edu"
     )
 
 
