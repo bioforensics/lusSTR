@@ -191,7 +191,7 @@ def df_on_change(locus):
 
 
 def interactive_plots_allmarkers(sample_df):
-    cols = st.columns(3)
+    cols = st.columns(4)
     max_reads = max(sample_df["Reads"])
     n = 100 if max_reads > 1000 else 10
     max_yvalue = int(math.ceil(max_reads / n)) * n
@@ -200,16 +200,16 @@ def interactive_plots_allmarkers(sample_df):
     for marker in sample_df["Locus"].unique():
         at = get_at(sample_df, marker)
         marker_df = sample_df[sample_df["Locus"] == marker].sort_values(by="CE_Allele")
-        plot = interactive_plots(marker_df, marker)
+        plot = interactive_plots(marker_df, marker, max_yvalue, increase_value, all=True)
         col = cols[n]
         col.plotly_chart(plot, use_container_width=True)
-        if n == 2:
+        if n == 3:
             n = 0
         else:
             n += 1   
     
 
-def interactive_plots(df, locus):
+def interactive_plots(df, locus, ymax, increase, all=False):
     at = get_at(df, locus)
     for i, row in df.iterrows():
         if df.loc[i, "allele_type"] == "Typed":
@@ -237,6 +237,10 @@ def interactive_plots(df, locus):
     plot.update_layout(
         xaxis=dict(range=[min_x, max_x], tickmode="array", tickvals=np.arange(min_x, max_x, 1))
     )
+    if all:
+        plot.update_layout(
+            yaxis=dict(range=[0, ymax], tickmode="array", tickvals=np.arange(0, ymax, increase))
+        )
     return plot
 
 
@@ -300,7 +304,7 @@ def interactive_setup(df1, file):
             "-1_stutter/+1_stutter",
             "+1_stutter",
         ]
-        plot = interactive_plots(st.session_state[locus_key], locus)
+        plot = interactive_plots(st.session_state[locus_key], locus, None, None)
         st.plotly_chart(plot, use_container_width=True)
         col1, col2, col3 = st.columns(3)
         if locus_key in flags["key"].values:
