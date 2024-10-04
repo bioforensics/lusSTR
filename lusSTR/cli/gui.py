@@ -16,7 +16,7 @@
 from datetime import datetime
 import json
 import importlib.resources
-from lusSTR.wrappers.filter import get_at, EFM_output, STRmix_output
+from lusSTR.wrappers.filter import get_at, EFM_output, marker_plots, make_plot, STRmix_output
 import math
 import numpy as np
 import pandas as pd
@@ -279,14 +279,17 @@ def remake_final_files(full_df, outpath):
 
 def interactive_setup(df1, file):
     col1, col2, col3, col4, col5 = st.columns(5)
-    flags = pd.read_csv(f"{file}_Flagged_Loci.csv")
-    flags["key"] = flags["SampleID"] + "_" + flags["Locus"]
     sample = col1.selectbox("Select Sample:", options=df1["SampleID"].unique())
-    flags_sample = flags[flags["SampleID"] == sample].reset_index(drop=True)
     sample_df = df1[df1["SampleID"] == sample].reset_index(drop=True)
     locus_list = pd.concat([pd.Series("All Markers"), sample_df["Locus"].drop_duplicates()])
-    for flagged_locus in flags_sample["Locus"].unique():
-        locus_list = locus_list.str.replace(flagged_locus, f"⚠️{flagged_locus}⚠️")
+    if os.path.isfile(f"{file}_Flagged_Loci.csv"):
+        flags = pd.read_csv(f"{file}_Flagged_Loci.csv")
+        flags["key"] = flags["SampleID"] + "_" + flags["Locus"]
+        flags_sample = flags[flags["SampleID"] == sample].reset_index(drop=True)
+        for flagged_locus in flags_sample["Locus"].unique():
+            locus_list = locus_list.str.replace(flagged_locus, f"⚠️{flagged_locus}⚠️")
+    else:
+        flags = pd.DataFrame(columns=["key"])
     locus = col2.selectbox("Select Marker:", options=locus_list)
     if "⚠️" in locus:
         locus = locus.replace("⚠️", "")
@@ -338,6 +341,9 @@ def interactive_setup(df1, file):
             args=(locus_key,),
         )
     if st.button("Save Edits"):
+        ph = st.empty()
+        with ph.container():
+            st.write("Saving Changes - May take a minute or two.")
         combined_df = pd.DataFrame()
         for sample in df1["SampleID"].unique():
             sample_df = df1[df1["SampleID"] == sample].reset_index(drop=True)
@@ -359,20 +365,25 @@ def interactive_setup(df1, file):
             parents=True, exist_ok=True
         )
         outpath = f"{st.session_state.wd_dirname}/{st.session_state.output}/edited_{dt}/"
+        marker_plots(combined_df, f"{st.session_state.output}_edited_{dt}", sex=False, wd=outpath)
         combined_df.to_csv(
             f"{st.session_state.wd_dirname}/{st.session_state.output}/edited_{dt}/"
             f"{st.session_state.output}_sequence_info_edited_{dt}.csv",
             index=False,
         )
-        st.write(
+        new_text = (
             f"Changes saved to {st.session_state.wd_dirname}/{st.session_state.output}"
             f"/edited_{dt}/{st.session_state.output}_sequence_info_edited_{dt}.csv"
-        )
-        remake_final_files(combined_df, outpath)
-        st.write(
             f"New {st.session_state.output_type} files created in {st.session_state.wd_dirname}"
             f"/{st.session_state.output}/edited_{dt}/ folder"
         )
+        remake_final_files(combined_df, outpath)
+        ph.empty()
+        with ph.container():
+            st.write(
+                f"New files and marker plots with edits saved to {st.session_state.wd_dirname}/"
+                f"{st.session_state.output}/edited_{dt}/"
+            )
 
 
 def create_settings():

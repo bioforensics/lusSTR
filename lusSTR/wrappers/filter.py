@@ -349,13 +349,13 @@ def format_ref_table(new_rows, sample_data, datatype):
     return sort_df
 
 
-def marker_plots(df, output_name, sex):
-    Path("MarkerPlots").mkdir(parents=True, exist_ok=True)
+def marker_plots(df, output_name, sex, wd="."):
+    Path(f"{wd}/MarkerPlots").mkdir(parents=True, exist_ok=True)
     df["CE_Allele"] = df["CE_Allele"].astype(float)
     filt_df = df[df["allele_type"] == "Typed"]
     for sample_id in df["SampleID"].unique():
         # sample_id = f"{id}_ystrs" if sex else id
-        with PdfPages(f"MarkerPlots/{output_name}_{sample_id}_marker_plots.pdf") as pdf:
+        with PdfPages(f"{wd}/MarkerPlots/{output_name}_{sample_id}_marker_plots.pdf") as pdf:
             make_plot(filt_df, sample_id, filters=True, at=False)
             pdf.savefig()
             make_plot(df, sample_id)
