@@ -198,13 +198,14 @@ def interactive_plots_allmarkers(sample_df, flagged_df):
     increase_value = int(math.ceil((max_yvalue / 5)) / n) * n
     n = 0
     for marker in sample_df["Locus"].unique():
+        col = cols[n]
+        container = col.container(border=True)
         sample_locus = sample_df["SampleID"].unique() + "_" + marker
         marker_df = sample_df[sample_df["Locus"] == marker].sort_values(by="CE_Allele")
         if sample_locus in flagged_df["key"].values:
             marker = f"⚠️{marker}⚠️"
         plot = interactive_plots(marker_df, marker, max_yvalue, increase_value, all=True)
-        col = cols[n]
-        col.plotly_chart(plot, use_container_width=True)
+        container.plotly_chart(plot, use_container_width=True)
         if n == 3:
             n = 0
         else:
