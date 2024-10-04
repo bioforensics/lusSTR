@@ -17,6 +17,7 @@ from datetime import datetime
 import json
 import importlib.resources
 from lusSTR.wrappers.filter import get_at, EFM_output, STRmix_output
+import math
 import numpy as np
 import pandas as pd
 from pathlib import Path
@@ -189,6 +190,25 @@ def df_on_change(locus):
             st.session_state[locus].loc[st.session_state[locus].index == index, key] = value
 
 
+def interactive_plots_allmarkers(sample_df):
+    cols = st.columns(3)
+    max_reads = max(sample_df["Reads"])
+    n = 100 if max_reads > 1000 else 10
+    max_yvalue = int(math.ceil(max_reads / n)) * n
+    increase_value = int(math.ceil((max_yvalue / 5)) / n) * n
+    n = 0
+    for marker in sample_df["Locus"].unique():
+        at = get_at(sample_df, marker)
+        marker_df = sample_df[sample_df["Locus"] == marker].sort_values(by="CE_Allele")
+        plot = interactive_plots(marker_df, marker)
+        col = cols[n]
+        col.plotly_chart(plot, use_container_width=True)
+        if n == 2:
+            n = 0
+        else:
+            n += 1   
+    
+
 def interactive_plots(df, locus):
     at = get_at(df, locus)
     for i, row in df.iterrows():
@@ -217,7 +237,7 @@ def interactive_plots(df, locus):
     plot.update_layout(
         xaxis=dict(range=[min_x, max_x], tickmode="array", tickvals=np.arange(min_x, max_x, 1))
     )
-    st.plotly_chart(plot, use_container_width=True)
+    return plot
 
 
 def remake_final_files(full_df, outpath):
@@ -260,56 +280,59 @@ def interactive_setup(df1, file):
     sample = col1.selectbox("Select Sample:", options=df1["SampleID"].unique())
     flags_sample = flags[flags["SampleID"] == sample].reset_index(drop=True)
     sample_df = df1[df1["SampleID"] == sample].reset_index(drop=True)
-    locus_list = sample_df["Locus"].drop_duplicates()
+    locus_list = pd.concat([pd.Series("All Markers"), sample_df["Locus"].drop_duplicates()])
     for flagged_locus in flags_sample["Locus"].unique():
         locus_list = locus_list.str.replace(flagged_locus, f"⚠️{flagged_locus}⚠️")
     locus = col2.selectbox("Select Marker:", options=locus_list)
     if "⚠️" in locus:
         locus = locus.replace("⚠️", "")
-    locus_key = f"{sample}_{locus}"
-    if locus_key not in st.session_state:
-        st.session_state[locus_key] = sample_df[sample_df["Locus"] == locus].reset_index(drop=True)
-    Type = [
-        "Typed",
-        "-1_stutter",
-        "-2_stutter",
-        "BelowAT",
-        "-1_stutter/+1_stutter",
-        "+1_stutter",
-    ]
-    interactive_plots(st.session_state[locus_key], locus)
-    col1, col2, col3 = st.columns(3)
-    if locus_key in flags["key"].values:
-        locus_flags = flags[flags["key"] == locus_key]
-        for flag in locus_flags["Flags"].unique():
-            col2.write(f"⚠️ Potential issue: {flag} identified!")
-    st.data_editor(
-        data=st.session_state[locus_key],
-        disabled=(
-            "SampleID",
-            "Locus",
-            "UAS_Output_Sequence",
-            "CE_Allele",
-            "UAS_Output_Bracketed_Notation",
-            "Custom_Range_Sequence",
-            "Custom_Bracketed_Notation",
-            "Reads",
-            "parent_allele1",
-            "parent_allele2",
-            "allele1_ref_reads",
-            "allele2_ref_reads",
-            "perc_noise",
-            "perc_stutter",
-        ),
-        column_config={
-            "allele_type": st.column_config.SelectboxColumn("allele_type", options=Type)
-        },
-        hide_index=True,
-        key=f"{locus_key}_edited",
-        on_change=df_on_change,
-        args=(locus_key,),
-    )
-
+    if locus == "All Markers":
+        interactive_plots_allmarkers(sample_df)
+    else:
+        locus_key = f"{sample}_{locus}"
+        if locus_key not in st.session_state:
+            st.session_state[locus_key] = sample_df[sample_df["Locus"] == locus].reset_index(drop=True)
+        Type = [
+            "Typed",
+            "-1_stutter",
+            "-2_stutter",
+            "BelowAT",
+            "-1_stutter/+1_stutter",
+            "+1_stutter",
+        ]
+        plot = interactive_plots(st.session_state[locus_key], locus)
+        st.plotly_chart(plot, use_container_width=True)
+        col1, col2, col3 = st.columns(3)
+        if locus_key in flags["key"].values:
+            locus_flags = flags[flags["key"] == locus_key]
+            for flag in locus_flags["Flags"].unique():
+                col2.write(f"⚠️ Potential issue: {flag} identified!")
+        st.data_editor(
+            data=st.session_state[locus_key],
+            disabled=(
+                "SampleID",
+                "Locus",
+                "UAS_Output_Sequence",
+                "CE_Allele",
+                "UAS_Output_Bracketed_Notation",
+                "Custom_Range_Sequence",
+                "Custom_Bracketed_Notation",
+                "Reads",
+                "parent_allele1",
+                "parent_allele2",
+                "allele1_ref_reads",
+                "allele2_ref_reads",
+                "perc_noise",
+                "perc_stutter",
+            ),
+            column_config={
+                "allele_type": st.column_config.SelectboxColumn("allele_type", options=Type)
+            },
+            hide_index=True,
+            key=f"{locus_key}_edited",
+            on_change=df_on_change,
+            args=(locus_key,),
+        )
     if st.button("Save Edits"):
         combined_df = pd.DataFrame()
         for sample in df1["SampleID"].unique():
