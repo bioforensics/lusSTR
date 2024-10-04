@@ -190,7 +190,7 @@ def df_on_change(locus):
             st.session_state[locus].loc[st.session_state[locus].index == index, key] = value
 
 
-def interactive_plots_allmarkers(sample_df):
+def interactive_plots_allmarkers(sample_df, flagged_df):
     cols = st.columns(4)
     max_reads = max(sample_df["Reads"])
     n = 100 if max_reads > 1000 else 10
@@ -198,8 +198,10 @@ def interactive_plots_allmarkers(sample_df):
     increase_value = int(math.ceil((max_yvalue / 5)) / n) * n
     n = 0
     for marker in sample_df["Locus"].unique():
-        at = get_at(sample_df, marker)
+        sample_locus = sample_df["SampleID"].unique() + "_" + marker
         marker_df = sample_df[sample_df["Locus"] == marker].sort_values(by="CE_Allele")
+        if sample_locus in flagged_df["key"].values:
+            marker = f"⚠️{marker}⚠️"
         plot = interactive_plots(marker_df, marker, max_yvalue, increase_value, all=True)
         col = cols[n]
         col.plotly_chart(plot, use_container_width=True)
@@ -210,7 +212,11 @@ def interactive_plots_allmarkers(sample_df):
     
 
 def interactive_plots(df, locus, ymax, increase, all=False):
-    at = get_at(df, locus)
+    if "⚠️" in locus:
+        locus_at = locus.replace("⚠️", "")
+    else:
+        locus_at = locus
+    at = get_at(df, locus_at)
     for i, row in df.iterrows():
         if df.loc[i, "allele_type"] == "Typed":
             df.loc[i, "Label"] = "Typed"
@@ -294,7 +300,12 @@ def interactive_setup(df1, file):
     if "⚠️" in locus:
         locus = locus.replace("⚠️", "")
     if locus == "All Markers":
-        interactive_plots_allmarkers(sample_df)
+        if not flags_sample.empty:
+            st.write(
+                f"⚠️ indicates potential problems with the marker. Examine the individual marker "
+                f"plots for more information."
+            )
+        interactive_plots_allmarkers(sample_df, flags)
     else:
         locus_key = f"{sample}_{locus}"
         if locus_key not in st.session_state:
