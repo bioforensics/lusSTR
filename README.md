@@ -52,7 +52,10 @@ Once lusSTR has been installed, the GUI can be started with the command:
 ```
 lusstr gui
 ```
-All lusSTR settings for either the STR pipeline or the SNP pipeline can be specified after selecting the desired pipeline tab.
+All lusSTR settings for either the STR pipeline or the SNP pipeline can be specified after selecting the desired pipeline tab.  
+
+The GUI provides an option to view marker plots interactively and manually edit the sequence type after lusSTR is complete.  
+There is also an option to upload previously run data to view. See the last STR section (```View and Edit lusSTR data```) for more information.  
 ____
 
 ## *Command line interface*
@@ -210,7 +213,23 @@ When using STRmix data, the data type can be specified using the ```data-type```
 
 Finally, output files are created for direct use in EuroForMix (EFM), MPSproto or STRmix. If EFM or MPSproto is specified, a single file is created containing all samples in the input file (however, separate output files for each sample can be created with the ```separate``` setting specified in the config file). If STRmix is specified, a directory containing files for each individual sample is created. The ```profile-type``` setting allows for the creation of either a ```reference``` or ```evidence``` profile. Both EuroForMix/MPSproto and STRmix require different formatting depending on the type of sample. 
 
+---
+
+### View and Edit lusSTR data
+
+The ```See Individual Marker Plots & Data``` button at the bottom of the lusSTR STR page can be run either directly after a lusSTR run (e.g. the settings have already been specified) or the user can upload previously-run lusSTR data by uploading the lusSTR output folder using the ```Select an Output Folder``` button. If using previously run data, the configuration settings within the ```config.yaml``` file in that folder will automatically be loaded and used. If other settings are desired, please re-run lusSTR using the new settings.  
+
+Once the ```See Individual Marker Plots & Data``` button has been pressed, the sample of interest can be selected from the dropdown menu (if multiple samples are present). The first screen contains the marker plots for all autosomal STRs. Individual markers can be selected from the dropdown menu. Markers with potential issues are flagged with a caution symbol.  
+
+On the individual marker pages, the ```allele_type``` column can be changed (no other column in the data table can be edited). A dropdown menu will appear to change the assigned allele type for a specific sequence. If a type is changed, the page will automatically refresh and the marker plot will be updated with the edited changes. The user may edit multiple markers and samples.  
+
+Once all desired changes are made, selecting the "Save Edits" button will create the following files containing the changes:
+  1. New final lusSTR output files (either ```STRmix``` or ```EFM``` files as generated previously with lusSTR)  
+  2. New allele information file  
+  3. New PDFs of the marker plots  
+The new files are automatically generated into a folder labeled as: ```edited_date_time``` (e.g. ```edited_10042024_16_29_50```)
 ___
+
 
  ## SNP Data Processing
 
