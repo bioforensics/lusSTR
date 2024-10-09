@@ -291,12 +291,12 @@ def interactive_setup(df1, file):
     locus_list = pd.concat([pd.Series("All Markers"), sample_df["Locus"].drop_duplicates()])
     if os.path.isfile(f"{file}_Flagged_Loci.csv"):
         flags = pd.read_csv(f"{file}_Flagged_Loci.csv")
-        flags["key"] = flags["SampleID"] + "_" + flags["Locus"]
-        flags_sample = flags[flags["SampleID"] == sample].reset_index(drop=True)
-        for flagged_locus in flags_sample["Locus"].unique():
-            locus_list = locus_list.str.replace(flagged_locus, f"⚠️{flagged_locus}⚠️")
     else:
-        flags = pd.DataFrame(columns=["key"])
+        flags = pd.DataFrame(columns=["key", "SampleID", "Locus"])
+    flags["key"] = flags["SampleID"] + "_" + flags["Locus"]
+    flags_sample = flags[flags["SampleID"] == sample].reset_index(drop=True)
+    for flagged_locus in flags_sample["Locus"].unique():
+        locus_list = locus_list.str.replace(flagged_locus, f"⚠️{flagged_locus}⚠️")
     locus = col2.selectbox("Select Marker:", options=locus_list)
     if "⚠️" in locus:
         locus = locus.replace("⚠️", "")
