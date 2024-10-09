@@ -223,13 +223,6 @@ def interactive_plots(df, locus, ymax, increase, all=False):
             df.loc[i, "Label"] = "Stutter"
         else:
             df.loc[i, "Label"] = df.loc[i, "allele_type"]
-        # if df.loc[i, "allele_type"] == "Typed":
-        #    df.loc[i, "Label"] = "Typed"
-        # elif df.loc[i, "allele_type"] == "BelowAT":
-        #    df.loc[i, "Label"] = "BelowAT"
-        # elif df.loc[i, "allele_type"]
-        # else:
-        #    df.loc[i, "Label"] = "Stutter"
     min_x = round(min(df["CE_Allele"]) - 1)
     max_x = round(max(df["CE_Allele"]) + 1)
     plot = px.bar(
