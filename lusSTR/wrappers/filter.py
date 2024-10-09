@@ -146,9 +146,9 @@ def process_strs(dict_loc, datatype, seq_col, brack_col):
 
 def EFM_output(profile, outfile, profile_type, data_type, col, sex, separate=False):
     if profile_type == "reference":
-        profile = profile[profile.allele_type == "Typed"]
+        profile = profile.query("allele_type == 'Typed'")
     else:
-        profile = profile[profile.allele_type != "BelowAT"]
+        profile = profile.query("allele_type != ['BelowAT', 'Deleted']")
     efm_profile = populate_efm_profile(profile, data_type, col, sex)
     if separate:
         write_sample_specific_efm_profiles(efm_profile, profile_type, data_type, outfile)
@@ -254,9 +254,10 @@ def determine_max_num_alleles(allele_heights):
 def STRmix_output(profile, outdir, profile_type, data_type, seq_col):
     Path(outdir).mkdir(parents=True, exist_ok=True)
     if profile_type == "reference":
-        filtered_df = profile[profile.allele_type == "Typed"]
+        filtered_df = profile.query("allele_type == 'Typed'")
     else:
-        filtered_df = profile[profile.allele_type != "BelowAT"]
+        # filtered_df = profile.loc[([profile.allele_type != "BelowAT"]) & ([profile.allele_type != "Deleted"])]
+        filtered_df = profile.query("allele_type != ['BelowAT', 'Deleted']")
     if data_type == "ce":
         strmix_profile = strmix_ce_processing(filtered_df)
     elif data_type == "lusplus":
@@ -371,8 +372,9 @@ def make_plot(df, sample_id, sameyaxis=False, filters=False, at=True):
         sample_df["allele_type"].str.contains("Typed"),
         sample_df["allele_type"].str.contains("BelowAT"),
         sample_df["allele_type"].str.contains("stutter"),
+        sample_df["allele_type"].str.contains("Deleted"),
     ]
-    values = ["Typed", "BelowAT", "Stutter"]
+    values = ["Typed", "BelowAT", "Stutter", "Deleted"]
     sample_df.loc[:, "Type"] = np.select(conditions, values)
     max_reads = max(sample_df["Reads"])
     n = 100 if max_reads > 1000 else 10
@@ -383,7 +385,7 @@ def make_plot(df, sample_id, sameyaxis=False, filters=False, at=True):
     for marker in sample_df["Locus"].unique():
         if marker in strs or marker in ystrs:
             n += 1
-            colors = {"Typed": "g", "Stutter": "b", "BelowAT": "r"}
+            colors = {"Typed": "green", "Stutter": "blue", "BelowAT": "red", "Deleted": "purple"}
             marker_df = sample_df[sample_df["Locus"] == marker].sort_values(by="CE_Allele")
             ax = fig.add_subplot(6, 5, n)
             p = ax.bar(

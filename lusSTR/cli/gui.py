@@ -209,8 +209,8 @@ def interactive_plots_allmarkers(sample_df, flagged_df):
         if n == 3:
             n = 0
         else:
-            n += 1   
-    
+            n += 1
+
 
 def interactive_plots(df, locus, ymax, increase, all=False):
     if "⚠️" in locus:
@@ -219,12 +219,17 @@ def interactive_plots(df, locus, ymax, increase, all=False):
         locus_at = locus
     at = get_at(df, locus_at)
     for i, row in df.iterrows():
-        if df.loc[i, "allele_type"] == "Typed":
-            df.loc[i, "Label"] = "Typed"
-        elif df.loc[i, "allele_type"] == "BelowAT" or df.loc[i, "allele_type"] == "NotTyped":
-            df.loc[i, "Label"] = "BelowAT"
-        else:
+        if "stutter" in df.loc[i, "allele_type"]:
             df.loc[i, "Label"] = "Stutter"
+        else:
+            df.loc[i, "Label"] = df.loc[i, "allele_type"]
+        # if df.loc[i, "allele_type"] == "Typed":
+        #    df.loc[i, "Label"] = "Typed"
+        # elif df.loc[i, "allele_type"] == "BelowAT":
+        #    df.loc[i, "Label"] = "BelowAT"
+        # elif df.loc[i, "allele_type"]
+        # else:
+        #    df.loc[i, "Label"] = "Stutter"
     min_x = round(min(df["CE_Allele"]) - 1)
     max_x = round(max(df["CE_Allele"]) + 1)
     plot = px.bar(
@@ -236,6 +241,7 @@ def interactive_plots(df, locus, ymax, increase, all=False):
             "Typed": "green",
             "BelowAT": "red",
             "Stutter": "blue",
+            "Deleted": "purple",
         },
         title=locus,
     )
@@ -310,8 +316,11 @@ def interactive_setup(df1, file):
     else:
         locus_key = f"{sample}_{locus}"
         if locus_key not in st.session_state:
-            st.session_state[locus_key] = sample_df[sample_df["Locus"] == locus].reset_index(drop=True)
+            st.session_state[locus_key] = sample_df[sample_df["Locus"] == locus].reset_index(
+                drop=True
+            )
         Type = [
+            "Deleted",
             "Typed",
             "-1_stutter",
             "-2_stutter",
