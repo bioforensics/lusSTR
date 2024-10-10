@@ -8,19 +8,15 @@ from lusSTR.cli import strs
 from lusSTR.cli import snps
 from lusSTR.cli import gui
 
-mains = {
-    "config": config.main,
-    "strs": strs.main,
-    "snps": snps.main,
-    "gui": gui.main
-}
+mains = {"config": config.main, "strs": strs.main, "snps": snps.main, "gui": gui.main}
 
 subparser_funcs = {
     "config": config.subparser,
     "strs": strs.subparser,
     "snps": snps.subparser,
-    "gui": gui.subparser
+    "gui": gui.subparser,
 }
+
 
 def main(args=None):
     if args is None:
@@ -36,6 +32,7 @@ def main(args=None):
         result = mainmethod(args)
         return result
 
+
 def get_parser():
     parser = argparse.ArgumentParser()
     parser.add_argument(
@@ -46,6 +43,7 @@ def get_parser():
     for func in subparser_funcs.values():
         func(subparsers)
     return parser
+
 
 if __name__ == "__main__":
     main()

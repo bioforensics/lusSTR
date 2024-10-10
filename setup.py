@@ -50,6 +50,7 @@ setup(
         "numpy==1.26.4",
         "streamlit>=1.31.0",
         "streamlit_option_menu>=0.3.12",
+        "plotly==5.24.1",
     ],
     entry_points={"console_scripts": ["lusstr = lusSTR.cli:main"]},
     scripts=glob.glob("lusSTR/scripts/*"),

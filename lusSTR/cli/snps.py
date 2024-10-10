@@ -22,15 +22,15 @@ def main(args):
         lusSTR.snakefile(workflow="snps"), targets=[pretarget], workdir=workdir, verbose=True
     )
     if result is not True:
-        raise SystemError('Snakemake failed')
+        raise SystemError("Snakemake failed")
+
 
 def subparser(subparsers):
-    p = subparsers.add_parser(
-        "snps", description="Running the SNP pipeline"
-    )
+    p = subparsers.add_parser("snps", description="Running the SNP pipeline")
     p.add_argument(
-        "target", choices=["format", "all"], 
+        "target",
+        choices=["format", "all"],
         help="Steps to run. Specifying 'format' will run only 'format'. Specifying "
-        "'all' will run all steps of the SNP workflow ('format' and 'convert')."
+        "'all' will run all steps of the SNP workflow ('format' and 'convert').",
     )
     p.add_argument("-w", "--workdir", metavar="W", default=".", help="working directory")

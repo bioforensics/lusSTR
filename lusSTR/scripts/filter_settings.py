@@ -48,7 +48,7 @@ def single_allele_thresholds(metadata, locus_reads, single_all_df):
     elif thresholds("Analytical", metadata, locus_reads, single_all_df["Reads"][0])[1] is False:
         single_all_df[["allele_type", "perc_noise"]] = ["BelowAT", 1.0]
     elif thresholds("Analytical", metadata, locus_reads, single_all_df["Reads"][0])[1] is True:
-        single_all_df["allele_type"] = "real_allele"
+        single_all_df["allele_type"] = "Typed"
     return single_all_df
 
 
@@ -67,7 +67,7 @@ def multiple_allele_thresholds(metadata, locus_reads, locus_allele_info):
                 round(quest_allele_reads / locus_reads, 3),
             ]
         else:
-            locus_allele_info.loc[i, "allele_type"] = "real_allele"
+            locus_allele_info.loc[i, "allele_type"] = "Typed"
     return locus_allele_info, locus_reads
 
 
@@ -102,7 +102,7 @@ def thresholds(filter, metadata, locus_reads, quest_al_reads):
 
 def ce_filtering(locus_allele_info, locus_reads, metadata, datatype, brack_col):
     for i in range(len(locus_allele_info)):  # check for stutter alleles
-        if locus_allele_info.loc[i, "allele_type"] != "real_allele":
+        if locus_allele_info.loc[i, "allele_type"] != "Typed":
             continue
         else:
             ref_allele_reads = locus_allele_info.loc[i, "Reads"]
@@ -133,8 +133,8 @@ def ce_filtering(locus_allele_info, locus_reads, metadata, datatype, brack_col):
                             3,
                         )
                 else:
-                    locus_allele_info.loc[j, "perc_stutter"] = ""
-                locus_allele_info.loc[j, "perc_noise"] = ""
+                    locus_allele_info.loc[j, "perc_stutter"] = None
+                locus_allele_info.loc[j, "perc_noise"] = None
             elif "BelowAT" in locus_allele_info.loc[j, "allele_type"]:
                 locus_allele_info.loc[j, "perc_noise"] = round(
                     locus_allele_info.loc[j, "Reads"] / locus_reads, 3
@@ -345,7 +345,7 @@ def output_allele_call(quest_al_reads, all_thresh, orig_type):
     if quest_al_reads <= all_thresh:
         all_type = orig_type
     else:
-        all_type = "real_allele"
+        all_type = "Typed"
     return all_type
 
 
@@ -382,7 +382,7 @@ def check_2stutter(stutter_df, allele_des, allele, brack_col):
 def allele_counts(allele_df):
     mix_df = pd.DataFrame(columns=["SampleID", "Locus", "Flags"])
     try:
-        if allele_df.allele_type.value_counts()["real_allele"] > 2:
+        if allele_df.allele_type.value_counts()["Typed"] > 2:
             mix_df.loc[len(mix_df.index)] = [
                 allele_df.loc[1, "SampleID"],
                 allele_df.loc[1, "Locus"],
@@ -466,8 +466,8 @@ def allele_imbalance_check(allele_df):
         locus = allele_df.loc[0, "Locus"]
         metadata = filter_marker_data[locus]
         het_perc = metadata["MinimumHeterozygousBalanceThresholdDynamicPercent"]
-        if allele_df.allele_type.value_counts()["real_allele"] >= 2:
-            real_df = allele_df[allele_df["allele_type"] == "real_allele"].reset_index(drop=True)
+        if allele_df.allele_type.value_counts()["Typed"] >= 2:
+            real_df = allele_df[allele_df["allele_type"] == "Typed"].reset_index(drop=True)
             max_reads = real_df["Reads"].max()
             min_reads = real_df["Reads"].min()
             if min_reads / max_reads < het_perc:
