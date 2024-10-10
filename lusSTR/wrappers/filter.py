@@ -256,7 +256,6 @@ def STRmix_output(profile, outdir, profile_type, data_type, seq_col):
     if profile_type == "reference":
         filtered_df = profile.query("allele_type == 'Typed'")
     else:
-        # filtered_df = profile.loc[([profile.allele_type != "BelowAT"]) & ([profile.allele_type != "Deleted"])]
         filtered_df = profile.query("allele_type != ['BelowAT', 'Deleted']")
     if data_type == "ce":
         strmix_profile = strmix_ce_processing(filtered_df)
@@ -355,7 +354,6 @@ def marker_plots(df, output_name, sex, wd="."):
     df["CE_Allele"] = df["CE_Allele"].astype(float)
     filt_df = df[df["allele_type"] == "Typed"]
     for sample_id in df["SampleID"].unique():
-        # sample_id = f"{id}_ystrs" if sex else id
         with PdfPages(f"{wd}/MarkerPlots/{output_name}_{sample_id}_marker_plots.pdf") as pdf:
             make_plot(filt_df, sample_id, filters=True, at=False)
             pdf.savefig()
@@ -367,7 +365,6 @@ def marker_plots(df, output_name, sex, wd="."):
 
 def make_plot(df, sample_id, sameyaxis=False, filters=False, at=True):
     sample_df = df[df["SampleID"] == sample_id].copy()
-    # sample_id = f"{id}_sexchr" if sex else id
     conditions = [
         sample_df["allele_type"].str.contains("Typed"),
         sample_df["allele_type"].str.contains("BelowAT"),
