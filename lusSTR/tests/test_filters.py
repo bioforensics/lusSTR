@@ -219,7 +219,7 @@ def test_STRmixoutput_format(outputdir, datatype, tmp_path):
     shutil.copyfile(inputfile, os.path.join(str_path, "STRmix_Files.txt"))
     all_arglist = ["strs", "all", "-w", str_path]
     lusSTR.cli.main(lusSTR.cli.get_parser().parse_args(all_arglist))
-    # assert filecmp.cmp(exp_out, obs_out) is True
+    assert filecmp.cmp(exp_out, obs_out) is True
     assert filecmp.cmp(exp_info_out, obs_info_out) is True
 
 
