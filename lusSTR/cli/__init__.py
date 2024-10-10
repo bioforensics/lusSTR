@@ -1,14 +1,23 @@
-import argparse
-import importlib.resources
+# -------------------------------------------------------------------------------------------------
+# Copyright (c) 2024, DHS.
+#
+# This file is part of lusSTR (http://github.com/bioforensics/lusSTR) and is licensed under
+# the BSD license: see LICENSE.txt.
+#
+# This software was prepared for the Department of Homeland Security (DHS) by the Battelle National
+# Biodefense Institute, LLC (BNBI) as part of contract HSHQDC-15-C-00064 to manage and operate the
+# National Biodefense Analysis and Countermeasures Center (NBACC), a Federally Funded Research and
+# Development Center.
+# -------------------------------------------------------------------------------------------------
+
+from argparse import ArgumentParser
+from importlib.resources import files
+import lusSTR
+from lusSTR.cli import config, gui, strs, snps
 import streamlit.web.cli as stcli
 import sys
-import lusSTR
-from lusSTR.cli import config
-from lusSTR.cli import strs
-from lusSTR.cli import snps
-from lusSTR.cli import gui
 
-mains = {"config": config.main, "strs": strs.main, "snps": snps.main, "gui": gui.main}
+mains = {"config": config.main, "strs": strs.main, "snps": snps.main}
 
 subparser_funcs = {
     "config": config.subparser,
@@ -24,7 +33,7 @@ def main(args=None):
     if args.subcmd is None:
         get_parser().parse_args(["-h"])
     elif args.subcmd == "gui":
-        gui_path = importlib.resources.files("lusSTR") / "cli" / "gui.py"
+        gui_path = files("lusSTR") / "cli" / "gui.py"
         sys.argv = ["streamlit", "run", str(gui_path)]
         sys.exit(stcli.main())
     else:
@@ -34,7 +43,7 @@ def main(args=None):
 
 
 def get_parser():
-    parser = argparse.ArgumentParser()
+    parser = ArgumentParser()
     parser.add_argument(
         "-v", "--version", action="version", version="lusSTR v" + lusSTR.__version__
     )

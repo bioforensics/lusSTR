@@ -1,5 +1,5 @@
 # -------------------------------------------------------------------------------------------------
-# Copyright (c) 2020, DHS.
+# Copyright (c) 2024, DHS.
 #
 # This file is part of lusSTR (http://github.com/bioforensics/lusSTR) and is licensed under
 # the BSD license: see LICENSE.txt.
@@ -9,19 +9,3 @@
 # National Biodefense Analysis and Countermeasures Center (NBACC), a Federally Funded Research and
 # Development Center.
 # -------------------------------------------------------------------------------------------------
-
-import importlib.resources
-from . import cli
-from . import gui
-from lusSTR._version import get_versions
-
-__version__ = get_versions()["version"]
-del get_versions
-
-
-def snakefile(workflow="strs"):
-    return importlib.resources.files("lusSTR") / f"workflows/{workflow}.smk"
-
-
-def wrapper(label):
-    return importlib.resources.files("lusSTR") / f"wrappers/{label}.py"

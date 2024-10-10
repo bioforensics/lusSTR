@@ -10,7 +10,6 @@
 # Development Center.
 # -------------------------------------------------------------------------------------------------
 
-import argparse
 import lusSTR
 from snakemake import snakemake
 
