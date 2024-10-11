@@ -174,15 +174,16 @@ def allele_ident(
         brack_col,
     )
     if "stutter" in locus_allele_info.loc[j, "allele_type"]:
-        if "/" in locus_allele_info.loc[j, "allele_type"] and pd.isnull(
-            locus_allele_info.loc[j, "parent_allele2"]
+        if (
+            "/" in locus_allele_info.loc[j, "allele_type"]
+            and locus_allele_info.loc[j, "parent_allele2"] == "nan"
         ):
             stut_allele2 = ref_allele if datatype == "ce" else ref_altformat
             locus_allele_info.loc[j, ["parent_allele2", "allele2_ref_reads"]] = [
                 stut_allele2,
                 ref_allele_reads,
             ]
-        elif pd.isnull(locus_allele_info.loc[j, "parent_allele1"]):
+        elif locus_allele_info.loc[j, "parent_allele1"] == "nan":
             stut_allele1 = ref_allele if datatype == "ce" else ref_altformat
             locus_allele_info.loc[j, ["parent_allele1", "allele1_ref_reads"]] = [
                 stut_allele1,
