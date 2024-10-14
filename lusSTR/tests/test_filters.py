@@ -19,6 +19,7 @@ import os
 import pytest
 import shutil
 from tempfile import NamedTemporaryFile
+import warnings
 
 
 with open(get_filter_metadata_file(), "r") as fh:
@@ -166,6 +167,7 @@ def test_plus1stutter(
     ],
 )
 def test_EFMoutput_format(outputdir, datatype, software, tmp_path):
+    warnings.filterwarnings("ignore", category=DeprecationWarning)
     str_path = str(tmp_path / "WD")
     inputfile = data_file("test_stutter.txt")
     exp_out = data_file(f"{outputdir}test_filtering_EFMoutput_{datatype}.csv")
