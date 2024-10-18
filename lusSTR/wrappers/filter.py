@@ -132,8 +132,18 @@ def process_strs(dict_loc, datatype, seq_col, brack_col):
             ],
             fill_value=None,
         )
+        data_order = data_order.astype(
+            {
+                "allele_type": "str",
+                "parent_allele1": "str",
+                "parent_allele2": "str",
+                "perc_noise": "float64",
+                "perc_stutter": "float64",
+            }
+        )
         if locus in strs or locus in ystrs:
             filtered_df = filters(data_order, locus, total_reads, datatype, brack_col)
+            filtered_df = filtered_df.replace({"nan": None})
             final_df = pd.concat([final_df, filtered_df])
             flags_df = pd.concat([flags_df, flags(filtered_df, datatype)])
     if datatype == "ce" or datatype == "ngs":
