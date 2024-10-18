@@ -13,7 +13,8 @@
 import streamlit as st
 
 
-class ContactPage():
-    def display(self):
-        st.title("Contact Us")
-        st.write("For any questions or issues, please contact rebecca.mitchell@st.dhs.gov or daniel.standage@st.dhs.gov.")
+def contact_page_display():
+    st.title("Contact Us")
+    st.write(
+        "For any questions or issues, please contact rebecca.mitchell@st.dhs.gov or daniel.standage@st.dhs.gov."
+    )

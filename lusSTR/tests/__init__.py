@@ -15,6 +15,6 @@ import os
 
 
 def data_file(path):
-    pathparts = path.split('/')
-    relpath = os.path.join('tests', 'data', *pathparts)
+    pathparts = path.split("/")
+    relpath = os.path.join("tests", "data", *pathparts)
     return importlib.resources.files("lusSTR") / relpath

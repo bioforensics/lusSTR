@@ -11,20 +11,11 @@
 # -------------------------------------------------------------------------------------------------
 
 from lusSTR.gui import initialize
-from lusSTR.gui.snps import show_SNP_page
-
-
-def main():
-    app = initialize()
-    if app is None:
-        show_SNP_page()
-    else:
-        app().display()
-
-
-if __name__ == "__main__":
-    main()
 
 
 def subparser(subparsers):
     subparsers.add_parser("gui", description="Launch the lusSTR GUI")
+
+
+if __name__ == "__main__":
+    initialize()

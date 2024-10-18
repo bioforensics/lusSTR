@@ -16,8 +16,7 @@ import streamlit as st
 import subprocess
 
 
-def show_SNP_page():
-
+def snp_workflow_display():
     st.title("SNP Workflow")
     st.info(
         "Please Select SNP Settings Below for lusSTR! For Information Regarding the Settings,"
@@ -37,27 +36,27 @@ def show_SNP_page():
     )
 
     # Initialize session state if not already initialized
-    if "samp_input" not in st.session_state:
-        st.session_state.samp_input = None
+    if "samp_input_snp" not in st.session_state:
+        st.session_state.samp_input_snp = None
 
     # Logic for Path Picker based on user's input option
 
     if input_option == "Folder with Multiple Files":
         clicked = st.button("Please Select a Folder")
         if clicked:
-            st.session_state.samp_input = select.folder()
+            st.session_state.samp_input_snp = select.folder()
 
     else:
         clicked_file = st.button("Please Select a File")
         if clicked_file:
-            st.session_state.samp_input = select.file()
+            st.session_state.samp_input_snp = select.file()
 
     # Display The Selected Path
-    if st.session_state.samp_input:
-        st.text_input("Location Of Your Input File(s):", st.session_state.samp_input)
+    if st.session_state.samp_input_snp:
+        st.text_input("Location Of Your Input File(s):", st.session_state.samp_input_snp)
 
     # Store Selected Path to Reference in Config
-    samp_input = st.session_state.samp_input
+    samp_input_snp = st.session_state.samp_input_snp
 
     #####################################################################
     #      SNP: General Software Settings to Generate Config File       #
@@ -159,16 +158,16 @@ def show_SNP_page():
     col1, col2, col3, col4, col5 = st.columns(5)
 
     # Initialize session state if not already initialized
-    if "wd_dirname" not in st.session_state:
-        st.session_state.wd_dirname = None
+    if "wd_dirname_snp" not in st.session_state:
+        st.session_state.wd_dirname_snp = None
 
     clicked_wd = col1.button("Please Select An Output Folder")
     if clicked_wd:
-        st.session_state.wd_dirname = select.folder()
+        st.session_state.wd_dirname_snp = select.folder()
 
     # Display selected path
-    if st.session_state.wd_dirname:
-        st.text_input("Your Specified Output Folder:", st.session_state.wd_dirname)
+    if st.session_state.wd_dirname_snp:
+        st.text_input("Your Specified Output Folder:", st.session_state.wd_dirname_snp)
 
     #####################################################################
     #     SNP: Generate Config File Based on Settings                   #
@@ -178,7 +177,12 @@ def show_SNP_page():
     if st.button("Submit"):
 
         # Check if all required fields are filled
-        if analysis_software and samp_input and output and wd_dirname:
+        if (
+            analysis_software
+            and st.session_state.samp_input_snp
+            and output
+            and st.session_state.wd_dirname_snp
+        ):
 
             # Validate output prefix
             if not validate_prefix(output):
@@ -195,7 +199,7 @@ def show_SNP_page():
 
                 config_data = {
                     "analysis_software": analysis_software,
-                    "samp_input": samp_input,
+                    "samp_input_snp": samp_input_snp,
                     "output": output,
                     "kit": kit,
                     "types": types_string,
@@ -211,14 +215,14 @@ def show_SNP_page():
                     config_data["references"] = st.session_state.reference
 
                 # Generate YAML config file
-                generate_config_file(config_data, st.session_state.wd_dirname, "SNP")
+                generate_config_file(config_data, st.session_state.wd_dirname_snp, "SNP")
 
                 # Subprocess lusSTR commands
                 command = ["lusstr", "snps", "all"]
 
                 # Specify WD to lusSTR
-                if wd_dirname:
-                    command.extend(["-w", st.session_state.wd_dirname + "/"])
+                if st.session_state.wd_dirname_snp:
+                    command.extend(["-w", st.session_state.wd_dirname_snp + "/"])
 
                 # Run lusSTR command in terminal
                 try:
@@ -241,11 +245,3 @@ def show_SNP_page():
                 "Directory or File, Prefix for Output, and Specification of Working Directory) "
                 "before submitting."
             )
-
-
-if __name__ == "__main__":
-    main()
-
-
-def subparser(subparsers):
-    subparsers.add_parser("gui", description="Launch the lusSTR GUI")

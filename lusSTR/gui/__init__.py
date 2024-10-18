@@ -10,20 +10,21 @@
 # Development Center.
 # -------------------------------------------------------------------------------------------------
 
-from .home import HomePage
-from .howto import HowToPage
-from .contact import ContactPage
-from .strs import STRWorkflow
+from .contact import contact_page_display
+from .home import home_page_display
+from .howto import howto_page_display
+from .snps import snp_workflow_display
+from .strs import str_workflow_display
 import streamlit as st
 from streamlit_option_menu import option_menu
 
 
-apps = {
-    "Home": HomePage,
-    "STRs": STRWorkflow,
-    "SNPs": None,
-    "How to Use": HowToPage,
-    "Contact": ContactPage,
+pages = {
+    "Home": home_page_display,
+    "STRs": str_workflow_display,
+    "SNPs": snp_workflow_display,
+    "How to Use": howto_page_display,
+    "Contact": contact_page_display,
 }
 
 
@@ -38,4 +39,5 @@ def initialize():
         orientation="horizontal",
     )
     appname = str(selected)
-    return apps[appname]
+    renderer = pages[appname]
+    renderer()
