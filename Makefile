@@ -10,11 +10,11 @@ test:
 
 ## style:     check code style
 style:
-	black --line-length=99 --check *.py lusSTR/scripts/*.py lusSTR/wrappers/*.py lusSTR/tests/test_*.py
+	black --line-length=99 --check *.py lusSTR/*/*.py
 
 ## format:    auto-reformat code with Black
 format:
-	black --line-length=99 *.py lusSTR/cli/gui.py lusSTR/scripts/*.py lusSTR/wrappers/*.py lusSTR/tests/test_*.py
+	black --line-length=99 *.py lusSTR/*/*.py
 
 ## devenv:    configure a development environment
 devenv:

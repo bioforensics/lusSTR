@@ -1,5 +1,5 @@
 # -------------------------------------------------------------------------------------------------
-# Copyright (c) 2020, DHS.
+# Copyright (c) 2024, DHS.
 #
 # This file is part of lusSTR (http://github.com/bioforensics/lusSTR) and is licensed under
 # the BSD license: see LICENSE.txt.
@@ -10,11 +10,11 @@
 # Development Center.
 # -------------------------------------------------------------------------------------------------
 
-import importlib.resources
-import os
+import streamlit as st
 
 
-def data_file(path):
-    pathparts = path.split("/")
-    relpath = os.path.join("tests", "data", *pathparts)
-    return importlib.resources.files("lusSTR") / relpath
+def contact_page_display():
+    st.title("Contact Us")
+    st.write(
+        "For any questions or issues, please contact rebecca.mitchell@st.dhs.gov or daniel.standage@st.dhs.gov."
+    )

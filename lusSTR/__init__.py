@@ -11,7 +11,8 @@
 # -------------------------------------------------------------------------------------------------
 
 import importlib.resources
-from lusSTR import cli
+from . import cli
+from . import gui
 from lusSTR._version import get_versions
 
 __version__ = get_versions()["version"]
