@@ -10,21 +10,22 @@
 # Development Center.
 # -------------------------------------------------------------------------------------------------
 
-from lusSTR.gui import initialize
-from lusSTR.gui.snps import show_SNP_page
+from pathlib import Path
+import re
+import yaml
 
 
-def main():
-    app = initialize()
-    if app is None:
-        show_SNP_page()
+def generate_config_file(config_data, working_directory, workflow_type):
+    if workflow_type == "STR":
+        config_filename = "config.yaml"
+    elif workflow_type == "SNP":
+        config_filename = "snp_config.yaml"
     else:
-        app().display()
+        raise ValueError("Invalid workflow type. Please specify either 'STR' or 'SNP'.")
+    config_path = Path(working_directory) / config_filename
+    with open(config_path, "w") as file:
+        yaml.dump(config_data, file)
 
 
-if __name__ == "__main__":
-    main()
-
-
-def subparser(subparsers):
-    subparsers.add_parser("gui", description="Launch the lusSTR GUI")
+def validate_prefix(prefix):
+    return re.match(r"^[A-Za-z0-9_-]+$", prefix) is not None
