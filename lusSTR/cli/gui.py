@@ -922,8 +922,8 @@ def show_SNP_page():
 
     clicked_wd = col1.button("Please Select An Output Folder")
     if clicked_wd:
-        wd = folder_picker_dialog()
-        st.session_state.wd_dirname = wd
+        wd_dirname = folder_picker_dialog()
+        st.session_state.wd_dirname = wd_dirname
 
     # Display selected path
     if st.session_state.wd_dirname:
@@ -937,7 +937,7 @@ def show_SNP_page():
     if st.button("Submit"):
 
         # Check if all required fields are filled
-        if analysis_software and samp_input and output and wd_dirname:
+        if analysis_software and samp_input and output and st.session_state.wd_dirname:
 
             # Validate output prefix
             if not validate_prefix(output):
@@ -976,7 +976,7 @@ def show_SNP_page():
                 command = ["lusstr", "snps", "all"]
 
                 # Specify WD to lusSTR
-                if wd_dirname:
+                if st.session_state.wd_dirname:
                     command.extend(["-w", st.session_state.wd_dirname + "/"])
 
                 # Run lusSTR command in terminal
