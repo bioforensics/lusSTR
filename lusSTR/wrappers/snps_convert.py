@@ -158,7 +158,7 @@ def straitrazor_filtering(sr_df, thresh):
         if sr_df.loc[i, "Issues"] == "Allele call does not match expected allele!":
             sr_df = sr_df.drop(i)
         else:
-            if allele_reads < (total_snp_reads * thresh):
+            if allele_reads < (total_snp_reads * thresh) or allele_reads < 11:
                 sr_df.loc[i, "Reads"] = 0
     return sr_df
 
