@@ -385,8 +385,8 @@ def make_plot(df, sample_id, sameyaxis=False, filters=False, at=True):
     sample_df.loc[:, "Type"] = np.select(conditions, values)
     max_reads = max(sample_df["Reads"])
     n = 100 if max_reads > 1000 else 10
-    max_yvalue = int(math.ceil(max_reads / n)) * n
-    increase_value = int(math.ceil((max_yvalue / 5)) / n) * n
+    max_yvalue = (int(math.ceil(max_reads / n)) * n) + n
+    increase_value = int(math.ceil((max_yvalue / 5) / n)) * n
     fig = plt.figure(figsize=(30, 30))
     n = 0
     for marker in sample_df["Locus"].unique():
@@ -418,6 +418,7 @@ def make_plot(df, sample_id, sameyaxis=False, filters=False, at=True):
                     )
                 ax.bar_label(p, labels=marker_df["Label"])
             if sameyaxis:
+                plt.ylim(0, max_yvalue)
                 ax.set_yticks(np.arange(0, max_yvalue, increase_value))
             ax.set_xticks(
                 np.arange(
