@@ -196,7 +196,6 @@ def interactive_plots_allmarkers(sample_df, flagged_df):
     n = 100 if max_reads > 1000 else 10
     max_yvalue = (int(math.ceil(max_reads / n)) * n) + n
     increase_value = int(math.ceil((max_yvalue / 5) / n)) * n
-    print(max_yvalue)
     n = 0
     for marker in sample_df["Locus"].unique():
         col = cols[n]
