@@ -19,9 +19,9 @@ def create_log(log):
     now = datetime.now()
     dt = now.strftime("%m%d%Y_%H_%M_%S")
     shell("mkdir -p logs/{dt}/input/")
-    shell("cp {log} logs/{dt}/strs.log")
+    shell("cp '{log}' logs/{dt}/")
     if os.path.isdir(input_name):
-        shell("cp {input_name}/*.* logs/{dt}/input/")
+        shell("cp '{input_name}'/*.* logs/{dt}/input/")
     else:
         shell("cp '{input_name}' logs/{dt}/input/")
     shell("cp snp_config.yaml logs/{dt}/")
