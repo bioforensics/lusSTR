@@ -1,4 +1,23 @@
 {
+    "AMELOGENIN": {
+        "BasesToSubtract": 47,
+        "NumRepeats": 1,
+        "Repeats": [
+            "AAAGTG"
+        ],
+        "NumBasesToSeparate": 0,
+        "ReverseCompNeeded": "No",
+        "LUS": "",
+        "Sec": "",
+        "Tert": "",
+        "Foren_5": 26,
+        "Foren_3": 37,
+        "Power_5": 10,
+        "Power_3": 37,
+        "Custom_5": 10,
+        "Custom_3": 37,
+        "Alleles": ["0", "1"]
+    },
     "CSF1PO": {
         "BasesToSubtract": 0,
         "NumRepeats": 1,

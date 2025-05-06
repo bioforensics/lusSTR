@@ -355,6 +355,29 @@ class STRMarker:
         ]
 
 
+class STRMarker_Amelogenin(STRMarker):
+    @property
+    def canonical(self):
+        if self.uas_sequence == "AAAGTG":
+            return "Y"
+        else:
+            return "X"
+
+    @property
+    def summary(self):
+        return [
+            self.uas_sequence,
+            self.forward_sequence,
+            self.custom_sequence,
+            self.uas_sequence,
+            self.uas_sequence,
+            self.uas_sequence,
+            self.canonical,
+            "NA",
+            "NA",
+        ]
+
+
 class STRMarker_D8S1179(STRMarker):
     @property
     def flank_5p(self):
@@ -1742,6 +1765,7 @@ class STRMarker_DYS389II(STRMarker):
 
 def STRMarkerObject(locus, sequence, software, custom=False, kit="forenseq"):
     constructors = {
+        "AMELOGENIN": STRMarker_Amelogenin,
         "D8S1179": STRMarker_D8S1179,
         "D13S317": STRMarker_D13S317,
         "D20S482": STRMarker_D20S482,
