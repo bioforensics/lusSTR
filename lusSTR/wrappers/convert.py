@@ -65,7 +65,11 @@ def format_table(input, software, kit="forenseq", custom=False):
         else:
             remove_5p = metadata["Power_5"]
             remove_3p = metadata["Power_3"]
-        if len(sequence) <= (remove_5p + remove_3p) and software != "uas":
+        if (
+            len(sequence) <= (remove_5p + remove_3p)
+            and software != "uas"
+            and locus != "AMELOGENIN"
+        ):
             flank_summary = [
                 sampleid,
                 project,

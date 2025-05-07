@@ -63,7 +63,10 @@ class STRMarker:
 
     @property
     def repeat_size(self):
-        return len(self.data["LUS"])
+        if self.data["LUS"] != "":
+            return len(self.data["LUS"])
+        else:
+            return 1
 
     @property
     def repeats(self):
@@ -357,6 +360,20 @@ class STRMarker:
 
 class STRMarker_Amelogenin(STRMarker):
     @property
+    def forward_sequence(self):
+        if self.software == "uas":
+            return self.sequence
+        front, back = self._uas_bases_to_trim()
+        if len(self.sequence) == 0:
+            back = None
+        else:
+            back *= -1
+        if self.sequence[front:back] == "":
+            return ""
+        else:
+            return self.sequence[front:back]
+
+    @property
     def canonical(self):
         if self.uas_sequence == "AAAGTG":
             return "Y"
@@ -364,18 +381,45 @@ class STRMarker_Amelogenin(STRMarker):
             return "X"
 
     @property
+    def convert(self):
+        if self.forward_sequence == "":
+            return ""
+        else:
+            return self.forward_sequence
+
+    @property
+    def custom_brack(self):
+        if self.forward_sequence == "":
+            return ""
+        else:
+            return "NA"
+
+    @property
     def summary(self):
-        return [
-            self.uas_sequence,
-            self.forward_sequence,
-            self.custom_sequence,
-            self.uas_sequence,
-            self.uas_sequence,
-            self.uas_sequence,
-            self.canonical,
-            "NA",
-            "NA",
-        ]
+        if self.uas_sequence == "AAAGTG":
+            return [
+                "AAAGTG",
+                "AAAGTG",
+                "AAAGTG",
+                "AAAGTG",
+                "NA",
+                "NA",
+                "Y",
+                "NA",
+                "NA",
+            ]
+        elif self.uas_sequence == "":
+            return [
+                "",
+                "",
+                "",
+                "",
+                "NA",
+                "NA",
+                "X",
+                "NA",
+                "NA",
+            ]
 
 
 class STRMarker_D8S1179(STRMarker):

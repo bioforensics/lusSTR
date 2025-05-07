@@ -71,7 +71,7 @@ def uas_format(infile, sexloci=False):
 def nonuas_load(inpath, software, sexloci=False):
     """Format a directory of STRait Razor/GeneMarker output files."""
     locus_list = [
-        "AMELOGENIN",
+        "Amelogenin",
         "CSF1PO",
         "D10S1248",
         "D12S391",
