@@ -69,7 +69,7 @@ def format_table(input, software, kit="forenseq", custom=False):
             len(sequence) <= (remove_5p + remove_3p)
             and software != "uas"
             and locus != "AMELOGENIN"
-        ):
+        ) or (locus == "AMELOGENIN" and len(sequence) < (remove_5p + remove_3p)):
             flank_summary = [
                 sampleid,
                 project,

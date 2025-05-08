@@ -377,8 +377,10 @@ class STRMarker_Amelogenin(STRMarker):
     def canonical(self):
         if self.uas_sequence == "AAAGTG":
             return "Y"
-        else:
+        elif self.uas_sequence == "":
             return "X"
+        else:
+            return self.uas_sequence
 
     @property
     def convert(self):
@@ -396,19 +398,19 @@ class STRMarker_Amelogenin(STRMarker):
 
     @property
     def summary(self):
-        if self.uas_sequence == "AAAGTG":
-            return [
-                "AAAGTG",
-                "AAAGTG",
-                "AAAGTG",
-                "AAAGTG",
-                "NA",
-                "NA",
-                "Y",
-                "NA",
-                "NA",
-            ]
-        elif self.uas_sequence == "":
+        # if self.uas_sequence == "AAAGTG":
+        #    return [
+        #        "AAAGTG",
+        #        "AAAGTG",
+        #        "AAAGTG",
+        #        "AAAGTG",
+        #        "NA",
+        #        "NA",
+        #        "Y",
+        #        "NA",
+        #        "NA",
+        #    ]
+        if self.uas_sequence == "":
             return [
                 "",
                 "",
@@ -417,6 +419,18 @@ class STRMarker_Amelogenin(STRMarker):
                 "NA",
                 "NA",
                 "X",
+                "NA",
+                "NA",
+            ]
+        else:
+            return [
+                self.uas_sequence,
+                self.forward_sequence,
+                self.custom_sequence,
+                self.convert,
+                self.convert,
+                self.custom_brack,
+                self.canonical,
                 "NA",
                 "NA",
             ]

@@ -28,6 +28,7 @@ import sys
 
 
 strs = [
+    "AMELOGENIN",
     "CSF1PO",
     "D10S1248",
     "D12S391",
@@ -146,6 +147,8 @@ def process_strs(dict_loc, datatype, seq_col, brack_col):
             filtered_df = filtered_df.replace({"nan": None})
             final_df = pd.concat([final_df, filtered_df])
             flags_df = pd.concat([flags_df, flags(filtered_df, datatype)])
+    # elif locus == "AMELOGENIN":
+    #    final_df = pd.concet([final_df, data_order])
     if datatype == "ce" or datatype == "ngs":
         try:
             final_df = final_df.astype({"CE_Allele": "float64", "Reads": "int"})
@@ -155,6 +158,7 @@ def process_strs(dict_loc, datatype, seq_col, brack_col):
 
 
 def EFM_output(profile, outfile, profile_type, data_type, col, sex, separate=False):
+    profile = profile[profile["Locus"] != "AMELOGENIN"]
     if profile_type == "reference":
         profile = profile.query("allele_type == 'Typed'")
     else:
