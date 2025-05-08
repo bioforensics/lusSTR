@@ -58,8 +58,6 @@ def format_table(input, software, kit="forenseq", custom=False):
             locus = "PENTA E"
         if locus == "DYS385A/B" or locus == "DYS385":
             locus = "DYS385A-B"
-        if locus == "AMELOGENIN":
-            continue
         metadata = str_marker_data[locus]
         if kit == "forenseq":
             remove_5p = metadata["Foren_5"]
@@ -67,7 +65,11 @@ def format_table(input, software, kit="forenseq", custom=False):
         else:
             remove_5p = metadata["Power_5"]
             remove_3p = metadata["Power_3"]
-        if len(sequence) <= (remove_5p + remove_3p) and software != "uas":
+        if (
+            len(sequence) <= (remove_5p + remove_3p)
+            and software != "uas"
+            and locus != "AMELOGENIN"
+        ) or (locus == "AMELOGENIN" and len(sequence) < (remove_5p + remove_3p)):
             flank_summary = [
                 sampleid,
                 project,

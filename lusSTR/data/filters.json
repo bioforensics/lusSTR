@@ -1,4 +1,22 @@
 {
+    "AMELOGENIN": {
+        "MinimumNumberReadsForDynamicThresholds": 650,
+        "DetectionThresholdStaticCount": 10,
+        "DetectionThresholdDynamicPercent": 0,
+        "DetectionThresholdUse": "Static",
+        "AnalyticalThresholdStaticCount": 20,
+        "AnalyticalThresholdDynamicPercent": 0.017,
+        "AnalyticalThresholdUse": "Both",
+        "StochasticThresholdStaticCount": 20,
+        "StochasticThresholdDynamicPercent": 0.017,
+        "StochasticThresholdUse": "Both",
+        "MinimumHeterozygousBalanceThresholdDynamicPercent": 0.50,
+        "SameSizeThresholdDynamicPercent": 0,
+        "StutterThresholdDynamicPercent": 0,
+        "StutterForwardThresholdDynamicPercent": 0,
+        "Intercept": 0,
+        "Slope": 0
+    },
     "CSF1PO": {
         "MinimumNumberReadsForDynamicThresholds": 650,
         "DetectionThresholdStaticCount": 10,
