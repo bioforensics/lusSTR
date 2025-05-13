@@ -73,8 +73,7 @@ def filter_amel(metadata, amel_df, locus_reads):
                         round(al_reads / locus_reads, 3),
                     ]
                 else:
-                    amel_dt.loc[i, "allele_tpye"] = "Typed"
-    print(amel_dt)
+                    amel_dt.loc[i, "allele_type"] = "Typed"
     return amel_dt
 
 
