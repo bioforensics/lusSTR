@@ -147,13 +147,11 @@ def process_strs(dict_loc, datatype, seq_col, brack_col):
             filtered_df = filtered_df.replace({"nan": None})
             final_df = pd.concat([final_df, filtered_df])
             flags_df = pd.concat([flags_df, flags(filtered_df, datatype)])
-    # elif locus == "AMELOGENIN":
-    #    final_df = pd.concet([final_df, data_order])
-    if datatype == "ce" or datatype == "ngs":
-        try:
-            final_df = final_df.astype({"CE_Allele": "float64", "Reads": "int"})
-        except KeyError:
-            final_df = None
+    # if datatype == "ce" or datatype == "ngs":
+    #    try:
+    #        final_df = final_df.astype({"CE_Allele": "float64", "Reads": "int"})
+    #    except KeyError:
+    #        final_df = None
     return final_df, flags_df
 
 
@@ -266,6 +264,7 @@ def determine_max_num_alleles(allele_heights):
 
 
 def STRmix_output(profile, outdir, profile_type, data_type, seq_col):
+    profile = profile[profile["Locus"] != "AMELOGENIN"]
     Path(outdir).mkdir(parents=True, exist_ok=True)
     if profile_type == "reference":
         filtered_df = profile.query("allele_type == 'Typed'")
@@ -365,7 +364,6 @@ def format_ref_table(new_rows, sample_data, datatype):
 
 def marker_plots(df, output_name, sex, wd="."):
     Path(f"{wd}/MarkerPlots").mkdir(parents=True, exist_ok=True)
-    df["CE_Allele"] = df["CE_Allele"].astype(float)
     filt_df = df[df["allele_type"] == "Typed"]
     for sample_id in df["SampleID"].unique():
         with PdfPages(f"{wd}/MarkerPlots/{output_name}_{sample_id}_marker_plots.pdf") as pdf:
@@ -398,6 +396,12 @@ def make_plot(df, sample_id, sameyaxis=False, filters=False, at=True):
             n += 1
             colors = {"Typed": "green", "Stutter": "blue", "BelowAT": "red", "Deleted": "purple"}
             marker_df = sample_df[sample_df["Locus"] == marker].sort_values(by="CE_Allele")
+            if marker == "AMELOGENIN":
+                for i, row in marker_df.iterrows():
+                    marker_df.loc[i, "CE_Allele"] = (
+                        0 if marker_df.loc[i, "CE_Allele"] == "X" else 1
+                    )
+            marker_df["CE_Allele"] = marker_df["CE_Allele"].astype(float)
             ax = fig.add_subplot(6, 5, n)
             p = ax.bar(
                 marker_df["CE_Allele"],
@@ -411,15 +415,25 @@ def make_plot(df, sample_id, sameyaxis=False, filters=False, at=True):
                 ax.text(round(min(marker_df["CE_Allele"])) - 0.9, at + (at * 0.1), f"AT", size=12)
             labels = marker_df["Type"].unique()
             handles = [plt.Rectangle((0, 0), 1, 1, color=colors[l]) for l in labels]
+            if marker == "AMELOGENIN":
+                plt.xlim(-1, 2)
+                ax.set_xticks(np.arange(-1, 3, 1))
+                labels_x = ["", "X", "Y", ""]
+                ax.set_xticklabels(labels_x)
             if not filters:
                 plt.legend(handles, labels, title="Allele Type")
             else:
                 for i, row in marker_df.iterrows():
-                    marker_df.loc[i, "Label"] = (
-                        str(int(marker_df.loc[i, "CE_Allele"]))
-                        if ".0" in str(marker_df.loc[i, "CE_Allele"])
-                        else str(marker_df.loc[i, "CE_Allele"])
-                    )
+                    if marker == "AMELOGENIN":
+                        marker_df.loc[i, "Label"] = (
+                            "X" if marker_df.loc[i, "CE_Allele"] == 0 else "Y"
+                        )
+                    else:
+                        marker_df.loc[i, "Label"] = (
+                            str(int(marker_df.loc[i, "CE_Allele"]))
+                            if ".0" in str(marker_df.loc[i, "CE_Allele"])
+                            else str(marker_df.loc[i, "CE_Allele"])
+                        )
                 ax.bar_label(p, labels=marker_df["Label"])
             if sameyaxis:
                 plt.ylim(0, max_yvalue)
