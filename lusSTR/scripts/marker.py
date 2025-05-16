@@ -374,6 +374,22 @@ class STRMarker_Amelogenin(STRMarker):
             return self.sequence[front:back]
 
     @property
+    def custom_sequence(self):
+        if self.custom:
+            custom_front = self.data["Custom_5"]
+            custom_back = self.data["Custom_3"]
+            if custom_back == 0:
+                custom_back = None
+            else:
+                custom_back *= -1
+            if self.sequence[custom_front:custom_back] == "":
+                return ""
+            else:
+                return self.sequence[custom_front:custom_back]
+        else:
+            return None
+
+    @property
     def canonical(self):
         if self.uas_sequence == "AAAGTG":
             return "Y"
@@ -398,18 +414,6 @@ class STRMarker_Amelogenin(STRMarker):
 
     @property
     def summary(self):
-        # if self.uas_sequence == "AAAGTG":
-        #    return [
-        #        "AAAGTG",
-        #        "AAAGTG",
-        #        "AAAGTG",
-        #        "AAAGTG",
-        #        "NA",
-        #        "NA",
-        #        "Y",
-        #        "NA",
-        #        "NA",
-        #    ]
         if self.uas_sequence == "":
             return [
                 "",
