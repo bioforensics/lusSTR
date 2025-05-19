@@ -201,7 +201,13 @@ def interactive_plots_allmarkers(sample_df, flagged_df):
         col = cols[n]
         container = col.container(border=True)
         sample_locus = sample_df["SampleID"].unique() + "_" + marker
-        marker_df = sample_df[sample_df["Locus"] == marker].sort_values(by="CE_Allele")
+        for i, row in sample_df.iterrows():
+            if sample_df.loc[i, "Locus"] == "AMELOGENIN":
+                sample_df.loc[i, "CE_Allele"] = 0 if sample_df.loc[i, "CE_Allele"] == "X" else 1
+        sample_df["CE_Allele"] = pd.to_numeric(sample_df["CE_Allele"])
+        marker_df = sample_df[sample_df["Locus"] == marker].sort_values(
+            by=["CE_Allele", "allele_type"], ascending=[False, True]
+        )
         if sample_locus in flagged_df["key"].values:
             marker = f"⚠️{marker}⚠️"
         plot = interactive_plots(marker_df, marker, max_yvalue, increase_value, all=True)
@@ -240,9 +246,14 @@ def interactive_plots(df, locus, ymax, increase, all=False):
     )
     plot.add_hline(y=at, line_width=3, line_dash="dot", line_color="gray")
     plot.add_annotation(text=f"AT", x=min_x + 0.1, y=at, showarrow=False, yshift=10)
-    plot.update_layout(
-        xaxis=dict(range=[min_x, max_x], tickmode="array", tickvals=np.arange(min_x, max_x, 1))
-    )
+    if locus == "AMELOGENIN":
+        plot.update_layout(
+            xaxis=dict(range=[-1, 2], tickmode="array", tickvals=["", "X", "Y", ""])
+        )
+    else:
+        plot.update_layout(
+            xaxis=dict(range=[min_x, max_x], tickmode="array", tickvals=np.arange(min_x, max_x, 1))
+        )
     if all:
         plot.update_layout(
             yaxis=dict(range=[0, ymax], tickmode="array", tickvals=np.arange(0, ymax, increase))
@@ -307,6 +318,10 @@ def interactive_setup(df1, file):
             )
         interactive_plots_allmarkers(sample_df, flags)
     else:
+        for i, row in sample_df.iterrows():
+            if sample_df.loc[i, "Locus"] == "AMELOGENIN":
+                sample_df.loc[i, "CE_Allele"] = 0 if sample_df.loc[i, "CE_Allele"] == "X" else 1
+        sample_df["CE_Allele"] = pd.to_numeric(sample_df["CE_Allele"])
         locus_key = f"{sample}_{locus}"
         if locus_key not in st.session_state:
             st.session_state[locus_key] = sample_df[sample_df["Locus"] == locus].reset_index(
