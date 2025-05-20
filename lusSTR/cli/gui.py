@@ -248,7 +248,7 @@ def interactive_plots(df, locus, ymax, increase, all=False):
     plot.add_annotation(text=f"AT", x=min_x + 0.1, y=at, showarrow=False, yshift=10)
     if locus == "AMELOGENIN":
         plot.update_layout(
-            xaxis=dict(range=[-1, 2], tickmode="array", tickvals=["", "X", "Y", ""])
+            xaxis=dict(tickvals=np.arange(-1, 2, 1), tickmode="array", ticktext=["", "X", "Y", ""])
         )
     else:
         plot.update_layout(
@@ -318,15 +318,14 @@ def interactive_setup(df1, file):
             )
         interactive_plots_allmarkers(sample_df, flags)
     else:
-        for i, row in sample_df.iterrows():
-            if sample_df.loc[i, "Locus"] == "AMELOGENIN":
-                sample_df.loc[i, "CE_Allele"] = 0 if sample_df.loc[i, "CE_Allele"] == "X" else 1
-        sample_df["CE_Allele"] = pd.to_numeric(sample_df["CE_Allele"])
+        plot_df = sample_df
+        for i, row in plot_df.iterrows():
+            if plot_df.loc[i, "Locus"] == "AMELOGENIN":
+                plot_df.loc[i, "CE_Allele"] = 0 if plot_df.loc[i, "CE_Allele"] == "X" else 1
+        plot_df["CE_Allele"] = pd.to_numeric(plot_df["CE_Allele"])
         locus_key = f"{sample}_{locus}"
         if locus_key not in st.session_state:
-            st.session_state[locus_key] = sample_df[sample_df["Locus"] == locus].reset_index(
-                drop=True
-            )
+            st.session_state[locus_key] = plot_df[plot_df["Locus"] == locus].reset_index(drop=True)
         Type = [
             "Deleted",
             "Typed",

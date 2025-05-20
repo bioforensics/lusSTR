@@ -155,7 +155,7 @@ def process_strs(dict_loc, datatype, seq_col, brack_col):
     return final_df, flags_df
 
 
-def EFM_output(profile, id_list, outfile, profile_type, data_type, col, sex, separate=False):
+def EFM_output(profile, outfile, profile_type, data_type, col, sex, separate=False):
     profile = profile[profile["Locus"] != "AMELOGENIN"]
     if profile_type == "reference":
         profile = profile.query("allele_type == 'Typed'")
@@ -513,9 +513,7 @@ def process_input(
         if final_df is not None:
             marker_plots(final_df, input_name, sex)
             if output_type == "efm" or output_type == "mpsproto":
-                EFM_output(
-                    final_df, id_list, outpath, profile_type, data_type, brack_col, sex, separate
-                )
+                EFM_output(final_df, outpath, profile_type, data_type, brack_col, sex, separate)
             else:
                 STRmix_output(final_df, outpath, profile_type, data_type, seq_col, id_list)
             if info:
