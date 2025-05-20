@@ -376,8 +376,7 @@ class STRMarker_Amelogenin(STRMarker):
     @property
     def custom_sequence(self):
         if self.custom:
-            custom_front = self.data["Custom_5"]
-            custom_back = self.data["Custom_3"]
+            custom_front, custom_back = self._uas_bases_to_trim()
             if custom_back == 0:
                 custom_back = None
             else:

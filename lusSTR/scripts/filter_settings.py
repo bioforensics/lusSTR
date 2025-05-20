@@ -30,17 +30,19 @@ def filters(locus_allele_info, locus, locus_reads, datatype, brack_col):
     metadata = filter_marker_data[locus]
     if locus == "AMELOGENIN":
         locus_allele_info = filter_amel(metadata, locus_allele_info, locus_reads)
-    elif len(locus_allele_info) == 1:
-        locus_allele_info = single_allele_thresholds(metadata, locus_reads, locus_allele_info)
     else:
-        locus_allele_info, locus_reads = multiple_allele_thresholds(
-            metadata, locus_reads, locus_allele_info
-        )
-        locus_allele_info = ce_filtering(
-            locus_allele_info, locus_reads, metadata, datatype, brack_col
-        )
-        if datatype != "ce":
-            locus_allele_info = same_size_filter(locus_allele_info, metadata, datatype)
+        locus_allele_info["CE_Allele"] = locus_allele_info["CE_Allele"].astype(float)
+        if len(locus_allele_info) == 1:
+            locus_allele_info = single_allele_thresholds(metadata, locus_reads, locus_allele_info)
+        else:
+            locus_allele_info, locus_reads = multiple_allele_thresholds(
+                metadata, locus_reads, locus_allele_info
+            )
+            locus_allele_info = ce_filtering(
+                locus_allele_info, locus_reads, metadata, datatype, brack_col
+            )
+            if datatype != "ce":
+                locus_allele_info = same_size_filter(locus_allele_info, metadata, datatype)
     return locus_allele_info
 
 

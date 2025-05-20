@@ -65,8 +65,13 @@ def format_table(input, software, kit="forenseq", custom=False):
         else:
             remove_5p = metadata["Power_5"]
             remove_3p = metadata["Power_3"]
+        if custom:
+            if metadata["Custom_5"] < 0:
+                remove_5p = remove_5p - metadata["Custom_5"]
+            if metadata["Custom_3"] < 0:
+                remove_3p = remove_3p - metadata["Custom_3"]
         if (
-            len(sequence) <= (remove_5p + remove_3p)
+            len(sequence) <= (remove_5p + remove_3p + len(metadata["LUS"]))
             and software != "uas"
             and locus != "AMELOGENIN"
         ) or (locus == "AMELOGENIN" and len(sequence) < (remove_5p + remove_3p)):
@@ -222,7 +227,6 @@ def check_vwa(marker, sequence, software, custom):
 
 def combine_reads(table, columns, custom=False):
     if custom:
-        print(table)
         comb_table = (
             table.groupby(
                 [

@@ -155,7 +155,7 @@ def process_strs(dict_loc, datatype, seq_col, brack_col):
     return final_df, flags_df
 
 
-def EFM_output(profile, outfile, profile_type, data_type, col, sex, separate=False):
+def EFM_output(profile, id_list, outfile, profile_type, data_type, col, sex, separate=False):
     profile = profile[profile["Locus"] != "AMELOGENIN"]
     if profile_type == "reference":
         profile = profile.query("allele_type == 'Typed'")
@@ -263,7 +263,7 @@ def determine_max_num_alleles(allele_heights):
     return max_num_alleles
 
 
-def STRmix_output(profile, outdir, profile_type, data_type, seq_col):
+def STRmix_output(profile, outdir, profile_type, data_type, seq_col, id_list):
     profile = profile[profile["Locus"] != "AMELOGENIN"]
     Path(outdir).mkdir(parents=True, exist_ok=True)
     if profile_type == "reference":
@@ -288,7 +288,6 @@ def STRmix_output(profile, outdir, profile_type, data_type, seq_col):
         {"Locus": {"VWA": "vWA", "PENTA D": "PentaD", "PENTA E": "PentaE"}}, inplace=True
     )
     Path(outdir).mkdir(exist_ok=True)
-    id_list = strmix_profile["SampleID"].unique()
     for id in id_list:
         sample_df = strmix_profile[strmix_profile["SampleID"] == id].reset_index(drop=True)
         if profile_type == "evidence":
@@ -366,13 +365,17 @@ def marker_plots(df, output_name, sex, wd="."):
     Path(f"{wd}/MarkerPlots").mkdir(parents=True, exist_ok=True)
     filt_df = df[df["allele_type"] == "Typed"]
     for sample_id in df["SampleID"].unique():
-        with PdfPages(f"{wd}/MarkerPlots/{output_name}_{sample_id}_marker_plots.pdf") as pdf:
-            make_plot(filt_df, sample_id, filters=True, at=False)
-            pdf.savefig()
-            make_plot(df, sample_id)
-            pdf.savefig()
-            make_plot(df, sample_id, sameyaxis=True)
-            pdf.savefig()
+        if df[df["SampleID"] == sample_id].empty:
+            print(f"{sample_id} does not have any reads passing filter. Skipping to next sample.")
+        else:
+            with PdfPages(f"{wd}/MarkerPlots/{output_name}_{sample_id}_marker_plots.pdf") as pdf:
+                if not filt_df[filt_df["SampleID"] == sample_id].empty:
+                    make_plot(filt_df, sample_id, filters=True, at=False)
+                    pdf.savefig()
+                make_plot(df, sample_id)
+                pdf.savefig()
+                make_plot(df, sample_id, sameyaxis=True)
+                pdf.savefig()
 
 
 def make_plot(df, sample_id, sameyaxis=False, filters=False, at=True):
@@ -505,13 +508,16 @@ def process_input(
             STRmix_output(full_df, outpath, profile_type, data_type, seq_col)
     else:
         dict_loc = {k: v for k, v in full_df.groupby(["SampleID", "Locus"])}
+        id_list = full_df["SampleID"].unique()
         final_df, flags_df = process_strs(dict_loc, data_type, seq_col, brack_col)
         if final_df is not None:
             marker_plots(final_df, input_name, sex)
             if output_type == "efm" or output_type == "mpsproto":
-                EFM_output(final_df, outpath, profile_type, data_type, brack_col, sex, separate)
+                EFM_output(
+                    final_df, id_list, outpath, profile_type, data_type, brack_col, sex, separate
+                )
             else:
-                STRmix_output(final_df, outpath, profile_type, data_type, seq_col)
+                STRmix_output(final_df, outpath, profile_type, data_type, seq_col, id_list)
             if info:
                 name = os.path.basename(outpath)
                 final_df.to_csv(f"{outpath}/{input_name}_sequence_info.csv", index=False)
