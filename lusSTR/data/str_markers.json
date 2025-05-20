@@ -14,8 +14,8 @@
         "Foren_3": 37,
         "Power_5": 10,
         "Power_3": 37,
-        "Custom_5": 10,
-        "Custom_3": 37,
+        "Custom_5": 0,
+        "Custom_3": 0,
         "Alleles": ["X", "Y"]
     },
     "CSF1PO": {
