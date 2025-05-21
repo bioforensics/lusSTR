@@ -147,11 +147,6 @@ def process_strs(dict_loc, datatype, seq_col, brack_col):
             filtered_df = filtered_df.replace({"nan": None})
             final_df = pd.concat([final_df, filtered_df])
             flags_df = pd.concat([flags_df, flags(filtered_df, datatype)])
-    # if datatype == "ce" or datatype == "ngs":
-    #    try:
-    #        final_df = final_df.astype({"CE_Allele": "float64", "Reads": "int"})
-    #    except KeyError:
-    #        final_df = None
     return final_df, flags_df
 
 
@@ -361,7 +356,7 @@ def format_ref_table(new_rows, sample_data, datatype):
     return sort_df
 
 
-def marker_plots(df, output_name, sex, wd="."):
+def marker_plots(df, output_name, wd="."):
     Path(f"{wd}/MarkerPlots").mkdir(parents=True, exist_ok=True)
     filt_df = df[df["allele_type"] == "Typed"]
     for sample_id in df["SampleID"].unique():
@@ -370,15 +365,15 @@ def marker_plots(df, output_name, sex, wd="."):
         else:
             with PdfPages(f"{wd}/MarkerPlots/{output_name}_{sample_id}_marker_plots.pdf") as pdf:
                 if not filt_df[filt_df["SampleID"] == sample_id].empty:
-                    make_plot(filt_df, sample_id, filters=True, at=False)
+                    make_plot(filt_df, sample_id, output_name, filters=True, at=False)
                     pdf.savefig()
-                make_plot(df, sample_id)
+                make_plot(df, sample_id, output_name)
                 pdf.savefig()
-                make_plot(df, sample_id, sameyaxis=True)
+                make_plot(df, sample_id, output_name, sameyaxis=True)
                 pdf.savefig()
 
 
-def make_plot(df, sample_id, sameyaxis=False, filters=False, at=True):
+def make_plot(df, sample_id, output_name, sameyaxis=False, filters=False, at=True):
     sample_df = df[df["SampleID"] == sample_id].copy()
     conditions = [
         sample_df["allele_type"].str.contains("Typed"),
@@ -394,18 +389,20 @@ def make_plot(df, sample_id, sameyaxis=False, filters=False, at=True):
     increase_value = int(math.ceil((max_yvalue / 5) / n)) * n
     fig = plt.figure(figsize=(30, 30))
     n = 0
-    for marker in sample_df["Locus"].unique():
-        if marker in strs or marker in ystrs:
-            n += 1
-            colors = {"Typed": "green", "Stutter": "blue", "BelowAT": "red", "Deleted": "purple"}
-            marker_df = sample_df[sample_df["Locus"] == marker].sort_values(by="CE_Allele")
+    str_list = ystrs if "sexloci" in output_name else strs
+    for marker in str_list:
+        n += 1
+        colors = {"Typed": "green", "Stutter": "blue", "BelowAT": "red", "Deleted": "purple"}
+        marker_df = sample_df[sample_df["Locus"] == marker].sort_values(by="CE_Allele")
+        ax = fig.add_subplot(6, 5, n)
+        if not marker_df.empty:
             if marker == "AMELOGENIN":
                 for i, row in marker_df.iterrows():
                     marker_df.loc[i, "CE_Allele"] = (
                         0 if marker_df.loc[i, "CE_Allele"] == "X" else 1
                     )
             marker_df["CE_Allele"] = marker_df["CE_Allele"].astype(float)
-            ax = fig.add_subplot(6, 5, n)
+            # ax = fig.add_subplot(6, 5, n)
             p = ax.bar(
                 marker_df["CE_Allele"],
                 marker_df["Reads"],
@@ -448,7 +445,7 @@ def make_plot(df, sample_id, sameyaxis=False, filters=False, at=True):
                     1.0,
                 )
             )
-            ax.title.set_text(marker)
+        ax.title.set_text(marker)
     if sameyaxis:
         title = "Marker Plots for All Alleles With Same Y-Axis Scale"
     elif filters:
@@ -501,7 +498,7 @@ def process_input(
         )
     if nofiltering:
         full_df["allele_type"] = "Typed"
-        marker_plots(full_df, input_name, sex)
+        marker_plots(full_df, input_name)
         if output_type == "efm" or output_type == "mpsproto":
             EFM_output(full_df, outpath, profile_type, data_type, brack_col, sex, separate)
         else:
@@ -511,7 +508,7 @@ def process_input(
         id_list = full_df["SampleID"].unique()
         final_df, flags_df = process_strs(dict_loc, data_type, seq_col, brack_col)
         if final_df is not None:
-            marker_plots(final_df, input_name, sex)
+            marker_plots(final_df, input_name)
             if output_type == "efm" or output_type == "mpsproto":
                 EFM_output(final_df, outpath, profile_type, data_type, brack_col, sex, separate)
             else:
