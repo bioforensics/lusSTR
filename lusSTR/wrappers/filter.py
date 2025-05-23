@@ -27,7 +27,34 @@ import re
 import sys
 
 
-strs = [
+p_strs = [
+    "AMELOGENIN",
+    "CSF1PO",
+    "D10S1248",
+    "D12S391",
+    "D13S317",
+    "D16S539",
+    "D18S51",
+    "D19S433",
+    "D1S1656",
+    "D21S11",
+    "D22S1045",
+    "D2S1338",
+    "D2S441",
+    "D3S1358",
+    "D5S818",
+    "D6S1043",
+    "D7S820",
+    "D8S1179",
+    "FGA",
+    "PENTA D",
+    "PENTA E",
+    "TH01",
+    "TPOX",
+    "VWA",
+]
+
+f_strs = [
     "AMELOGENIN",
     "CSF1PO",
     "D10S1248",
@@ -58,7 +85,7 @@ strs = [
     "VWA",
 ]
 
-ystrs = [
+p_ystrs = [
     "DYS19",
     "DYS385A-B",
     "DYS389II",
@@ -82,6 +109,31 @@ ystrs = [
     "Y-GATA-H4",
 ]
 
+f_ystrs = [
+    "DYS19",
+    "DYS385A-B",
+    "DYS389II",
+    "DYS390",
+    "DYS391",
+    "DYS392",
+    "DYS437",
+    "DYS438",
+    "DYS439",
+    "DYS448",
+    "DYS460",
+    "DYS481",
+    "DYS505",
+    "DYS522",
+    "DYS533",
+    "DYS549",
+    "DYS570",
+    "DYS576",
+    "DYS612",
+    "DYS635",
+    "DYS643",
+    "Y-GATA-H4",
+]
+
 
 def get_filter_metadata_file():
     return importlib.resources.files("lusSTR") / "data/filters.json"
@@ -91,9 +143,11 @@ with open(get_filter_metadata_file(), "r") as fh:
     filter_marker_data = json.load(fh)
 
 
-def process_strs(dict_loc, datatype, seq_col, brack_col):
+def process_strs(dict_loc, datatype, seq_col, brack_col, kit):
     final_df = pd.DataFrame()
     flags_df = pd.DataFrame()
+    strs = p_strs if kit == "powerseq" else f_strs
+    ystrs = p_ystrs if kit == "powerseq" else f_ystrs
     for key, value in dict_loc.items():
         data = dict_loc[key].reset_index(drop=True)
         if datatype == "ce":
@@ -150,20 +204,20 @@ def process_strs(dict_loc, datatype, seq_col, brack_col):
     return final_df, flags_df
 
 
-def EFM_output(profile, outfile, profile_type, data_type, col, sex, separate=False):
+def EFM_output(profile, outfile, profile_type, data_type, col, sex, kit, separate=False):
     profile = profile[profile["Locus"] != "AMELOGENIN"]
     if profile_type == "reference":
         profile = profile.query("allele_type == 'Typed'")
     else:
         profile = profile.query("allele_type != ['BelowAT', 'Deleted']")
-    efm_profile = populate_efm_profile(profile, data_type, col, sex)
+    efm_profile = populate_efm_profile(profile, data_type, col, sex, kit)
     if separate:
         write_sample_specific_efm_profiles(efm_profile, profile_type, data_type, outfile)
     else:
         write_aggregate_efm_profile(efm_profile, profile_type, data_type, outfile)
 
 
-def populate_efm_profile(profile, data_type, colname, sex):
+def populate_efm_profile(profile, data_type, colname, sex, kit):
     if data_type == "ce":
         prof_col = "CE_Allele"
     elif data_type == "lusplus":
@@ -186,6 +240,8 @@ def populate_efm_profile(profile, data_type, colname, sex):
             allele_heights[row.SampleID][row.Locus][row.Allele] = int(row.Reads)
     max_num_alleles = determine_max_num_alleles(allele_heights)
     reformatted_profile = list()
+    strs = p_strs if kit == "powerseq" else f_strs
+    ystrs = p_ystrs if kit == "powerseq" else f_ystrs
     for sampleid, loci in allele_heights.items():
         for locusid, alleles in loci.items():
             allele_list, height_list = list(), list()
@@ -356,7 +412,7 @@ def format_ref_table(new_rows, sample_data, datatype):
     return sort_df
 
 
-def marker_plots(df, output_name, wd="."):
+def marker_plots(df, output_name, kit, wd="."):
     Path(f"{wd}/MarkerPlots").mkdir(parents=True, exist_ok=True)
     filt_df = df[df["allele_type"] == "Typed"]
     for sample_id in df["SampleID"].unique():
@@ -365,15 +421,15 @@ def marker_plots(df, output_name, wd="."):
         else:
             with PdfPages(f"{wd}/MarkerPlots/{output_name}_{sample_id}_marker_plots.pdf") as pdf:
                 if not filt_df[filt_df["SampleID"] == sample_id].empty:
-                    make_plot(filt_df, sample_id, output_name, filters=True, at=False)
+                    make_plot(filt_df, sample_id, output_name, kit, filters=True, at=False)
                     pdf.savefig()
-                make_plot(df, sample_id, output_name)
+                make_plot(df, sample_id, output_name, kit)
                 pdf.savefig()
-                make_plot(df, sample_id, output_name, sameyaxis=True)
+                make_plot(df, sample_id, output_name, kit, sameyaxis=True)
                 pdf.savefig()
 
 
-def make_plot(df, sample_id, output_name, sameyaxis=False, filters=False, at=True):
+def make_plot(df, sample_id, output_name, kit, sameyaxis=False, filters=False, at=True):
     sample_df = df[df["SampleID"] == sample_id].copy()
     conditions = [
         sample_df["allele_type"].str.contains("Typed"),
@@ -389,7 +445,10 @@ def make_plot(df, sample_id, output_name, sameyaxis=False, filters=False, at=Tru
     increase_value = int(math.ceil((max_yvalue / 5) / n)) * n
     fig = plt.figure(figsize=(30, 30))
     n = 0
-    str_list = ystrs if "sexloci" in output_name else strs
+    if kit == "powerseq":
+        str_list = p_ystrs if "sexloci" in output_name else p_strs
+    else:
+        str_list = f_ystrs if "sexloci" in output_name else f_strs
     for marker in str_list:
         n += 1
         colors = {"Typed": "green", "Stutter": "blue", "BelowAT": "red", "Deleted": "purple"}
@@ -478,6 +537,7 @@ def process_input(
     profile_type,
     data_type,
     output_type,
+    kit,
     strand="forward",
     nofiltering=False,
     separate=False,
@@ -498,19 +558,21 @@ def process_input(
         )
     if nofiltering:
         full_df["allele_type"] = "Typed"
-        marker_plots(full_df, input_name)
+        marker_plots(full_df, input_name, kit)
         if output_type == "efm" or output_type == "mpsproto":
-            EFM_output(full_df, outpath, profile_type, data_type, brack_col, sex, separate)
+            EFM_output(full_df, outpath, profile_type, data_type, brack_col, sex, kit, separate)
         else:
             STRmix_output(full_df, outpath, profile_type, data_type, seq_col)
     else:
         dict_loc = {k: v for k, v in full_df.groupby(["SampleID", "Locus"])}
         id_list = full_df["SampleID"].unique()
-        final_df, flags_df = process_strs(dict_loc, data_type, seq_col, brack_col)
+        final_df, flags_df = process_strs(dict_loc, data_type, seq_col, brack_col, kit)
         if final_df is not None:
-            marker_plots(final_df, input_name)
+            marker_plots(final_df, input_name, kit)
             if output_type == "efm" or output_type == "mpsproto":
-                EFM_output(final_df, outpath, profile_type, data_type, brack_col, sex, separate)
+                EFM_output(
+                    final_df, outpath, profile_type, data_type, brack_col, sex, kit, separate
+                )
             else:
                 STRmix_output(final_df, outpath, profile_type, data_type, seq_col, id_list)
             if info:
@@ -534,6 +596,7 @@ def main(
     strand,
     custom,
     sex,
+    kit,
 ):
     input = str(input)
     if profile_type not in ("evidence", "reference"):
@@ -553,6 +616,7 @@ def main(
             profile_type,
             data_type,
             output_type,
+            kit,
             strand=strand,
             nofiltering=nofilters,
             separate=separate,
@@ -568,6 +632,7 @@ def main(
         profile_type,
         data_type,
         output_type,
+        kit,
         strand=strand,
         nofiltering=nofilters,
         separate=separate,
@@ -590,4 +655,5 @@ if __name__ == "__main__":
         strand=snakemake.params.strand,
         custom=snakemake.params.custom,
         sex=snakemake.params.sex,
+        kit=snakemake.params.kit,
     )
