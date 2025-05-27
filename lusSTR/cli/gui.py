@@ -22,6 +22,7 @@ import numpy as np
 import pandas as pd
 from pathlib import Path
 import plotly.express as px
+import plotly.graph_objs as go
 import streamlit as st
 from streamlit_option_menu import option_menu
 import yaml
@@ -146,6 +147,64 @@ def main():
 #                     lusSTR Home Page                              #
 #####################################################################
 
+p_strs = [
+    "AMELOGENIN",
+    "CSF1PO",
+    "D10S1248",
+    "D12S391",
+    "D13S317",
+    "D16S539",
+    "D18S51",
+    "D19S433",
+    "D1S1656",
+    "D21S11",
+    "D22S1045",
+    "D2S1338",
+    "D2S441",
+    "D3S1358",
+    "D5S818",
+    "D6S1043",
+    "D7S820",
+    "D8S1179",
+    "FGA",
+    "PENTA D",
+    "PENTA E",
+    "TH01",
+    "TPOX",
+    "VWA",
+]
+
+f_strs = [
+    "AMELOGENIN",
+    "CSF1PO",
+    "D10S1248",
+    "D12S391",
+    "D13S317",
+    "D16S539",
+    "D17S1301",
+    "D18S51",
+    "D19S433",
+    "D1S1656",
+    "D20S482",
+    "D21S11",
+    "D22S1045",
+    "D2S1338",
+    "D2S441",
+    "D3S1358",
+    "D4S2408",
+    "D5S818",
+    "D6S1043",
+    "D7S820",
+    "D8S1179",
+    "D9S1122",
+    "FGA",
+    "PENTA D",
+    "PENTA E",
+    "TH01",
+    "TPOX",
+    "VWA",
+]
+
 
 def show_home_page():
 
@@ -197,7 +256,9 @@ def interactive_plots_allmarkers(sample_df, flagged_df):
     max_yvalue = (int(math.ceil(max_reads / n)) * n) + n
     increase_value = int(math.ceil((max_yvalue / 5) / n)) * n
     n = 0
-    for marker in sample_df["Locus"].unique():
+    all_loci = f_strs if st.session_state.kit == "forenseq" else p_strs
+    missing_loci = [x for x in all_loci if x not in sample_df["Locus"].unique()]
+    for marker in all_loci:
         col = cols[n]
         container = col.container(border=True)
         sample_locus = sample_df["SampleID"].unique() + "_" + marker
@@ -210,7 +271,12 @@ def interactive_plots_allmarkers(sample_df, flagged_df):
         )
         if sample_locus in flagged_df["key"].values:
             marker = f"⚠️{marker}⚠️"
-        plot = interactive_plots(marker_df, marker, max_yvalue, increase_value, all=True)
+        if marker in missing_loci:
+            marker = f"⚠️{marker}⚠️"
+            plot = go.Figure()
+            plot.update_layout(title=marker)
+        else:
+            plot = interactive_plots(marker_df, marker, max_yvalue, increase_value, all=True)
         container.plotly_chart(plot, use_container_width=True)
         if n == 3:
             n = 0
