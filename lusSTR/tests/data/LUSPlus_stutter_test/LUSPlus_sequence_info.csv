@@ -1,24 +1,24 @@
 SampleID,Locus,CE_Allele,LUS_Plus,Reads,allele_type,parent_allele1,parent_allele2,allele1_ref_reads,allele2_ref_reads,perc_noise,perc_stutter
-Sample1,D4S2408,10.0,10_10_0,1022,Typed,,,,,,
-Sample1,D4S2408,9.0,9_9_0,116,-1_stutter/+1_stutter,10_10_0,8_8_0,1022.0,1050.0,,
-Sample1,D4S2408,8.0,8_8_0,1050,Typed,,,,,,
-Sample1,D8S1179,14.0,14_12_1_0,869,Typed,,,,,,
-Sample1,D8S1179,13.0,13_11_1_0,184,-1_stutter,14_12_1_0,,869.0,,,0.212
-Sample1,D8S1179,12.0,12_10_1_0,37,-2_stutter,14_12_1_0,,869.0,,,0.201
-Sample1,D9S1122,13.0,13_11,948,Typed,,,,,,
-Sample1,D9S1122,12.0,12_10,108,-1_stutter,13_11,,948.0,,,0.114
-Sample1,D9S1122,11.0,11_11,991,Typed,,,,,,
-Sample1,D9S1122,10.0,10_10,87,-1_stutter,11_11,,991.0,,,0.088
-Sample1,FGA,23.0,23_15_3_0,1436,Typed,,,,,,
-Sample1,FGA,22.0,22_14_3_0,262,-1_stutter,23_15_3_0,,1436.0,,,0.182
-Sample1,FGA,21.0,21_13_3_0,48,BelowAT,,,,,0.013,
-Sample1,FGA,20.0,20_12_3_0,1750,Typed,,,,,,
-Sample1,FGA,18.0,18_10_3_0,181,Typed,,,,,,
-Sample1,FGA,17.0,17_9_3_0,15,BelowAT,,,,,0.004,
-Sample1,PENTA D,15.0,15_15,50,Typed,,,,,,
-Sample1,PENTA D,13.0,13_13,1000,Typed,,,,,,
+Sample1,D4S2408,10,10_10_0,1022,Typed,,,,,,
+Sample1,D4S2408,9,9_9_0,116,-1_stutter/+1_stutter,10_10_0,8_8_0,1022.0,1050.0,,
+Sample1,D4S2408,8,8_8_0,1050,Typed,,,,,,
+Sample1,D8S1179,14,14_12_1_0,869,Typed,,,,,,
+Sample1,D8S1179,13,13_11_1_0,184,-1_stutter,14_12_1_0,,869.0,,,0.212
+Sample1,D8S1179,12,12_10_1_0,37,-2_stutter,14_12_1_0,,869.0,,,0.201
+Sample1,D9S1122,13,13_11,948,Typed,,,,,,
+Sample1,D9S1122,12,12_10,108,-1_stutter,13_11,,948.0,,,0.114
+Sample1,D9S1122,11,11_11,991,Typed,,,,,,
+Sample1,D9S1122,10,10_10,87,-1_stutter,11_11,,991.0,,,0.088
+Sample1,FGA,23,23_15_3_0,1436,Typed,,,,,,
+Sample1,FGA,22,22_14_3_0,262,-1_stutter,23_15_3_0,,1436.0,,,0.182
+Sample1,FGA,21,21_13_3_0,48,BelowAT,,,,,0.013,
+Sample1,FGA,20,20_12_3_0,1750,Typed,,,,,,
+Sample1,FGA,18,18_10_3_0,181,Typed,,,,,,
+Sample1,FGA,17,17_9_3_0,15,BelowAT,,,,,0.004,
+Sample1,PENTA D,15,15_15,50,Typed,,,,,,
+Sample1,PENTA D,13,13_13,1000,Typed,,,,,,
 Sample1,PENTA E,7.0,7_7,505,Typed,,,,,,
-Sample1,TH01,7.0,7_7,2197,Typed,,,,,,
-Sample1,TH01,6.0,6_6,1632,Typed,,,,,,
-Sample1,TH01,5.0,5_5,66,BelowAT,,,,,0.017,
+Sample1,TH01,7,7_7,2197,Typed,,,,,,
+Sample1,TH01,6,6_6,1632,Typed,,,,,,
+Sample1,TH01,5,5_5,66,BelowAT,,,,,0.017,
 Sample1,TPOX,11.0,11_11,15,BelowAT,,,,,1.0,
