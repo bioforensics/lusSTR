@@ -43,7 +43,6 @@ p_strs = [
     "D2S441",
     "D3S1358",
     "D5S818",
-    "D6S1043",
     "D7S820",
     "D8S1179",
     "FGA",
@@ -205,7 +204,6 @@ def process_strs(dict_loc, datatype, seq_col, brack_col, kit):
 
 
 def EFM_output(profile, outfile, profile_type, data_type, col, sex, kit, separate=False):
-    profile = profile[profile["Locus"] != "AMELOGENIN"]
     if profile_type == "reference":
         profile = profile.query("allele_type == 'Typed'")
     else:
@@ -266,7 +264,8 @@ def populate_efm_profile(profile, data_type, colname, sex, kit):
     for col in height_columns:
         efm_profile[col] = efm_profile[col].astype("Int64")
     efm_profile = efm_profile.sort_values(by=["SampleName", "Marker"])
-    return efm_profile
+    efm_profile_noamel = efm_profile[efm_profile["Marker"] != "AMELOGENIN"]
+    return efm_profile_noamel
 
 
 def write_sample_specific_efm_profiles(efm_profile, profile_type, data_type, outdir):
@@ -314,7 +313,7 @@ def determine_max_num_alleles(allele_heights):
     return max_num_alleles
 
 
-def STRmix_output(profile, outdir, profile_type, data_type, seq_col, id_list):
+def STRmix_output(profile, outdir, profile_type, data_type, seq_col):
     profile = profile[profile["Locus"] != "AMELOGENIN"]
     Path(outdir).mkdir(parents=True, exist_ok=True)
     if profile_type == "reference":
@@ -339,6 +338,7 @@ def STRmix_output(profile, outdir, profile_type, data_type, seq_col, id_list):
         {"Locus": {"VWA": "vWA", "PENTA D": "PentaD", "PENTA E": "PentaE"}}, inplace=True
     )
     Path(outdir).mkdir(exist_ok=True)
+    id_list = strmix_profile["SampleID"].unique()
     for id in id_list:
         sample_df = strmix_profile[strmix_profile["SampleID"] == id].reset_index(drop=True)
         if profile_type == "evidence":
@@ -565,7 +565,6 @@ def process_input(
             STRmix_output(full_df, outpath, profile_type, data_type, seq_col)
     else:
         dict_loc = {k: v for k, v in full_df.groupby(["SampleID", "Locus"])}
-        id_list = full_df["SampleID"].unique()
         final_df, flags_df = process_strs(dict_loc, data_type, seq_col, brack_col, kit)
         if final_df is not None:
             marker_plots(final_df, input_name, kit)
@@ -574,7 +573,7 @@ def process_input(
                     final_df, outpath, profile_type, data_type, brack_col, sex, kit, separate
                 )
             else:
-                STRmix_output(final_df, outpath, profile_type, data_type, seq_col, id_list)
+                STRmix_output(final_df, outpath, profile_type, data_type, seq_col)
             if info:
                 name = os.path.basename(outpath)
                 final_df.to_csv(f"{outpath}/{input_name}_sequence_info.csv", index=False)
