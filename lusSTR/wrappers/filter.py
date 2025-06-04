@@ -27,109 +27,6 @@ import re
 import sys
 
 
-p_strs = [
-    "AMELOGENIN",
-    "CSF1PO",
-    "D10S1248",
-    "D12S391",
-    "D13S317",
-    "D16S539",
-    "D18S51",
-    "D19S433",
-    "D1S1656",
-    "D21S11",
-    "D22S1045",
-    "D2S1338",
-    "D2S441",
-    "D3S1358",
-    "D5S818",
-    "D7S820",
-    "D8S1179",
-    "FGA",
-    "PENTA D",
-    "PENTA E",
-    "TH01",
-    "TPOX",
-    "VWA",
-]
-
-f_strs = [
-    "AMELOGENIN",
-    "CSF1PO",
-    "D10S1248",
-    "D12S391",
-    "D13S317",
-    "D16S539",
-    "D17S1301",
-    "D18S51",
-    "D19S433",
-    "D1S1656",
-    "D20S482",
-    "D21S11",
-    "D22S1045",
-    "D2S1338",
-    "D2S441",
-    "D3S1358",
-    "D4S2408",
-    "D5S818",
-    "D6S1043",
-    "D7S820",
-    "D8S1179",
-    "D9S1122",
-    "FGA",
-    "PENTA D",
-    "PENTA E",
-    "TH01",
-    "TPOX",
-    "VWA",
-]
-
-p_ystrs = [
-    "DYS19",
-    "DYS385A-B",
-    "DYS389II",
-    "DYS390",
-    "DYS391",
-    "DYS392",
-    "DYS393",
-    "DYS437",
-    "DYS438",
-    "DYS439",
-    "DYS448",
-    "DYS456",
-    "DYS458",
-    "DYS481",
-    "DYS533",
-    "DYS549",
-    "DYS570",
-    "DYS576",
-    "DYS635",
-    "DYS643",
-    "Y-GATA-H4",
-]
-
-f_ystrs = [
-    "DYS19",
-    "DYS385A-B",
-    "DYS389II",
-    "DYS390",
-    "DYS391",
-    "DYS392",
-    "DYS437",
-    "DYS438",
-    "DYS439",
-    "DYS448",
-    "DYS481",
-    "DYS533",
-    "DYS549",
-    "DYS570",
-    "DYS576",
-    "DYS635",
-    "DYS643",
-    "Y-GATA-H4",
-]
-
-
 def get_filter_metadata_file():
     return importlib.resources.files("lusSTR") / "data/filters.json"
 
@@ -138,11 +35,19 @@ with open(get_filter_metadata_file(), "r") as fh:
     filter_marker_data = json.load(fh)
 
 
+def get_strlist_file():
+    return importlib.resources.files("lusSTR") / "data/str_lists.json"
+
+
+with open(get_strlist_file(), "r") as fh:
+    str_lists = json.load(fh)
+
+
 def process_strs(dict_loc, datatype, seq_col, brack_col, kit):
     final_df = pd.DataFrame()
     flags_df = pd.DataFrame()
-    strs = p_strs if kit == "powerseq" else f_strs
-    ystrs = p_ystrs if kit == "powerseq" else f_ystrs
+    strs = str_lists["powerseq_strs"] if kit == "powerseq" else str_lists["forenseq_strs"]
+    ystrs = str_lists["powerseq_ystrs"] if kit == "powerseq" else str_lists["forenseq_ystrs"]
     for key, value in dict_loc.items():
         data = dict_loc[key].reset_index(drop=True)
         if datatype == "ce":
@@ -234,8 +139,8 @@ def populate_efm_profile(profile, data_type, colname, sex, kit):
             allele_heights[row.SampleID][row.Locus][row.Allele] = int(row.Reads)
     max_num_alleles = determine_max_num_alleles(allele_heights)
     reformatted_profile = list()
-    strs = p_strs if kit == "powerseq" else f_strs
-    ystrs = p_ystrs if kit == "powerseq" else f_ystrs
+    strs = str_lists["powerseq_strs"] if kit == "powerseq" else str_lists["forenseq_strs"]
+    ystrs = str_lists["powerseq_ystrs"] if kit == "powerseq" else str_lists["forenseq_ystrs"]
     for sampleid, loci in allele_heights.items():
         for locusid, alleles in loci.items():
             allele_list, height_list = list(), list()
@@ -442,9 +347,13 @@ def make_plot(df, sample_id, output_name, kit, sameyaxis=False, filters=False, a
     fig = plt.figure(figsize=(30, 30))
     n = 0
     if kit == "powerseq":
-        str_list = p_ystrs if "sexloci" in output_name else p_strs
+        str_list = (
+            str_lists["powerseq_ystrs"] if "sexloci" in output_name else str_lists["powerseq_strs"]
+        )
     else:
-        str_list = f_ystrs if "sexloci" in output_name else f_strs
+        str_list = (
+            str_lists["forenseq_ystrs"] if "sexloci" in output_name else str_lists["forenseq_strs"]
+        )
     for marker in str_list:
         n += 1
         colors = {"Typed": "green", "Stutter": "blue", "BelowAT": "red", "Deleted": "purple"}
@@ -457,7 +366,6 @@ def make_plot(df, sample_id, output_name, kit, sameyaxis=False, filters=False, a
                         0 if marker_df.loc[i, "CE_Allele"] == "X" else 1
                     )
             marker_df["CE_Allele"] = marker_df["CE_Allele"].astype(float)
-            # ax = fig.add_subplot(6, 5, n)
             p = ax.bar(
                 marker_df["CE_Allele"],
                 marker_df["Reads"],
@@ -478,16 +386,15 @@ def make_plot(df, sample_id, output_name, kit, sameyaxis=False, filters=False, a
             if not filters:
                 plt.legend(handles, labels, title="Allele Type")
             else:
+                marker_df["Label"] = None
                 for i, row in marker_df.iterrows():
                     if marker == "AMELOGENIN":
-                        marker_df.loc[i, "Label"] = (
-                            "X" if marker_df.loc[i, "CE_Allele"] == 0 else "Y"
-                        )
+                        row["Label"] = "X" if row["CE_Allele"] == 0 else "Y"
                     else:
-                        marker_df.loc[i, "Label"] = (
-                            str(int(marker_df.loc[i, "CE_Allele"]))
-                            if ".0" in str(marker_df.loc[i, "CE_Allele"])
-                            else str(marker_df.loc[i, "CE_Allele"])
+                        row["Label"] = (
+                            str(int(row["CE_Allele"]))
+                            if ".0" in str(row["CE_Allele"])
+                            else str(row["CE_Allele"])
                         )
                 ax.bar_label(p, labels=marker_df["Label"])
             if sameyaxis:

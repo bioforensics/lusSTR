@@ -44,6 +44,14 @@ with open(get_filter_metadata_file(), "r") as fh:
     filter_marker_data = json.load(fh)
 
 
+def get_strlist_file():
+    return importlib.resources.files("lusSTR") / "data/str_lists.json"
+
+
+with open(get_strlist_file(), "r") as fh:
+    str_lists = json.load(fh)
+
+
 # ------------ Function to Generate config.yaml File ---------- #
 
 
@@ -147,63 +155,6 @@ def main():
 #                     lusSTR Home Page                              #
 #####################################################################
 
-p_strs = [
-    "AMELOGENIN",
-    "CSF1PO",
-    "D10S1248",
-    "D12S391",
-    "D13S317",
-    "D16S539",
-    "D18S51",
-    "D19S433",
-    "D1S1656",
-    "D21S11",
-    "D22S1045",
-    "D2S1338",
-    "D2S441",
-    "D3S1358",
-    "D5S818",
-    "D7S820",
-    "D8S1179",
-    "FGA",
-    "PENTA D",
-    "PENTA E",
-    "TH01",
-    "TPOX",
-    "VWA",
-]
-
-f_strs = [
-    "AMELOGENIN",
-    "CSF1PO",
-    "D10S1248",
-    "D12S391",
-    "D13S317",
-    "D16S539",
-    "D17S1301",
-    "D18S51",
-    "D19S433",
-    "D1S1656",
-    "D20S482",
-    "D21S11",
-    "D22S1045",
-    "D2S1338",
-    "D2S441",
-    "D3S1358",
-    "D4S2408",
-    "D5S818",
-    "D6S1043",
-    "D7S820",
-    "D8S1179",
-    "D9S1122",
-    "FGA",
-    "PENTA D",
-    "PENTA E",
-    "TH01",
-    "TPOX",
-    "VWA",
-]
-
 
 def show_home_page():
 
@@ -255,15 +206,21 @@ def interactive_plots_allmarkers(sample_df, flagged_df):
     max_yvalue = (int(math.ceil(max_reads / n)) * n) + n
     increase_value = int(math.ceil((max_yvalue / 5) / n)) * n
     n = 0
-    all_loci = f_strs if st.session_state.kit == "forenseq" else p_strs
+    all_loci = (
+        str_lists["forenseq_strs"]
+        if st.session_state.kit == "forenseq"
+        else str_lists["powerseq_strs"]
+    )
     missing_loci = [x for x in all_loci if x not in sample_df["Locus"].unique()]
     for marker in all_loci:
         col = cols[n]
         container = col.container(border=True)
         sample_locus = sample_df["SampleID"].unique() + "_" + marker
-        for i, row in sample_df.iterrows():
-            if sample_df.loc[i, "Locus"] == "AMELOGENIN":
-                sample_df.loc[i, "CE_Allele"] = 0 if sample_df.loc[i, "CE_Allele"] == "X" else 1
+        sample_df = np.where(
+            sample_df["Locus"] == "AMELOGENIN",
+            np.where(sample_df["CE_Allele"] == "X", 0, 1),
+            sample_df["CE_Allele"],
+        )
         sample_df["CE_Allele"] = pd.to_numeric(sample_df["CE_Allele"])
         marker_df = sample_df[sample_df["Locus"] == marker].sort_values(
             by=["CE_Allele", "allele_type"], ascending=[False, True]
@@ -384,9 +341,11 @@ def interactive_setup(df1, file):
         interactive_plots_allmarkers(sample_df, flags)
     else:
         plot_df = sample_df
-        for i, row in plot_df.iterrows():
-            if plot_df.loc[i, "Locus"] == "AMELOGENIN":
-                plot_df.loc[i, "CE_Allele"] = 0 if plot_df.loc[i, "CE_Allele"] == "X" else 1
+        sample_df = np.where(
+            sample_df["Locus"] == "AMELOGENIN",
+            np.where(sample_df["CE_Allele"] == "X", 0, 1),
+            sample_df["CE_Allele"],
+        )
         plot_df["CE_Allele"] = pd.to_numeric(plot_df["CE_Allele"])
         locus_key = f"{sample}_{locus}"
         if locus_key not in st.session_state:
