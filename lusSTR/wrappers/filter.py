@@ -386,12 +386,11 @@ def make_plot(df, sample_id, output_name, kit, sameyaxis=False, filters=False, a
             if not filters:
                 plt.legend(handles, labels, title="Allele Type")
             else:
-                marker_df["Label"] = None
                 for i, row in marker_df.iterrows():
                     if marker == "AMELOGENIN":
-                        row["Label"] = "X" if row["CE_Allele"] == 0 else "Y"
+                        marker_df.loc[i, "Label"] = "X" if row["CE_Allele"] == 0 else "Y"
                     else:
-                        row["Label"] = (
+                        marker_df.loc[i, "Label"] = (
                             str(int(row["CE_Allele"]))
                             if ".0" in str(row["CE_Allele"])
                             else str(row["CE_Allele"])
