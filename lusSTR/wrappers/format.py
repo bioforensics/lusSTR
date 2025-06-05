@@ -59,7 +59,7 @@ def parse_str_table_from_sheet(infile, sheet, exclude=None):
 
 
 def uas_format(infile, sexloci=False):
-    auto_strs = parse_str_table_from_sheet(infile, sheet="Autosomal STRs", exclude=["Amelogenin"])
+    auto_strs = parse_str_table_from_sheet(infile, sheet="Autosomal STRs")
     sex_strs = None
     if sexloci is True:
         y_strs = parse_str_table_from_sheet(infile, "Y STRs")
@@ -71,6 +71,7 @@ def uas_format(infile, sexloci=False):
 def nonuas_load(inpath, software, sexloci=False):
     """Format a directory of STRait Razor/GeneMarker output files."""
     locus_list = [
+        "Amelogenin",
         "CSF1PO",
         "D10S1248",
         "D12S391",

@@ -58,8 +58,6 @@ def format_table(input, software, kit="forenseq", custom=False):
             locus = "PENTA E"
         if locus == "DYS385A/B" or locus == "DYS385":
             locus = "DYS385A-B"
-        if locus == "AMELOGENIN":
-            continue
         metadata = str_marker_data[locus]
         if kit == "forenseq":
             remove_5p = metadata["Foren_5"]
@@ -67,7 +65,15 @@ def format_table(input, software, kit="forenseq", custom=False):
         else:
             remove_5p = metadata["Power_5"]
             remove_3p = metadata["Power_3"]
-        if len(sequence) <= (remove_5p + remove_3p) and software != "uas":
+        if custom:
+            if metadata["Custom_5"] < 0:
+                remove_5p = remove_5p - metadata["Custom_5"]
+            if metadata["Custom_3"] < 0:
+                remove_3p = remove_3p - metadata["Custom_3"]
+        locus_min_length = remove_5p + remove_3p + len(metadata["LUS"])
+        if locus == "AMELOGENIN":
+            locus_min_length -= 1
+        if software != "uas" and len(sequence) < locus_min_length:
             flank_summary = [
                 sampleid,
                 project,
@@ -218,8 +224,35 @@ def check_vwa(marker, sequence, software, custom):
     return new_marker
 
 
-def combine_reads(table, columns):
-    comb_table = table.groupby(columns[:-1], as_index=False)["Reads"].sum()
+def combine_reads(table, columns, custom=False):
+    if custom:
+        comb_table = (
+            table.groupby(
+                [
+                    "SampleID",
+                    "Project",
+                    "Analysis",
+                    "Locus",
+                    "Custom_Range_Sequence",
+                    "Custom_Bracketed_Notation",
+                    "CE_Allele",
+                ]
+            )
+            .agg(
+                {
+                    "UAS_Output_Sequence": lambda x: ", ".join(x),
+                    "Forward_Strand_Sequence": lambda x: ", ".join(x),
+                    "UAS_Output_Bracketed_Notation": lambda x: ", ".join(x),
+                    "Forward_Strand_Bracketed_Notation": lambda x: ", ".join(x),
+                    "LUS": lambda x: ", ".join(x),
+                    "LUS_Plus": lambda x: ", ".join(x),
+                    "Reads": "sum",
+                }
+            )
+            .reset_index()
+        )
+    else:
+        comb_table = table.groupby(columns[:-1], as_index=False)["Reads"].sum()
     sorted = sort_table(comb_table)
     return sorted
 
@@ -237,7 +270,7 @@ def remove_columns(column_list, remove_list):
     return column_list
 
 
-def create_custom_outputtable(columns, table):
+def create_custom_outputtable(columns, table, custom):
     remove_list = [
         "UAS_Output_Sequence",
         "Forward_Strand_Sequence",
@@ -273,7 +306,9 @@ def main(input, out, kit, software, sex, nocombine, custom):
                 sex_final_table = combine_reads(sex_final_table, sex_columns)
                 sex_final_table.to_csv(f"{full_table_name}_sexloci.txt", sep="\t", index=False)
                 if custom:
-                    sex_table_custom = create_custom_outputtable(sex_columns, sex_final_table)
+                    sex_table_custom = create_custom_outputtable(
+                        sex_columns, sex_final_table, custom=True
+                    )
                     sex_table_custom.to_csv(f"{output_name}_sexloci.txt", index=False, sep="\t")
         else:
             sex_final_table.to_csv(f"{output_name}_sexloci.txt", sep="\t", index=False)
@@ -287,7 +322,9 @@ def main(input, out, kit, software, sex, nocombine, custom):
             autosomal_final_table = combine_reads(autosomal_final_table, columns)
             autosomal_final_table.to_csv(f"{full_table_name}.txt", sep="\t", index=False)
             if custom:
-                custom_table_comb = create_custom_outputtable(columns, autosomal_final_table)
+                custom_table_comb = create_custom_outputtable(
+                    columns, autosomal_final_table, custom=True
+                )
                 custom_table_comb.to_csv(out, sep="\t", index=False)
     else:
         autosomal_final_table.to_csv(out, sep="\t", index=False)

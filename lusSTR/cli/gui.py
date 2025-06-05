@@ -22,6 +22,7 @@ import numpy as np
 import pandas as pd
 from pathlib import Path
 import plotly.express as px
+import plotly.graph_objs as go
 import streamlit as st
 from streamlit_option_menu import option_menu
 import yaml
@@ -41,6 +42,14 @@ def get_filter_metadata_file():
 
 with open(get_filter_metadata_file(), "r") as fh:
     filter_marker_data = json.load(fh)
+
+
+def get_strlist_file():
+    return importlib.resources.files("lusSTR") / "data/str_lists.json"
+
+
+with open(get_strlist_file(), "r") as fh:
+    str_lists = json.load(fh)
 
 
 # ------------ Function to Generate config.yaml File ---------- #
@@ -197,14 +206,33 @@ def interactive_plots_allmarkers(sample_df, flagged_df):
     max_yvalue = (int(math.ceil(max_reads / n)) * n) + n
     increase_value = int(math.ceil((max_yvalue / 5) / n)) * n
     n = 0
-    for marker in sample_df["Locus"].unique():
+    all_loci = (
+        str_lists["forenseq_strs"]
+        if st.session_state.kit == "forenseq"
+        else str_lists["powerseq_strs"]
+    )
+    missing_loci = [x for x in all_loci if x not in sample_df["Locus"].unique()]
+    for marker in all_loci:
         col = cols[n]
         container = col.container(border=True)
         sample_locus = sample_df["SampleID"].unique() + "_" + marker
-        marker_df = sample_df[sample_df["Locus"] == marker].sort_values(by="CE_Allele")
+        sample_df = np.where(
+            sample_df["Locus"] == "AMELOGENIN",
+            np.where(sample_df["CE_Allele"] == "X", 0, 1),
+            sample_df["CE_Allele"],
+        )
+        sample_df["CE_Allele"] = pd.to_numeric(sample_df["CE_Allele"])
+        marker_df = sample_df[sample_df["Locus"] == marker].sort_values(
+            by=["CE_Allele", "allele_type"], ascending=[False, True]
+        )
         if sample_locus in flagged_df["key"].values:
             marker = f"⚠️{marker}⚠️"
-        plot = interactive_plots(marker_df, marker, max_yvalue, increase_value, all=True)
+        if marker in missing_loci:
+            marker = f"⚠️{marker}⚠️"
+            plot = go.Figure()
+            plot.update_layout(title=marker)
+        else:
+            plot = interactive_plots(marker_df, marker, max_yvalue, increase_value, all=True)
         container.plotly_chart(plot, use_container_width=True)
         if n == 3:
             n = 0
@@ -240,9 +268,14 @@ def interactive_plots(df, locus, ymax, increase, all=False):
     )
     plot.add_hline(y=at, line_width=3, line_dash="dot", line_color="gray")
     plot.add_annotation(text=f"AT", x=min_x + 0.1, y=at, showarrow=False, yshift=10)
-    plot.update_layout(
-        xaxis=dict(range=[min_x, max_x], tickmode="array", tickvals=np.arange(min_x, max_x, 1))
-    )
+    if locus == "AMELOGENIN":
+        plot.update_layout(
+            xaxis=dict(tickvals=np.arange(-1, 2, 1), tickmode="array", ticktext=["", "X", "Y", ""])
+        )
+    else:
+        plot.update_layout(
+            xaxis=dict(range=[min_x, max_x], tickmode="array", tickvals=np.arange(min_x, max_x, 1))
+        )
     if all:
         plot.update_layout(
             yaxis=dict(range=[0, ymax], tickmode="array", tickvals=np.arange(0, ymax, increase))
@@ -307,11 +340,16 @@ def interactive_setup(df1, file):
             )
         interactive_plots_allmarkers(sample_df, flags)
     else:
+        plot_df = sample_df
+        sample_df = np.where(
+            sample_df["Locus"] == "AMELOGENIN",
+            np.where(sample_df["CE_Allele"] == "X", 0, 1),
+            sample_df["CE_Allele"],
+        )
+        plot_df["CE_Allele"] = pd.to_numeric(plot_df["CE_Allele"])
         locus_key = f"{sample}_{locus}"
         if locus_key not in st.session_state:
-            st.session_state[locus_key] = sample_df[sample_df["Locus"] == locus].reset_index(
-                drop=True
-            )
+            st.session_state[locus_key] = plot_df[plot_df["Locus"] == locus].reset_index(drop=True)
         Type = [
             "Deleted",
             "Typed",

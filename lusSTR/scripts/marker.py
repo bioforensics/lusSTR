@@ -63,7 +63,10 @@ class STRMarker:
 
     @property
     def repeat_size(self):
-        return len(self.data["LUS"])
+        if self.data["LUS"] != "":
+            return len(self.data["LUS"])
+        else:
+            return 1
 
     @property
     def repeats(self):
@@ -353,6 +356,87 @@ class STRMarker:
             lus_final_output,
             lus_plus,
         ]
+
+
+class STRMarker_Amelogenin(STRMarker):
+    @property
+    def forward_sequence(self):
+        if self.software == "uas":
+            return self.sequence
+        front, back = self._uas_bases_to_trim()
+        if len(self.sequence) == 0:
+            back = None
+        else:
+            back *= -1
+        if self.sequence[front:back] == "":
+            return ""
+        else:
+            return self.sequence[front:back]
+
+    @property
+    def custom_sequence(self):
+        if self.custom:
+            custom_front, custom_back = self._uas_bases_to_trim()
+            if custom_back == 0:
+                custom_back = None
+            else:
+                custom_back *= -1
+            if self.sequence[custom_front:custom_back] == "":
+                return ""
+            else:
+                return self.sequence[custom_front:custom_back]
+        else:
+            return None
+
+    @property
+    def canonical(self):
+        if self.uas_sequence == "AAAGTG":
+            return "Y"
+        elif self.uas_sequence == "":
+            return "X"
+        else:
+            return self.uas_sequence
+
+    @property
+    def convert(self):
+        if self.forward_sequence == "":
+            return ""
+        else:
+            return self.forward_sequence
+
+    @property
+    def custom_brack(self):
+        if self.forward_sequence == "":
+            return ""
+        else:
+            return "NA"
+
+    @property
+    def summary(self):
+        if self.uas_sequence == "":
+            return [
+                "",
+                "",
+                "",
+                "",
+                "NA",
+                "NA",
+                "X",
+                "NA",
+                "NA",
+            ]
+        else:
+            return [
+                self.uas_sequence,
+                self.forward_sequence,
+                self.custom_sequence,
+                self.convert,
+                self.convert,
+                self.custom_brack,
+                self.canonical,
+                "NA",
+                "NA",
+            ]
 
 
 class STRMarker_D8S1179(STRMarker):
@@ -1742,6 +1826,7 @@ class STRMarker_DYS389II(STRMarker):
 
 def STRMarkerObject(locus, sequence, software, custom=False, kit="forenseq"):
     constructors = {
+        "AMELOGENIN": STRMarker_Amelogenin,
         "D8S1179": STRMarker_D8S1179,
         "D13S317": STRMarker_D13S317,
         "D20S482": STRMarker_D20S482,

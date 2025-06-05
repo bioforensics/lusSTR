@@ -28,18 +28,55 @@ with open(get_filter_metadata_file(), "r") as fh:
 
 def filters(locus_allele_info, locus, locus_reads, datatype, brack_col):
     metadata = filter_marker_data[locus]
-    if len(locus_allele_info) == 1:
-        locus_allele_info = single_allele_thresholds(metadata, locus_reads, locus_allele_info)
+    if locus == "AMELOGENIN":
+        locus_allele_info = filter_amel(metadata, locus_allele_info, locus_reads)
     else:
-        locus_allele_info, locus_reads = multiple_allele_thresholds(
-            metadata, locus_reads, locus_allele_info
-        )
-        locus_allele_info = ce_filtering(
-            locus_allele_info, locus_reads, metadata, datatype, brack_col
-        )
-        if datatype != "ce":
-            locus_allele_info = same_size_filter(locus_allele_info, metadata, datatype)
+        locus_allele_info["CE_Allele"] = locus_allele_info["CE_Allele"].astype(float)
+        if len(locus_allele_info) == 1:
+            locus_allele_info = single_allele_thresholds(metadata, locus_reads, locus_allele_info)
+        else:
+            locus_allele_info, locus_reads = multiple_allele_thresholds(
+                metadata, locus_reads, locus_allele_info
+            )
+            locus_allele_info = ce_filtering(
+                locus_allele_info, locus_reads, metadata, datatype, brack_col
+            )
+            if datatype != "ce":
+                locus_allele_info = same_size_filter(locus_allele_info, metadata, datatype)
     return locus_allele_info
+
+
+def filter_amel(metadata, amel_df, locus_reads):
+    for filter in ["Detection", "Analytical"]:
+        use = metadata[f"{filter}ThresholdUse"]
+        count = metadata[f"{filter}ThresholdStaticCount"]
+        perc = metadata[f"{filter}ThresholdDynamicPercent"]
+        thresh_perc = round(perc * locus_reads, 1)
+        if (
+            use.lower() == "dynamic"
+            and locus_reads < metadata["MinimumNumberReadsForDynamicThresholds"]
+        ):
+            use = "static"
+        if use.lower() == "both":
+            thresh = thresh_perc if thresh_perc >= count else count
+        elif use.lower() == "static":
+            thresh = count
+        elif use.lower() == "dynamic":
+            thresh = thresh_perc
+        if filter == "Detection":
+            amel_dt = amel_df[amel_df["Reads"] >= thresh].reset_index(drop=True)
+            locus_reads = amel_df["Reads"].sum()
+        else:
+            for i in range(len(amel_dt)):
+                al_reads = amel_dt.loc[i, "Reads"]
+                if al_reads < thresh:
+                    amel_dt.loc[i, ["allele_type", "perc_noise"]] = [
+                        "BelowAT",
+                        round(al_reads / locus_reads, 3),
+                    ]
+                else:
+                    amel_dt.loc[i, "allele_type"] = "Typed"
+    return amel_dt
 
 
 def single_allele_thresholds(metadata, locus_reads, single_all_df):

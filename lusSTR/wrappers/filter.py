@@ -27,61 +27,6 @@ import re
 import sys
 
 
-strs = [
-    "CSF1PO",
-    "D10S1248",
-    "D12S391",
-    "D13S317",
-    "D16S539",
-    "D17S1301",
-    "D18S51",
-    "D19S433",
-    "D1S1656",
-    "D20S482",
-    "D21S11",
-    "D22S1045",
-    "D2S1338",
-    "D2S441",
-    "D3S1358",
-    "D4S2408",
-    "D5S818",
-    "D6S1043",
-    "D7S820",
-    "D8S1179",
-    "D9S1122",
-    "FGA",
-    "PENTA D",
-    "PENTA E",
-    "TH01",
-    "TPOX",
-    "VWA",
-]
-
-ystrs = [
-    "DYS19",
-    "DYS385A-B",
-    "DYS389II",
-    "DYS390",
-    "DYS391",
-    "DYS392",
-    "DYS393",
-    "DYS437",
-    "DYS438",
-    "DYS439",
-    "DYS448",
-    "DYS456",
-    "DYS458",
-    "DYS481",
-    "DYS533",
-    "DYS549",
-    "DYS570",
-    "DYS576",
-    "DYS635",
-    "DYS643",
-    "Y-GATA-H4",
-]
-
-
 def get_filter_metadata_file():
     return importlib.resources.files("lusSTR") / "data/filters.json"
 
@@ -90,9 +35,19 @@ with open(get_filter_metadata_file(), "r") as fh:
     filter_marker_data = json.load(fh)
 
 
-def process_strs(dict_loc, datatype, seq_col, brack_col):
+def get_strlist_file():
+    return importlib.resources.files("lusSTR") / "data/str_lists.json"
+
+
+with open(get_strlist_file(), "r") as fh:
+    str_lists = json.load(fh)
+
+
+def process_strs(dict_loc, datatype, seq_col, brack_col, kit):
     final_df = pd.DataFrame()
     flags_df = pd.DataFrame()
+    strs = str_lists["powerseq_strs"] if kit == "powerseq" else str_lists["forenseq_strs"]
+    ystrs = str_lists["powerseq_ystrs"] if kit == "powerseq" else str_lists["forenseq_ystrs"]
     for key, value in dict_loc.items():
         data = dict_loc[key].reset_index(drop=True)
         if datatype == "ce":
@@ -146,27 +101,22 @@ def process_strs(dict_loc, datatype, seq_col, brack_col):
             filtered_df = filtered_df.replace({"nan": None})
             final_df = pd.concat([final_df, filtered_df])
             flags_df = pd.concat([flags_df, flags(filtered_df, datatype)])
-    if datatype == "ce" or datatype == "ngs":
-        try:
-            final_df = final_df.astype({"CE_Allele": "float64", "Reads": "int"})
-        except KeyError:
-            final_df = None
     return final_df, flags_df
 
 
-def EFM_output(profile, outfile, profile_type, data_type, col, sex, separate=False):
+def EFM_output(profile, outfile, profile_type, data_type, col, sex, kit, separate=False):
     if profile_type == "reference":
         profile = profile.query("allele_type == 'Typed'")
     else:
         profile = profile.query("allele_type != ['BelowAT', 'Deleted']")
-    efm_profile = populate_efm_profile(profile, data_type, col, sex)
+    efm_profile = populate_efm_profile(profile, data_type, col, sex, kit)
     if separate:
         write_sample_specific_efm_profiles(efm_profile, profile_type, data_type, outfile)
     else:
         write_aggregate_efm_profile(efm_profile, profile_type, data_type, outfile)
 
 
-def populate_efm_profile(profile, data_type, colname, sex):
+def populate_efm_profile(profile, data_type, colname, sex, kit):
     if data_type == "ce":
         prof_col = "CE_Allele"
     elif data_type == "lusplus":
@@ -189,6 +139,8 @@ def populate_efm_profile(profile, data_type, colname, sex):
             allele_heights[row.SampleID][row.Locus][row.Allele] = int(row.Reads)
     max_num_alleles = determine_max_num_alleles(allele_heights)
     reformatted_profile = list()
+    strs = str_lists["powerseq_strs"] if kit == "powerseq" else str_lists["forenseq_strs"]
+    ystrs = str_lists["powerseq_ystrs"] if kit == "powerseq" else str_lists["forenseq_ystrs"]
     for sampleid, loci in allele_heights.items():
         for locusid, alleles in loci.items():
             allele_list, height_list = list(), list()
@@ -213,7 +165,8 @@ def populate_efm_profile(profile, data_type, colname, sex):
     for col in height_columns:
         efm_profile[col] = efm_profile[col].astype("Int64")
     efm_profile = efm_profile.sort_values(by=["SampleName", "Marker"])
-    return efm_profile
+    efm_profile_noamel = efm_profile[efm_profile["Marker"] != "AMELOGENIN"]
+    return efm_profile_noamel
 
 
 def write_sample_specific_efm_profiles(efm_profile, profile_type, data_type, outdir):
@@ -262,6 +215,7 @@ def determine_max_num_alleles(allele_heights):
 
 
 def STRmix_output(profile, outdir, profile_type, data_type, seq_col):
+    profile = profile[profile["Locus"] != "AMELOGENIN"]
     Path(outdir).mkdir(parents=True, exist_ok=True)
     if profile_type == "reference":
         filtered_df = profile.query("allele_type == 'Typed'")
@@ -359,21 +313,24 @@ def format_ref_table(new_rows, sample_data, datatype):
     return sort_df
 
 
-def marker_plots(df, output_name, sex, wd="."):
+def marker_plots(df, output_name, kit, wd="."):
     Path(f"{wd}/MarkerPlots").mkdir(parents=True, exist_ok=True)
-    df["CE_Allele"] = df["CE_Allele"].astype(float)
     filt_df = df[df["allele_type"] == "Typed"]
     for sample_id in df["SampleID"].unique():
-        with PdfPages(f"{wd}/MarkerPlots/{output_name}_{sample_id}_marker_plots.pdf") as pdf:
-            make_plot(filt_df, sample_id, filters=True, at=False)
-            pdf.savefig()
-            make_plot(df, sample_id)
-            pdf.savefig()
-            make_plot(df, sample_id, sameyaxis=True)
-            pdf.savefig()
+        if df[df["SampleID"] == sample_id].empty:
+            print(f"{sample_id} does not have any reads passing filter. Skipping to next sample.")
+        else:
+            with PdfPages(f"{wd}/MarkerPlots/{output_name}_{sample_id}_marker_plots.pdf") as pdf:
+                if not filt_df[filt_df["SampleID"] == sample_id].empty:
+                    make_plot(filt_df, sample_id, output_name, kit, filters=True, at=False)
+                    pdf.savefig()
+                make_plot(df, sample_id, output_name, kit)
+                pdf.savefig()
+                make_plot(df, sample_id, output_name, kit, sameyaxis=True)
+                pdf.savefig()
 
 
-def make_plot(df, sample_id, sameyaxis=False, filters=False, at=True):
+def make_plot(df, sample_id, output_name, kit, sameyaxis=False, filters=False, at=True):
     sample_df = df[df["SampleID"] == sample_id].copy()
     conditions = [
         sample_df["allele_type"].str.contains("Typed"),
@@ -389,12 +346,26 @@ def make_plot(df, sample_id, sameyaxis=False, filters=False, at=True):
     increase_value = int(math.ceil((max_yvalue / 5) / n)) * n
     fig = plt.figure(figsize=(30, 30))
     n = 0
-    for marker in sample_df["Locus"].unique():
-        if marker in strs or marker in ystrs:
-            n += 1
-            colors = {"Typed": "green", "Stutter": "blue", "BelowAT": "red", "Deleted": "purple"}
-            marker_df = sample_df[sample_df["Locus"] == marker].sort_values(by="CE_Allele")
-            ax = fig.add_subplot(6, 5, n)
+    if kit == "powerseq":
+        str_list = (
+            str_lists["powerseq_ystrs"] if "sexloci" in output_name else str_lists["powerseq_strs"]
+        )
+    else:
+        str_list = (
+            str_lists["forenseq_ystrs"] if "sexloci" in output_name else str_lists["forenseq_strs"]
+        )
+    for marker in str_list:
+        n += 1
+        colors = {"Typed": "green", "Stutter": "blue", "BelowAT": "red", "Deleted": "purple"}
+        marker_df = sample_df[sample_df["Locus"] == marker].sort_values(by="CE_Allele")
+        ax = fig.add_subplot(6, 5, n)
+        if not marker_df.empty:
+            if marker == "AMELOGENIN":
+                for i, row in marker_df.iterrows():
+                    marker_df.loc[i, "CE_Allele"] = (
+                        0 if marker_df.loc[i, "CE_Allele"] == "X" else 1
+                    )
+            marker_df["CE_Allele"] = marker_df["CE_Allele"].astype(float)
             p = ax.bar(
                 marker_df["CE_Allele"],
                 marker_df["Reads"],
@@ -407,15 +378,23 @@ def make_plot(df, sample_id, sameyaxis=False, filters=False, at=True):
                 ax.text(round(min(marker_df["CE_Allele"])) - 0.9, at + (at * 0.1), f"AT", size=12)
             labels = marker_df["Type"].unique()
             handles = [plt.Rectangle((0, 0), 1, 1, color=colors[l]) for l in labels]
+            if marker == "AMELOGENIN":
+                plt.xlim(-1, 2)
+                ax.set_xticks(np.arange(-1, 3, 1))
+                labels_x = ["", "X", "Y", ""]
+                ax.set_xticklabels(labels_x)
             if not filters:
                 plt.legend(handles, labels, title="Allele Type")
             else:
                 for i, row in marker_df.iterrows():
-                    marker_df.loc[i, "Label"] = (
-                        str(int(marker_df.loc[i, "CE_Allele"]))
-                        if ".0" in str(marker_df.loc[i, "CE_Allele"])
-                        else str(marker_df.loc[i, "CE_Allele"])
-                    )
+                    if marker == "AMELOGENIN":
+                        marker_df.loc[i, "Label"] = "X" if row["CE_Allele"] == 0 else "Y"
+                    else:
+                        marker_df.loc[i, "Label"] = (
+                            str(int(row["CE_Allele"]))
+                            if ".0" in str(row["CE_Allele"])
+                            else str(row["CE_Allele"])
+                        )
                 ax.bar_label(p, labels=marker_df["Label"])
             if sameyaxis:
                 plt.ylim(0, max_yvalue)
@@ -427,7 +406,7 @@ def make_plot(df, sample_id, sameyaxis=False, filters=False, at=True):
                     1.0,
                 )
             )
-            ax.title.set_text(marker)
+        ax.title.set_text(marker)
     if sameyaxis:
         title = "Marker Plots for All Alleles With Same Y-Axis Scale"
     elif filters:
@@ -460,6 +439,7 @@ def process_input(
     profile_type,
     data_type,
     output_type,
+    kit,
     strand="forward",
     nofiltering=False,
     separate=False,
@@ -480,18 +460,20 @@ def process_input(
         )
     if nofiltering:
         full_df["allele_type"] = "Typed"
-        marker_plots(full_df, input_name, sex)
+        marker_plots(full_df, input_name, kit)
         if output_type == "efm" or output_type == "mpsproto":
-            EFM_output(full_df, outpath, profile_type, data_type, brack_col, sex, separate)
+            EFM_output(full_df, outpath, profile_type, data_type, brack_col, sex, kit, separate)
         else:
             STRmix_output(full_df, outpath, profile_type, data_type, seq_col)
     else:
         dict_loc = {k: v for k, v in full_df.groupby(["SampleID", "Locus"])}
-        final_df, flags_df = process_strs(dict_loc, data_type, seq_col, brack_col)
+        final_df, flags_df = process_strs(dict_loc, data_type, seq_col, brack_col, kit)
         if final_df is not None:
-            marker_plots(final_df, input_name, sex)
+            marker_plots(final_df, input_name, kit)
             if output_type == "efm" or output_type == "mpsproto":
-                EFM_output(final_df, outpath, profile_type, data_type, brack_col, sex, separate)
+                EFM_output(
+                    final_df, outpath, profile_type, data_type, brack_col, sex, kit, separate
+                )
             else:
                 STRmix_output(final_df, outpath, profile_type, data_type, seq_col)
             if info:
@@ -515,6 +497,7 @@ def main(
     strand,
     custom,
     sex,
+    kit,
 ):
     input = str(input)
     if profile_type not in ("evidence", "reference"):
@@ -534,6 +517,7 @@ def main(
             profile_type,
             data_type,
             output_type,
+            kit,
             strand=strand,
             nofiltering=nofilters,
             separate=separate,
@@ -549,6 +533,7 @@ def main(
         profile_type,
         data_type,
         output_type,
+        kit,
         strand=strand,
         nofiltering=nofilters,
         separate=separate,
@@ -571,4 +556,5 @@ if __name__ == "__main__":
         strand=snakemake.params.strand,
         custom=snakemake.params.custom,
         sex=snakemake.params.sex,
+        kit=snakemake.params.kit,
     )
