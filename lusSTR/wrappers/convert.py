@@ -70,13 +70,10 @@ def format_table(input, software, kit="forenseq", custom=False):
                 remove_5p = remove_5p - metadata["Custom_5"]
             if metadata["Custom_3"] < 0:
                 remove_3p = remove_3p - metadata["Custom_3"]
-        if (
-            len(sequence) <= (remove_5p + remove_3p + len(metadata["LUS"]))
-            and software != "uas"
-            and locus != "AMELOGENIN"
-        ) or (
-            software != "uas" and locus == "AMELOGENIN" and len(sequence) < (remove_5p + remove_3p)
-        ):
+        locus_min_length = remove_5p + remove_3p + len(metadata["LUS"])
+        if locus == "AMELOGENIN":
+            locus_min_length -= 1
+        if software != "uas" and len(sequence) < locus_min_length:
             flank_summary = [
                 sampleid,
                 project,
