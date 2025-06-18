@@ -1,5 +1,6 @@
 include versioneer.py
 include lusSTR/_version.py
+include lusSTR/cli/logo.png
 include lusSTR/data/*
 include lusSTR/tests/data/*
 include lusSTR/workflows/*
