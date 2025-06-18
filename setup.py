@@ -23,6 +23,7 @@ setup(
     packages=["lusSTR", "lusSTR.cli", "lusSTR.tests"],
     package_data={
         "lusSTR": [
+            "lusSTR/cli/logo.png",
             "lusSTR/data/*",
             "lusSTR/tests/data/*",
             "lusSTR/tests/data/STRait_Razor_test_output/*",
