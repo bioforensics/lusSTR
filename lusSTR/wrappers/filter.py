@@ -313,39 +313,40 @@ def format_ref_table(new_rows, sample_data, datatype):
     return sort_df
 
 
-def marker_plots(df, output_name, kit, wd="."):
+def marker_plots(df, output_name, kit, sample_list, wd="."):
     Path(f"{wd}/MarkerPlots").mkdir(parents=True, exist_ok=True)
     filt_df = df[df["allele_type"] == "Typed"]
-    for sample_id in df["SampleID"].unique():
-        if df[df["SampleID"] == sample_id].empty:
-            print(f"{sample_id} does not have any reads passing filter. Skipping to next sample.")
-        else:
-            with PdfPages(f"{wd}/MarkerPlots/{output_name}_{sample_id}_marker_plots.pdf") as pdf:
-                if not filt_df[filt_df["SampleID"] == sample_id].empty:
-                    make_plot(filt_df, sample_id, output_name, kit, filters=True, at=False)
-                    pdf.savefig()
-                make_plot(df, sample_id, output_name, kit)
+    for sample_id in sample_list:
+        # if df[df["SampleID"] == sample_id].empty:
+        #    print(f"{sample_id} does not have any reads passing filter. Skipping to next sample.")
+        # else:
+        with PdfPages(f"{wd}/MarkerPlots/{output_name}_{sample_id}_marker_plots.pdf") as pdf:
+            if not filt_df[filt_df["SampleID"] == sample_id].empty:
+                make_plot(filt_df, sample_id, output_name, kit, filters=True, at=False)
                 pdf.savefig()
-                make_plot(df, sample_id, output_name, kit, sameyaxis=True)
-                pdf.savefig()
+            make_plot(df, sample_id, output_name, kit)
+            pdf.savefig()
+            make_plot(df, sample_id, output_name, kit, sameyaxis=True)
+            pdf.savefig()
 
 
 def make_plot(df, sample_id, output_name, kit, sameyaxis=False, filters=False, at=True):
     sample_df = df[df["SampleID"] == sample_id].copy()
-    conditions = [
-        sample_df["allele_type"].str.contains("Typed"),
-        sample_df["allele_type"].str.contains("BelowAT"),
-        sample_df["allele_type"].str.contains("stutter"),
-        sample_df["allele_type"].str.contains("Deleted"),
-    ]
-    values = ["Typed", "BelowAT", "Stutter", "Deleted"]
-    sample_df.loc[:, "Type"] = np.select(conditions, values)
-    max_reads = max(sample_df["Reads"])
-    n = 100 if max_reads > 1000 else 10
-    max_yvalue = (int(math.ceil(max_reads / n)) * n) + n
-    increase_value = int(math.ceil((max_yvalue / 5) / n)) * n
+    plot_loc = 0
     fig = plt.figure(figsize=(30, 30))
-    n = 0
+    if not sample_df.empty:
+        conditions = [
+            sample_df["allele_type"].str.contains("Typed"),
+            sample_df["allele_type"].str.contains("BelowAT"),
+            sample_df["allele_type"].str.contains("stutter"),
+            sample_df["allele_type"].str.contains("Deleted"),
+        ]
+        values = ["Typed", "BelowAT", "Stutter", "Deleted"]
+        sample_df.loc[:, "Type"] = np.select(conditions, values)
+        max_reads = max(sample_df["Reads"])
+        n = 100 if max_reads > 1000 else 10
+        max_yvalue = (int(math.ceil(max_reads / n)) * n) + n
+        increase_value = int(math.ceil((max_yvalue / 5) / n)) * n
     if kit == "powerseq":
         str_list = (
             str_lists["powerseq_ystrs"] if "sexloci" in output_name else str_lists["powerseq_strs"]
@@ -355,10 +356,10 @@ def make_plot(df, sample_id, output_name, kit, sameyaxis=False, filters=False, a
             str_lists["forenseq_ystrs"] if "sexloci" in output_name else str_lists["forenseq_strs"]
         )
     for marker in str_list:
-        n += 1
+        plot_loc += 1
         colors = {"Typed": "green", "Stutter": "blue", "BelowAT": "red", "Deleted": "purple"}
         marker_df = sample_df[sample_df["Locus"] == marker].sort_values(by="CE_Allele")
-        ax = fig.add_subplot(6, 5, n)
+        ax = fig.add_subplot(6, 5, plot_loc)
         if not marker_df.empty:
             if marker == "AMELOGENIN":
                 for i, row in marker_df.iterrows():
@@ -448,6 +449,7 @@ def process_input(
     info=True,
 ):
     full_df = pd.read_csv(f"{input_name}.txt", sep="\t")
+    sample_list = full_df["SampleID"].unique()
     if custom:
         seq_col = "Custom_Range_Sequence"
         brack_col = "Custom_Bracketed_Notation"
@@ -460,7 +462,7 @@ def process_input(
         )
     if nofiltering:
         full_df["allele_type"] = "Typed"
-        marker_plots(full_df, input_name, kit)
+        marker_plots(full_df, input_name, kit, sample_list)
         if output_type == "efm" or output_type == "mpsproto":
             EFM_output(full_df, outpath, profile_type, data_type, brack_col, sex, kit, separate)
         else:
@@ -469,7 +471,7 @@ def process_input(
         dict_loc = {k: v for k, v in full_df.groupby(["SampleID", "Locus"])}
         final_df, flags_df = process_strs(dict_loc, data_type, seq_col, brack_col, kit)
         if final_df is not None:
-            marker_plots(final_df, input_name, kit)
+            marker_plots(final_df, input_name, kit, sample_list)
             if output_type == "efm" or output_type == "mpsproto":
                 EFM_output(
                     final_df, outpath, profile_type, data_type, brack_col, sex, kit, separate
