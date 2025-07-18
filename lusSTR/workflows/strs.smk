@@ -74,13 +74,24 @@ def parse_sample_details(filename):
 def create_log(log):
     now = datetime.now()
     dt = now.strftime("%m%d%Y_%H_%M_%S")
-    shell("mkdir -p logs/{dt}/input/")
-    shell("cp '{log}' logs/{dt}/")
-    if os.path.isdir(input_name):
-        shell("cp '{input_name}'/*.* logs/{dt}/input/")
+    system = os.name
+    if system == "nt":
+        shell("md logs\\{dt}\\Input\\")
+        shell('copy "{log}" logs\\{dt}\\')
+        shell("copy config.yaml logs\\{dt}\\")
+        new_file = input_name.replace("/", "\\")
+        if os.path.isdir(input_name):
+            shell('xcopy "{new_file}" logs\\{dt}\\Input')
+        else:
+            shell('copy "{new_file}" logs\\{dt}\\Input\\')
     else:
-        shell("cp '{input_name}' logs/{dt}/input/")
-    shell("cp config.yaml logs/{dt}/")
+        shell("mkdir -p logs/{dt}/input/")
+        shell("cp '{log}' logs/{dt}/")
+        if os.path.isdir(input_name):
+            shell("cp '{input_name}'/*.* logs/{dt}/input/")
+        else:
+            shell("cp '{input_name}' logs/{dt}/input/")
+        shell("cp config.yaml logs/{dt}/")
 
 
 def get_output():
@@ -103,9 +114,9 @@ rule all:
         expand("{name}.csv", name=output_name),
         expand("{name}.txt", name=output_name),
         expand(
-            "{outdir}/{samplename}_{prof_t}_{data_t}.csv", outdir=output_name,
+            "MarkerPlots/{output_name}_{samplename}_marker_plots.pdf", output_name=get_markerplot_name(output_name, config["custom_ranges"]), 
             samplename=get_sample_IDs(input_name, config["analysis_software"], output_name, software, 
-            separate), prof_t=prof, data_t=data
+            separate)
         )
 
 
@@ -141,7 +152,7 @@ rule filter:
         rules.convert.output
     output:
         expand(
-            "MarkerPlots/{output_name}_{samplename}_marker_plots.pdf", output_name=get_markerplot_name(config["output"], config["custom_ranges"]), 
+            "MarkerPlots/{output_name}_{samplename}_marker_plots.pdf", output_name=get_markerplot_name(output_name, config["custom_ranges"]), 
             samplename=get_sample_IDs(input_name, config["analysis_software"], output_name, software, 
             separate)
         )
