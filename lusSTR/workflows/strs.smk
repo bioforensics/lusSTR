@@ -6,6 +6,7 @@ import os
 import pandas as pd
 from pathlib import Path
 import re
+import shutil
 
 
 configfile: "config.yaml"
@@ -74,24 +75,17 @@ def parse_sample_details(filename):
 def create_log(log):
     now = datetime.now()
     dt = now.strftime("%m%d%Y_%H_%M_%S")
-    system = os.name
-    if system == "nt":
-        shell("md logs\\{dt}\\Input\\")
-        shell('copy "{log}" logs\\{dt}\\')
-        shell("copy config.yaml logs\\{dt}\\")
-        new_file = input_name.replace("/", "\\")
-        if os.path.isdir(input_name):
-            shell('xcopy "{new_file}" logs\\{dt}\\Input')
-        else:
-            shell('copy "{new_file}" logs\\{dt}\\Input\\')
+    input_name = Path(config["samp_input"])
+    dtdir = Path("logs") / dt
+    logdir = dtdir / "input"
+    logdir.mkdir(parents=True, exist_ok=True)
+    shutil.copy(log, dtdir / "snakemake.log")
+    if input_name.is_dir():
+        for path in input_name.glob("*.*"):
+            shutil.copy(path, logdir / path.name)
     else:
-        shell("mkdir -p logs/{dt}/input/")
-        shell("cp '{log}' logs/{dt}/")
-        if os.path.isdir(input_name):
-            shell("cp '{input_name}'/*.* logs/{dt}/input/")
-        else:
-            shell("cp '{input_name}' logs/{dt}/input/")
-        shell("cp config.yaml logs/{dt}/")
+        shutil.copy(input_name, logdir / input_name.name)
+    shutil.copy("config.yaml", dtdir / "config.yaml")
 
 
 def get_output():
