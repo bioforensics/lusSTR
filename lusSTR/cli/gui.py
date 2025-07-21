@@ -208,11 +208,6 @@ def interactive_plots_allmarkers(sample_df, flagged_df):
         col = cols[n]
         container = col.container(border=True)
         sample_locus = sample_df["SampleID"].unique() + "_" + marker
-        #sample_df = np.where(
-        #    sample_df["Locus"] == "AMELOGENIN",
-        #    np.where(sample_df["CE_Allele"] == "X", "0.0", "1.0"),
-        #    sample_df["CE_Allele"],
-        #)
         for i, row in sample_df.iterrows():
             if row["Locus"] == "AMELOGENIN":
                 sample_df.loc[i, "CE_Allele"] = 0 if row.CE_Allele == "X" else 1
@@ -336,11 +331,6 @@ def interactive_setup(df1, file):
         interactive_plots_allmarkers(sample_df, flags)
     else:
         plot_df = sample_df
-        #sample_df = np.where(
-        #    sample_df["Locus"] == "AMELOGENIN",
-        #    np.where(sample_df["CE_Allele"] == "X", 0, 1),
-        #    sample_df["CE_Allele"],
-        #)
         for i, row in sample_df.iterrows():
             if row["Locus"] == "AMELOGENIN":
                 sample_df.loc[i, "CE_Allele"] = 0 if row.CE_Allele == "X" else 1

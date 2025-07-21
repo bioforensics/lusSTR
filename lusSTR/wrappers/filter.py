@@ -317,9 +317,6 @@ def marker_plots(df, output_name, kit, sample_list, wd="."):
     Path(f"{wd}/MarkerPlots").mkdir(parents=True, exist_ok=True)
     filt_df = df[df["allele_type"] == "Typed"]
     for sample_id in sample_list:
-        # if df[df["SampleID"] == sample_id].empty:
-        #    print(f"{sample_id} does not have any reads passing filter. Skipping to next sample.")
-        # else:
         with PdfPages(f"{wd}/MarkerPlots/{output_name}_{sample_id}_marker_plots.pdf") as pdf:
             if not filt_df[filt_df["SampleID"] == sample_id].empty:
                 make_plot(filt_df, sample_id, output_name, kit, filters=True, at=False)
