@@ -6,6 +6,7 @@ import os
 import pandas as pd
 from pathlib import Path
 import re
+import shutil
 
 
 configfile: "config.yaml"
@@ -21,9 +22,7 @@ custom = config["custom_ranges"]
 def get_sample_IDs(input, a_software, output, software, separate):
     convert_out = f"{output}.txt"
     format_out = f"{output}.csv"
-    if (software == "efm" or software == "mpsproto") and separate is False:
-        ID_list = os.path.basename(output)
-    elif os.path.exists(convert_out):
+    if os.path.exists(convert_out):
         ID_list = get_existing_IDs(convert_out, "\t")
     elif os.path.exists(format_out):
         ID_list = get_existing_IDs(format_out, ",")
@@ -76,13 +75,17 @@ def parse_sample_details(filename):
 def create_log(log):
     now = datetime.now()
     dt = now.strftime("%m%d%Y_%H_%M_%S")
-    shell("mkdir -p logs/{dt}/input/")
-    shell("cp '{log}' logs/{dt}/")
-    if os.path.isdir(input_name):
-        shell("cp '{input_name}'/*.* logs/{dt}/input/")
+    input_name = Path(config["samp_input"])
+    dtdir = Path("logs") / dt
+    logdir = dtdir / "input"
+    logdir.mkdir(parents=True, exist_ok=True)
+    shutil.copy(log, dtdir / "snakemake.log")
+    if input_name.is_dir():
+        for path in input_name.glob("*.*"):
+            shutil.copy(path, logdir / path.name)
     else:
-        shell("cp '{input_name}' logs/{dt}/input/")
-    shell("cp config.yaml logs/{dt}/")
+        shutil.copy(input_name, logdir / input_name.name)
+    shutil.copy("config.yaml", dtdir / "config.yaml")
 
 
 def get_output():
@@ -93,14 +96,21 @@ def get_output():
     return outname
 
 
+def get_markerplot_name(output, custom):
+    if custom:
+        return f"{output}_custom_range"
+    else:
+        return output
+
+
 rule all:
     input:
         expand("{name}.csv", name=output_name),
         expand("{name}.txt", name=output_name),
         expand(
-            "{outdir}/{samplename}_{prof_t}_{data_t}.csv", outdir=output_name,
+            "MarkerPlots/{output_name}_{samplename}_marker_plots.pdf", output_name=get_markerplot_name(output_name, config["custom_ranges"]), 
             samplename=get_sample_IDs(input_name, config["analysis_software"], output_name, software, 
-            separate), prof_t=prof, data_t=data
+            separate)
         )
 
 
@@ -136,9 +146,9 @@ rule filter:
         rules.convert.output
     output:
         expand(
-            "{outdir}/{samplename}_{prof_t}_{data_t}.csv", outdir=output_name,
+            "MarkerPlots/{output_name}_{samplename}_marker_plots.pdf", output_name=get_markerplot_name(output_name, config["custom_ranges"]), 
             samplename=get_sample_IDs(input_name, config["analysis_software"], output_name, software, 
-            separate), prof_t=prof, data_t=data
+            separate)
         )
     params:
         output_type=config["output_type"],

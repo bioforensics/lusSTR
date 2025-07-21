@@ -24,7 +24,6 @@ from pathlib import Path
 import plotly.express as px
 import plotly.graph_objs as go
 import streamlit as st
-from streamlit_option_menu import option_menu
 import yaml
 import subprocess
 import os
@@ -126,28 +125,21 @@ def main():
 
     # Creating Navigation Bar
 
-    selected = option_menu(
-        menu_title=None,
-        options=["Home", "STRs", "SNPs", "How to Use", "Contact"],
-        icons=["house", "gear", "gear-fill", "book", "envelope"],
-        menu_icon="cast",
-        default_index=0,
-        orientation="horizontal",
-    )
+    tab1, tab2, tab3, tab4, tab5 = st.tabs(["Home", "STRs", "SNPs", "How To Use", "Contact"])
 
-    if selected == "Home":
+    with tab1:
         show_home_page()
 
-    elif selected == "STRs":
+    with tab2:
         show_STR_page()
 
-    elif selected == "SNPs":
+    with tab3:
         show_SNP_page()
 
-    elif selected == "How to Use":
+    with tab4:
         show_how_to_use_page()
 
-    elif selected == "Contact":
+    with tab5:
         show_contact_page()
 
 
@@ -216,11 +208,9 @@ def interactive_plots_allmarkers(sample_df, flagged_df):
         col = cols[n]
         container = col.container(border=True)
         sample_locus = sample_df["SampleID"].unique() + "_" + marker
-        sample_df = np.where(
-            sample_df["Locus"] == "AMELOGENIN",
-            np.where(sample_df["CE_Allele"] == "X", 0, 1),
-            sample_df["CE_Allele"],
-        )
+        for i, row in sample_df.iterrows():
+            if row["Locus"] == "AMELOGENIN":
+                sample_df.loc[i, "CE_Allele"] = 0 if row.CE_Allele == "X" else 1
         sample_df["CE_Allele"] = pd.to_numeric(sample_df["CE_Allele"])
         marker_df = sample_df[sample_df["Locus"] == marker].sort_values(
             by=["CE_Allele", "allele_type"], ascending=[False, True]
@@ -341,11 +331,9 @@ def interactive_setup(df1, file):
         interactive_plots_allmarkers(sample_df, flags)
     else:
         plot_df = sample_df
-        sample_df = np.where(
-            sample_df["Locus"] == "AMELOGENIN",
-            np.where(sample_df["CE_Allele"] == "X", 0, 1),
-            sample_df["CE_Allele"],
-        )
+        for i, row in sample_df.iterrows():
+            if row["Locus"] == "AMELOGENIN":
+                sample_df.loc[i, "CE_Allele"] = 0 if row.CE_Allele == "X" else 1
         plot_df["CE_Allele"] = pd.to_numeric(plot_df["CE_Allele"])
         locus_key = f"{sample}_{locus}"
         if locus_key not in st.session_state:
@@ -825,7 +813,7 @@ def show_SNP_page():
         "Multiple Input Files"
     )
     input_option = st.radio(
-        "Select Input Option:", ("Individual File", "Folder with Multiple Files")
+        "Select Input Option:", ("Individual File", "Folder with Multiple Files"), key="snps"
     )
 
     # Initialize session state if not already initialized
@@ -850,7 +838,7 @@ def show_SNP_page():
 
     # Display The Selected Path
     if st.session_state.samp_input:
-        st.text_input("Location Of Your Input File(s):", st.session_state.samp_input)
+        st.text_input("Location Of Your Input File(s):", st.session_state.samp_input, key="input_snps")
 
     # Store Selected Path to Reference in Config
     samp_input = st.session_state.samp_input
@@ -965,7 +953,7 @@ def show_SNP_page():
 
     # Display selected path
     if st.session_state.wd_dirname:
-        st.text_input("Your Specified Output Folder:", st.session_state.wd_dirname)
+        st.text_input("Your Specified Output Folder:", st.session_state.wd_dirname, key="output_snps")
 
     #####################################################################
     #     SNP: Generate Config File Based on Settings                   #
