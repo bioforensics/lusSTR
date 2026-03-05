@@ -183,19 +183,23 @@ def process_kin(input, nofilter):
     sheet_names = ["Ancestry SNPs", "Phenotype SNPs", "Identity SNPs", "Kinship SNPs"]
     data_filt = pd.DataFrame()
     uas_version = determine_version(file)
+    print(uas_version)
     for sheet in sheet_names:
-        file_sheet = file[sheet]
-        table = pd.DataFrame(file_sheet.values)
-        if uas_version == "2.5.0":
-            data = process_v5(table)
-        else:
-            data = process_v0(table)
-        data = data[["Locus", "Reads", "Allele Name", "Typed Allele?"]]
-        if nofilter:
-            data_typed = data
-        else:
-            data_typed = data[data["Typed Allele?"] == "Yes"]
-        data_filt = pd.concat([data_filt, data_typed]).reset_index(drop=True)
+        try:
+            file_sheet = file[sheet]
+            table = pd.DataFrame(file_sheet.values)
+            if uas_version == "2.7.0" or uas_version == "2.5.0":
+                data = process_v5(table)
+            else:
+                data = process_v0(table)
+            data = data[["Locus", "Reads", "Allele Name", "Typed Allele?"]]
+            if nofilter:
+                data_typed = data
+            else:
+                data_typed = data[data["Typed Allele?"] == "Yes"]
+            data_filt = pd.concat([data_filt, data_typed]).reset_index(drop=True)
+        except KeyError:
+            pass
     sampid = table.iloc[2, 1]
     projid = table.iloc[3, 1]
     analyid = table.iloc[4, 1]
