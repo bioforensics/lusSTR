@@ -31,7 +31,7 @@ def uas_load(inpath, sexloci=False):
         sex_strs = pd.DataFrame() if sexloci is True else None
         files = glob.glob(os.path.join(inpath, "[!~]*.xlsx"))
         for filename in sorted(files):
-            if "Sample Details" not in filename:
+            if "Sample" not in filename:
                 continue
             autodata, sexdata = uas_format(filename, sexloci)
             auto_strs = pd.concat([auto_strs, autodata])
@@ -42,13 +42,46 @@ def uas_load(inpath, sexloci=False):
     return auto_strs, sex_strs
 
 
-def parse_str_table_from_sheet(infile, sheet, exclude=None):
-    file = openpyxl.load_workbook(infile)
-    file_sheet = file[sheet]
+def determine_version(file):
+    file_sheet = file["Settings"]
     table = pd.DataFrame(file_sheet.values)
+    try:
+        version = table.loc[table[0] == "Software Version", 1].iloc[0]
+    except IndexError:
+        version = "1"
+    return version
+
+
+def process_v1(table):
     offset = table[table.iloc[:, 0] == "Coverage Information"].index.tolist()[0]
     data = table.iloc[offset + 2 :]
     data.columns = table.iloc[offset + 1]
+    return data
+
+
+def process_v2(table):
+    offset = table[table.iloc[:, 4] == "Locus"].index.tolist()[0]
+    data = table.iloc[offset + 1 :, 4:10]
+    data.columns = [
+        "Locus",
+        "Allele Name",
+        "Typed Allele?",
+        "Reads",
+        "Bracketed Sequence",
+        "Repeat Sequence",
+    ]
+    return data
+
+
+def parse_str_table_from_sheet(infile, sheet, exclude=None):
+    file = openpyxl.load_workbook(infile)
+    uas_version = determine_version(file)
+    file_sheet = file[sheet]
+    table = pd.DataFrame(file_sheet.values)
+    if uas_version.startswith("2"):
+        data = process_v2(table)
+    else:
+        data = process_v1(table)
     if exclude is not None:
         data = data[~data.Locus.isin(exclude)]
     data = data[["Locus", "Reads", "Repeat Sequence"]]

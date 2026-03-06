@@ -183,7 +183,6 @@ def process_kin(input, nofilter):
     sheet_names = ["Ancestry SNPs", "Phenotype SNPs", "Identity SNPs", "Kinship SNPs"]
     data_filt = pd.DataFrame()
     uas_version = determine_version(file)
-    print(uas_version)
     for sheet in sheet_names:
         try:
             file_sheet = file[sheet]
