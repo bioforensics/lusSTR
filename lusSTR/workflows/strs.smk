@@ -81,7 +81,8 @@ def create_log(log):
     logdir.mkdir(parents=True, exist_ok=True)
     shutil.copy(log, dtdir / "snakemake.log")
     if input_name.is_dir():
-        for path in input_name.glob("*.*"):
+        ext = "*.xlsx" if config["analysis_software"] == "uas" else "*.txt"
+        for path in input_name.glob(ext):
             shutil.copy(path, logdir / path.name)
     else:
         shutil.copy(input_name, logdir / input_name.name)
