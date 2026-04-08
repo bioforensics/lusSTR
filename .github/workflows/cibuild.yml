@@ -4,13 +4,11 @@ on: [push]
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
     strategy:
       max-parallel: 4
       matrix:
         python-version: ["3.10", "3.11"]
-
     steps:
     - uses: actions/checkout@v1
     - name: Set up Python ${{ matrix.python-version }}
@@ -19,8 +17,7 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - name: Install
       run: |
-        pip install --upgrade pip pytest pytest-cov black==22.6
-        pip install .
+        pip install .[dev,test]
     - name: Style check
       run: make style
     - name: Test with pytest
