@@ -4,19 +4,31 @@ version = "0.11"
 description = "lusSTR: tool to translate forensic STR sequences into interpretable formats"
 readme = "README.md"
 requires-python = ">=3.10"
-dependencies = [
-    "pandas>=1.0,<2.0",
-    "openpyxl>=3.0.6",
-    "pyyaml>=6.0",
-    "matplotlib>=3.8",
-    "numpy==1.26.4",
-    "streamlit>=1.31.0",
-    "streamlit_option_menu>=0.3.12",
-    "plotly==5.24.1"
-]
 authors = [
     {name = "Rebecca Mitchell", email = "rebecca.mitchell@st.dhs.gov"},
     {name = "Daniel Standage", email = "daniel.standage@st.dhs.gov"}
+]
+dependencies = [
+    "matplotlib>=3.8",
+    "numpy==1.26.4",
+    "openpyxl>=3.0.6",
+    "pandas>=1.0,<2.0",
+    "plotly==5.24.1"
+    "pyyaml>=6.0",
+    "snakemake>=7.22,<8.0",
+    "streamlit>=1.31.0",
+    "streamlit_option_menu>=0.3.12",
+]
+
+[project.optional-dependencies]
+dev = [
+    "black==24.10",
+    "build",
+    "snakefmt==0.10",
+]
+test = [
+    "pytest",
+    "pytest-cov",
 ]
 
 
