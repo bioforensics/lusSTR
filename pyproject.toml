@@ -22,7 +22,7 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = [
-    "black==24.10",
+    "black==22.6",
     "build",
     "snakefmt==0.10",
 ]
