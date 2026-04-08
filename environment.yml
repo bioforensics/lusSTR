@@ -1,4 +1,4 @@
-name: yeat
+name: lusstr
 channels:
     - conda-forge
     - bioconda
