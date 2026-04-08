@@ -7,6 +7,8 @@ from lusSTR.cli import config
 from lusSTR.cli import strs
 from lusSTR.cli import snps
 from lusSTR.cli import gui
+from importlib.metadata import version
+
 
 mains = {"config": config.main, "strs": strs.main, "snps": snps.main, "gui": gui.main}
 
@@ -36,7 +38,7 @@ def main(args=None):
 def get_parser():
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        "-v", "--version", action="version", version="lusSTR v" + lusSTR.__version__
+        "-v", "--version", action="version", version=f"lusSTR {version('lusstr')}" 
     )
     subcommandstr = ", ".join(sorted(subparser_funcs.keys()))
     subparsers = parser.add_subparsers(dest="subcmd", metavar="subcmd", help=subcommandstr)

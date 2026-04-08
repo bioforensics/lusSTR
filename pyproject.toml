@@ -1,0 +1,40 @@
+[project]
+name = "lusstr"
+version = "0.11"
+description = "lusSTR: tool to translate forensic STR sequences into interpretable formats"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "pandas>=1.0,<2.0",
+    "openpyxl>=3.0.6",
+    "pyyaml>=6.0",
+    "matplotlib>=3.8",
+    "numpy==1.26.4",
+    "streamlit>=1.31.0",
+    "streamlit_option_menu>=0.3.12",
+    "plotly==5.24.1"
+]
+authors = [
+    {name = "Rebecca Mitchell", email = "rebecca.mitchell@st.dhs.gov"},
+    {name = "Daniel Standage", email = "daniel.standage@st.dhs.gov"}
+]
+
+
+[project.scripts]
+lusstr = "lusSTR.cli:main"
+
+[build-system]
+requires = ["setuptools", "setuptools-scm"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+include-package-data = true
+script-files = [
+    "lusSTR/scripts/file_selector.py",
+    "lusSTR/scripts/filter_settings.py",
+    "lusSTR/scripts/folder_selector.py",
+    "lusSTR/scripts/marker.py",
+    "lusSTR/scripts/repeat.py"
+]
+
+
