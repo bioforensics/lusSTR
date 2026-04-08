@@ -10,7 +10,7 @@ test:
 
 ## style:     check code style
 style:
-	black --line-length=99 --check *.py lusSTR/scripts/*.py lusSTR/wrappers/*.py lusSTR/tests/test_*.py
+	black --line-length=99 --check lusSTR/scripts/*.py lusSTR/wrappers/*.py lusSTR/tests/test_*.py
 
 ## format:    auto-reformat code with Black
 format:
