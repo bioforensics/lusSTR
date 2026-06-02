@@ -340,7 +340,7 @@ def make_plot(df, sample_id, output_name, kit, sameyaxis=False, filters=False, a
             sample_df["allele_type"].str.contains("Deleted"),
         ]
         values = ["Typed", "BelowAT", "Stutter", "Deleted"]
-        sample_df.loc[:, "Type"] = np.select(conditions, values)
+        sample_df.loc[:, "Type"] = np.select(conditions, values, default="")
         max_reads = max(sample_df["Reads"])
         n = 100 if max_reads > 1000 else 10
         max_yvalue = (int(math.ceil(max_reads / n)) * n) + n
