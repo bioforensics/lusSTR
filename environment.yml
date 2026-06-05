@@ -1,7 +1,0 @@
-name: lusstr
-channels:
-    - conda-forge
-    - bioconda
-    - defaults
-dependencies:
-    - snakemake>=7.22,<8.0
