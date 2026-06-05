@@ -38,10 +38,10 @@ conda install -c bioconda lusstr
 ```
 Contributors/developers who want to create a dedicated environment on their machine can do so:
 ```
+conda create --name lusstr -y python=3.10
+conda activate lusstr
 git clone https://www.github.com/bioforensics/lusSTR.git
 cd lusSTR
-conda create --name lusstr python=3.10
-conda activate lusstr
 make devenv
 ```
 
