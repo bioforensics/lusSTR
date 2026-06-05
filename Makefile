@@ -10,15 +10,14 @@ test:
 
 ## style:     check code style
 style:
-	black --line-length=99 --check *.py lusSTR/scripts/*.py lusSTR/wrappers/*.py lusSTR/tests/test_*.py
+	black --line-length=99 --check lusSTR/scripts/*.py lusSTR/wrappers/*.py lusSTR/tests/test_*.py
 
 ## format:    auto-reformat code with Black
 format:
-	black --line-length=99 *.py lusSTR/cli/gui.py lusSTR/scripts/*.py lusSTR/wrappers/*.py lusSTR/tests/test_*.py
+	black --line-length=99 lusSTR/cli/gui.py lusSTR/scripts/*.py lusSTR/wrappers/*.py lusSTR/tests/test_*.py
 
 ## devenv:    configure a development environment
 devenv:
-	conda install black==22.6 pytest pytest-cov
-	pip install -e .
+	pip install -e .[dev,test]
 	echo 'make style' > .git/hooks/pre-commit
 	chmod 755 .git/hooks/pre-commit
