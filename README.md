@@ -40,7 +40,7 @@ Contributors/developers who want to create a dedicated environment on their mach
 ```
 git clone https://www.github.com/bioforensics/lusSTR.git
 cd lusSTR
-conda env create --name lusstr environment.yml
+conda create --name lusstr python=3.10
 conda activate lusstr
 make devenv
 ```

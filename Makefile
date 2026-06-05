@@ -18,7 +18,6 @@ format:
 
 ## devenv:    configure a development environment
 devenv:
-	conda install black==22.6 pytest pytest-cov
-	pip install -e .
+	pip install -e .[dev,test]
 	echo 'make style' > .git/hooks/pre-commit
 	chmod 755 .git/hooks/pre-commit
