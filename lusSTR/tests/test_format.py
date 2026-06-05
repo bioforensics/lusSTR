@@ -104,3 +104,15 @@ def test_uas_directory_with_xy(tmp_path):
     lusSTR.cli.main(lusSTR.cli.get_parser().parse_args(format_arglist))
     assert filecmp.cmp(exp_output_sex, obs_sex_output) is True
     assert filecmp.cmp(exp_output, obs_output) is True
+
+
+def test_uas_version2(tmp_path):
+    UAStestfile = data_file("2800M-2 Sample Report 2026_02_24_11_14_00.xlsx")
+    exp_output = data_file("uas_v2_format.csv")
+    obs_output = str(tmp_path / "lusstr_output.csv")
+    str_path = str(tmp_path)
+    config_arglist = ["config", "--input", str(UAStestfile), "-w", str_path]
+    lusSTR.cli.main(lusSTR.cli.get_parser().parse_args(config_arglist))
+    format_arglist = ["strs", "format", "-w", str_path]
+    lusSTR.cli.main(lusSTR.cli.get_parser().parse_args(format_arglist))
+    assert filecmp.cmp(exp_output, obs_output) is True

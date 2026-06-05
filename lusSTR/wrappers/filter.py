@@ -268,6 +268,7 @@ def strmix_ce_processing(profile):
 
 def reference_table(sample_data, datatype):
     new_rows = []
+    final_reference = pd.DataFrame()
     for i, row in sample_data.iterrows():
         locus = sample_data.loc[i, "Locus"]
         try:

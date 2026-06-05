@@ -184,9 +184,11 @@ def process_kin(input, nofilter):
     data_filt = pd.DataFrame()
     uas_version = determine_version(file)
     for sheet in sheet_names:
+        if sheet not in file:
+            continue
         file_sheet = file[sheet]
         table = pd.DataFrame(file_sheet.values)
-        if uas_version == "2.5.0":
+        if uas_version == "2.7.0" or uas_version == "2.5.0":
             data = process_v5(table)
         else:
             data = process_v0(table)
