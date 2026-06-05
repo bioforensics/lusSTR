@@ -838,7 +838,9 @@ def show_SNP_page():
 
     # Display The Selected Path
     if st.session_state.samp_input:
-        st.text_input("Location Of Your Input File(s):", st.session_state.samp_input, key="input_snps")
+        st.text_input(
+            "Location Of Your Input File(s):", st.session_state.samp_input, key="input_snps"
+        )
 
     # Store Selected Path to Reference in Config
     samp_input = st.session_state.samp_input
@@ -953,7 +955,9 @@ def show_SNP_page():
 
     # Display selected path
     if st.session_state.wd_dirname:
-        st.text_input("Your Specified Output Folder:", st.session_state.wd_dirname, key="output_snps")
+        st.text_input(
+            "Your Specified Output Folder:", st.session_state.wd_dirname, key="output_snps"
+        )
 
     #####################################################################
     #     SNP: Generate Config File Based on Settings                   #
